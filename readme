@@ -1,6 +1,25 @@
-on dash:
+Mini instructions:
 
-dash(pts/35):/my/dl/modified/mpd% src/mpd --no-daemon --verbose
+% buildout2.7
+
+% export LIGHT9_SHOW=path/to/light9/show/dance2011
+
+Edit $LIGHT9_SHOW/config.n3 to set :musicRoot and the values under sh:netHome 
+
+% bin/dmxserver --dummy
+(leave that shell)
+
+% bin/ascoltami2
+(leave that shell)
+
+Browse to http://localhost:8040/ to see the music player.
+
+% bin/curvecalc --reload http://light9.bigasterisk.com/show/dance2011/song16
+(gui opens)
+
+See bin/listsongs for a way to make zsh autocomplete on the last
+argument to bin/curvecalc
+
 
 
 --------------------------------

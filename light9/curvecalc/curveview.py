@@ -111,14 +111,7 @@ class Curveview(object):
         #            print ev.state
         #        self.bind("<KeyPress>",curs)
         #        self.bind("<KeyRelease-Control_L>",lambda ev: curs(0))
-        
-        if 0:
-            for x in range(1, 6):
-                def add_kb_marker_point(evt, x=x):
-                    self.add_point((self.current_time(), (x - 1) / 4.0))
-
-                self.bind("<Key-%s>" % x, add_kb_marker_point)
-
+      
         # this binds on c-a-b1, etc
         if 0:
             self.regionzoom = RegionZoom(self, self.world_from_screen,
@@ -148,6 +141,7 @@ class Curveview(object):
         """
         if hasattr(self, 'widget'):
             self.widget.destroy()
+            self._time = -999
             print "rebuilding canvas"
 
         self.timelineLine = self.curveGroup = None
@@ -190,16 +184,16 @@ class Curveview(object):
         print "   %s on %s" % (event, w)
         
     def onFocusIn(self, *args):
-        print "focusin", args
         self.widget.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("red"))
 
     def onFocusOut(self, widget=None, event=None):
-        #if event:
-        #    import pdb;pdb.set_trace()
-        print "focusout now", event.get_state() if event else 0
+        self.widget.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray30"))
 
-    def onKeyPress(self, *args):
-        print "canvas key", args
+    def onKeyPress(self, widget, event):
+        print "canvas key", event
+        if event.string in '12345':
+            x = int(event.string)
+            self.add_point((self.current_time(), (x - 1) / 4.0))
 
     def onExpose(self, *args):
         if self.culled:
@@ -227,6 +221,9 @@ class Curveview(object):
             self.sketch_press(event)
         else:
             self.select_press(event)
+
+        # this stops some other handler that wants to unfocus 
+        return True
 
     def playPause(self):
         """
