@@ -62,8 +62,8 @@ class ZoomControl(object):
         else:
             self.maxtime = 0
 
-        self.start=0
-        self.end=20
+        self.start = 0
+        self.end = 250
 
         self.root = self.widget.get_root_item()
         self.leftbrack = goocanvas.Polyline(parent=self.root,

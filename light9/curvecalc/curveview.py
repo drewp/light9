@@ -71,6 +71,104 @@ class Sketch:
         self.curveview.update_curve()
         self.curveview.select_points(finalPoints)
 
+class SelectManip(object):
+    """
+    selection manipulator is created whenever you have a selection. It
+    draws itself on the canvas and edits the points when you drag
+    various parts
+    """
+    def __init__(self, parent, getSelectedIndices, getWorldPoint, getScreenPoint, getCanvasSize, setPoints, getWorldTime):
+        """parent goocanvas group"""
+        self.getSelectedIndices = getSelectedIndices
+        self.getWorldPoint = getWorldPoint
+        self.getScreenPoint = getScreenPoint
+        self.getCanvasSize = getCanvasSize
+        self.setPoints = setPoints
+        self.getWorldTime = getWorldTime
+        self.grp = goocanvas.Group(parent=parent)
+        
+        self.title = goocanvas.Text(parent=self.grp, text="selectmanip", x=10, y=10, fill_color='white', font="ubuntu 10")
+
+        self.bbox = goocanvas.Rect(parent=self.grp,
+                                   stroke_color='yellow',
+                                   fill_color_rgba=0xffff0030,
+                                   line_width=.7)
+
+        self.xTrans = goocanvas.Polyline(parent=self.grp, close_path=True,
+                                         fill_color_rgba=0xffffff88,
+                                         )
+        self.xTrans.connect("button-press-event", self.onXPress)
+        self.xTrans.connect("button-release-event", self.onXRelease)
+        self.xTrans.connect("motion-notify-event", self.onXMotion)
+        self.update()
+
+    def onXPress(self, item, target_item, event):
+        self.dragStartTime = self.getWorldTime(event.x)
+        self.origPoints = [self.getWorldPoint(i) for i in
+                           self.getSelectedIndices()]
+        return True
+
+    def onXMotion(self, item, target_item, event):
+        if hasattr(self, 'dragStartTime'):
+            dt = self.getWorldTime(event.x) - self.dragStartTime
+            self.setPoints(
+                (i, (orig[0] + dt, orig[1]))
+                for i, orig in zip(self.getSelectedIndices(), self.origPoints))
+            
+
+    def onXRelease(self, item, target_item, event):
+        del self.dragStartTime
+
+    def update(self):
+        """if the view or selection or selected point positions
+        change, call this to redo the layout of the manip"""
+        idxs = self.getSelectedIndices()
+        pts = [self.getScreenPoint(i) for i in idxs]
+        
+        b = self.bbox.props
+        b.x = min(p[0] for p in pts) - 5
+        b.y = min(p[1] for p in pts) - 5
+        margin = 10 if len(pts) > 1 else 0
+        b.width = max(p[0] for p in pts) - b.x + margin
+        b.height = min(max(p[1] for p in pts) - b.y + margin,
+                       self.getCanvasSize().height - b.y - 1)
+
+        b.visibility = goocanvas.ITEM_VISIBLE if len(pts) > 1 else goocanvas.ITEM_HIDDEN
+
+        self.title.props.text = "%s %s selected" % (
+            len(idxs), "point" if len(idxs) == 1 else "points")
+
+        centerX = b.x + b.width / 2
+
+        midY = self.getCanvasSize().height / 2
+        x1 = centerX - 30
+        x2 = centerX - 20
+        x3 = centerX + 20
+        x4 = centerX + 30
+        y1 = midY - 10
+        y2 = midY - 5
+        y3 = midY + 5
+        y4 = midY + 10
+        shape = [
+            (x1, midY), # left tip
+            (x2, y1),
+            (x2, y2),
+            
+            (x3, y2),
+            (x3, y1),
+            (x4, midY), # right tip
+            (x3, y4),
+            (x3, y3),
+            
+            (x2, y3),
+            (x2, y4)
+            ]
+
+        self.xTrans.props.points = goocanvas.Points(shape)
+
+    def destroy(self):
+        self.grp.remove()
+
 class Curveview(object):
     """
     graphical curve widget only. Please pack .widget
@@ -79,10 +177,10 @@ class Curveview(object):
                  zoomControl=None):
         """knobEnabled=True highlights the previous key and ties it to a
         hardware knob"""
+        self.redrawsEnabled = False
 
         self.rebuild()
         
-        self.redrawsEnabled = False
         self.curve = curve
         self.knobEnabled = knobEnabled
         self._isMusic = isMusic
@@ -113,7 +211,7 @@ class Curveview(object):
         #        self.bind("<KeyRelease-Control_L>",lambda ev: curs(0))
       
         # this binds on c-a-b1, etc
-        if 0:
+        if 0: # unported
             self.regionzoom = RegionZoom(self, self.world_from_screen,
                                          self.screen_from_world)
 
@@ -122,17 +220,6 @@ class Curveview(object):
         self.dragging_dots = False
         self.selecting = False
         
-        if 0:
-            self.bind("<ButtonPress-1>",#"<Alt-Key>",
-                      self.select_press, add=True)
-            self.bind("<Motion>", self.select_motion, add=True)
-            self.bind("<ButtonRelease-1>", #"<Alt-KeyRelease>",
-                      self.select_release, add=True)
-
-            self.bind("<ButtonPress-1>", self.check_deselect, add=True)
-
-            self.bind("<Key-m>", lambda *args: self.curve.toggleMute())
-
     def rebuild(self):
         """
         sometimes after windows get resized, canvas gets stuck with a
@@ -144,7 +231,7 @@ class Curveview(object):
             self._time = -999
             print "rebuilding canvas"
 
-        self.timelineLine = self.curveGroup = None
+        self.timelineLine = self.curveGroup = self.selectManip = None
         self.widget = gtk.EventBox()
         self.widget.set_can_focus(True)
         self.widget.add_events(gtk.gdk.KEY_PRESS_MASK |
@@ -178,7 +265,7 @@ class Curveview(object):
 
         self.widget.connect("focus-in-event", self.onFocusIn)
         self.widget.connect("focus-out-event", self.onFocusOut)
-        self.widget.connect("event", self.onAny)
+        #self.widget.connect("event", self.onAny)
 
     def onAny(self, w, event):
         print "   %s on %s" % (event, w)
@@ -190,8 +277,7 @@ class Curveview(object):
         self.widget.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray30"))
 
     def onKeyPress(self, widget, event):
-        print "canvas key", event
-        if event.string in '12345':
+        if event.string in list('12345'):
             x = int(event.string)
             self.add_point((self.current_time(), (x - 1) / 4.0))
 
@@ -211,9 +297,7 @@ class Curveview(object):
         # really thick line would be a nice way to allow a sloppier
         # click
 
-        print "focus on", self.widget
         self.widget.grab_focus()
-        print "done grab"
         
         if event.get_state() & gtk.gdk.CONTROL_MASK:
             self.new_point_at_mouse(event)
@@ -276,13 +360,6 @@ class Curveview(object):
             print "%s: dragging_dots=%s selecting=%s" % (
                 msg, self.dragging_dots, self.selecting)
 
-    def check_deselect(self,ev):
-        try:
-            self.find_index_near(ev.x, ev.y)
-        except ValueError:
-            self.selected_points[:] = []
-            self.highlight_selected_dots()
-
     def select_points(self, pts):
         """set selection to the given point values (tuples, not indices)"""
         idxs = []
@@ -291,9 +368,34 @@ class Curveview(object):
         self.select_indices(idxs)
 
     def select_indices(self, idxs):
-        """set selection to these point indices"""
+        """set selection to these point indices. This is the only
+        writer to self.selected_points"""
         self.selected_points = idxs
         self.highlight_selected_dots()
+        if self.selected_points and not self.selectManip:
+            self.selectManip = SelectManip(
+                self.root,
+                getSelectedIndices=lambda: self.selected_points,
+                getWorldPoint=lambda i: self.curve.points[i],
+                getScreenPoint=lambda i: self.screen_from_world(self.curve.points[i]),
+                getWorldTime=lambda x: self.world_from_screen(x, 0)[0],
+                getCanvasSize=lambda: self.size,
+                setPoints=self.setPoints,
+                )
+        if not self.selected_points and self.selectManip:
+            self.selectManip.destroy()
+            self.selectManip = None
+
+        self.selectionChanged()
+
+    def setPoints(self, updates):
+        for i, pt in updates:
+            self.curve.points[i] = pt
+        self.update_curve()
+        
+    def selectionChanged(self):
+        if self.selectManip:
+            self.selectManip.update()
 
     def select_press(self,ev):
         # todo: these select_ handlers are getting called on c-a-drag
@@ -433,7 +535,6 @@ class Curveview(object):
         #                         "gray20" if self.curve.muted else "black")
 
         if self.size.height < 40:
-            #self._draw_gradient()
             self._draw_line(visible_points, area=True)
         else:
             self._draw_markers(visible_x)
@@ -444,42 +545,12 @@ class Curveview(object):
             if len(visible_points) < 50 and not self.curve.muted:
                 self._draw_handle_points(visible_idxs,visible_points)
 
+        self.selectionChanged()
+
     def is_music(self):
         """are we one of the music curves (which might be drawn a bit
         differently)"""
         return self._isMusic
- 
-    def _draw_gradient(self):
-        # not yet ported
-        t1 = time.time()
-        gradient_res = 6 if self.is_music() else 3
-        startX = startColor = None
-        rects = 0
-        for x in range(0, self.size.width, gradient_res):
-            wx = self.world_from_screen(x,0)[0]
-            mag = self.curve.eval(wx, allow_muting=False)
-            if self.curve.muted:
-                low = (8, 8, 8)
-                high = (60, 60, 60)
-            else:
-                low = (20, 10, 50)
-                high = (255, 187, 255)
-            color = gradient(mag, low=low, high=high)
-            if color != startColor:
-                if startColor is not None:
-                    self._draw_gradient_slice(startX, x, startColor)
-                    rects += 1
-                startX = x
-                startColor = color
-
-        if startColor is not None:
-            self._draw_gradient_slice(startX, self.size.width, startColor)
-            rects += 1
-        log.debug("redraw %s rects in %.02f ms", rects, 1000 * (time.time()-t1))
-
-    def _draw_gradient_slice(self, x1, x2, color):
-        self.create_rectangle(x1, 0, x2, 40,
-                              fill=color, width=0, tags='curve')        
 
     def _draw_markers(self,visible_x):
         mark = self._draw_one_marker
@@ -627,12 +698,15 @@ class Curveview(object):
                     ii -= 1
                 newidxs.append(idxs[ii])
 
-            self.selected_points[:] = newsel
+            self.select_indices(newsel)
             idxs[:] = newidxs
             
         self.update_curve()
 
     def highlight_selected_dots(self):
+        if not self.redrawsEnabled:
+            return
+
         for i,d in self.dots.items():
             if i in self.selected_points:
                 d.set_property('fill_color', 'red')
@@ -642,8 +716,8 @@ class Curveview(object):
     def dotpress(self, r1, r2, ev, dotidx):
         self.print_state("dotpress")
         if dotidx not in self.selected_points:
-            self.selected_points=[dotidx]
-        self.highlight_selected_dots()
+            self.select_indices([dotidx])
+
         self.last_mouse_world = self.world_from_screen(ev.x, ev.y)
         self.dragging_dots = True
 
@@ -698,8 +772,7 @@ class Curveview(object):
             self.update_curve()
 
     def unselect(self):
-        self.selected_points=[]
-        self.highlight_selected_dots()
+        self.select_indices([])
 
     def onScroll(self, widget, event):
         t = self.world_from_screen(event.x, 0)[0]

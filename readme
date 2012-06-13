@@ -28,6 +28,8 @@ curvecalc upgrades:
 
 draw handles for moving and resizing a fade with various anchor points
 
+single click doesn't deselect
+
 add vidref on mousemove. separate process? yes
 
 sub autocomplete
