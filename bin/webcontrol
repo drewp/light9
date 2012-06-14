@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!bin/python
 """
 web UI for various commands that we might want to run from remote
 computers and phones
