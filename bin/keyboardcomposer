@@ -413,6 +413,8 @@ class Sliders(BCF2000):
             except IOError, e:
                 if dev is devices[-1]:
                     raise
+            else:
+                break
 
         self.kc = kc
     def valueIn(self, name, value):
