@@ -299,6 +299,7 @@ class Curveview(object):
         dispatcher.connect(self.update_curve, "mute changed", 
                            sender=self.curve)
         dispatcher.connect(self.select_between, "select between")
+        dispatcher.connect(self.acls, "all curves lose selection")
         if self.knobEnabled:
             dispatcher.connect(self.knob_in, "knob in")
             dispatcher.connect(self.slider_in, "set key")
@@ -319,6 +320,11 @@ class Curveview(object):
 
         self.dragging_dots = False
         self.selecting = False
+
+    def acls(self, butNot):
+        if butNot is self:
+            return
+        self.unselect()
         
     def rebuild(self):
         """
@@ -371,10 +377,17 @@ class Curveview(object):
         print "   %s on %s" % (event, w)
         
     def onFocusIn(self, *args):
+        dispatcher.send("all curves lose selection", butNot=self)
+
         self.widget.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("red"))
 
     def onFocusOut(self, widget=None, event=None):
         self.widget.modify_bg(gtk.STATE_NORMAL, gtk.gdk.color_parse("gray30"))
+
+        # you'd think i'm unselecting when we lose focus, but we also
+        # lose focus when the user moves off the toplevel window, and
+        # that's not a time to forget the selection. See the 'all
+        # curves lose selection' signal for the fix.
 
     def onKeyPress(self, widget, event):
         if event.string in list('12345'):
@@ -1052,6 +1065,7 @@ class Curvesetview(object):
     def takeFocus(self, *args):
         """the whole curveset's eventbox is what gets the focus, currently, so
         keys like 'c' can work in it"""
+        dispatcher.send("all curves lose selection")
         self.curvesVBox.get_parent().grab_focus()
 
     def onKeyPress(self, widget, event):
