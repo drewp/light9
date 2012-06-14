@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!bin/python
 
 from __future__ import division, nested_scopes
 import cgi, os, sys, time, subprocess, logging
