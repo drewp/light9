@@ -289,6 +289,7 @@ class Curveview(object):
         self.culled = False # have we been putting off updates?
         self.entered = False # is the mouse currently over this widget
         self.selected_points=[] # idx of points being dragged
+        self.dots = {}
         # self.bind("<Enter>",self.focus)
         dispatcher.connect(self.playPause, "onPlayPause")
         dispatcher.connect(self.input_time, "input time")
@@ -455,7 +456,7 @@ class Curveview(object):
         self.update_curve()
 
     def print_state(self, msg=""):
-        if 1:
+        if 0:
             print "%s: dragging_dots=%s selecting=%s" % (
                 msg, self.dragging_dots, self.selecting)
 
