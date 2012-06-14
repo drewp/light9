@@ -1,5 +1,5 @@
 from __future__ import division
-import glob, time, logging
+import glob, time, logging, ast
 from bisect import bisect_left,bisect
 import louie as dispatcher
 
@@ -12,13 +12,12 @@ postPad = 4
 
 class Curve(object):
     """curve does not know its name. see Curveset"""
-    points = None # x-sorted list of (x,y)
     def __init__(self):
-        self.points = []
+        self.points = [] # x-sorted list of (x,y)
         self._muted = False
 
     def __repr__(self):
-        return "<Curve (%s points)>" % len(self.points)
+        return "<%s (%s points)>" % (self.__class__.__name__, len(self.points))
 
     def muted():
         doc = "Whether to currently send levels (boolean, obviously)"
@@ -36,7 +35,8 @@ class Curve(object):
     def load(self,filename):
         self.points[:]=[]
         for line in file(filename):
-            self.points.append(tuple([float(a) for a in line.split()]))
+            x, y = line.split()
+            self.points.append((float(x), ast.literal_eval(y)))
         self.points.sort()
         dispatcher.send("points changed",sender=self)
 
@@ -46,7 +46,7 @@ class Curve(object):
             return
         f = file(filename,'w')
         for p in self.points:
-            f.write("%s %s\n" % p)
+            f.write("%s %r\n" % p)
         f.close()
 
     def eval(self, t, allow_muting=True):
@@ -66,9 +66,9 @@ class Curve(object):
         return y
     __call__=eval
 
-    def insert_pt(self,new_pt):
+    def insert_pt(self, new_pt):
         """returns index of new point"""
-        i = bisect(self.points,(new_pt[0],None))
+        i = bisect(self.points, (new_pt[0],None))
         self.points.insert(i,new_pt)
         return i
 
@@ -93,7 +93,12 @@ class Curve(object):
         if leftidx < 0:
             return None
         return leftidx
-        
+
+class Markers(Curve):
+    """Marker is like a point but the y value is a string"""
+    def eval(self):
+        raise NotImplementedError()
+    
 
 def slope(p1,p2):
     if p2[0] == p1[0]:
@@ -153,12 +158,19 @@ class Curveset(object):
             c.load(filename)
             curvename = curvename.replace('-','_')
             self.add_curve(curvename,c)
+
+        self.markers = Markers()
+        try:
+            self.markers.load("%s.markers" % basename)
+        except IOError:
+            print "no marker file found"
             
     def save(self,basename):
         """writes a file for each curve with a name
         like basename-curvename"""
         for name,cur in self.curves.items():
             cur.save("%s-%s" % (basename,name))
+        self.markers.save("%s.markers" % basename)
 
     def curveNamesInOrder(self):
         return sorted(self.curves.keys(), key=self.sorter)

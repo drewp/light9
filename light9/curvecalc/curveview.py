@@ -272,7 +272,7 @@ class Curveview(object):
     """
     graphical curve widget only. Please pack .widget
     """
-    def __init__(self, curve, knobEnabled=False, isMusic=False,
+    def __init__(self, curve, markers, knobEnabled=False, isMusic=False,
                  zoomControl=None):
         """knobEnabled=True highlights the previous key and ties it to a
         hardware knob"""
@@ -281,6 +281,7 @@ class Curveview(object):
         self.rebuild()
         
         self.curve = curve
+        self.markers = markers
         self.knobEnabled = knobEnabled
         self._isMusic = isMusic
         self.zoomControl = zoomControl
@@ -393,6 +394,8 @@ class Curveview(object):
         if event.string in list('12345'):
             x = int(event.string)
             self.add_point((self.current_time(), (x - 1) / 4.0))
+        if event.string in list('qwerty'):
+            self.add_marker((self.current_time(), event.string))
 
     def onExpose(self, *args):
         if self.culled:
@@ -598,7 +601,9 @@ class Curveview(object):
     def input_time(self, val, forceUpdate=False):
         if self._time == val:
             return
-        t=val
+        self.update_time_bar(val)
+        
+    def update_time_bar(self, t):
 
         if not getattr(self, 'timelineLine', None):
             self.timelineGroup = goocanvas.Group(parent=self.root)
@@ -608,8 +613,8 @@ class Curveview(object):
                 line_width=2, stroke_color='red')
 
         self.timelineLine.set_property('points', goocanvas.Points([
-            self.screen_from_world((val,0)),
-            self.screen_from_world((val,1))]))
+            self.screen_from_world((t, 0)),
+            self.screen_from_world((t, 1))]))
         
         self._time = t
         if self.knobEnabled:
@@ -668,11 +673,15 @@ class Curveview(object):
         #self.canvas.set_property("background-color",
         #                         "gray20" if self.curve.muted else "black")
 
+        self.update_time_bar(self._time)
         if self.size.height < 40:
             self._draw_line(visible_points, area=True)
         else:
-            self._draw_markers(visible_x)
+            self._draw_time_tics(visible_x)
             self._draw_line(visible_points)
+            self._draw_markers(
+                self.markers.points[i] for i in
+                self.markers.indices_between(visible_x[0], visible_x[1]))
 
             self.dots = {} # idx : canvas rectangle
 
@@ -686,23 +695,39 @@ class Curveview(object):
         differently)"""
         return self._isMusic
 
-    def _draw_markers(self,visible_x):
-        mark = self._draw_one_marker
+    def _draw_markers(self, pts):
+        colorMap = {
+            'q':'#598522',
+            'w':'#662285',
+            'e':'#852922',
+            'r':'#85225C',
+            't':'#856B22',
+            'y':'#227085',
+            }
+        for t, name in pts:
+            x = int(self.screen_from_world((t,0))[0]) + .5
+            goocanvas.polyline_new_line(self.curveGroup,
+                                        x, 0, x, self.size.height,
+                                        line_width=.4 if name in 'rty' else .8,
+                                        stroke_color=colorMap.get(name, 'gray'))
 
-        mark(0, "0")
+    def _draw_time_tics(self,visible_x):
+        tic = self._draw_one_tic
+
+        tic(0, "0")
         t1,t2=visible_x
         if t2-t1<30:
             for t in range(int(t1),int(t2)+1):
-                mark(t,str(t))
-        mark(introPad, str(introPad))
+                tic(t,str(t))
+        tic(introPad, str(introPad))
 
         endtimes = dispatcher.send("get max time")
         if endtimes:
             endtime = endtimes[0][1]
-            mark(endtime, "end %.1f"%endtime)
-            mark(endtime - postPad, "post %.1f" % (endtime - postPad))
+            tic(endtime, "end %.1f"%endtime)
+            tic(endtime - postPad, "post %.1f" % (endtime - postPad))
         
-    def _draw_one_marker(self,t,label):
+    def _draw_one_tic(self,t,label):
         x = self.screen_from_world((t,0))[0]
         ht = self.size.height
         if not 0 <= x < self.size.width:
@@ -811,6 +836,10 @@ class Curveview(object):
         i = self.curve.insert_pt(p)
         self.update_curve()
         self.select_indices([i])
+
+    def add_marker(self, p):
+        self.markers.insert_pt(p)
+        self.update_curve()
         
     def remove_point_idx(self, *idxs):
         idxs = list(idxs)
@@ -935,7 +964,7 @@ class CurveRow(object):
 
     please pack self.box
     """
-    def __init__(self, name, curve, slider, knobEnabled, zoomControl):
+    def __init__(self, name, curve, markers, slider, knobEnabled, zoomControl):
         self.name = name
         self.box = gtk.VBox()
         self.box.set_border_width(1)
@@ -949,7 +978,7 @@ class CurveRow(object):
         self.cols.pack_start(controls, expand=False)
         self.setupControls(controls, name, curve, slider)
 
-        self.curveView = Curveview(curve, knobEnabled=knobEnabled,
+        self.curveView = Curveview(curve, markers, knobEnabled=knobEnabled,
                                    isMusic=name in ['music', 'smooth_music'],
                                    zoomControl=zoomControl)
         self.initCurveView()
@@ -1098,7 +1127,8 @@ class Curvesetview(object):
         
     def add_curve(self, name, slider=None, knobEnabled=False):
         curve = self.curveset.curves[name]
-        f = CurveRow(name, curve, slider, knobEnabled, self.zoomControl)
+        f = CurveRow(name, curve, self.curveset.markers,
+                     slider, knobEnabled, self.zoomControl)
         self.curvesVBox.pack_start(f.box)
         f.box.show_all()
         self.allCurveRows.add(f)
