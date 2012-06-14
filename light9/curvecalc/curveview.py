@@ -77,7 +77,7 @@ class SelectManip(object):
     draws itself on the canvas and edits the points when you drag
     various parts
     """
-    def __init__(self, parent, getSelectedIndices, getWorldPoint, getScreenPoint, getCanvasSize, setPoints, getWorldTime):
+    def __init__(self, parent, getSelectedIndices, getWorldPoint, getScreenPoint, getCanvasSize, setPoints, getWorldTime, getWorldValue, getDragRange):
         """parent goocanvas group"""
         self.getSelectedIndices = getSelectedIndices
         self.getWorldPoint = getWorldPoint
@@ -85,39 +85,112 @@ class SelectManip(object):
         self.getCanvasSize = getCanvasSize
         self.setPoints = setPoints
         self.getWorldTime = getWorldTime
+        self.getDragRange = getDragRange
+        self.getWorldValue = getWorldValue
         self.grp = goocanvas.Group(parent=parent)
         
         self.title = goocanvas.Text(parent=self.grp, text="selectmanip", x=10, y=10, fill_color='white', font="ubuntu 10")
 
         self.bbox = goocanvas.Rect(parent=self.grp,
-                                   stroke_color='yellow',
                                    fill_color_rgba=0xffff0030,
-                                   line_width=.7)
+                                   line_width=0)
 
         self.xTrans = goocanvas.Polyline(parent=self.grp, close_path=True,
                                          fill_color_rgba=0xffffff88,
                                          )
-        self.xTrans.connect("button-press-event", self.onXPress)
-        self.xTrans.connect("button-release-event", self.onXRelease)
-        self.xTrans.connect("motion-notify-event", self.onXMotion)
+        self.centerScale = goocanvas.Polyline(parent=self.grp, close_path=True,
+                                              fill_color_rgba=0xffffff88,
+                                         )
+
+        thickLine = lambda: goocanvas.Polyline(parent=self.grp,
+                                               stroke_color_rgba=0xffffccff,
+                                               line_width=6)
+        self.leftScale = thickLine()
+        self.rightScale = thickLine()
+        self.topScale = thickLine()
+        
+        for grp, name in [(self.xTrans, 'x'),
+                          (self.leftScale, 'left'),
+                          (self.rightScale, 'right'),
+                          (self.topScale, 'top'),
+                          (self.centerScale, 'centerScale'),
+                          ]:
+            grp.connect("button-press-event", self.onPress, name)
+            grp.connect("button-release-event", self.onRelease, name)
+            grp.connect("motion-notify-event", self.onMotion, name)
+            grp.connect("enter-notify-event", self.onEnter, name)
+            grp.connect("leave-notify-event", self.onLeave, name)
+            # and hover highlight
         self.update()
 
-    def onXPress(self, item, target_item, event):
+    def onEnter(self, item, target_item, event, param):
+        self.prevColor = item.props.stroke_color_rgba
+        item.props.stroke_color_rgba = 0xff0000ff
+        
+    def onLeave(self, item, target_item, event, param):
+        item.props.stroke_color_rgba = self.prevColor
+        
+    def onPress(self, item, target_item, event, param):
         self.dragStartTime = self.getWorldTime(event.x)
-        self.origPoints = [self.getWorldPoint(i) for i in
-                           self.getSelectedIndices()]
+        idxs = self.getSelectedIndices()
+
+        self.origPoints = [self.getWorldPoint(i) for i in idxs]
+        self.origMaxValue = max(p[1] for p in self.origPoints)
+        moveLeft, moveRight = self.getDragRange(idxs)
+
+        if param == 'centerScale':
+            self.maxPointMove = min(moveLeft, moveRight)
+        
+        self.dragRange = (self.dragStartTime - moveLeft,
+                          self.dragStartTime + moveRight)
         return True
 
-    def onXMotion(self, item, target_item, event):
+    def onMotion(self, item, target_item, event, param):
         if hasattr(self, 'dragStartTime'):
-            dt = self.getWorldTime(event.x) - self.dragStartTime
-            self.setPoints(
-                (i, (orig[0] + dt, orig[1]))
-                for i, orig in zip(self.getSelectedIndices(), self.origPoints))
-            
+            origPts = zip(self.getSelectedIndices(), self.origPoints)
+            left = origPts[0][1][0]
+            right = origPts[-1][1][0]
+            width = right - left
 
-    def onXRelease(self, item, target_item, event):
-        del self.dragStartTime
+            clampLo = left if param == 'right' else self.dragRange[0]
+            clampHi = right if param == 'left' else self.dragRange[1]
+
+            mouseT = self.getWorldTime(event.x)
+            clampedT = max(clampLo, min(clampHi, mouseT))
+            dt = clampedT - self.dragStartTime
+
+            if param == 'x':
+                self.setPoints((i, (orig[0] + dt, orig[1]))
+                               for i, orig in origPts)
+            elif param == 'left':
+                self.setPoints((i, (left + dt +
+                                    (orig[0] - left) / width * (width - dt),
+                                    orig[1])) for i, orig in origPts)
+            elif param == 'right':
+                self.setPoints((i, (left +
+                                    (orig[0] - left) / width * (width + dt),
+                                    orig[1])) for i, orig in origPts)
+            elif param == 'top':
+                v = self.getWorldValue(event.y)
+                scl = max(0, min(1 / self.origMaxValue, v / self.origMaxValue))
+                self.setPoints((i, (orig[0], orig[1] * scl))
+                               for i, orig in origPts)
+
+            elif param == 'centerScale':
+                dt = mouseT - self.dragStartTime
+                rad = width / 2
+                tMid = left + rad
+                maxScl = (rad + self.maxPointMove) / rad
+                newWidth = max(0, min((rad + dt) / rad, maxScl)) * width
+                self.setPoints((i,
+                                (tMid +
+                                 ((orig[0] - left) / width - .5) * newWidth,
+                                 orig[1])) for i, orig in origPts)
+                
+
+    def onRelease(self, item, target_item, event, param):
+        if hasattr(self, 'dragStartTime'):
+            del self.dragStartTime
 
     def update(self):
         """if the view or selection or selected point positions
@@ -133,14 +206,40 @@ class SelectManip(object):
         b.height = min(max(p[1] for p in pts) - b.y + margin,
                        self.getCanvasSize().height - b.y - 1)
 
-        b.visibility = goocanvas.ITEM_VISIBLE if len(pts) > 1 else goocanvas.ITEM_HIDDEN
+        multi = (goocanvas.ITEM_VISIBLE if len(pts) > 1 else
+                 goocanvas.ITEM_INVISIBLE)
+        b.visibility = multi
+        self.leftScale.props.visibility = multi
+        self.rightScale.props.visibility = multi
+        self.topScale.props.visibility = multi
+        self.centerScale.props.visibility = multi
 
         self.title.props.text = "%s %s selected" % (
             len(idxs), "point" if len(idxs) == 1 else "points")
 
         centerX = b.x + b.width / 2
 
-        midY = self.getCanvasSize().height / 2
+        midY = self.getCanvasSize().height * .5
+        loY = self.getCanvasSize().height * .8
+
+        self.leftScale.props.points = goocanvas.Points([
+            (b.x, b.y), (b.x, b.y + b.height)])
+        self.rightScale.props.points = goocanvas.Points([
+            (b.x + b.width, b.y), (b.x + b.width, b.y + b.height)])
+
+        self.topScale.props.points = goocanvas.Points([
+            (b.x, b.y), (b.x + b.width, b.y)])
+
+        self.updateXTrans(centerX, midY)
+
+        self.centerScale.props.points = goocanvas.Points([
+            (centerX - 5, loY - 5),
+            (centerX + 5, loY - 5),
+            (centerX + 5, loY + 5),
+            (centerX - 5, loY + 5)])
+            
+
+    def updateXTrans(self, centerX, midY):       
         x1 = centerX - 30
         x2 = centerX - 20
         x3 = centerX + 20
@@ -375,18 +474,39 @@ class Curveview(object):
         if self.selected_points and not self.selectManip:
             self.selectManip = SelectManip(
                 self.root,
-                getSelectedIndices=lambda: self.selected_points,
+                getSelectedIndices=lambda: sorted(self.selected_points),
                 getWorldPoint=lambda i: self.curve.points[i],
                 getScreenPoint=lambda i: self.screen_from_world(self.curve.points[i]),
                 getWorldTime=lambda x: self.world_from_screen(x, 0)[0],
+                getWorldValue=lambda y: self.world_from_screen(0, y)[1],
                 getCanvasSize=lambda: self.size,
                 setPoints=self.setPoints,
+                getDragRange=self.getDragRange,
                 )
         if not self.selected_points and self.selectManip:
             self.selectManip.destroy()
             self.selectManip = None
 
         self.selectionChanged()
+
+    def getDragRange(self, idxs):
+        """if you're dragging these points, what's the most time you
+        can move left and right before colliding with another point"""
+        maxLeft = maxRight = 99999
+        cp = self.curve.points
+        for i in idxs:
+            nextStatic = i
+            while nextStatic >= 0 and nextStatic in idxs:
+                nextStatic -= 1
+            if nextStatic >= 0:
+                maxLeft = min(maxLeft, cp[i][0] - cp[nextStatic][0])
+
+            nextStatic = i
+            while nextStatic <= len(cp) - 1 and nextStatic in idxs:
+                nextStatic += 1
+            if nextStatic <= len(cp) - 1:
+                maxRight = min(maxRight, cp[nextStatic][0] - cp[i][0])
+        return maxLeft, maxRight
 
     def setPoints(self, updates):
         for i, pt in updates:
