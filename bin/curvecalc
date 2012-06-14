@@ -66,7 +66,8 @@ class Main(object):
         # this is the only one i found that would set the size right,
         # but it's a minimum size, which i don't really want
         mainwin.set_size_request(1000, 1000)
-        
+
+        wtree.get_object("subterms").connect("add", self.onSubtermChildAdded)
         self.add_subterms_for_song(song, curveset, subterms)
         self.refreshCurveView()       
         
@@ -105,6 +106,11 @@ class Main(object):
     def refreshTheme(self):
         gtk.rc_reparse_all()
         reactor.callLater(1, self.refreshTheme)
+
+    def onSubtermChildAdded(self, subtermsTable, *args):
+        # this would probably work, but isn't getting called
+        v = subtermsTable.get_parent().props.vadjustment
+        v.props.value = v.props.upper
 
     def onQuit(self, *args):
         reactor.crash()

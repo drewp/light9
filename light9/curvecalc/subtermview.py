@@ -66,11 +66,29 @@ def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=F
 
     stv = Subtermview(graph, term)
     y = master.get_property('n-rows')
-    master.resize(y + 1, columns=2)
     master.attach(stv.label, 0, 1, y, y + 1, xoptions=0, yoptions=0)
     master.attach(stv.exprView, 1, 2, y, y + 1, yoptions=0)
+    scrollToRowUponAdd(stv.label)  
     if show:
         master.show_all()
     return term
 
 
+def scrollToRowUponAdd(widgetInRow):
+    """when this table widget is ready, scroll the table so we can see it"""
+    
+    # this doesn't work right, yet
+    return
+    
+    vp = widgetInRow
+    while vp.get_name() != 'GtkViewport':
+        print "walk", vp.get_name()
+        vp = vp.get_parent()
+    adj = vp.props.vadjustment
+
+    def firstExpose(widget, event, adj, widgetInRow):
+        print "scroll", adj.props.value
+        adj.props.value = adj.props.upper
+        widgetInRow.disconnect(handler)
+        
+    handler = widgetInRow.connect('expose-event', firstExpose, adj, widgetInRow)
