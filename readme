@@ -26,19 +26,14 @@ argument to bin/curvecalc
 
 curvecalc upgrades:
 
-draw handles for moving and resizing a fade with various anchor points
-
-single click doesn't deselect
+dnd a submaster from KC to CC to make a new subterm and curve with an
+envelope fading in at the current time
 
 add vidref on mousemove. separate process? yes
 
 sub autocomplete
 
 fix fader UIs
-
-drop grids with keystrokes. grid all the beats that way? different
-keys make different grid colors. do the beats from various songs with
-different colors.
 
 be able to select grid lines to delete them. maybe grid is on a
 special curve row
