@@ -15,9 +15,8 @@ from twisted.internet import gtk2reactor
 gtk2reactor.install()
 from twisted.internet import reactor
 
-import time, textwrap, os, optparse, urllib2, gtk, gobject, linecache, signal, traceback
+import time, textwrap, os, optparse, gtk, linecache, signal, traceback
 import louie as dispatcher 
-from twisted.python.util import sibpath
 from rdflib import URIRef, Graph, Literal, RDF, RDFS
 import logging
 log = logging.getLogger()
@@ -41,6 +40,9 @@ def makeGraph():
         graph.add(s)
     read_all_subs(graph)
     return graph
+
+class SubtermExists(ValueError):
+    pass
 
 class Main(object):
     def __init__(self, graph, opts, song, curveset, subterms, music):
@@ -73,6 +75,33 @@ class Main(object):
         
         self.makeStatusLines(wtree.get_object("status"))
 
+        def connect(w):
+            w.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
+                            targets=[('text/uri-list', 0, 0)],
+                            actions=gtk.gdk.ACTION_COPY)
+            w.connect("drag-data-received", self.onDataReceived)
+        connect(mainwin)
+        # that's not enough- deeper windows don't accept the
+        # event. 
+        mainwin.forall(connect) # not very effective
+        connect(wtree.get_object("subterms")) # works for that area
+
+    def onDataReceived(self, widget, context, x, y, selection,
+                       targetType, time):
+        uri = URIRef(selection.data.strip())
+        subName = self.graph.label(uri)
+
+        try:
+            self.makeSubterm(subName, withCurve=True)
+        except SubtermExists:
+            pass
+        curveView = self.curvesetView.row(subName).curveView
+        t = curveView.current_time()
+        print "time", t
+        curveView.add_point((t - .5, 0))
+        curveView.add_point((t, 1))
+            
+
     def onNewCurve(self, *args):
         dialog = self.wtree.get_object("newCurve")
         entry = self.wtree.get_object("newCurveName")
@@ -91,17 +120,22 @@ class Main(object):
         entry.grab_focus()
         if dialog.run() == 1:
             newname = entry.get_text()
-            uri = L9['sub/%s' % newname]
-            self.graph.add((uri, RDF.type, L9.Subterm))
-            self.graph.add((uri, RDFS.label, Literal(newname)))
-            add_one_subterm(self.graph, uri,
-                            self.curveset, self.subterms,
-                            self.wtree.get_object("subterms"),
-                            None, show=True)
-            if self.wtree.get_object("newSubtermMakeCurve").get_active():
-                self.curveset.new_curve(newname)
-            
+            wc = self.wtree.get_object("newSubtermMakeCurve").get_active()
+            self.makeSubterm(newname, withCurve=wc)
         dialog.hide()
+
+    def makeSubterm(self, newname, withCurve=False):
+        uri = L9['sub/%s' % newname]
+        if (uri, RDF.type, L9.Subterm) in self.graph:
+            raise SubtermExists("already have a subterm named %r" % newname)
+        self.graph.add((uri, RDF.type, L9.Subterm))
+        self.graph.add((uri, RDFS.label, Literal(newname)))
+        add_one_subterm(self.graph, uri,
+                        self.curveset, self.subterms,
+                        self.wtree.get_object("subterms"),
+                        None, show=True)
+        if withCurve:
+            self.curveset.new_curve(newname)
 
     def refreshTheme(self):
         gtk.rc_reparse_all()
@@ -219,7 +253,7 @@ class Main(object):
                 # the curve at startup. If tk is very slow, it's
                 # ok. You'll just get some wasted redraws.
                 self.curvesetView.goLive()
-            except Exception, e:
+            except Exception:
                 print "reload failed:"
                 traceback.print_exc()
         if self.opts.reload:

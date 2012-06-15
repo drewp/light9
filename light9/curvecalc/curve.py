@@ -176,6 +176,8 @@ class Curveset(object):
         return sorted(self.curves.keys(), key=self.sorter)
             
     def add_curve(self,name,curve):
+        if name in self.curves:
+            raise ValueError("can't add a second curve named %r" % name)
         self.curves[name] = curve
         self.curveName[curve] = name
 
