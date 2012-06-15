@@ -19,9 +19,9 @@ show:dance2012 :playList (
 
 show:dance2012 :networking sh:netHome .
 sh:netHome  
-  :musicPlayer <http://dash:8040/>;
-  :dmxServer <http://dash:8030/>;
-  :keyboardComposer <http://dash:8050/> .
+  :musicPlayer <http://10.4.0.2:8040/>;
+  :dmxServer <http://10.4.0.2:8030/>;
+  :keyboardComposer <http://10.4.0.2:8050/> .
 
 :Song is rdf:type of sh:song1, sh:song2, sh:song3, sh:song4,
    sh:song5, sh:song6, sh:song7, sh:song8, sh:song9, sh:song10,

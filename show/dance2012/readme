@@ -22,6 +22,8 @@ mix all songs to mono?
 configuration
 =============
 
+remember to rmmod ftdi_sio so dmx_usb gets to see the device
+
 for next year
 =============
 
