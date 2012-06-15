@@ -1,7 +1,7 @@
 /*
  * DMX USB driver
  *
- * Copyright (C) 2004,2006 Erwin Rol (erwin@erwinrol.com)
+ * Copyright (C) 2004,2006,2010 Erwin Rol (erwin@erwinrol.com)
  *
  * This driver is based on the usb-skeleton driver;
  *
@@ -11,7 +11,6 @@
  *	modify it under the terms of the GNU General Public License as
  *	published by the Free Software Foundation, version 2.
  *
- * $Id: dmx_usb.c 41 2004-09-14 23:35:25Z erwin $ 
  */
 
 #include <linux/kernel.h>
@@ -19,11 +18,21 @@
 #include <linux/init.h>
 #include <linux/slab.h>
 #include <linux/module.h>
-#include <linux/smp_lock.h>
+#include <linux/spinlock.h>
 #include <linux/completion.h>
 #include <asm/uaccess.h>
 #include <linux/usb.h>
 #include <linux/version.h>
+
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(2,6,26)
+#include <linux/semaphore.h>
+#else
+#include <asm/semaphore.h>
+#endif
+
+#if (LINUX_VERSION_CODE > KERNEL_VERSION(2,6,36) )
+#define init_MUTEX(LOCKNAME) sema_init(LOCKNAME,1);
+#endif
 
 #include "dmx_usb.h"
 
@@ -37,15 +46,12 @@
 #undef dbg
 #define dbg(format, arg...) do { if (debug) printk(KERN_DEBUG __FILE__ ": " format "\n" , ## arg); } while (0)
 
-
-// from http://www.linuxinsight.com/vmware-workstation-7.1.3-runs-great-on-linux-kernel-2.6.37.html
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(2, 6, 37)
-   #define DECLARE_MUTEX(_m) DEFINE_SEMAPHORE(_m)
-   #define init_MUTEX(_m) sema_init(_m, 1)
+#ifndef info
+#define info(format, arg...) do { printk(KERN_INFO __FILE__ ": " format "\n" , ## arg); } while (0)
 #endif
 
 /* Version Information */
-#define DRIVER_VERSION "v0.1.20060816"
+#define DRIVER_VERSION "v0.1.20111215"
 #define DRIVER_AUTHOR "Erwin Rol, erwin@erwinrol.com"
 #define DRIVER_DESC "DMX USB Driver"
 
@@ -97,19 +103,27 @@ struct dmx_usb_device {
 
 
 /* prevent races between open() and disconnect() */
-static DECLARE_MUTEX (disconnect_sem);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37)
+	static DECLARE_MUTEX(disconnect_sem);
+#else
+	static DEFINE_SEMAPHORE(disconnect_sem);
+#endif
 
 /* local function prototypes */
 //static ssize_t dmx_usb_read	(struct file *file, char *buffer, size_t count, loff_t *ppos);
 static ssize_t dmx_usb_write	(struct file *file, const char *buffer, size_t count, loff_t *ppos);
-static int dmx_usb_ioctl	(struct file *file, unsigned int cmd, unsigned long arg);
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37) )
+static int dmx_usb_ioctl	(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg);
+#else
+static long dmx_usb_ioctl	(struct file *file, unsigned int cmd, unsigned long arg);
+#endif
 static int dmx_usb_open		(struct inode *inode, struct file *file);
 static int dmx_usb_release	(struct inode *inode, struct file *file);
 
 static int dmx_usb_probe	(struct usb_interface *interface, const struct usb_device_id *id);
 static void dmx_usb_disconnect	(struct usb_interface *interface);
 
-static void dmx_usb_write_bulk_callback	(struct urb *urb, struct pt_regs *regs);
+static void dmx_usb_write_bulk_callback	(struct urb *urb);
 
 static struct file_operations dmx_usb_fops = {
 	/*
@@ -123,14 +137,18 @@ static struct file_operations dmx_usb_fops = {
 	 */
 	.owner =	THIS_MODULE,
 
-	/* .read =		dmx_usb_read, */ 
-	.write =	dmx_usb_write,
-	.unlocked_ioctl = dmx_usb_ioctl,
-	.open =		dmx_usb_open,
-	.release =	dmx_usb_release,
+	/* .read =		dmx_usb_read, */
+	.write =		dmx_usb_write,
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37) )
+	.ioctl		=	dmx_usb_ioctl,
+#else
+	.unlocked_ioctl =	dmx_usb_ioctl,
+#endif
+	.open =			dmx_usb_open,
+	.release =		dmx_usb_release,
 };
 
-/* 
+/*
  * usb class driver info in order to get a minor number from the usb core,
  * and to have the device registered with devfs and the driver core
  */
@@ -151,6 +169,19 @@ static struct usb_driver dmx_usb_driver = {
 	.id_table =	dmx_usb_table,
 };
 
+#if ( LINUX_VERSION_CODE < KERNEL_VERSION(2,6,34) )
+static inline void *usb_alloc_coherent(struct usb_device *dev, size_t size,
+                                    gfp_t mem_flags, dma_addr_t *dma)
+{
+	return usb_buffer_alloc(dev, size, mem_flags, dma);
+}
+
+static inline void usb_free_coherent(struct usb_device *dev, size_t size,
+                                  void *addr, dma_addr_t dma)
+{
+	return usb_buffer_free(dev, size, addr, dma);
+}
+#endif
 
 /**
  */
@@ -424,7 +455,7 @@ static __u16 dmx_usb_get_status(struct dmx_usb_device* dev)
 
 	if (retval)
 		return 0;
-	
+
 	return buf;
 }
 
@@ -532,13 +563,13 @@ exit:
 
 /**
  */
-static int dmx_usb_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
+#if (LINUX_VERSION_CODE < KERNEL_VERSION(2,6,37) )
+static int dmx_usb_ioctl (struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
+#else
+static long dmx_usb_ioctl (struct file *file, unsigned int cmd, unsigned long arg)
+#endif
 {
 	struct dmx_usb_device *dev;
-
-	lock_kernel(); // this was originally getting the Big Kernel
-	// Lock. I don't know if that was needed, but I don't want to
-	// destabilize anything as I move to unlocked_ioctl
 
 	dev = (struct dmx_usb_device *)file->private_data;
 
@@ -548,7 +579,6 @@ static int dmx_usb_ioctl (struct file *file, unsigned int cmd, unsigned long arg
 	/* verify that the device wasn't unplugged */
 	if (!dev->present) {
 		up (&dev->sem);
-		unlock_kernel();
 		return -ENODEV;
 	}
 
@@ -560,7 +590,6 @@ static int dmx_usb_ioctl (struct file *file, unsigned int cmd, unsigned long arg
 	/* unlock the device */
 	up (&dev->sem);
 
-	unlock_kernel();
 	/* return that we did not understand this ioctl call */
 	return -ENOTTY;
 }
@@ -568,7 +597,7 @@ static int dmx_usb_ioctl (struct file *file, unsigned int cmd, unsigned long arg
 
 /**
  */
-static void dmx_usb_write_bulk_callback (struct urb *urb, struct pt_regs *regs)
+static void dmx_usb_write_bulk_callback (struct urb *urb)
 {
 	struct dmx_usb_device *dev = (struct dmx_usb_device *)urb->context;
 
@@ -701,7 +730,7 @@ static int dmx_usb_probe(struct usb_interface *interface, const struct usb_devic
 	dev->minor = interface->minor;
 
 	/* let the user know what node this device is now attached to */
-	err ("info: DMX USB device now attached to dmx%d", dev->minor);
+	info ("DMX USB device now attached to dmx%d", dev->minor);
 	return 0;
 
 error:
@@ -755,7 +784,7 @@ static void dmx_usb_disconnect(struct usb_interface *interface)
 
 	up (&disconnect_sem);
 
-	err("info: DMX USB #%d now disconnected", minor);
+	info("DMX USB #%d now disconnected", minor);
 }
 
 
@@ -775,7 +804,7 @@ static int __init dmx_usb_init(void)
 		return result;
 	}
 
-	err("info: " DRIVER_DESC " " DRIVER_VERSION);
+	info(DRIVER_DESC " " DRIVER_VERSION);
 	return 0;
 }
 
