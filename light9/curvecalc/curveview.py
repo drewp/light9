@@ -322,7 +322,7 @@ class Curveview(object):
         self.dragging_dots = False
         self.selecting = False
 
-    def acls(self, butNot):
+    def acls(self, butNot=None):
         if butNot is self:
             return
         self.unselect()
@@ -992,7 +992,9 @@ class CurveRow(object):
         self.curveView = Curveview(curve, markers, knobEnabled=knobEnabled,
                                    isMusic=name in ['music', 'smooth_music'],
                                    zoomControl=zoomControl)
+        
         self.initCurveView()
+        dispatcher.connect(self.rebuild, "all curves rebuild")
 
     def rebuild(self):
         self.curveView.rebuild()
@@ -1116,9 +1118,6 @@ class Curvesetview(object):
             r = self.row_under_mouse()
             # calling toggled() had no effect; don't know why
             r.collapsed.set_active(not r.collapsed.get_active())
-        if event.string == 'r':
-            r = self.row_under_mouse()
-            r.rebuild()
  
     def row_under_mouse(self):
         x, y = self.curvesVBox.get_pointer()

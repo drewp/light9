@@ -227,6 +227,7 @@ class Main(object):
 
     def onReloadSubs(self, *args): # wants to be ctrl-r  too
         dispatcher.send('reload all subs')
+        dispatcher.send("all curves rebuild")
 
 
 def main():
