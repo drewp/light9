@@ -29,6 +29,9 @@
       <button id="cmd-intro">Skip intro <div class="key">i</div></button>
       <button id="cmd-post">Skip to Post <div class="key">t</div></button>
       <button id="cmd-go">Go  <div class="key">space</div></button>
+
+      <button id="cmd-out0">Output 0</button>
+      <button id="cmd-out1">Output 1</button>
     </div>
 
     todo: go button actions, display next action
@@ -118,6 +121,8 @@ $(function () {
     $("#cmd-go").click(function () {
 	// todo
     });
+    $("#cmd-out0").click(function () { $.post("output", tojs({sink: "0"})); })
+    $("#cmd-out1").click(function () { $.post("output", tojs({sink: "1"})); })
 
     var pendingSlide = false;
     $("#timeSlider").slider({

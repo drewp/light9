@@ -1,4 +1,4 @@
-import web, json, socket
+import web, json, socket, subprocess
 from twisted.python.util import sibpath
 from light9.namespaces import L9
 from light9.showconfig import getSongsFromShow, songOnDisk
@@ -93,6 +93,11 @@ class seekPlayOrPause(object):
             player.seek(data['t'])
             player.resume()
 
+class output(object):
+    def POST(self):
+        d = json.loads(web.data())
+        subprocess.check_call(["bin/movesinks", str(d['sink'])])
+
 def makeWebApp(theApp):
     global app
     app = theApp
@@ -102,6 +107,7 @@ def makeWebApp(theApp):
             r"/song", "songResource",
             r"/songs", "songs",
             r"/seekPlayOrPause", "seekPlayOrPause",
+            r"/output", "output",
             )
 
     return web.application(urls, globals(), autoreload=False)
