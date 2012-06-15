@@ -18,6 +18,7 @@ from light9.subclient import SubClient
 from light9 import dmxclient, showconfig, networking, prof
 from light9.uihelpers import toplevelat, bindkeys
 from light9.namespaces import L9
+from light9.tkdnd import initTkdnd, dragSourceRegister
 from bcf2000 import BCF2000
 
 nudge_keys = {
@@ -72,6 +73,9 @@ class SubmasterTk(Frame):
         levellabel.pack(side=TOP)
         self.scale.pack(side=BOTTOM, expand=1, fill=BOTH)
         bindkeys(self, "<Control-Key-l>", self.launch_subcomposer)
+
+        for w in [self, namelabel, levellabel]:
+            dragSourceRegister(w, 'copy', 'text/uri-list', sub.uri)
 
     def launch_subcomposer(self, *args):
         subprocess.Popen(["bin/subcomposer", "--no-geometry", self.name])
@@ -465,6 +469,8 @@ if __name__ == "__main__":
     s = Submasters(graph)
 
     root = Tk()
+    initTkdnd(root.tk, 'tkdnd/trunk/')
+    
     tl = toplevelat("Keyboard Composer", existingtoplevel=root)
 
     startLevels = None
