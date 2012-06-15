@@ -5,6 +5,10 @@ from light9 import Submaster
 from light9.namespaces import L9
 from light9.curvecalc.subterm import Subterm, Subexpr
 
+# inspired by http://www.daa.com.au/pipermail/pygtk/2008-August/015772.html
+# keeping a ref to the __dict__ of the object stops it from getting zeroed
+keep = []
+
 class Subexprview(object):
     def __init__(self, se):
         self.subexpr = se
@@ -22,11 +26,15 @@ class Subexprview(object):
         self.expr_changed()
         self.entryBuffer.connect("deleted-text", self.entry_changed)
         self.entryBuffer.connect("inserted-text", self.entry_changed)
-        dispatcher.connect(self.expr_changed,"expr_changed",
+        dispatcher.connect(self.expr_changed, "expr_changed",
                            sender=self.subexpr)
 
-        dispatcher.connect(lambda exc: self.error.set_text(str(exc)),
-                           "expr_error",sender=self.subexpr,weak=0)
+        dispatcher.connect(self.exprError, "expr_error", sender=self.subexpr)
+        print "made", id(self), self.__dict__
+        keep.append(self.__dict__)
+
+    def exprError(self, exc):
+        self.error.set_text(str(exc))
         
     def expr_changed(self):
         e = str(self.subexpr.expr)
@@ -35,7 +43,7 @@ class Subexprview(object):
             
     def entry_changed(self, *args):
         self.subexpr.expr = self.entryBuffer.get_text()
-
+            
 class Subtermview(object):
     """
     has .label and .exprView widgets for you to put in a table
@@ -47,7 +55,6 @@ class Subtermview(object):
 
         sev = Subexprview(self.subterm.subexpr)
         self.exprView = sev.box
-
 
 def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=False):
     subname = graph.label(subUri)
