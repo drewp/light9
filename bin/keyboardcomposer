@@ -108,8 +108,9 @@ class KeyboardComposer(Frame, SubClient):
 
         self.make_key_hints()
         self.draw_sliders()
-        self.change_row(self.current_row)
-        self.rows[self.current_row].focus()
+        if len(self.rows):
+            self.change_row(self.current_row)
+            self.rows[self.current_row].focus()
 
         self.buttonframe = Frame(self, bg='black')
         self.buttonframe.pack(side=BOTTOM)
