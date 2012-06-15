@@ -48,6 +48,7 @@ class Main(object):
     def __init__(self, graph, opts, song, curveset, subterms, music):
         self.graph, self.opts, self.song = graph, opts, song
         self.curveset, self.subterms, self.music = curveset, subterms, music
+        self.lastSeenInputTime = 0
 
         wtree = self.wtree = gtk.Builder()
         wtree.add_from_file("light9/curvecalc/curvecalc.glade")
@@ -96,7 +97,7 @@ class Main(object):
         except SubtermExists:
             pass
         curveView = self.curvesetView.row(subName).curveView
-        t = curveView.current_time()
+        t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet
         print "time", t
         curveView.add_point((t - .5, 0))
         curveView.add_point((t, 1))
@@ -218,6 +219,8 @@ class Main(object):
             dispatcher.connect(lambda val, value=value, tf=textfilter:
                                value.set_text(tf(val)),
                                signame, weak=False)
+        dispatcher.connect(lambda val: setattr(self, 'lastSeenInputTime', val),
+                           'input time', weak=False)
         master.show_all()
 
     def refreshCurveView(self):
