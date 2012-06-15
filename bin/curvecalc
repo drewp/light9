@@ -63,11 +63,11 @@ class Main(object):
 
         mainwin.connect("delete-event", lambda *args: reactor.crash())
         mainwin.set_title("curvecalc - %s" % graph.label(song))
-        mainwin.parse_geometry("715x930+1080+26")
+        mainwin.parse_geometry("715x930-0+24")
 
         # this is the only one i found that would set the size right,
         # but it's a minimum size, which i don't really want
-        mainwin.set_size_request(1000, 1000)
+        mainwin.set_size_request(1678, 922)
 
         wtree.get_object("subterms").connect("add", self.onSubtermChildAdded)
         self.add_subterms_for_song(song, curveset, subterms)

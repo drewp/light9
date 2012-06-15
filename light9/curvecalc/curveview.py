@@ -353,8 +353,11 @@ class Curveview(object):
         self.canvas = goocanvas.Canvas()
         box.pack_start(self.canvas)
         self.canvas.show()
-        
-        self.canvas.set_property("background-color", "black")
+
+        p = self.canvas.props
+        p.background_color = 'black'
+        p.x2 = 2000
+
         self.size = self.canvas.get_allocation()
         self.root = self.canvas.get_root_item()
 

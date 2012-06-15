@@ -55,6 +55,7 @@ class ZoomControl(object):
         self.widget = goocanvas.Canvas(bounds_padding=5)
         self.widget.set_property("background-color", "gray60")
         self.widget.set_size_request(-1, 30)
+        self.widget.props.x2 = 2000
 
         endtimes = dispatcher.send("get max time")
         if endtimes:
