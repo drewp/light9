@@ -1137,7 +1137,10 @@ class Curvesetview(object):
         f.curveView.goLive()
 
     def row(self, name):
-        return [r for r in self.allCurveRows if r.name == name][0]
+        matches = [r for r in self.allCurveRows if r.name == name]
+        if not matches:
+            raise ValueError("no curveRow named %r" % name)
+        return matches[0]
 
     def goLive(self):
         """for startup performance, none of the curves redraw
