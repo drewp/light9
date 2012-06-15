@@ -374,6 +374,17 @@ class Curveview(object):
         self.widget.connect("focus-out-event", self.onFocusOut)
         #self.widget.connect("event", self.onAny)
 
+        # this is actually for subterms or mainwin, but i test here for reloads.
+        self.widget.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
+                                  targets=[('text/uri-list', 0, 0)],
+                                  actions=gtk.gdk.ACTION_COPY)
+        self.widget.connect("drag-data-received", self.onDataReceived)
+
+
+    def onDataReceived(self, widget, context, x, y, selection, targetType, time):
+        print "recv", repr(selection.data)
+        
+
     def onAny(self, w, event):
         print "   %s on %s" % (event, w)
         
