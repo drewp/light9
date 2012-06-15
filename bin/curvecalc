@@ -64,7 +64,7 @@ class Main(object):
 
         mainwin.connect("delete-event", lambda *args: reactor.crash())
         mainwin.set_title("curvecalc - %s" % graph.label(song))
-        mainwin.parse_geometry("715x930-0+24")
+        mainwin.parse_geometry("1x1-0+0")
 
         # this is the only one i found that would set the size right,
         # but it's a minimum size, which i don't really want
