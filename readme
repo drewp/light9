@@ -29,7 +29,8 @@ curvecalc upgrades:
 dnd a submaster from KC to CC to make a new subterm and curve with an
 envelope fading in at the current time
 
-add vidref on mousemove. separate process? yes
+add vidref on mousemove. separate process? yes, vidref polls CC when
+music is paused
 
 sub autocomplete
 
