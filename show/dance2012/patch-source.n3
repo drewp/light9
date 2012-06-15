@@ -1,9 +1,6 @@
 @prefix : <http://light9.bigasterisk.com/prepStatements/> .
 @prefix dmx: <http://light9.bigasterisk.com/dmx/> .
 
-# build with:
-# python2.5 =cwm patch-source.n3 --filter=patch-rules.n3 --n3=/ > patch.n3
-# python2.5 =cwm show/dance2009/patch-source.n3 --filter=show/dance2009/patch-rules.n3 --n3=/ > show/dance2009/patch.n3
 [ :name "oran1"; :output dmx:c21 ] .
 [ :name "oran2"; :output dmx:c25 ] .
 [ :name "oran3"; :output dmx:c29 ] .
@@ -22,8 +19,6 @@
 [ :name "red4"; :output dmx:c36 ] .
 [ :name "upright"; :output dmx:c37 ] .
 [ :name "upleft"; :output dmx:c38 ] .
-# 35 blue has a white in it too
-# nice rhyme, drew
 
 [ :name "strobespeed"; :output dmx:c47 ] .
 [ :name "strobebright"; :output dmx:c48 ] .

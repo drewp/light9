@@ -19,14 +19,19 @@ tasks
 
 mix all songs to mono?
 
-gaff tape
+norm audio
 
-bulbs
+
 
 configuration
 =============
 
 remember to rmmod ftdi_sio so dmx_usb gets to see the device
+
+new plus crashed in nvidia_drv.o so it got switched to the secondary box running
+only vidref with usb HD camera. everything else move to host 'amp'.
+
+
 
 for next year
 =============
