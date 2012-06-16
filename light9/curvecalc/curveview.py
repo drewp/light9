@@ -77,7 +77,8 @@ class SelectManip(object):
     draws itself on the canvas and edits the points when you drag
     various parts
     """
-    def __init__(self, parent, getSelectedIndices, getWorldPoint, getScreenPoint, getCanvasSize, setPoints, getWorldTime, getWorldValue, getDragRange):
+    def __init__(self, parent, getSelectedIndices, getWorldPoint, getScreenPoint,
+                 getCanvasSize, setPoints, getWorldTime, getWorldValue, getDragRange):
         """parent goocanvas group"""
         self.getSelectedIndices = getSelectedIndices
         self.getWorldPoint = getWorldPoint
@@ -89,7 +90,8 @@ class SelectManip(object):
         self.getWorldValue = getWorldValue
         self.grp = goocanvas.Group(parent=parent)
         
-        self.title = goocanvas.Text(parent=self.grp, text="selectmanip", x=10, y=10, fill_color='white', font="ubuntu 10")
+        self.title = goocanvas.Text(parent=self.grp, text="selectmanip",
+                                    x=10, y=10, fill_color='white', font="ubuntu 10")
 
         self.bbox = goocanvas.Rect(parent=self.grp,
                                    fill_color_rgba=0xffff0030,

@@ -97,7 +97,7 @@ class Main(object):
         except SubtermExists:
             pass
         curveView = self.curvesetView.row(subName).curveView
-        t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet
+        t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
         print "time", t
         curveView.add_point((t - .5, 0))
         curveView.add_point((t, 1))
