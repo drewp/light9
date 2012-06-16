@@ -1,0 +1,8 @@
+_:_8668097a-ab30-44f0-913e-03af6e1046d6 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b24-c-red> .
+_:_8668097a-ab30-44f0-913e-03af6e1046d6 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<http://light9.bigasterisk.com/sub/backred> <http://light9.bigasterisk.com/lightLevel> _:_8668097a-ab30-44f0-913e-03af6e1046d6 .
+<http://light9.bigasterisk.com/sub/backred> <http://light9.bigasterisk.com/lightLevel> _:_5c511b0e-fc71-44eb-a4ae-b7ca8d4c3259 .
+<http://light9.bigasterisk.com/sub/backred> <http://www.w3.org/2000/01/rdf-schema#label> "backred" .
+_:_5c511b0e-fc71-44eb-a4ae-b7ca8d4c3259 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b33-c-red> .
+_:_5c511b0e-fc71-44eb-a4ae-b7ca8d4c3259 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+

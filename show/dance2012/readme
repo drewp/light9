@@ -27,6 +27,8 @@ song7 last 1/3 has a rolling standup by the cyc that should be timed with them
 
 song10 add blacklight with other colors
 
+song14 light up the 4 pools at the very start 
+
 strike the gels
 
 configuration
@@ -42,10 +44,22 @@ only vidref with usb HD camera. everything else move to host 'amp'.
 for next year
 =============
 
-edit a subterm and we make sure that its dependent curves are all visible and expanded
+edit a subterm and we make sure that its dependent curves are all
+visible and expanded
 
 clicking a song that's paused in post doesn't start it over
 
 web page of things to put in the current song, including
-sub-with-curve, premade subterm (chase, other effects) with various curves 
+sub-with-curve, premade subterm (chase, other effects) with various
+curves
+
+vidref should include its very last recording in the replays if you're
+hovering (though not usually)
+
+vidref should be able to replay any song that you hover on, even not
+the one the music player is playing. Or maybe that was the point of
+putting the hover replay in the CC window, so it could also work
+during music playback
+
+CC's expanders are pointless; they should just be frames
 
