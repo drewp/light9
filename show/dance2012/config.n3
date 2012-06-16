@@ -53,6 +53,7 @@ sub:orange :color "#f65d00"; :group group:strip; :order 1 .
 sub:green  :color "#1d9500"; :group group:strip; :order 2 .
 sub:blue   :color "#0000ff"; :group group:strip; :order 3.
 sub:purple :color "#ff00cd"; :group group:strip; :order 4.
+sub:backred :color "#cc0000"; :group group:strip; :order 5.
 
 sub:sharlyn :group group:live; :order 1 .
 sub:cyc :group group:live; :order 2 .
