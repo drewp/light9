@@ -1,0 +1,11 @@
+<http://light9.bigasterisk.com/show/dance2012/song5> <http://light9.bigasterisk.com/subterm> <http://light9.bigasterisk.com/show/dance2012/song5/subterm/blacklight> .
+<http://light9.bigasterisk.com/show/dance2012/song5> <http://light9.bigasterisk.com/subterm> <http://light9.bigasterisk.com/show/dance2012/song5/subterm/full> .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/blacklight> <http://www.w3.org/2000/01/rdf-schema#label> "blacklight" .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/blacklight> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://light9.bigasterisk.com/Subterm> .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/blacklight> <http://light9.bigasterisk.com/expression> "blacklight(t)" .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/blacklight> <http://light9.bigasterisk.com/sub> <http://light9.bigasterisk.com/sub/blacklight> .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/full> <http://www.w3.org/2000/01/rdf-schema#label> "full" .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/full> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://light9.bigasterisk.com/Subterm> .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/full> <http://light9.bigasterisk.com/expression> "full(t)" .
+<http://light9.bigasterisk.com/show/dance2012/song5/subterm/full> <http://light9.bigasterisk.com/sub> <http://light9.bigasterisk.com/sub/full> .
+

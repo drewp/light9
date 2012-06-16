@@ -1,0 +1,14 @@
+<http://light9.bigasterisk.com/sub/edges> <http://www.w3.org/2000/01/rdf-schema#label> "edges" .
+<http://light9.bigasterisk.com/sub/edges> <http://light9.bigasterisk.com/lightLevel> _:_5fca32d2-73a2-404b-9a38-cc597c7002c8 .
+<http://light9.bigasterisk.com/sub/edges> <http://light9.bigasterisk.com/lightLevel> _:_799afab7-67e6-484b-8985-62bbe2986b3a .
+<http://light9.bigasterisk.com/sub/edges> <http://light9.bigasterisk.com/lightLevel> _:_5d5b23d0-063f-439c-885b-db71017142b4 .
+<http://light9.bigasterisk.com/sub/edges> <http://light9.bigasterisk.com/lightLevel> _:_7434e765-5a61-4f1b-9dd2-da0f086d44c9 .
+_:_799afab7-67e6-484b-8985-62bbe2986b3a <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b31-l2> .
+_:_799afab7-67e6-484b-8985-62bbe2986b3a <http://light9.bigasterisk.com/level> "0.48"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_5d5b23d0-063f-439c-885b-db71017142b4 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b16-r2> .
+_:_5d5b23d0-063f-439c-885b-db71017142b4 <http://light9.bigasterisk.com/level> "0.455"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_5fca32d2-73a2-404b-9a38-cc597c7002c8 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b35-l2> .
+_:_5fca32d2-73a2-404b-9a38-cc597c7002c8 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_7434e765-5a61-4f1b-9dd2-da0f086d44c9 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b12-r2> .
+_:_7434e765-5a61-4f1b-9dd2-da0f086d44c9 <http://light9.bigasterisk.com/level> "0.56"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+

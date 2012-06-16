@@ -1,0 +1,5 @@
+<http://light9.bigasterisk.com/sub/blacklight> <http://light9.bigasterisk.com/lightLevel> _:_c02cdadf-3818-450a-8e98-832e4e3a6412 .
+<http://light9.bigasterisk.com/sub/blacklight> <http://www.w3.org/2000/01/rdf-schema#label> "blacklight" .
+_:_c02cdadf-3818-450a-8e98-832e4e3a6412 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/blacklight> .
+_:_c02cdadf-3818-450a-8e98-832e4e3a6412 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+

@@ -63,7 +63,7 @@
 [ :name "front12-crap"; :output dmx:c12 ] .
 
 [ :name ""; :output dmx:c13 ] .
-[ :name ""; :output dmx:c14 ] .
+[ :name "blacklight"; :output dmx:c14 ] .
 [ :name ""; :output dmx:c15 ] .
 [ :name "up-l"; :output dmx:c16 ] .
 [ :name ""; :output dmx:c17 ] .
