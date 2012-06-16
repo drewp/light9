@@ -17,6 +17,7 @@ from Queue import Queue
 from light9 import networking
 from light9.vidref.replay import ReplayViews, songDir, takeDir, framerate
 from restkit.errors import ResourceNotFound
+import http_parser.http
 
 log = logging.getLogger()
 
@@ -54,8 +55,10 @@ class MusicTime(object):
             pos['t'] = pos['t'] + (time.time() - self.positionFetchTime)
         else:
             try:
+                # todo: this is blocking for a long while if CC is
+                # down. Either make a tiny timeout, or go async
                 r = self.curveCalc.get("hoverTime")
-            except ResourceNotFound:
+            except (ResourceNotFound, http_parser.http.NoMoreData, Exception):
                 pass
             else:
                 pos['hoverTime'] = json.loads(r.body_string())['hoverTime']
