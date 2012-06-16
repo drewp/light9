@@ -70,6 +70,7 @@ class Main(object):
         # but it's a minimum size, which i don't really want
         mainwin.set_size_request(1678, 922)
 
+
         wtree.get_object("subterms").connect("add", self.onSubtermChildAdded)
         self.add_subterms_for_song(song, curveset, subterms)
         self.refreshCurveView()       
@@ -86,6 +87,9 @@ class Main(object):
         # event. 
         mainwin.forall(connect) # not very effective
         connect(wtree.get_object("subterms")) # works for that area
+
+        # may not work
+        wtree.get_object("paned1").set_position(600)
 
     def onDataReceived(self, widget, context, x, y, selection,
                        targetType, time):
