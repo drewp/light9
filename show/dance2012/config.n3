@@ -61,8 +61,9 @@ sub:cyc :group group:live; :order 2 .
 sub:house :group group:live; :order 3 .
 sub:scoop :group group:live; :order 4 .
 sub:front :group group:live; :order 5 .
-sub:curtain :group group:live; :order 6 .
-sub:patio :group group:live; :order 7 .
+sub:full :group group:live; :order 6 .
+sub:curtain :group group:live; :order 7 .
+sub:patio :group group:live; :order 8 .
 
 <http://light9.bigasterisk.com/sub/b-cool>   :color "#81b5b1"; :xgroup group:back; :order 0 .
 <http://light9.bigasterisk.com/sub/b-blue>   :color "#3e6dca"; :xgroup group:back; :order 1 .
