@@ -8,7 +8,7 @@ gst-launch dv1394src ! dvdemux name=d ! dvdec ! ffmpegcolorspace ! hqdn3d ! xvim
 """
 import pygst
 pygst.require("0.10")
-import gst, gobject, time, jsonlib, restkit, logging, os, traceback
+import gst, gobject, time, json, restkit, logging, os, traceback
 import gtk
 from twisted.python.util import sibpath
 import Image
@@ -16,6 +16,7 @@ from threading import Thread
 from Queue import Queue
 from light9 import networking
 from light9.vidref.replay import ReplayViews, songDir, takeDir, framerate
+from restkit.errors import ResourceNotFound
 
 log = logging.getLogger()
 
@@ -37,6 +38,7 @@ class MusicTime(object):
         self.period = period
         self.onChange = onChange
         self.musicResource = restkit.Resource(networking.musicPlayer.url)
+        self.curveCalc = restkit.Resource(networking.curveCalc.url)
         t = Thread(target=self._timeUpdate)
         t.setDaemon(True)
         t.start()
@@ -50,13 +52,19 @@ class MusicTime(object):
         pos = self.position.copy()
         if pos['playing']:
             pos['t'] = pos['t'] + (time.time() - self.positionFetchTime)
+        else:
+            try:
+                r = self.curveCalc.get("hoverTime")
+            except ResourceNotFound:
+                pass
+            else:
+                pos['hoverTime'] = json.loads(r.body_string())['hoverTime']
         return pos
 
     def _timeUpdate(self):
         while True:
             try:
-                position = jsonlib.loads(self.musicResource.get("time").body_string(),
-                                         use_float=True)
+                position = json.loads(self.musicResource.get("time").body_string())
 
                 # this is meant to be the time when the server gave me its
                 # report, and I don't know if that's closer to the
@@ -73,7 +81,7 @@ class MusicTime(object):
 
     def sendTime(self, t):
         """request that the player go to this time"""
-        self.musicResource.post("time", payload=jsonlib.dumps({"t" : t}),
+        self.musicResource.post("time", payload=json.dumps({"t" : t}),
                                 headers={"content-type" : "application/json"})
         
 class VideoRecordSink(gst.Element):
@@ -116,6 +124,7 @@ class VideoRecordSink(gst.Element):
 
         try:
             cap = buffer.caps[0]
+            #print "cap", (cap['width'], cap['height'])
             img = Image.fromstring('RGB', (cap['width'], cap['height']),
                                    buffer.data)
             self.imagesToSave.put((position, img, buffer.timestamp))

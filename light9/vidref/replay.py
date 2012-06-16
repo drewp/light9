@@ -174,8 +174,9 @@ class ReplayView(object):
 
         if not self.enabled:
             return
-        
-        inPic = self.replay.findClosestFrame(position['t'] + lag)
+
+        t = position.get('hoverTime', position['t'])
+        inPic = self.replay.findClosestFrame(t + lag)
 
         if inPic == self.showingPic:
             return
