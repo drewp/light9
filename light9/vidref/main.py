@@ -164,6 +164,8 @@ class Main(object):
         mainwin = wtree.get_object("MainWindow")
         mainwin.connect("destroy", gtk.main_quit)
         wtree.connect_signals(self)
+        mainwin.set_size_request(920, 815)
+        gtk.rc_parse("theme/marble-ice/gtk-2.0/gtkrc")
 
         self.recordingTo = wtree.get_object('recordingTo')
         self.musicScale = wtree.get_object("musicScale")
