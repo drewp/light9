@@ -173,7 +173,10 @@ class Main(object):
         self.curvesetView.onDelete()
 
     def onPythonConsole(self, item):
-        togglePyConsole(self, item, self.__dict__)
+        ns = dict()
+        ns.update(globals())
+        ns.update(self.__dict__)
+        togglePyConsole(self, item, ns)
         
     def onSeeCurrentTime(self, item):
         dispatcher.send("see time")
