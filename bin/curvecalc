@@ -96,6 +96,12 @@ class Main(object):
         uri = URIRef(selection.data.strip())
         subName = self.graph.label(uri)
 
+        
+        if not list(self.graph.subjects(L9['sub'], uri)):
+            # might be a new one just created in KC
+            print "didn't find %r, reloading subs" % uri
+            self.onReloadSubs()
+
         try:
             self.makeSubterm(subName, withCurve=True)
         except SubtermExists:
