@@ -16,6 +16,7 @@ gtk2reactor.install()
 from twisted.internet import reactor
 
 import time, textwrap, os, optparse, gtk, linecache, signal, traceback, json
+from urlparse import parse_qsl
 import louie as dispatcher 
 from rdflib import URIRef, Graph, Literal, RDF, RDFS
 import logging
@@ -93,9 +94,12 @@ class Main(object):
 
     def onDataReceived(self, widget, context, x, y, selection,
                        targetType, time):
-        uri = URIRef(selection.data.strip())
+        data = selection.data.strip()
+        if '?' in data:
+            self.handleSubtermDrop(data)
+            return
+        uri = URIRef(data)
         subName = self.graph.label(uri)
-
         
         if not list(self.graph.subjects(L9['sub'], uri)):
             # might be a new one just created in KC
@@ -111,7 +115,16 @@ class Main(object):
         print "time", t
         curveView.add_points([(t - .5, 0),
                               (t, 1)])
-            
+
+    def handleSubtermDrop(self, data):
+        params = parse_qsl(data.split('?')[1])
+        flattened = dict(params)
+        self.makeSubterm(flattened['subtermName'],
+                         expr=flattened['subtermExpr'])
+
+        for cmd, name in params:
+            if cmd == 'curve':
+                self.curveset.new_curve(name)
 
     def onNewCurve(self, *args):
         dialog = self.wtree.get_object("newCurve")
@@ -135,7 +148,7 @@ class Main(object):
             self.makeSubterm(newname, withCurve=wc)
         dialog.hide()
 
-    def makeSubterm(self, newname, withCurve=False):
+    def makeSubterm(self, newname, withCurve=False, expr=None):
         uri = L9['sub/%s' % newname]
         if (uri, RDF.type, L9.Subterm) in self.graph:
             raise SubtermExists("already have a subterm named %r" % newname)
@@ -144,7 +157,7 @@ class Main(object):
         add_one_subterm(self.graph, uri,
                         self.curveset, self.subterms,
                         self.wtree.get_object("subterms"),
-                        None, show=True)
+                        expr=expr, show=True)
         if withCurve:
             self.curveset.new_curve(newname)
 
