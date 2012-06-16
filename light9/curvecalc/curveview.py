@@ -991,6 +991,7 @@ class CurveRow(object):
     def rebuild(self):
         self.curveView.rebuild()
         self.initCurveView()
+        self.update_ui_to_collapsed_state()
 
     def initCurveView(self):
         self.curveView.widget.show()
