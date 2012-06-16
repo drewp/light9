@@ -837,10 +837,13 @@ class Curveview(object):
         y = self.curve.eval(x)
         self.add_point((x, y))
 
-    def add_point(self, p):
-        i = self.curve.insert_pt(p)
+    def add_points(self, pts):
+        idxs = [self.curve.insert_pt(p) for p in pts]
         self.update_curve()
-        self.select_indices([i])
+        self.select_indices(idxs)
+        
+    def add_point(self, p):
+        self.add_points([p])
 
     def add_marker(self, p):
         self.markers.insert_pt(p)

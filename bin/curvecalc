@@ -99,8 +99,8 @@ class Main(object):
         curveView = self.curvesetView.row(subName).curveView
         t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
         print "time", t
-        curveView.add_point((t - .5, 0))
-        curveView.add_point((t, 1))
+        curveView.add_points([(t - .5, 0),
+                              (t, 1)])
             
 
     def onNewCurve(self, *args):
