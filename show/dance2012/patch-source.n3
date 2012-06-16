@@ -23,24 +23,26 @@
 [ :name "strobespeed"; :output dmx:c47 ] .
 [ :name "strobebright"; :output dmx:c48 ] .
 
-[ :name "b11-c"; :output dmx:c54 ] .
-[ :name "b12x-r2"; :output dmx:c53 ] .
-[ :name "b13-fos"; :output dmx:c52 ] .
-[ :name "b14-c"; :output dmx:c51 ] .
-[ :name "b15-"; :output dmx:c50 ] .
-[ :name "b16-"; :output dmx:c49 ] .
-[ :name "b21x-"; :output dmx:c55 ] .
-[ :name "b22-"; :output dmx:c56 ] .
-[ :name "b23-fos"; :output dmx:c57 ] .
-[ :name "b24-"; :output dmx:c58 ] .
-[ :name "b25x-"; :output dmx:c59 ] .
-[ :name "b26-"; :output dmx:c60 ] .
-[ :name "b31-"; :output dmx:c61 ] .
-[ :name "b32x-"; :output dmx:c62 ] .
-[ :name "b33x-c"; :output dmx:c63 ] .
-[ :name "b34-fos"; :output dmx:c64 ] .
-[ :name "b35-l2"; :output dmx:c65 ] .
-[ :name "b36-c"; :output dmx:c66 ] .
+[ :name "b11-c";		:output dmx:c54 ] .
+[ :name "b12-r2";		:output dmx:c53 ] .
+[ :name "b13-c";		:output dmx:c52 ] .
+[ :name "b14-fos";		:output dmx:c51 ] .
+[ :name "b15-r1-warm";		:output dmx:c50 ] .
+[ :name "b16-r2";		:output dmx:c49 ] .
+
+[ :name "b21-r-purple";	:output dmx:c55 ] .
+[ :name "b22-l-warm";		:output dmx:c56 ] .
+[ :name "b23-fos";		:output dmx:c57 ] .
+[ :name "b24-c-red";		:output dmx:c58 ] .
+[ :name "b25-r-cool";		:output dmx:c59 ] .
+[ :name "b26-l-purple";	:output dmx:c60 ] .
+
+[ :name "b31-l2";		:output dmx:c61 ] .
+[ :name "b32-l1-cool";		:output dmx:c62 ] .
+[ :name "b33-c-red";		:output dmx:c63 ] .
+[ :name "b34-fos";		:output dmx:c64 ] .
+[ :name "b35-l2";		:output dmx:c65 ] .
+[ :name "b36-c";		:output dmx:c66 ] .
 
 [ :name "post-l"; :output dmx:c45 ] .
 [ :name "post-r"; :output dmx:c46 ] .

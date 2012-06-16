@@ -1,0 +1,11 @@
+_:_46b9177e-5922-4532-8892-7b46f8c2d69e <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_46b9177e-5922-4532-8892-7b46f8c2d69e <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-mid> .
+<http://light9.bigasterisk.com/sub/cyc> <http://www.w3.org/2000/01/rdf-schema#label> "cyc" .
+<http://light9.bigasterisk.com/sub/cyc> <http://light9.bigasterisk.com/lightLevel> _:_46b9177e-5922-4532-8892-7b46f8c2d69e .
+<http://light9.bigasterisk.com/sub/cyc> <http://light9.bigasterisk.com/lightLevel> _:_5046e889-e3a9-42a9-af6d-76b8b2ba95a9 .
+<http://light9.bigasterisk.com/sub/cyc> <http://light9.bigasterisk.com/lightLevel> _:_cff050c1-c00e-45cf-8c26-c025bf8838cc .
+_:_5046e889-e3a9-42a9-af6d-76b8b2ba95a9 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_5046e889-e3a9-42a9-af6d-76b8b2ba95a9 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-left> .
+_:_cff050c1-c00e-45cf-8c26-c025bf8838cc <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_cff050c1-c00e-45cf-8c26-c025bf8838cc <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-right> .
+

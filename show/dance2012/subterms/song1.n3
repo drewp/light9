@@ -1,0 +1,6 @@
+<http://light9.bigasterisk.com/show/dance2012/song1/subterm/fos> <http://light9.bigasterisk.com/sub> <http://light9.bigasterisk.com/sub/fos> .
+<http://light9.bigasterisk.com/show/dance2012/song1/subterm/fos> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://light9.bigasterisk.com/Subterm> .
+<http://light9.bigasterisk.com/show/dance2012/song1/subterm/fos> <http://light9.bigasterisk.com/expression> "fos(t)" .
+<http://light9.bigasterisk.com/show/dance2012/song1/subterm/fos> <http://www.w3.org/2000/01/rdf-schema#label> "fos" .
+<http://light9.bigasterisk.com/show/dance2012/song1> <http://light9.bigasterisk.com/subterm> <http://light9.bigasterisk.com/show/dance2012/song1/subterm/fos> .
+

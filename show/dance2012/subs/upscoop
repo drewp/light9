@@ -1,0 +1,8 @@
+<http://light9.bigasterisk.com/sub/upscoop> <http://light9.bigasterisk.com/lightLevel> _:_9cbd4af9-5d96-42fa-a3e4-cd801c0b29b2 .
+<http://light9.bigasterisk.com/sub/upscoop> <http://light9.bigasterisk.com/lightLevel> _:_4a5926d5-7c02-4aa3-b362-7424c848bd4a .
+<http://light9.bigasterisk.com/sub/upscoop> <http://www.w3.org/2000/01/rdf-schema#label> "upscoop" .
+_:_9cbd4af9-5d96-42fa-a3e4-cd801c0b29b2 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/upright> .
+_:_9cbd4af9-5d96-42fa-a3e4-cd801c0b29b2 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_4a5926d5-7c02-4aa3-b362-7424c848bd4a <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/upleft> .
+_:_4a5926d5-7c02-4aa3-b362-7424c848bd4a <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+

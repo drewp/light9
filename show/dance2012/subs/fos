@@ -1,0 +1,11 @@
+_:_aecd1a00-e3b2-4c5d-a70e-4540feb49e2c <http://light9.bigasterisk.com/level> "1.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_aecd1a00-e3b2-4c5d-a70e-4540feb49e2c <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b34-fos> .
+_:_9474f7a3-191a-421a-a041-ada0a5f0bf04 <http://light9.bigasterisk.com/level> "1.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_9474f7a3-191a-421a-a041-ada0a5f0bf04 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b23-fos> .
+_:_f1578eb2-5fa3-409f-a7b1-aaa34290db84 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_f1578eb2-5fa3-409f-a7b1-aaa34290db84 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b14-fos> .
+<http://light9.bigasterisk.com/sub/fos> <http://www.w3.org/2000/01/rdf-schema#label> "fos" .
+<http://light9.bigasterisk.com/sub/fos> <http://light9.bigasterisk.com/lightLevel> _:_aecd1a00-e3b2-4c5d-a70e-4540feb49e2c .
+<http://light9.bigasterisk.com/sub/fos> <http://light9.bigasterisk.com/lightLevel> _:_9474f7a3-191a-421a-a041-ada0a5f0bf04 .
+<http://light9.bigasterisk.com/sub/fos> <http://light9.bigasterisk.com/lightLevel> _:_f1578eb2-5fa3-409f-a7b1-aaa34290db84 .
+
