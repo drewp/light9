@@ -182,8 +182,9 @@ class Main(object):
         mainwin.show_all()
         vid3 = wtree.get_object("vid3")
         self.liveVideoXid = vid3.window.xid
-        vid3.props.height_request = 240-70-50
-        wtree.get_object("frame1").props.height_request = 277-70-50
+        vid3.props.width_request = 360
+        vid3.props.height_request = 220
+        wtree.get_object("frame1").props.height_request = 220
         
 
         self.setInput('dv') # auto seems to not search for dv
@@ -222,8 +223,8 @@ class Main(object):
 
         cam = (sourcePipe + " ! "
               "videorate ! video/x-raw-yuv,framerate=%s/1 ! "
-              "videoscale ! video/x-raw-yuv,width=320,height=240;video/x-raw-rgb,width=320,height=240 ! "
-              "videocrop top=70 bottom=50 ! "
+              "videoscale ! video/x-raw-yuv,width=640,height=480;video/x-raw-rgb,width=320,height=240 ! "
+              "videocrop left=160 top=180 right=120 bottom=80 ! "
               "queue name=vid" % framerate)
 
         self.pipeline = gst.parse_launch(cam)
