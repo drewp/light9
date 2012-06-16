@@ -68,3 +68,7 @@ when music's not playing, maybe the time cursor should float with the
 mouse and apply 1..5/marker keys at mouse. But it needs to be clear
 during playback that this is not what's happening.
 
+smoothing in chases.
+
+in CC, one horiz drag should take a curve from its current level to 0,
+which i do all the time. maybe use a modifier key.

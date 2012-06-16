@@ -31,23 +31,23 @@ sh:netHome
 
 show:dance2012 :musicRoot "show/dance2012/music/pad" .
 
-sh:song1 rdfs:label  "01 welcome";		:songFilename "01-mix.wav" . 
-sh:song2 rdfs:label  "02 dancing happy";	:songFilename "02-dancinghappy.wav" . 
-sh:song3 rdfs:label  "03 popular";		:songFilename "03-popularmix.wav" . 
-sh:song4 rdfs:label  "04 hello dolly";		:songFilename "04-hellodolly.wav" . 
-sh:song5 rdfs:label  "05 wink";			:songFilename "05-wink.wav" . 
-sh:song6 rdfs:label  "06 roses";		:songFilename "06-roses.wav" . 
-sh:song7 rdfs:label  "07 chicagomix";		:songFilename "07-chicagomix.wav" . 
-sh:song8 rdfs:label  "08 forget about the boy";	:songFilename "08-forgetmix.wav" . 
-sh:song9 rdfs:label  "09 secondhandrose";	:songFilename "09-secondhandrose.wav" . 
-sh:song10 rdfs:label "10 mazie";		:songFilename "10-mazie.wav" . 
-sh:song11 rdfs:label "11 hotbox";		:songFilename "11-hotbox.wav" . 
-sh:song12 rdfs:label "12 razz";			:songFilename "12-razz.wav" . 
-sh:song13 rdfs:label "13 daintyjunemix";	:songFilename "13-daintyjunemix.wav" . 
-sh:song14 rdfs:label "14 showoff";		:songFilename "14-showoff.wav" . 
-sh:song15 rdfs:label "15 rocky";		:songFilename "15-rocky.wav" . 
-sh:song16 rdfs:label "16 burlesque";		:songFilename "16-mix.wav" . 
-sh:song17 rdfs:label "17 mywife";		:songFilename "17-mywife-declick-strong-compress.wav" . 
+sh:song1 rdfs:label  "01 welcome [all]";		:songFilename "01-mix.wav" . 
+sh:song2 rdfs:label  "02 dancing happy [jr/sr]";	:songFilename "02-dancinghappy.wav" . 
+sh:song3 rdfs:label  "03 popular [2]";		:songFilename "03-popularmix.wav" . 
+sh:song4 rdfs:label  "04 hello dolly [4]";		:songFilename "04-hellodolly.wav" . 
+sh:song5 rdfs:label  "05 wink [1]";			:songFilename "05-wink.wav" . 
+sh:song6 rdfs:label  "06 roses [3]";		:songFilename "06-roses.wav" . 
+sh:song7 rdfs:label  "07 chicagomix [4]";		:songFilename "07-chicagomix.wav" . 
+sh:song8 rdfs:label  "08 forget about the boy [2]";	:songFilename "08-forgetmix.wav" . 
+sh:song9 rdfs:label  "09 secondhandrose [1]";	:songFilename "09-secondhandrose.wav" . 
+sh:song10 rdfs:label "10 mazie [4]";		:songFilename "10-mazie.wav" . 
+sh:song11 rdfs:label "11 hotbox [3]";		:songFilename "11-hotbox.wav" . 
+sh:song12 rdfs:label "12 razz [sr]";			:songFilename "12-razz.wav" . 
+sh:song13 rdfs:label "13 daintyjunemix [1]";	:songFilename "13-daintyjunemix.wav" . 
+sh:song14 rdfs:label "14 showoff [2]";		:songFilename "14-showoff.wav" . 
+sh:song15 rdfs:label "15 rocky [3]";		:songFilename "15-rocky.wav" . 
+sh:song16 rdfs:label "16 burlesque [4]";		:songFilename "16-mix.wav" . 
+sh:song17 rdfs:label "17 mywife [all]";		:songFilename "17-mywife-declick-strong-compress.wav" . 
 
 sub:red    :color "#ff0000"; :group group:strip; :order 0 .
 sub:orange :color "#f65d00"; :group group:strip; :order 1 .
@@ -90,28 +90,36 @@ ch:blue2 ch:red2
 ch:blue2 ch:red2 
  ) .
 
-chase:back a :Chase; rdfs:comment "back non-white, brightness order"; 
+chase:backcolors a :Chase; rdfs:comment "back non-white, brightness order"; 
   :channels (
-ch:b33-b-c
-ch:b14-b-c
-ch:b26-c-r
-ch:b31-r-l
-ch:b32-c-l
-ch:b16-r-r
-ch:b12-p-r
-ch:b35-p-l
-ch:b21-c-l
-ch:b25-w-r
-ch:b15-c-r
-ch:b24-w-l
+ch:b16-r2
+ch:b15-r1-warm
+ch:b26-l-purple
+ch:b22-l-warm
+ch:b24-c-red
+ch:b25-r-cool
+ch:b32-l1-cool
+ch:b33-c-red
 ) .
 
 chase:scoop a :Chase; :channels (
 ch:cyc-left
-ch:cyc-mid
+ch:cyc-right
 ch:cyc-right
 ch:cyc-mid
 ch:upleft
+ch:upright
+ch:down-c-P
+ch:up-l
+ch:down-c-P
+ch:up-r
+ch:up-r
+ch:cyc-left
+ch:cyc-mid
+ch:cyc-mid
+ch:upleft
+ch:up-l
+ch:cyc-mid
 ch:upright
 ) .
 

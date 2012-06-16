@@ -1,0 +1,8 @@
+_:_afa22abe-c6f5-441f-9834-03052afa9fb5 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_afa22abe-c6f5-441f-9834-03052afa9fb5 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/down-c-P> .
+_:_2a66c279-3c24-4ef4-b8ae-ca40646d707a <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_2a66c279-3c24-4ef4-b8ae-ca40646d707a <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/front6-pool> .
+<http://light9.bigasterisk.com/sub/pool2> <http://light9.bigasterisk.com/lightLevel> _:_afa22abe-c6f5-441f-9834-03052afa9fb5 .
+<http://light9.bigasterisk.com/sub/pool2> <http://light9.bigasterisk.com/lightLevel> _:_2a66c279-3c24-4ef4-b8ae-ca40646d707a .
+<http://light9.bigasterisk.com/sub/pool2> <http://www.w3.org/2000/01/rdf-schema#label> "pool2" .
+

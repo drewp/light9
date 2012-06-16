@@ -1,0 +1,11 @@
+_:_7dec871b-8704-4d9b-81c6-a387ecb0f833 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_7dec871b-8704-4d9b-81c6-a387ecb0f833 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/front5-l> .
+_:_3f31f695-2ffa-42d2-9865-424f4147e5ce <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_3f31f695-2ffa-42d2-9865-424f4147e5ce <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/front8-r> .
+_:_f1f88e7c-f99e-46dd-b0fe-cb6d951b2b68 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_f1f88e7c-f99e-46dd-b0fe-cb6d951b2b68 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/front6-pool> .
+<http://light9.bigasterisk.com/sub/centertighter> <http://www.w3.org/2000/01/rdf-schema#label> "centertighter" .
+<http://light9.bigasterisk.com/sub/centertighter> <http://light9.bigasterisk.com/lightLevel> _:_7dec871b-8704-4d9b-81c6-a387ecb0f833 .
+<http://light9.bigasterisk.com/sub/centertighter> <http://light9.bigasterisk.com/lightLevel> _:_3f31f695-2ffa-42d2-9865-424f4147e5ce .
+<http://light9.bigasterisk.com/sub/centertighter> <http://light9.bigasterisk.com/lightLevel> _:_f1f88e7c-f99e-46dd-b0fe-cb6d951b2b68 .
+
