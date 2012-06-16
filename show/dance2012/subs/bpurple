@@ -1,0 +1,5 @@
+_:_e6e2200f-526e-4bdd-8a69-11ac1226ecd2 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_e6e2200f-526e-4bdd-8a69-11ac1226ecd2 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b26-l-purple> .
+<http://light9.bigasterisk.com/sub/bpurple> <http://www.w3.org/2000/01/rdf-schema#label> "bpurple" .
+<http://light9.bigasterisk.com/sub/bpurple> <http://light9.bigasterisk.com/lightLevel> _:_e6e2200f-526e-4bdd-8a69-11ac1226ecd2 .
+

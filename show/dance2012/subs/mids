@@ -1,8 +1,11 @@
-<http://light9.bigasterisk.com/sub/mids> <http://light9.bigasterisk.com/lightLevel> _:_209974ca-0e38-4457-8162-b14a9433527f .
-<http://light9.bigasterisk.com/sub/mids> <http://light9.bigasterisk.com/lightLevel> _:_4ff65017-e73b-4e55-a779-4dc430acc075 .
+_:_4d8634ea-7107-4b9e-93f5-b3b092cd433a <http://light9.bigasterisk.com/level> "1.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_4d8634ea-7107-4b9e-93f5-b3b092cd433a <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/up-r> .
 <http://light9.bigasterisk.com/sub/mids> <http://www.w3.org/2000/01/rdf-schema#label> "mids" .
-_:_209974ca-0e38-4457-8162-b14a9433527f <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/up-r> .
-_:_209974ca-0e38-4457-8162-b14a9433527f <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
-_:_4ff65017-e73b-4e55-a779-4dc430acc075 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/up-l> .
-_:_4ff65017-e73b-4e55-a779-4dc430acc075 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+<http://light9.bigasterisk.com/sub/mids> <http://light9.bigasterisk.com/lightLevel> _:_4d8634ea-7107-4b9e-93f5-b3b092cd433a .
+<http://light9.bigasterisk.com/sub/mids> <http://light9.bigasterisk.com/lightLevel> _:_daf047de-c51f-4c37-a2fa-456848202058 .
+<http://light9.bigasterisk.com/sub/mids> <http://light9.bigasterisk.com/lightLevel> _:_4780c9c5-63da-49f9-9969-57e715ef2532 .
+_:_daf047de-c51f-4c37-a2fa-456848202058 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_daf047de-c51f-4c37-a2fa-456848202058 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/down-c-P> .
+_:_4780c9c5-63da-49f9-9969-57e715ef2532 <http://light9.bigasterisk.com/level> "1.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_4780c9c5-63da-49f9-9969-57e715ef2532 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/up-l> .
 

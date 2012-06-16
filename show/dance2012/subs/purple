@@ -1,8 +1,5 @@
-_:_3b81cc27-e537-4327-b312-23d1a61b9fc8 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b21-r-purple> .
-_:_3b81cc27-e537-4327-b312-23d1a61b9fc8 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
-_:_82e6cda8-d4d2-406d-b606-963c44d593ef <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b26-l-purple> .
-_:_82e6cda8-d4d2-406d-b606-963c44d593ef <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
-<http://light9.bigasterisk.com/sub/purple> <http://light9.bigasterisk.com/lightLevel> _:_3b81cc27-e537-4327-b312-23d1a61b9fc8 .
-<http://light9.bigasterisk.com/sub/purple> <http://light9.bigasterisk.com/lightLevel> _:_82e6cda8-d4d2-406d-b606-963c44d593ef .
 <http://light9.bigasterisk.com/sub/purple> <http://www.w3.org/2000/01/rdf-schema#label> "purple" .
+<http://light9.bigasterisk.com/sub/purple> <http://light9.bigasterisk.com/lightLevel> _:_29c4fdd7-b70a-4ec8-b0e2-10707170fa7a .
+_:_29c4fdd7-b70a-4ec8-b0e2-10707170fa7a <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b26-l-purple> .
+_:_29c4fdd7-b70a-4ec8-b0e2-10707170fa7a <http://light9.bigasterisk.com/level> "1.0"^^<http://www.w3.org/2001/XMLSchema#decimal> .
 

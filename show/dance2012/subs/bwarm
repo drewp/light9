@@ -1,0 +1,8 @@
+<http://light9.bigasterisk.com/sub/bwarm> <http://light9.bigasterisk.com/lightLevel> _:_956b48b5-fea4-4f65-a053-8324ef75465b .
+<http://light9.bigasterisk.com/sub/bwarm> <http://light9.bigasterisk.com/lightLevel> _:_7d5abd17-d22b-4432-83a6-c61ed64249fc .
+<http://light9.bigasterisk.com/sub/bwarm> <http://www.w3.org/2000/01/rdf-schema#label> "bwarm" .
+_:_956b48b5-fea4-4f65-a053-8324ef75465b <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b15-r1-warm> .
+_:_956b48b5-fea4-4f65-a053-8324ef75465b <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_7d5abd17-d22b-4432-83a6-c61ed64249fc <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b22-l-warm> .
+_:_7d5abd17-d22b-4432-83a6-c61ed64249fc <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+

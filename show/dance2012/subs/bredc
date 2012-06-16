@@ -1,0 +1,5 @@
+<http://light9.bigasterisk.com/sub/bredc> <http://light9.bigasterisk.com/lightLevel> _:_b56b15e1-6891-4db3-8d46-790e17bba2b8 .
+<http://light9.bigasterisk.com/sub/bredc> <http://www.w3.org/2000/01/rdf-schema#label> "bredc" .
+_:_b56b15e1-6891-4db3-8d46-790e17bba2b8 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b24-c-red> .
+_:_b56b15e1-6891-4db3-8d46-790e17bba2b8 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+

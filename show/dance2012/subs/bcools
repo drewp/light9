@@ -1,0 +1,8 @@
+_:_c1424689-c889-4ba2-96c5-c099df07dc1e <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_c1424689-c889-4ba2-96c5-c099df07dc1e <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b32-l1-cool> .
+<http://light9.bigasterisk.com/sub/bcools> <http://light9.bigasterisk.com/lightLevel> _:_c1424689-c889-4ba2-96c5-c099df07dc1e .
+<http://light9.bigasterisk.com/sub/bcools> <http://light9.bigasterisk.com/lightLevel> _:_f9262165-512d-4667-8ee2-f906370033ca .
+<http://light9.bigasterisk.com/sub/bcools> <http://www.w3.org/2000/01/rdf-schema#label> "bcools" .
+_:_f9262165-512d-4667-8ee2-f906370033ca <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_f9262165-512d-4667-8ee2-f906370033ca <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b25-r-cool> .
+

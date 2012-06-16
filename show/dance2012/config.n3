@@ -65,13 +65,13 @@ sub:full :group group:live; :order 6 .
 sub:curtain :group group:live; :order 7 .
 sub:patio :group group:live; :order 8 .
 
-<http://light9.bigasterisk.com/sub/b-cool>   :color "#81b5b1"; :xgroup group:back; :order 0 .
-<http://light9.bigasterisk.com/sub/b-blue>   :color "#3e6dca"; :xgroup group:back; :order 1 .
-<http://light9.bigasterisk.com/sub/bbluec>  :color "#003cb3"; :xgroup group:back; :order 2 .
-<http://light9.bigasterisk.com/sub/b-warm>   :color "#ffaa77"; :xgroup group:back; :order 3 .
-<http://light9.bigasterisk.com/sub/b-purple> :color "#b4099d"; :xgroup group:back; :order 4 .
-<http://light9.bigasterisk.com/sub/b-red>    :color "#c0341b"; :xgroup group:back; :order 5 .
-<http://light9.bigasterisk.com/sub/bredc>   :color "#ff0000"; :xgroup group:back; :order 6 .
+sub:bcools   :color "#81b5b1"; :group group:back; :order 0 .
+sub:bblues   :color "#3e6dca"; :group group:back; :order 1 .
+sub:bbluec   :color "#003cb3"; :group group:back; :order 2 .
+sub:bwarm    :color "#ffaa77"; :group group:back; :order 3 .
+sub:bpurple  :color "#b4099d"; :group group:back; :order 4 .
+sub:breds    :color "#c0341b"; :group group:back; :order 5 .
+sub:bredc    :color "#ff0000"; :group group:back; :order 6 .
 
 chase:colors a :Chase; :channels (
 ch:oran1 ch:gree1 ch:blue1 ch:red1 
@@ -108,26 +108,22 @@ ch:b24-w-l
 
 chase:scoop a :Chase; :channels (
 ch:cyc-left
-ch:down-r
 ch:cyc-mid
-ch:down-c
 ch:cyc-right
-ch:down-l
 ch:cyc-mid
-ch:down-c
-#ch:upleft
-#ch:upright
+ch:upleft
+ch:upright
 ) .
 
+# left to right
 chase:fronts a :Chase; :channels (
-ch:front3-l3
+ch:front4-r
 ch:front5-l
-ch:front9-l
 ch:front6-pool
 ch:front11-c
-ch:front4-r
 ch:front8-r
-ch:front10-r3
+ch:front9-l
+ch:front10-r2
 ) .
 
 chase:frontsrand a :Chase; :channels (
@@ -138,7 +134,6 @@ ch:front4-r
 ch:front6-pool
 ch:front9-l
 ch:front8-r
-ch:front11-c
 ch:front11-c
 ch:front5-l
 ch:front8-r

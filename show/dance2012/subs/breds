@@ -1,0 +1,8 @@
+<http://light9.bigasterisk.com/sub/breds> <http://www.w3.org/2000/01/rdf-schema#label> "breds" .
+<http://light9.bigasterisk.com/sub/breds> <http://light9.bigasterisk.com/lightLevel> _:_5764b3fe-65ca-4e6b-87b3-ffcf1c25c681 .
+<http://light9.bigasterisk.com/sub/breds> <http://light9.bigasterisk.com/lightLevel> _:_29b23c45-8c89-48a7-ae39-648d0b32f2c0 .
+_:_29b23c45-8c89-48a7-ae39-648d0b32f2c0 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_29b23c45-8c89-48a7-ae39-648d0b32f2c0 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b33-c-red> .
+_:_5764b3fe-65ca-4e6b-87b3-ffcf1c25c681 <http://light9.bigasterisk.com/level> "1"^^<http://www.w3.org/2001/XMLSchema#decimal> .
+_:_5764b3fe-65ca-4e6b-87b3-ffcf1c25c681 <http://light9.bigasterisk.com/channel> <http://light9.bigasterisk.com/theater/piedmont/channel/b24-c-red> .
+
