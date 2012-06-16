@@ -15,14 +15,14 @@ from twisted.internet import gtk2reactor
 gtk2reactor.install()
 from twisted.internet import reactor
 
-import time, textwrap, os, optparse, gtk, linecache, signal, traceback
+import time, textwrap, os, optparse, gtk, linecache, signal, traceback, json
 import louie as dispatcher 
 from rdflib import URIRef, Graph, Literal, RDF, RDFS
 import logging
 log = logging.getLogger()
 
 import run_local
-from light9 import showconfig, prof
+from light9 import showconfig, prof, networking
 from light9.curvecalc.curve import Curveset
 from light9.curvecalc import curveview 
 from light9.curvecalc.musicaccess import Music, currentlyPlayingSong
@@ -331,6 +331,24 @@ def main():
     if opts.startup_only:
         log.debug("quitting now because of --startup-only")
         return
+
+    from twisted.web import server, resource
+    class Hover(resource.Resource):
+        isLeaf = True
+        def render_GET(self, request):
+            if request.path == '/hoverTime':
+                results = dispatcher.send("onPlayPause")
+                times = [t for listener, t in results if t is not None]
+                if not times:
+                    request.setResponseCode(404)
+                    return "not hovering over any time"
+                
+                return json.dumps({"song":song, "hoverTime" : times[0]})
+            raise NotImplementedError()
+
+    reactor.listenTCP(networking.curveCalc.port,
+                      server.Site(Hover()))
+
 
     prof.run(reactor.run, profile=False)
 
