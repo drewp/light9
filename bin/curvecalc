@@ -263,7 +263,8 @@ class Main(object):
             reactor.callLater(1, self.refreshCurveView)
 
     def onReloadSubs(self, *args): # wants to be ctrl-r  too
-        dispatcher.send('reload all subs')
+        read_all_subs(self.graph) # this will discover new subs (additive only)
+        dispatcher.send('reload all subs') # this rereads each sub from its graph file
         dispatcher.send("all curves rebuild")
 
 
