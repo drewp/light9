@@ -187,7 +187,7 @@ class Main(object):
         wtree.get_object("frame1").props.height_request = 220
         
 
-        self.setInput('dv') # auto seems to not search for dv
+        self.setInput('v4l') # auto seems to not search for dv
 
         gobject.timeout_add(1000 // framerate, self.updateLoop)
 
@@ -218,7 +218,7 @@ class Main(object):
             "auto": "autovideosrc name=src1",
             "testpattern" : "videotestsrc name=src1",
             "dv": "dv1394src name=src1 ! dvdemux ! dvdec",
-            "v4l": "v4l2src device=/dev/video0 name=src1 ! hqdn3d" ,
+            "v4l": "v4l2src device=/dev/video0 name=src1" ,
             }[name]
 
         cam = (sourcePipe + " ! "
