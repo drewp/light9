@@ -229,7 +229,7 @@ class Main(object):
             ('output levels',
              lambda levels: textwrap.fill("; ".join(["%s:%.2f"%(n,v)
                                                      for n,v in
-                                                     levels.items()[:5]
+                                                     levels.items()[:2]
                                                      if v>0]),70)),
             ('update period', lambda t: "%.1fms"%(t*1000)),
             ('update status', lambda x: str(x)),
