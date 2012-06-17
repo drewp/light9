@@ -71,11 +71,14 @@ exprglo = Expr()
         
 class Subexpr:
     curveset = None
-    def __init__(self,curveset,expr=""):
+    def __init__(self,curveset,expr="",graph=None):
         self.curveset = curveset
         self.lasteval = None
-        self.expr=expr
+        self.expr = expr
+        self.graph = graph
         self._smooth_random_items = [random.random() for x in range(100)]
+        self.submasters = Submaster.get_global_submasters(self.graph)
+
     def eval(self,t):
         if self.expr=="":
             dispatcher.send("expr_error",sender=self,exc="no expr, using 0")
@@ -84,6 +87,7 @@ class Subexpr:
         glo['t'] = t
 
         glo = exprglo.exprGlobals(glo, t)
+        glo['getsub'] = lambda name: self.submasters.get_sub_by_name(name)
         
         try:
             self.lasteval = eval(self.expr,glo)

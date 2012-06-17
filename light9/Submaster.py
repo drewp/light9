@@ -271,11 +271,11 @@ def fullsub(*chans):
 # a global instance of Submasters, created on demand
 _submasters = None
 
-def get_global_submasters():
-    """Get (and make on demand) the global instance of Submasters"""
+def get_global_submasters(graph):
+    """Get (and make on demand) the global instance of Submasters."""
     global _submasters
     if _submasters is None:
-        _submasters = Submasters()
+        _submasters = Submasters(graph)
     return _submasters
 
 def get_sub_by_name(name, submasters=None):
