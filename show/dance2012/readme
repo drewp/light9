@@ -45,8 +45,34 @@ configuration
 
 remember to rmmod ftdi_sio so dmx_usb gets to see the device
 
-new plus crashed in nvidia_drv.o so it got switched to the secondary box running
-only vidref with usb HD camera. everything else move to host 'amp'.
+new plus crashed in nvidia_drv.o so it got switched to the secondary
+box running only vidref with usb HD camera. everything else move to
+host 'amp'.
+
+i didn't set the cpu to 'performance' scaling because i didn't want
+unusual overheating. ondemand has worked fine.
+
+NetworkManager respawns, so i froze it with SIGSTOP and set my net
+with ifconfig. The problem was that if NM stops seeing the other
+machine on the link, it drops my own ip address which I'm using for
+same-host service requests, so they all froze.
+
+for audio, I only need the cable with 1/8" headphone to split 1/4" plugs
+
+gnome keyboard shortcuts, i made the Pause key run
+/home/drewp/projects/light9/bin/gobutton
+
+
+shows
+=====
+
+music player was fine
+
+some points got lost over save/load. I think it was because they were
+scaled to be at the same time or in backwards time order
+
+some pools of dancers went in a different order than they did in
+rehearsal
 
 
 
@@ -80,3 +106,9 @@ smoothing in chases.
 
 in CC, one horiz drag should take a curve from its current level to 0,
 which i do all the time. maybe use a modifier key.
+
+get a usb keyboard with all its pgup/pgdon/ins/del keys in the right places
+
+we happened to shine a light though some strips to make a fan-shaped
+series of shadows. Looked cool. Can we do that more on purpose?
+
