@@ -62,6 +62,9 @@ for audio, I only need the cable with 1/8" headphone to split 1/4" plugs
 gnome keyboard shortcuts, i made the Pause key run
 /home/drewp/projects/light9/bin/gobutton
 
+video guy took 'monitor out' for his sound
+
+radio is on 146.01
 
 shows
 =====
@@ -72,7 +75,12 @@ some points got lost over save/load. I think it was because they were
 scaled to be at the same time or in backwards time order
 
 some pools of dancers went in a different order than they did in
-rehearsal
+rehearsal. Sunday they were right, so apparently that's who rehearsed
+when we set the pools
+
+a few opening fade-ins looked late. not enough rehearsals to catch them.
+
+we didn't tie the hanging stars together to keep them all audience-facing
 
 
 
@@ -102,7 +110,7 @@ when music's not playing, maybe the time cursor should float with the
 mouse and apply 1..5/marker keys at mouse. But it needs to be clear
 during playback that this is not what's happening.
 
-smoothing in chases.
+smoothing in chases. /~\ shape instead of |~|
 
 in CC, one horiz drag should take a curve from its current level to 0,
 which i do all the time. maybe use a modifier key.
@@ -111,4 +119,24 @@ get a usb keyboard with all its pgup/pgdon/ins/del keys in the right places
 
 we happened to shine a light though some strips to make a fan-shaped
 series of shadows. Looked cool. Can we do that more on purpose?
+
+curvecalc --startup-only currently takes 7sec+ on amp; 2.7sec on
+plus. A lot of it is n3 parsing. Move toward the single shared graph
+across all processes, and maybe most of the code can use that directly
+for sub levels and such, maintaining other copies only when
+necessary. Everything can listen for a 'graph changed' signal to do
+refreshes. Even the hover position and other input like that could go
+into the graph to get transmitted between tools, which would cut out
+vidref's polling and perhaps others too. See what anzo is doing for
+their graph update protocol.
+
+bring 2-plug headphone+mic to go in the ICOM IC-V82 radio
+
+ascoltami might be making a new thread per request and that's why it
+takes 20% cpu. Can it use twisted for the web server?
+
+when vidref is following mouse hover, it's very important that it
+shows viewers where it is seeking. right now only the person holding
+the mouse has a clue how time is moving, so other people watching the
+vidref screen don't know if we're going forwards or backwards
 
