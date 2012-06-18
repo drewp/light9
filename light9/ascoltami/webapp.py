@@ -24,19 +24,22 @@ class root(object):
         # times into the page
         return render.index(host=socket.gethostname())
 
+def playerSongUri(graph, player):
+    """or None"""
+    
+    playingLocation = player.getSong()
+    if playingLocation:
+        return songUri(graph, URIRef(playingLocation))
+    else:
+        return None
+
 class timeResource(object):
     def GET(self):
         player = app.player
         graph = app.graph
-
-        playingLocation = player.getSong()
-        if playingLocation:
-            song = songUri(graph, URIRef(playingLocation))
-        else:
-            song = None
         web.header("content-type", "application/json")
         return json.dumps({
-            "song" : song,
+            "song" : playerSongUri(graph, player),
             "started" : player.playStartTime,
             "duration" : player.duration(),
             "playing" : player.isPlaying(),
@@ -98,6 +101,21 @@ class output(object):
         d = json.loads(web.data())
         subprocess.check_call(["bin/movesinks", str(d['sink'])])
 
+class goButton(object):
+    def POST(self):
+        """
+        if music is playing, this silently does nothing.
+        """
+        graph, player = app.graph, app.player
+
+        if player.isPlaying():
+            pass
+        else:
+            player.resume()
+            
+        web.header("content-type", "text/plain")
+        return "ok"
+
 def makeWebApp(theApp):
     global app
     app = theApp
@@ -108,6 +126,7 @@ def makeWebApp(theApp):
             r"/songs", "songs",
             r"/seekPlayOrPause", "seekPlayOrPause",
             r"/output", "output",
+            r"/go", "goButton",
             )
 
     return web.application(urls, globals(), autoreload=False)

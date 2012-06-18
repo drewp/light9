@@ -119,7 +119,7 @@ $(function () {
 	$.post("time", tojs({t: currentDuration - times.post, resume: true}))
     });
     $("#cmd-go").click(function () {
-	// todo
+	$.post("go");
     });
     $("#cmd-out0").click(function () { $.post("output", tojs({sink: "0"})); })
     $("#cmd-out1").click(function () { $.post("output", tojs({sink: "1"})); })

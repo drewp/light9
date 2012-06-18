@@ -21,6 +21,7 @@ class Player(object):
         self.playStartTime = 0
         self.lastWatchTime = 0
         self.autoStopTime = 0
+        self.lastSetSongUri = None
         self.onEOS = onEOS
         
         # before playbin2:
@@ -57,14 +58,6 @@ class Player(object):
                 log.info("autostop")
                 self.pause()
 
-                # new EOS logic above should be better
-            ## if not self.onEOS:
-            ##     if self.isPlaying() and t >= self.duration() - .2:
-            ##         # i don't expect to hit dur exactly with this
-            ##         # polling. What would be better would be to watch for
-            ##         # the EOS signal and react to that
-            ##         self.onEOS(self.getSong())
-
             self.lastWatchTime = t
         except:
             traceback.print_exc()
@@ -85,6 +78,7 @@ class Player(object):
         self.pipeline.set_state(gst.STATE_READY)
         self.preload(songLoc)
         self.pipeline.set_property("uri", songLoc)
+        self.lastSetSongUri = songLoc
         # todo: don't have any error report yet if the uri can't be read
         if play:
             self.pipeline.set_state(gst.STATE_PLAYING)
@@ -92,7 +86,8 @@ class Player(object):
 
     def getSong(self):
         """Returns the URI of the current song."""
-        return self.playbin.get_property("uri")
+        # even the 'uri' that I just set isn't readable yet
+        return self.playbin.get_property("uri") or self.lastSetSongUri
 
     def preload(self, songPath):
         """
@@ -129,12 +124,16 @@ class Player(object):
     def pause(self):
         self.pipeline.set_state(gst.STATE_PAUSED)
 
-    def resume(self):
-        self.pipeline.set_state(gst.STATE_PLAYING)
+    def isAutostopped(self):
+        """
+        are we stopped at the autostop time?
+        """
         pos = self.currentTime()
         autoStop = self.duration() - self.autoStopOffset
-        if abs(pos - autoStop) < .01:
-            self.releaseAutostop()
+        return not self.isPlaying() and abs(pos - autoStop) < 1 # i've seen .4 difference here
+
+    def resume(self):
+        self.pipeline.set_state(gst.STATE_PLAYING)
 
     def setupAutostop(self):
         dur = self.duration()

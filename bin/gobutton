@@ -1,0 +1,3 @@
+#!/bin/sh
+# uri should be set from $LIGHT9_SHOW/config.n3
+exec curl --silent -d '' http://localhost:8040/go

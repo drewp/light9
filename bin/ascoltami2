@@ -4,7 +4,7 @@ from rdflib import URIRef
 sys.path.append(".")
 from light9.ascoltami.player import Player
 from light9.ascoltami.playlist import Playlist, NoSuchSong
-from light9.ascoltami.webapp import makeWebApp
+from light9.ascoltami.webapp import makeWebApp, songUri, songLocation
 from light9 import networking, showconfig
 
 
@@ -33,14 +33,14 @@ class App:
         self.player.pause()
         self.player.seek(0)
 
-        # stop here for now- no go-button behavior
-        return
+        thisSongUri = songUri(graph, URIRef(song))
+
         try:
-            nextSong = self.playlist.nextSong(song)
+            nextSong = self.playlist.nextSong(thisSongUri)
         except NoSuchSong: # we're at the end of the playlist
             return
 
-        self.player.setSong(nextSong, play=False)
+        self.player.setSong(songLocation(graph, nextSong), play=False)
 
 if __name__ == "__main__":
     logging.basicConfig()
