@@ -993,6 +993,10 @@ class CurveRow(object):
         self.initCurveView()
         dispatcher.connect(self.rebuild, "all curves rebuild")
 
+        # incomplete: this makes the row start with a small size
+        # request, but doesn't update the row widgets
+        self.collapsed.props.active = True
+
     def rebuild(self):
         self.curveView.rebuild()
         self.initCurveView()
