@@ -1,5 +1,5 @@
 from __future__ import division
-import os, logging
+import os, logging, time
 from rdflib import Graph
 from rdflib import RDFS, Literal, BNode
 from light9.namespaces import L9, XSD
@@ -75,22 +75,29 @@ class Submaster:
                     pass
                 else:
                     inFile = showconfig.subFile(self.name)
-                    log.info("reading %s", inFile)
-                    graph.parse(inFile, format="n3")
-            self.uri = L9['sub/%s' % self.name]
-            for lev in graph.objects(self.uri, L9['lightLevel']):
-                chan = graph.value(lev, L9['channel'])
-                val = graph.value(lev, L9['level'])
-                name = patchGraph.label(chan)
-                if not name:
-                    log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
-                    continue
-                self.levels[name] = float(val)
 
+                    t1 = time.time()
+                    graph.parse(inFile, format="n3")
+                    log.info("reading %s in %.1fms", inFile, 1000 * (time.time() - t1))
+                    
+                self.setLevelsFromGraph(graph, patchGraph)
+                
             if (not quiet) and (oldlevels != self.levels):
                 log.info("sub %s changed" % self.name)
         except IOError, e:
             log.error("Can't read file for sub: %r (%s)" % (self.name, e))
+
+    def setLevelsFromGraph(self, graph, patchGraph):
+        self.uri = L9['sub/%s' % self.name]
+        for lev in graph.objects(self.uri, L9['lightLevel']):
+            chan = graph.value(lev, L9['channel'])
+            val = graph.value(lev, L9['level'])
+            name = patchGraph.label(chan)
+            if not name:
+                log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
+                continue
+            self.levels[name] = float(val)
+
     def save(self):
         if self.temporary:
             log.info("not saving temporary sub named %s",self.name)
@@ -231,14 +238,15 @@ class Submasters:
         self.submasters = {}
 
         files = os.listdir(showconfig.subsDir())
-
+        t1 = time.time()
         for filename in files:
             # we don't want these files
             if filename.startswith('.') or filename.endswith('~') or \
                filename.startswith('CVS'):
                 continue
             self.submasters[filename] = Submaster(filename, graph=graph)
-        log.info("loaded subs %s", self.submasters)
+        log.info("loaded all submasters in %.1fms" % ((time.time() - t1) * 1000))
+        
     def get_all_subs(self):
         "All Submaster objects"
         l = self.submasters.items()

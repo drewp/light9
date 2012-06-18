@@ -34,6 +34,7 @@ from light9.curvecalc.subtermview import add_one_subterm
 from light9.curvecalc.output import Output
 from light9.gtkpyconsole import togglePyConsole
 
+@prof.logTime
 def makeGraph():
     graphOrig = showconfig.getGraph()
     graph = Graph() # a copy, since we're going to add subs into it
@@ -374,4 +375,5 @@ def main():
 
     prof.run(reactor.run, profile=False)
 
-main()
+prof.run(main, profile=False)
+

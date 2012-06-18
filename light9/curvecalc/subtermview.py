@@ -67,8 +67,12 @@ def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=F
     if expr is None:
         expr = '%s(t)' % subname
 
-    term = Subterm(Submaster.Submaster(graph=graph, name=subname, sub=subUri),
-                   Subexpr(curveset, expr, graph))
+    # this is what I'd like to have, but the name replacement above is
+    # too unclear for me to make the change now
+    #get_global_submasters(graph).get_sub_by_name(
+        
+    sub = Submaster.Submaster(graph=graph, name=subname, sub=subUri)
+    term = Subterm(sub, Subexpr(curveset, expr, graph))
     subterms.append(term)
 
     stv = Subtermview(graph, term)
