@@ -1,11 +1,13 @@
 from __future__ import division
 from random import Random
+import logging
 import light9.Submaster as Submaster
 from chase import chase as chase_logic
 import showconfig
 from rdflib import RDF
 from light9 import Patch
 from light9.namespaces import L9
+log = logging.getLogger()
 
 def chase(t, ontime=0.5, offset=0.2, onval=1.0, 
           offval=0.0, names=None, combiner=max, random=False):
@@ -22,8 +24,8 @@ def chase(t, ontime=0.5, offset=0.2, onval=1.0,
         try:
             dmx = Patch.dmx_from_uri(uri)
         except KeyError:
-            print ("chase includes %r, which doesn't resolve to a dmx chan" %
-                   uri)
+            log.info(("chase includes %r, which doesn't resolve to a dmx chan" %
+                   uri))
             continue
         lev[dmx] = value
 
@@ -43,8 +45,8 @@ def stack(t, names=None, fade=0):
             try:
                 dmx = Patch.dmx_from_uri(uri)
             except KeyError:
-                print ("stack includes %r, which doesn't resolve to a dmx chan"%
-                       uri)
+                log.info(("stack includes %r, which doesn't resolve to a dmx chan"%
+                       uri))
                 continue
             lev[dmx] = 1
         else:

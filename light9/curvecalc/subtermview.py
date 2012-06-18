@@ -1,9 +1,10 @@
-import gtk
+import gtk, logging
 from louie import dispatcher
 from rdflib import RDF, RDFS, Literal
 from light9 import Submaster
 from light9.namespaces import L9
 from light9.curvecalc.subterm import Subterm, Subexpr
+log = logging.getLogger()
 
 # inspired by http://www.daa.com.au/pipermail/pygtk/2008-August/015772.html
 # keeping a ref to the __dict__ of the object stops it from getting zeroed
@@ -30,7 +31,7 @@ class Subexprview(object):
                            sender=self.subexpr)
 
         dispatcher.connect(self.exprError, "expr_error", sender=self.subexpr)
-        print "made", id(self), self.__dict__
+        log.info("made %r %r" % (id(self), self.__dict__))
         keep.append(self.__dict__)
 
     def exprError(self, exc):
@@ -58,11 +59,11 @@ class Subtermview(object):
 
 def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=False):
     subname = graph.label(subUri)
-    print "%s's label is %s" % (subUri, subname)
+    log.info("%s's label is %s" % (subUri, subname))
     if not subname: # fake sub, like for a chase
         st = graph.subjects(L9['sub'], subUri).next()
         subname = graph.label(st)
-        print "using parent subterm's name instead. parent %r, name %r" % (st, subname)
+        log.info("using parent subterm's name instead. parent %r, name %r" % (st, subname))
     assert subname, "%s has no name" % subUri
     if expr is None:
         expr = '%s(t)' % subname
@@ -93,12 +94,12 @@ def scrollToRowUponAdd(widgetInRow):
     
     vp = widgetInRow
     while vp.get_name() != 'GtkViewport':
-        print "walk", vp.get_name()
+        log.info("walk %s", vp.get_name())
         vp = vp.get_parent()
     adj = vp.props.vadjustment
 
     def firstExpose(widget, event, adj, widgetInRow):
-        print "scroll", adj.props.value
+        log.info("scroll %s", adj.props.value)
         adj.props.value = adj.props.upper
         widgetInRow.disconnect(handler)
         
