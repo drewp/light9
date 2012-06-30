@@ -1,4 +1,5 @@
 #!bin/python
+from twisted.internet import gtk2reactor, reactor
 import web, thread, gobject, sys, optparse, logging
 from rdflib import URIRef
 sys.path.append(".")
@@ -7,10 +8,6 @@ from light9.ascoltami.playlist import Playlist, NoSuchSong
 from light9.ascoltami.webapp import makeWebApp, songUri, songLocation
 from light9 import networking, showconfig
 
-
-import BaseHTTPServer
-BaseHTTPServer.BaseHTTPRequestHandler.log_message = \
-                     lambda self, format, *args: None
 
 class App:
     def __init__(self, graph, show):
@@ -22,12 +19,10 @@ class App:
     def run(self, musicPort):
         # the cherrypy server would wedge when vidref pounds on it; this
         # one seems to run
-        thread.start_new(web.httpserver.runbasic,
-                         (makeWebApp(self).wsgifunc(),
-                          ('0.0.0.0', musicPort)))
-
-        mainloop = gobject.MainLoop()
-        mainloop.run()
+        #gtk2reactor.install(useGtk=False)
+        reactor.listenTCP(musicPort, makeWebApp(self))
+        log.info("listening on %s" % musicPort)
+        reactor.run()
 
     def onEOS(self, song):
         self.player.pause()
@@ -45,7 +40,7 @@ class App:
 if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger()
-    gobject.threads_init()
+    gobject.threads_init() # this is in gtk2reactor too
 
     parser = optparse.OptionParser()
     parser.add_option('--show',
