@@ -22,6 +22,14 @@
       .patch .deletes {
           color: #DC6F6F;
       }
+      #out {
+          white-space: pre-wrap;
+      }
+      .patch fieldset {
+          color: gray;
+          font-family: arial;
+          font-size: 75%;
+      }
       /* ]]> */
     </style>
   </head>
@@ -64,7 +72,7 @@
                   );
               }
 
-              $('#out').append($('<div>').text(JSON.stringify(evt.data)));
+              $('#out').append($('<div>').text(evt.data));
           };
       });
       // ]]>

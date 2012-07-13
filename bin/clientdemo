@@ -5,14 +5,14 @@ sys.path.append(".")
 from twisted.internet import reactor
 import cyclone.web, cyclone.httpclient, logging
 from rdflib import Namespace, Literal
-from light9 import rdfdb
+from light9.rdfdb.patch import Patch
+from light9.rdfdb.syncedgraph import SyncedGraph
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG)
     log = logging.getLogger()
 
-    port = 8052
-    g = rdfdb.SyncedGraph(port)
+    g = SyncedGraph("clientdemo")
 
     L9 = Namespace("http://light9.bigasterisk.com/")
     def updateDemoValue():
@@ -22,8 +22,8 @@ if __name__ == "__main__":
     g.addHandler(updateDemoValue)
 
     def adj():
-        g.patch(rdfdb.Patch(addQuads=[(L9['demo'], L9['is'], Literal(os.getpid()), L9['clientdemo'])],
-                delTriples=[]))
+        g.patch(Patch(addQuads=[(L9['demo'], L9['is'], Literal(os.getpid()),
+                                 L9['clientdemo'])],
+                      delQuads=[]))
     reactor.callLater(2, adj)
-
     reactor.run()
