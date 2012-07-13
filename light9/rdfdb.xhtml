@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>rdfdb</title>
+    <style type="text/css" media="all">
+      /* <![CDATA[ */
+      .patch {
+          border: 1px solid gray;
+          padding: 2px;
+          margin: 4px;
+      }
+      .patch > div {
+          font-family: monospace;
+          font-size: 80%;
+          white-space: pre-wrap;
+      } 
+      .patch .adds {
+          color: #127E11;
+      }
+      .patch .deletes {
+          color: #DC6F6F;
+      }
+      /* ]]> */
+    </style>
+  </head>
+  <body>
+    <h1>rdfdb</h1>
+    <p>status: <span id="status">starting...</span></p>
+    
+    <section>
+      <h2>Edits</h2>
+      <div id="patches"></div>
+    </section>
+
+    <p>Clients: <span id="clients"/></p>
+
+    <fieldset>
+      <legend>Messages</legend>
+      <div id="out"></div>
+    </fieldset>
+
+    <script type="text/javascript" src="jquery-1.7.2.min.js"></script>
+    <script type="text/javascript">
+      // <![CDATA[
+      $(function(){
+          var ws = new WebSocket("ws://localhost:8051/live");
+          
+          ws.onopen = function() {   $("#status").text("connected"); };
+          ws.onerror = function(e) { $("#status").text("error: "+e); };
+          ws.onclose = function() {  $("#status").text("disconnected"); };
+          ws.onmessage = function (evt) {
+              var d = JSON.parse(evt.data);
+              if (d.clients !== undefined) {
+                  $("#clients").empty().text(JSON.stringify(d.clients));
+              }
+              if (d.patch !== undefined) {
+                  $("#patches").prepend(
+                      $("<fieldset>").addClass("patch")
+                          .append($("<legend>").text("Patch"))
+                          .append($("<div>").addClass("deletes").text(d.patch.deletes))
+                          .append($("<div>").addClass("adds").text(d.patch.adds))
+                  );
+              }
+
+              $('#out').append($('<div>').text(JSON.stringify(evt.data)));
+          };
+      });
+      // ]]>
+    </script>
+
+  </body>
+</html>

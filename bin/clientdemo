@@ -1,0 +1,29 @@
+#!bin/python
+
+import os, sys
+sys.path.append(".")
+from twisted.internet import reactor
+import cyclone.web, cyclone.httpclient, logging
+from rdflib import Namespace, Literal
+from light9 import rdfdb
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.DEBUG)
+    log = logging.getLogger()
+
+    port = 8052
+    g = rdfdb.SyncedGraph(port)
+
+    L9 = Namespace("http://light9.bigasterisk.com/")
+    def updateDemoValue():
+        v = list(g.objects(L9['demo'], L9['is']))
+        print "demo value is %r" % v
+
+    g.addHandler(updateDemoValue)
+
+    def adj():
+        g.patch(rdfdb.Patch(addQuads=[(L9['demo'], L9['is'], Literal(os.getpid()), L9['clientdemo'])],
+                delTriples=[]))
+    reactor.callLater(2, adj)
+
+    reactor.run()
