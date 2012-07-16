@@ -160,7 +160,7 @@ class PersistentSubmaster(Submaster):
             val = self.graph.value(lev, L9['level'])
             name = patchGraph.label(chan)
             if not name:
-                #log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
+                log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
                 continue
             self.levels[name] = float(val)
 
@@ -253,14 +253,9 @@ class Submasters:
         combined = notsongs + songs
 
         return combined
-    def get_all_sub_names(self):
-        return [s.name for s in self.get_all_subs()]
-    def get_sub_by_name(self, name):
-        "Makes a new sub if there isn't one."
-        if name in self.submasters:
-            return self.submasters[name]
-        return Submaster(name)
-    __getitem__ = get_sub_by_name
+
+    def get_sub_by_uri(self, uri):
+        return self.submasters[uri]
 
 def fullsub(*chans):
     """Make a submaster with chans at full."""

@@ -132,6 +132,7 @@ class Db(object):
         notifier.startReading()
 
         for inFile in [#"show/dance2012/config.n3",
+                       "show/dance2012/patch.n3",
                        "show/dance2012/subs/bcools",
                        "show/dance2012/subs/bwarm",
                        "show/dance2012/subs/house",

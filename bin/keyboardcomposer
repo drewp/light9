@@ -140,9 +140,8 @@ class KeyboardComposer(Frame, SubClient):
         self.sub_name = Entry(self.buttonframe, bg='black', fg='white')
         self.sub_name.pack(side=LEFT)
 
-
     def redraw_sliders(self):
-        self.slider_vars = {} # this holds subname:sub Tk vars
+        self.slider_vars = {} # this holds suburi : sub Tk vars
         self.slider_table = {} # this holds coords:sub Tk vars
         self.name_to_subtk.clear() # subname : SubmasterTk instance
 
@@ -219,7 +218,7 @@ class KeyboardComposer(Frame, SubClient):
         subtk.place(relx=col / 8, rely=0, relwidth=1 / 8, relheight=1)
         self.setup_key_nudgers(subtk.scale)
 
-        self.slider_vars[sub.name] = subtk.slider_var
+        self.slider_vars[sub.uri] = subtk.slider_var
         return subtk
 
     def toggle_slider_connectedness(self):
@@ -337,11 +336,11 @@ class KeyboardComposer(Frame, SubClient):
             return # no slider assigned at that column
         subtk.scale.set(value)
 
-    def send_to_hw(self, subName, hwNum):
+    def send_to_hw(self, subUri, hwNum):
         if isinstance(self.sliders, DummySliders):
             return
             
-        v = round(127 * self.slider_vars[subName].get())
+        v = round(127 * self.slider_vars[subUri].get())
         chan = "slider%s" % hwNum
         
         # workaround for some rounding issue, where we receive one
@@ -368,13 +367,12 @@ class KeyboardComposer(Frame, SubClient):
         row['bg'] = 'black'
 
     def get_levels(self):
-        return dict([(name, slidervar.get()) 
-            for name, slidervar in self.slider_vars.items()])
+        return dict([(uri, slidervar.get()) 
+            for uri, slidervar in self.slider_vars.items()])
 
     def get_levels_as_sub(self):
-        scaledsubs = [self.submasters.get_sub_by_name(sub) * level \
+        scaledsubs = [self.submasters.get_sub_by_uri(sub) * level
             for sub, level in self.get_levels().items() if level > 0.0]
-
         maxes = sub_maxes(*scaledsubs)
         return maxes
 
