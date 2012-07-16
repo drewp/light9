@@ -4,10 +4,7 @@ from __future__ import division, nested_scopes
 import sys,os,time,atexit
 from optparse import OptionParser
 import Tkinter as tk
-try:
-    from dispatch import dispatcher
-except ImportError:
-    import louie as dispatcher
+import louie as dispatcher
 
 import run_local
 from light9.dmxchanedit import Levelbox
@@ -60,9 +57,11 @@ class Subcomposer(tk.Frame):
         arranges to save the levels in that file upon exit"""
         self.load_levels()
         atexit.register(self.save_levels)
+
     def save_levels(self, *args):
         levelfile = file("subcomposer.savedlevels","w")
         levelfile.write(" ".join(map(str, self.levels)))
+
     def load_levels(self):
         try:
             levelfile = file("subcomposer.savedlevels","r")
@@ -70,12 +69,14 @@ class Subcomposer(tk.Frame):
             self.set_levels(levels)
         except IOError:
             pass
+
     def levelchanged(self, channel=None, newlevel=None):
         if channel is not None and newlevel is not None:
             if channel>len(self.levels):
                 return
             self.levels[channel-1]=max(0,min(1,float(newlevel)))
         self.levelbox.setlevels(self.levels)
+
     def savenewsub(self, subname):
         leveldict={}
         for i,lev in zip(range(len(self.levels)),self.levels):
@@ -84,22 +85,26 @@ class Subcomposer(tk.Frame):
 
         s=Submaster.Submaster(subname,leveldict=leveldict)
         s.save()
+
     def loadsub(self, subname):
         """puts a sub into the levels, replacing old level values"""
         s=Submaster.Submasters(showconfig.getGraph()).get_sub_by_name(subname)
         self.set_levels(s.get_dmx_list())
         dispatcher.send("levelchanged")
+
     def sendupdate(self):
         if not self.dmxdummy:
             dmxclient.outputlevels(self.levels)
             self.lastupdate = time.time()
             self.lastsent = self.levels[:]
+
     def considersendupdate(self, use_after_loop=0):
         """If use_after_loop is true, it is the period of the after loop."""
         if self.lastsent != self.levels or time.time() > self.lastupdate + 1:
             self.sendupdate()
         if use_after_loop:
             self.after(use_after_loop, self.considersendupdate, use_after_loop)
+
     def set_levels(self, levels):
         oldLen = len(self.levels)
         self.levels[:] = levels + [0] * (oldLen - len(levels))
