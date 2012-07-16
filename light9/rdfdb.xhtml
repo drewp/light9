@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="iso-8859-1"?>
+<?xml version="1.0" encoding="utf8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
 "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -6,6 +6,14 @@
     <title>rdfdb</title>
     <style type="text/css" media="all">
       /* <![CDATA[ */
+body {
+background: black;
+color: white;
+}
+      #patches { /* wants flex box */
+          max-height: 27em;
+          overflow-y: scroll;
+      }
       .patch {
           border: 1px solid gray;
           padding: 2px;
@@ -13,14 +21,14 @@
       }
       .patch > div {
           font-family: monospace;
-          font-size: 80%;
+          font-size: 90%;
           white-space: pre-wrap;
       } 
       .patch .adds {
-          color: #127E11;
+          color: #3AEA38;
       }
       .patch .deletes {
-          color: #DC6F6F;
+          color: #FF2828;
       }
       #out {
           white-space: pre-wrap;
@@ -53,13 +61,8 @@
     <script type="text/javascript">
       // <![CDATA[
       $(function(){
-          var ws = new WebSocket("ws://localhost:8051/live");
-          
-          ws.onopen = function() {   $("#status").text("connected"); };
-          ws.onerror = function(e) { $("#status").text("error: "+e); };
-          ws.onclose = function() {  $("#status").text("disconnected"); };
-          ws.onmessage = function (evt) {
-              var d = JSON.parse(evt.data);
+
+          function onMessage(d) {
               if (d.clients !== undefined) {
                   $("#clients").empty().text(JSON.stringify(d.clients));
               }
@@ -72,8 +75,27 @@
                   );
               }
 
-              $('#out').append($('<div>').text(evt.data));
-          };
+              $('#out').append($('<div>').text(JSON.stringify(d)));
+          }
+          
+          var pong = 0;
+          function connect() {
+              var ws = new WebSocket("ws://localhost:8051/live");
+              
+              ws.onopen = function() {   $("#status").text("connected"); };
+              ws.onerror = function(e) { $("#status").text("error: "+e); };
+              ws.onclose = function() {  
+                  pong = 1 - pong;
+                  $("#status").text("disconnected (retrying "+(pong ? "😼":"😺")+")"); 
+                  // this should be under a requestAnimationFrame to
+                  // save resources
+                  setTimeout(connect, 2000);
+              };
+              ws.onmessage = function (evt) {
+                  onMessage(JSON.parse(evt.data));
+              };
+          }
+          connect();
       });
       // ]]>
     </script>

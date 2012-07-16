@@ -24,10 +24,24 @@ class GraphFile(object):
         """update the graph with any diffs from this file"""
         old = self.getSubgraph(self.uri)
         new = Graph()
-        new.parse(location=self.path, format='n3')
+        try:
+            new.parse(location=self.path, format='n3')
+        except SyntaxError as e:
+            print e
+            log.error("syntax error in %s" % self.path)
+            return
 
         adds = [(s, p, o, self.uri) for s, p, o in new - old]
         dels = [(s, p, o, self.uri) for s, p, o in old - new]
 
+        print "file dels"
+        for s  in dels:
+            print s
+        print "file adds"
+        for s in adds:
+            print s
+        print ""
+
+        
         if adds or dels:
             self.patch(Patch(addQuads=adds, delQuads=dels))

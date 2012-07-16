@@ -82,6 +82,7 @@ from light9 import networking, showconfig
 from rdflib import ConjunctiveGraph, URIRef, Graph
 from light9.rdfdb.graphfile import GraphFile
 from light9.rdfdb.patch import Patch, ALLSTMTS
+from light9.rdfdb.rdflibpatch import patchQuads
 from light9.rdfdb import syncedgraph
 
 from twisted.internet.inotify import INotify
@@ -128,10 +129,13 @@ class Db(object):
         notifier = INotify()
         notifier.startReading()
 
-        for inFile in ["show/dance2012/config.n3", "demo.n3"]:
+        for inFile in [#"show/dance2012/config.n3",
+                       "show/dance2012/subs/bcools",
+                       #"demo.n3",
+                       ]:
             self.g = GraphFile(notifier,
                                inFile,
-                               URIRef("http://example.com/%s" %
+                               URIRef("http://example.com/file/%s" %
                                       os.path.basename(inFile)),
                                self.patch,
                                self.getSubgraph)
@@ -140,21 +144,13 @@ class Db(object):
         """
         apply this patch to the master graph then notify everyone about it
         """
-        log.info("patching graph with %s adds %s dels" %
-                 (len(p.addQuads), len(p.delQuads)))
+        log.info("patching graph -%d +%d" % (len(p.delQuads), len(p.addQuads)))
 
+        patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
         
-        for spoc in p.delQuads:
-            # probably need to insist that these existed, or else cull
-            # the ones that didn't exist, to make the patch invert right
-            self.graph.get_context(spoc[3]).remove(spoc[:3])
-
-        addQuads = p.addQuads[:2] # test
-
-        self.graph.addN(addQuads)
         self.summarizeToLog()
         for c in self.clients:
-            d = c.sendPatch(Patch(addQuads=addQuads, delQuads=p.delQuads))
+            d = c.sendPatch(p)
             d.addErrback(self.clientErrored, c)
         sendToLiveClients(asJson=p.jsonRepr)
 
@@ -162,9 +158,10 @@ class Db(object):
         err.trap(twisted.internet.error.ConnectError)
         log.info("connection error- dropping client %r" % c)
         self.clients.remove(c)
+        self.sendClientsToAllLivePages()        
 
     def summarizeToLog(self):
-        log.info("contexts in graph %s:" % len(self.graph))
+        log.info("contexts in graph (%s total stmts):" % len(self.graph))
         for c in self.graph.contexts():
             log.info("  %s: %s statements" %
                      (c.identifier, len(self.getSubgraph(c.identifier))))

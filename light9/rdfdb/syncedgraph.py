@@ -1,8 +1,9 @@
-from rdflib import ConjunctiveGraph
+from rdflib import ConjunctiveGraph, RDFS
 import logging, cyclone.httpclient, traceback, urllib
 from twisted.internet import reactor
 log = logging.getLogger()
 from light9.rdfdb.patch import Patch, ALLSTMTS
+from light9.rdfdb.rdflibpatch import patchQuads
 
 def sendPatch(putUri, patch):
     # this will take args for sender, etc
@@ -38,6 +39,9 @@ def makePatchEndpoint(cb):
     return Update
 
 class GraphWatchers(object):
+    """
+    store the current handlers that care about graph changes
+    """
     def __init__(self):
         self._handlersSp = {} # (s,p): set(handlers)
 
@@ -45,14 +49,34 @@ class GraphWatchers(object):
         if func is None:
             return
         key = s, p
-        self._handlersSp.setdefault(key, set()).add(func)
+        try:
+            self._handlersSp.setdefault(key, set()).add(func)
+        except Exception:
+            print "with key %r and func %r" % (key, func)
+            raise
 
-    def whoCares(self, p):
-        """what functions would care about the changes in this patch"""
+    def whoCares(self, patch):
+        """what handler functions would care about the changes in this patch"""
+        self.dependencies()
+        affectedSubjPreds = set([(s, p) for s, p, o, c in patch.addQuads]+
+                                [(s, p) for s, p, o, c in patch.delQuads])
+        
         ret = set()
-        for s in self._handlersSp.values():
-            ret.update(s)
+        for (s,p), func in self._handlersSp.iteritems():
+            if (s,p) in affectedSubjPreds:
+                ret.update(func)
         return ret
+
+    def dependencies(self):
+        """
+        for debugging, make a list of all the active handlers and what
+        data they depend on. This is meant for showing on the web ui
+        for browsing.
+        """
+        print "whocares"
+        from pprint import pprint
+        pprint(self._handlersSp)
+        
 
 class SyncedGraph(object):
     """
@@ -71,9 +95,7 @@ class SyncedGraph(object):
         self._watchers = GraphWatchers()
         
         def onPatch(p):
-            for spoc in p.delGraph.quads(ALLSTMTS):
-                _graph.get_context(spoc[3]).remove(spoc[:3])
-            _graph.addN(p.addGraph.quads(ALLSTMTS))
+            patchQuads(_graph, p.delQuads, p.addQuads)
             log.info("graph now has %s statements" % len(_graph))
             try:
                 self.updateOnPatch(p)
@@ -89,10 +111,7 @@ class SyncedGraph(object):
         self.updateResource = 'http://localhost:%s/update' % port
         log.info("listening on %s" % port)
         self.register(label)
-
-    def updateOnPatch(self, p):
-        for func in self._watchers.whoCares(p):
-            self.addHandler(func)
+        self.currentFunc = None
 
     def register(self, label):
 
@@ -140,13 +159,32 @@ class SyncedGraph(object):
         finally:
             self.currentFunc = None
 
+    def updateOnPatch(self, p):
+        """
+        patch p just happened to the graph; call everyone back who
+        might care, and then notice what data they depend on now
+        """
+        for func in self._watchers.whoCares(p):
+            # and forget the old one!
+            self.addHandler(func)
+
+    def _assertCurrent(self):
+        if self.currentFunc is None:
+            # this may become a warning later
+            raise ValueError("asked for graph data outside of a handler")
+
     # these just call through to triples() so it might be possible to
     # watch just that one
     def value(self, subj, pred):
+        self._assertCurrent()
         self._watchers.addSubjPredWatcher(self.currentFunc, subj, pred)
         return self._graph.value(subj, pred)
 
     def objects(self, subject=None, predicate=None):
+        self._assertCurrent()
         self._watchers.addSubjPredWatcher(self.currentFunc, subject, predicate)
         return self._graph.objects(subject, predicate)
     
+    def label(self, uri):
+        self._assertCurrent()
+        return self.value(uri, RDFS.label)
