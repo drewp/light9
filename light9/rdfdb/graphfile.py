@@ -1,4 +1,4 @@
-import logging
+import logging, traceback
 from twisted.python.filepath import FilePath
 from rdflib import Graph
 from light9.rdfdb.patch import Patch
@@ -18,7 +18,10 @@ class GraphFile(object):
       
     def notify(self, notifier, filepath, mask):
         log.info("file %s changed" % filepath)
-        self.reread()
+        try:
+            self.reread()
+        except Exception:
+            traceback.print_exc()
 
     def reread(self):
         """update the graph with any diffs from this file"""

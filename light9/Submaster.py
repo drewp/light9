@@ -1,100 +1,166 @@
 from __future__ import division
 import os, logging, time
-from rdflib import Graph
+from rdflib import Graph, RDF
 from rdflib import RDFS, Literal, BNode
 from light9.namespaces import L9, XSD
 from light9.TLUtility import dict_scale, dict_max
 from light9 import Patch, showconfig
-try:
-    import dispatch.dispatcher as dispatcher
-except ImportError:
-    from louie import dispatcher
-log = logging.getLogger()
+from louie import dispatcher
+log = logging.getLogger('submaster')
 
-class Submaster:
+class Submaster(object):
     "Contain a dictionary of levels, but you didn't need to know that"
-    def __init__(self,
-                 name=None,
-                 graph=None, sub=None,
-                 leveldict=None, temporary=False):
-        """sub is the URI for this submaster, graph is a graph where
-        we can learn about the sub. If graph is not provided, we look
-        in a file named name.
+    def __init__(self, name, levels):
+        """this sub has a name just for debugging. It doesn't get persisted. 
+        See PersistentSubmaster.
 
-        name is the filename where we can load a graph about this URI
-        (see showconfig.subFile)
-
-        passing name alone makes a new empty sub
-
-        temporary means the sub won't get saved or loaded
-
-
-        pass:
-          name, temporary=True  -  no rdf involved
-          sub, filename         -  read sub URI from graph at filename
-          
-          name - new sub
-          sub - n
-          name, sub - new 
-        
+        levels is a dict
         """
-        if name is sub is leveldict is None:
-            raise TypeError("more args are needed")
-        if sub is not None and name is None:
-            name = graph.label(sub)
-        if graph is not None:
-            # old code was passing leveldict as second positional arg
-            assert isinstance(graph, Graph)
         self.name = name
-        self.uri = sub
+        self.levels = levels
+
+        self.temporary = True
+        
+        if not self.temporary:
+            # obsolete
+            dispatcher.connect(log.error, 'reload all subs')
+            
+        log.debug("%s initial levels %s", self.name, self.levels)
+
+    def _editedLevels(self):
+        pass
+    
+    def set_level(self, channelname, level, save=True):
+        self.levels[Patch.resolve_name(channelname)] = level
+        self._editedLevels()
+
+    def set_all_levels(self, leveldict):
+        self.levels.clear()
+        for k, v in leveldict.items():
+            # this may call _editedLevels too many times
+            self.set_level(k, v, save=0)
+
+    def get_levels(self):
+        return self.levels
+    
+    def no_nonzero(self):
+        return (not self.levels.values()) or not (max(self.levels.values()) > 0)
+
+    def __mul__(self, scalar):
+        return Submaster("%s*%s" % (self.name, scalar), 
+                         levels=dict_scale(self.levels, scalar))
+    __rmul__ = __mul__
+    def max(self, *othersubs):
+        return sub_maxes(self, *othersubs)
+
+    def __add__(self, other):
+        return self.max(other)
+
+    def ident(self):
+        return (self.name, tuple(sorted(self.levels.items())))
+
+    def __repr__(self):
+        items = getattr(self, 'levels', {}).items()
+        items.sort()
+        levels = ' '.join(["%s:%.2f" % item for item in items])
+        return "<'%s': [%s]>" % (getattr(self, 'name', 'no name yet'), levels)
+    
+    def __cmp__(self, other):
+        # not sure how useful this is
+        return cmp(self.ident(), other.ident())
+    
+    def __hash__(self):
+        return hash(self.ident())
+
+    def get_dmx_list(self):
+        leveldict = self.get_levels() # gets levels of sub contents
+
+        levels = []
+        for k, v in leveldict.items():
+            if v == 0:
+                continue
+            try:
+                dmxchan = Patch.get_dmx_channel(k) - 1
+            except ValueError:
+                log.error("error trying to compute dmx levels for submaster %s" % self.name)
+                raise
+            if dmxchan >= len(levels):
+                levels.extend([0] * (dmxchan - len(levels) + 1))
+            levels[dmxchan] = max(v, levels[dmxchan])
+
+        return levels
+    
+    def normalize_patch_names(self):
+        """Use only the primary patch names."""
+        # possibly busted -- don't use unless you know what you're doing
+        self.set_all_levels(self.levels.copy())
+
+    def get_normalized_copy(self):
+        """Get a copy of this sumbaster that only uses the primary patch 
+        names.  The levels will be the same."""
+        newsub = Submaster("%s (normalized)" % self.name, {})
+        newsub.set_all_levels(self.levels)
+        return newsub
+    
+    def crossfade(self, othersub, amount):
+        """Returns a new sub that is a crossfade between this sub and
+        another submaster.  
+        
+        NOTE: You should only crossfade between normalized submasters."""
+        otherlevels = othersub.get_levels()
+        keys_set = {}
+        for k in self.levels.keys() + otherlevels.keys():
+            keys_set[k] = 1
+        all_keys = keys_set.keys()
+
+        xfaded_sub = Submaster("xfade", {})
+        for k in all_keys:
+            xfaded_sub.set_level(k, 
+                                 linear_fade(self.levels.get(k, 0),
+                                             otherlevels.get(k, 0),
+                                             amount))
+
+        return xfaded_sub
+
+class PersistentSubmaster(Submaster):
+    def __init__(self, graph, uri):
+        self.graph, self.uri = graph, uri
+        self.graph.addHandler(self.setName)
+        self.graph.addHandler(self.setLevels)
+        Submaster.__init__(self, self.name, self.levels)
         self.graph = graph
-        self.temporary = temporary
-        if leveldict:
-            self.levels = leveldict
+        self.uri = uri
+        self.temporary = False
+
+    def ident(self):
+        return self.uri
+        
+    def _editedLevels(self):
+        self.save()
+        
+    def setName(self):
+        log.info("sub update name %s %s", self.uri, self.graph.label(self.uri))
+        self.name = self.graph.label(self.uri)
+        
+    def setLevels(self):
+        log.info("sub update levels")
+        oldLevels = getattr(self, 'levels', {}).copy()
+        self.setLevelsFromGraph()
+        if oldLevels != self.levels:
+            log.info("sub %s changed" % self.name)
+        
+    def setLevelsFromGraph(self):
+        patchGraph = showconfig.getGraph() # going away
+        if hasattr(self, 'levels'):
+            self.levels.clear()
         else:
             self.levels = {}
-            self.reload(quiet=True, graph=graph)
-        if not self.temporary:
-            dispatcher.connect(self.reload, 'reload all subs')
-        log.debug("%s initial levels %s", self.name, self.levels)
-        
-    def reload(self, quiet=False, graph=None):
-        if self.temporary:
-            return
-        try:
-            oldlevels = self.levels.copy()
-            self.levels.clear()
-            patchGraph = showconfig.getGraph()
-            if 1 or graph is None:
-                # need to read the sub graph to build the levels, not
-                # use the main one! The sub graphs will eventually
-                # just be part of the one and only shared graph
-                graph = Graph()
-                if not self.name:
-                    # anon sub, maybe for a chase
-                    pass
-                else:
-                    inFile = showconfig.subFile(self.name)
-
-                    t1 = time.time()
-                    graph.parse(inFile, format="n3")
-                    log.info("reading %s in %.1fms", inFile, 1000 * (time.time() - t1))
-                    
-                self.setLevelsFromGraph(graph, patchGraph)
-                
-            if (not quiet) and (oldlevels != self.levels):
-                log.info("sub %s changed" % self.name)
-        except IOError, e:
-            log.error("Can't read file for sub: %r (%s)" % (self.name, e))
-
-    def setLevelsFromGraph(self, graph, patchGraph):
-        self.uri = L9['sub/%s' % self.name]
-        for lev in graph.objects(self.uri, L9['lightLevel']):
-            chan = graph.value(lev, L9['channel'])
-            val = graph.value(lev, L9['level'])
+        for lev in self.graph.objects(self.uri, L9['lightLevel']):
+            chan = self.graph.value(lev, L9['channel'])
+            val = self.graph.value(lev, L9['level'])
             name = patchGraph.label(chan)
             if not name:
-                log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
+                #log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
                 continue
             self.levels[name] = float(val)
 
@@ -120,87 +186,6 @@ class Submaster:
 
         graph.serialize(showconfig.subFile(self.name), format="nt")
 
-    def set_level(self, channelname, level, save=True):
-        self.levels[Patch.resolve_name(channelname)] = level
-        if save:
-            self.save()
-    def set_all_levels(self, leveldict):
-        self.levels.clear()
-        for k, v in leveldict.items():
-            self.set_level(k, v, save=0)
-        self.save()
-    def get_levels(self):
-        return self.levels
-    def no_nonzero(self):
-        return (not self.levels.values()) or not (max(self.levels.values()) > 0)
-    def __mul__(self, scalar):
-        return Submaster("%s*%s" % (self.name, scalar), 
-                         leveldict=dict_scale(self.levels, scalar),
-                         temporary=True)
-    __rmul__ = __mul__
-    def max(self, *othersubs):
-        return sub_maxes(self, *othersubs)
-
-    def __add__(self, other):
-        return self.max(other)
-
-    def __repr__(self):
-        items = self.levels.items()
-        items.sort()
-        levels = ' '.join(["%s:%.2f" % item for item in items])
-        return "<'%s': [%s]>" % (self.name, levels)
-    def get_dmx_list(self):
-        leveldict = self.get_levels() # gets levels of sub contents
-
-        levels = []
-        for k, v in leveldict.items():
-            if v == 0:
-                continue
-            try:
-                dmxchan = Patch.get_dmx_channel(k) - 1
-            except ValueError:
-                log.error("error trying to compute dmx levels for submaster %s" % self.name)
-                raise
-            if dmxchan >= len(levels):
-                levels.extend([0] * (dmxchan - len(levels) + 1))
-            levels[dmxchan] = max(v, levels[dmxchan])
-
-        return levels
-    def normalize_patch_names(self):
-        """Use only the primary patch names."""
-        # possibly busted -- don't use unless you know what you're doing
-        self.set_all_levels(self.levels.copy())
-    def get_normalized_copy(self):
-        """Get a copy of this sumbaster that only uses the primary patch 
-        names.  The levels will be the same."""
-        newsub = Submaster("%s (normalized)" % self.name, temporary=1)
-        newsub.set_all_levels(self.levels)
-        return newsub
-    def crossfade(self, othersub, amount):
-        """Returns a new sub that is a crossfade between this sub and
-        another submaster.  
-        
-        NOTE: You should only crossfade between normalized submasters."""
-        otherlevels = othersub.get_levels()
-        keys_set = {}
-        for k in self.levels.keys() + otherlevels.keys():
-            keys_set[k] = 1
-        all_keys = keys_set.keys()
-
-        xfaded_sub = Submaster("xfade", temporary=1)
-        for k in all_keys:
-            xfaded_sub.set_level(k, 
-                                 linear_fade(self.levels.get(k, 0),
-                                             otherlevels.get(k, 0),
-                                             amount))
-
-        return xfaded_sub
-    def __cmp__(self, other):
-        """Compare by sub repr (name, hopefully)"""
-        return cmp(repr(self), repr(other))
-    def __hash__(self):
-        raise NotImplementedError
-        return hash(repr(self))
                                             
 def linear_fade(start, end, amount):
     """Fades between two floats by an amount.  amount is a float between
@@ -213,8 +198,7 @@ def sub_maxes(*subs):
     nonzero_subs = [s for s in subs if not s.no_nonzero()]
     name = "max(%s)" % ", ".join([repr(s) for s in nonzero_subs])
     return Submaster(name,
-                     leveldict=dict_max(*[sub.levels for sub in nonzero_subs]),
-                     temporary=1)
+                     levels=dict_max(*[sub.levels for sub in nonzero_subs]))
 
 def combine_subdict(subdict, name=None, permanent=False):
     """A subdict is { Submaster objects : levels }.  We combine all
@@ -236,17 +220,24 @@ class Submasters:
     "Collection o' Submaster objects"
     def __init__(self, graph):
         self.submasters = {}
-
-        files = os.listdir(showconfig.subsDir())
-        t1 = time.time()
-        for filename in files:
-            # we don't want these files
-            if filename.startswith('.') or filename.endswith('~') or \
-               filename.startswith('CVS'):
-                continue
-            self.submasters[filename] = Submaster(filename, graph=graph)
-        log.info("loaded all submasters in %.1fms" % ((time.time() - t1) * 1000))
+        self.graph = graph
         
+        graph.addHandler(self.findSubs)
+
+    def findSubs(self):
+        current = set()
+
+        for s in self.graph.subjects(RDF.type, L9['Submaster']):
+            log.info("found sub %s", s)
+            if s not in self.submasters:
+                sub = self.submasters[s] = PersistentSubmaster(self.graph, s)
+                dispatcher.send("new submaster", sub=sub)
+                current.add(s)
+        for s in set(self.submasters.keys()) - current:
+            del self.submasters[s]
+            dispatcher.send("lost submaster", subUri=s)
+        log.info("findSubs finished %s", self.submasters)
+
     def get_all_subs(self):
         "All Submaster objects"
         l = self.submasters.items()
@@ -255,7 +246,7 @@ class Submasters:
         songs = []
         notsongs = []
         for s in l:
-            if s.name.startswith('song'):
+            if s.name and s.name.startswith('song'):
                 songs.append(s)
             else:
                 notsongs.append(s)

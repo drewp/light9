@@ -4,7 +4,7 @@ from __future__ import division, nested_scopes
 import cgi, os, sys, time, subprocess, logging
 from optparse import OptionParser
 import webcolors, colorsys
-
+from louie import dispatcher
 from twisted.internet import reactor, tksupport
 from twisted.web import xmlrpc, server, resource
 from Tix import *
@@ -19,6 +19,8 @@ from light9 import dmxclient, showconfig, networking, prof
 from light9.uihelpers import toplevelat, bindkeys
 from light9.namespaces import L9
 from light9.tkdnd import initTkdnd, dragSourceRegister
+from light9.rdfdb.syncedgraph import SyncedGraph
+
 from bcf2000 import BCF2000
 
 nudge_keys = {
@@ -55,6 +57,7 @@ class SubScale(Scale, Fadable):
 
 class SubmasterTk(Frame):
     def __init__(self, master, sub, current_level):
+        self.sub = sub
         bg = sub.graph.value(sub.uri, L9.color, default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
@@ -65,28 +68,34 @@ class SubmasterTk(Frame):
         self.slider_var = DoubleVar()
         self.slider_var.set(current_level)
         self.scale = SubScale(self, variable=self.slider_var, width=20)
-        namelabel = Label(self, text=sub.name, font="Arial 7", bg=darkBg,
+        
+        self.namelabel = Label(self, font="Arial 7", bg=darkBg,
             fg='white', pady=0)
-        namelabel.pack(side=TOP)
+        self.sub.graph.addHandler(self.updateName)
+        
+        self.namelabel.pack(side=TOP)
         levellabel = Label(self, textvariable=self.slider_var, font="Arial 7",
             bg='black', fg='white', pady=0)
         levellabel.pack(side=TOP)
         self.scale.pack(side=BOTTOM, expand=1, fill=BOTH)
         bindkeys(self, "<Control-Key-l>", self.launch_subcomposer)
 
-        for w in [self, namelabel, levellabel]:
+        for w in [self, self.namelabel, levellabel]:
             dragSourceRegister(w, 'copy', 'text/uri-list', sub.uri)
+
+    def updateName(self):
+        self.namelabel.config(text=self.sub.graph.label(self.sub.uri))
 
     def launch_subcomposer(self, *args):
         subprocess.Popen(["bin/subcomposer", "--no-geometry", self.name])
 
 class KeyboardComposer(Frame, SubClient):
-    def __init__(self, root, graph, submasters, current_sub_levels=None,
+    def __init__(self, root, graph, current_sub_levels=None,
                  hw_sliders=True):
         Frame.__init__(self, root, bg='black')
         SubClient.__init__(self)
         self.graph = graph
-        self.submasters = submasters
+        self.submasters = Submasters(graph)
         self.name_to_subtk = {}
         self.current_sub_levels = {}
         self.current_row = 0
@@ -101,21 +110,14 @@ class KeyboardComposer(Frame, SubClient):
 
         self.use_hw_sliders = hw_sliders
         self.connect_to_hw(hw_sliders)
-        self.draw_ui()
-        self.send_levels_loop()
-
-    def draw_ui(self):
-        self.rows = [] # this holds Tk Frames for each row
-        self.slider_vars = {} # this holds subname:sub Tk vars
-        self.slider_table = {} # this holds coords:sub Tk vars
-        self.name_to_subtk.clear() # subname : SubmasterTk instance
 
         self.make_key_hints()
-        self.draw_sliders()
-        if len(self.rows):
-            self.change_row(self.current_row)
-            self.rows[self.current_row].focus()
+        self.make_buttons()
 
+        self.graph.addHandler(self.redraw_sliders)
+        self.send_levels_loop()
+
+    def make_buttons(self):
         self.buttonframe = Frame(self, bg='black')
         self.buttonframe.pack(side=BOTTOM)
 
@@ -131,10 +133,6 @@ class KeyboardComposer(Frame, SubClient):
             command=self.alltozero, bg='black', fg='white')
         self.alltozerobutton.pack(side='left')
 
-        self.refreshbutton = Button(self.buttonframe, text="Refresh", 
-            command=self.refresh, bg='black', fg='white')
-        self.refreshbutton.pack(side=LEFT)
-
         self.save_stage_button = Button(self.buttonframe, text="Save", 
             command=lambda: self.save_current_stage(self.sub_name.get()), 
             bg='black', fg='white')
@@ -142,18 +140,53 @@ class KeyboardComposer(Frame, SubClient):
         self.sub_name = Entry(self.buttonframe, bg='black', fg='white')
         self.sub_name.pack(side=LEFT)
 
+
+    def redraw_sliders(self):
+        self.slider_vars = {} # this holds subname:sub Tk vars
+        self.slider_table = {} # this holds coords:sub Tk vars
+        self.name_to_subtk.clear() # subname : SubmasterTk instance
+
+        self.graph.addHandler(self.draw_sliders)
+        if len(self.rows):
+            self.change_row(self.current_row)
+            self.rows[self.current_row].focus()
+
         self.stop_frequent_update_time = 0
-                
+
+    def onNewSub(self, sub):
+        log.info("new %s", sub)
+        self.graph.addHandler(self.draw_sliders)
+
+    def onLostSub(self, subUri):
+        log.info("lost %s", subUri)
+        self.graph.addHandler(self.draw_sliders)
+    
     def draw_sliders(self):
+
+
+        if hasattr(self, 'rows'):
+            for r in self.rows:
+                r.destroy()
+        self.rows = [] # this holds Tk Frames for each row
+
+        
         self.tk_focusFollowsMouse()
 
         rowcount = -1
         col = 0
         last_group = None
+
+        # there are unlikely to be any subs at startup because we
+        # probably haven't been called back with the graph data yet
+        
+        #read get_all_subs then watch 'new submaster' 'lost submaster' signals
         withgroups = sorted((self.graph.value(sub.uri, L9['group']), 
                              self.graph.value(sub.uri, L9['order']), 
                              sub)
             for sub in self.submasters.get_all_subs())
+        dispatcher.connect(self.onNewSub, "new submaster")
+        dispatcher.connect(self.onLostSub, "lost submaster")
+        log.info("withgroups %s", withgroups)
 
         for group, order, sub in withgroups:
             group = self.graph.value(sub.uri, L9['group'])
@@ -203,7 +236,7 @@ class KeyboardComposer(Frame, SubClient):
             try:
                 self.sliders = Sliders(self)
             except IOError:
-                print "Couldn't actually find any sliders (but really, it's no problem)"
+                log.info("no hardware sliders")
                 self.sliders = DummySliders()
                 self.use_hw_sliders = False
         else:
@@ -256,6 +289,7 @@ class KeyboardComposer(Frame, SubClient):
         if event.keysym in ('Prior', 'p', 'bracketright'):
             diff = -1
         self.change_row(self.current_row + diff)
+
     def change_row(self, row):
         old_row = self.current_row
         self.current_row = row
@@ -328,20 +362,24 @@ class KeyboardComposer(Frame, SubClient):
     def highlight_row(self, row):
         row = self.rows[row]
         row['bg'] = 'red'
+
     def unhighlight_row(self, row):
         row = self.rows[row]
         row['bg'] = 'black'
+
     def get_levels(self):
         return dict([(name, slidervar.get()) 
             for name, slidervar in self.slider_vars.items()])
+
     def get_levels_as_sub(self):
         scaledsubs = [self.submasters.get_sub_by_name(sub) * level \
             for sub, level in self.get_levels().items() if level > 0.0]
 
         maxes = sub_maxes(*scaledsubs)
         return maxes
+
     def save_current_stage(self, subname):
-        print "saving current levels as", subname
+        log.info("saving current levels as %s", subname)
         sub = self.get_levels_as_sub()
         sub.name = subname
         sub.temporary = 0
@@ -355,20 +393,6 @@ class KeyboardComposer(Frame, SubClient):
         if time.time() <= self.stop_frequent_update_time:
             self.send_levels()
             self.after(10, self.send_frequent_updates)
-
-    def refresh(self):
-        self.save()
-        graph = showconfig.getGraph()
-        self.submasters = Submasters(graph)
-        self.current_sub_levels, self.current_row = \
-            pickle.load(file('.keyboardcomposer.savedlevels'))
-        for r in self.rows:
-            r.destroy()
-        self.keyhints.destroy()
-        self.buttonframe.destroy()
-        self.draw_ui()
-        # possibly paranoia (but possibly not)
-        self.change_row(self.current_row)
 
     def alltozero(self):
         for name, subtk in self.name_to_subtk.items():
@@ -463,10 +487,9 @@ if __name__ == "__main__":
     opts, args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO if opts.v else logging.WARN)
-    log = logging.getLogger()
+    log = logging.getLogger('keyboardcomposer')
 
-    graph = showconfig.getGraph()
-    s = Submasters(graph)
+    graph = SyncedGraph("keyboardcomposer")
 
     root = Tk()
     initTkdnd(root.tk, 'tkdnd/trunk/')
@@ -476,7 +499,7 @@ if __name__ == "__main__":
     startLevels = None
     if opts.nonpersistent:
         startLevels = {}
-    kc = KeyboardComposer(tl, graph, s, startLevels,
+    kc = KeyboardComposer(tl, graph, startLevels,
                           hw_sliders=not opts.no_sliders)
     kc.pack(fill=BOTH, expand=1)
 
@@ -489,8 +512,8 @@ if __name__ == "__main__":
         reactor.listenTCP(networking.keyboardComposer.port,
                           server.Site(LevelServerHttp(kc.name_to_subtk)))
     except twisted.internet.error.CannotListenError, e:
-        print "Can't (and won't!) start level server:"
-        print e
+        log.warn("Can't (and won't!) start level server:")
+        log.warn(e)
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
     if not opts.nonpersistent:
@@ -500,5 +523,5 @@ if __name__ == "__main__":
 
 
 #    prof.watchPoint("/usr/lib/python2.4/site-packages/rdflib-2.3.3-py2.4-linux-i686.egg/rdflib/Graph.py", 615)
-    
+
     prof.run(reactor.run, profile=False)

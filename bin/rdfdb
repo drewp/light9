@@ -70,7 +70,9 @@ Our web ui:
 registered clients
 
 recent edits, each one says what client it came from. You can reverse
-them here.
+them here. We should be able to take patches that are close in time
+and keep updating the same data (e.g. a stream of changes as the user
+drags a slider) and collapse them into a single edit for clarity.
 
 """
 from twisted.internet import reactor
@@ -131,7 +133,9 @@ class Db(object):
 
         for inFile in [#"show/dance2012/config.n3",
                        "show/dance2012/subs/bcools",
-                       #"demo.n3",
+                       "show/dance2012/subs/bwarm",
+                       "show/dance2012/subs/house",
+                       "demo.n3",
                        ]:
             self.g = GraphFile(notifier,
                                inFile,
