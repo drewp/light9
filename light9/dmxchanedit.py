@@ -58,12 +58,13 @@ class Onelevel(tk.Frame):
         self.num_lab.pack(side='left')
 
         # text description of channel
-        self.desc_lab=tk.Label(self, text=self.graph.label(self.uri),
+        self.desc_lab=tk.Label(self,
                                width=14,
                                font=stdfont,
                                anchor='w',
                                padx=0, pady=0, bd=0, 
                  height=1, bg='black', fg='white')
+        self.graph.addHandler(self.updateLabel)
         self.desc_lab.pack(side='left')
 
         # current level of channel, shows intensity with color
@@ -74,6 +75,9 @@ class Onelevel(tk.Frame):
 
         self.setlevel(0)
         self.setupmousebindings()
+
+    def updateLabel(self):
+         self.desc_lab.config(text=self.graph.label(self.uri))
         
     def setupmousebindings(self):
         def b1down(ev):
