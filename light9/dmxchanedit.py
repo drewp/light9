@@ -134,6 +134,7 @@ class Levelbox(tk.Frame):
         self.levels = [] # Onelevel objects
 
         chans = list(self.graph.subjects(RDF.type, L9.Channel))
+        chans.sort(key=lambda c: int(self.graph.value(c, L9.output).rsplit('/c')[-1]))
         cols = 2
         rows = len(chans) // cols
 

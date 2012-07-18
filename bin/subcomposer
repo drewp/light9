@@ -1,7 +1,6 @@
 #!bin/python
 
 from __future__ import division, nested_scopes
-import sys,os,time,atexit
 from optparse import OptionParser
 import Tkinter as tk
 import louie as dispatcher
