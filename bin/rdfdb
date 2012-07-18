@@ -74,6 +74,11 @@ them here. We should be able to take patches that are close in time
 and keep updating the same data (e.g. a stream of changes as the user
 drags a slider) and collapse them into a single edit for clarity.
 
+proposed rule feature:
+rdfdb should be able to watch a pair of (sourceFile, rulesFile) and
+rerun the rules when either one changes. Should the sourceFile be able
+to specify its own rules file? That would be easier configuration.
+
 """
 from twisted.internet import reactor
 import twisted.internet.error

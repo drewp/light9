@@ -15,11 +15,6 @@ windowlocations = {
     'scenes' : '504x198+462+12',
 }
 
-def make_frame(parent):
-    f = Frame(parent, bd=0, bg='black')
-    f.pack(side='left')
-    return f
-
 def bindkeys(root,key, func):
     root.bind(key, func)
     for w in root.winfo_children():

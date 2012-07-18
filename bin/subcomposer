@@ -5,26 +5,21 @@ import sys,os,time,atexit
 from optparse import OptionParser
 import Tkinter as tk
 import louie as dispatcher
+from twisted.internet import reactor, tksupport, task
 
 import run_local
 from light9.dmxchanedit import Levelbox
-from light9 import dmxclient, Patch, Submaster, showconfig
+from light9 import dmxclient, Patch, Submaster, showconfig, prof
 from light9.uihelpers import toplevelat
+from light9.rdfdb.syncedgraph import SyncedGraph
 
 class Subcomposer(tk.Frame):
-    def __init__(self, master, levelboxopts=None, dmxdummy=0, numchannels=72,
-        use_persistentlevels=0):
+    def __init__(self, master, graph):
         tk.Frame.__init__(self, master, bg='black')
-        self.dmxdummy = dmxdummy
-        self.numchannels = numchannels
+        self.graph = graph
 
-        self.levels = [0]*numchannels # levels should never get overwritten, just edited
-
-        self.levelbox = Levelbox(self, num_channels=numchannels)
+        self.levelbox = Levelbox(self, graph)
         self.levelbox.pack(side='top')
-        # the dmx levels we edit and output, range is 0..1 (dmx chan 1 is
-        # the 0 element)
-        self.levelbox.setlevels(self.levels)
 
         self.savebox = EntryCommand(self, cmd=self.savenewsub)
         self.savebox.pack(side='top')
@@ -33,30 +28,16 @@ class Subcomposer(tk.Frame):
         self.loadbox.pack(side='top')
 
         def alltozero():
-            self.set_levels([0] * self.numchannels)
-            dispatcher.send("levelchanged")
+            for lev in self.levelbox.levels:
+                lev.setlevel(0)
 
         tk.Button(self, text="all to zero", command=alltozero).pack(side='top')
 
-        dispatcher.connect(self.levelchanged,"levelchanged")
-        dispatcher.connect(self.sendupdate,"levelchanged")
-
-        if use_persistentlevels:
-            self.persistentlevels()
-
-        self.lastupdate=0 # time we last sent to dmx
-
-        self.lastsent=[] # copy of levels
+        dispatcher.connect(self.sendupdate, "levelchanged")
 
     def fill_both_boxes(self, subname):
         for box in [self.savebox, self.loadbox]:
             box.set(subname)
-
-    def persistentlevels(self):
-        """adjusts levels from subcomposer.savedlevels, if possible; and
-        arranges to save the levels in that file upon exit"""
-        self.load_levels()
-        atexit.register(self.save_levels)
 
     def save_levels(self, *args):
         levelfile = file("subcomposer.savedlevels","w")
@@ -69,13 +50,6 @@ class Subcomposer(tk.Frame):
             self.set_levels(levels)
         except IOError:
             pass
-
-    def levelchanged(self, channel=None, newlevel=None):
-        if channel is not None and newlevel is not None:
-            if channel>len(self.levels):
-                return
-            self.levels[channel-1]=max(0,min(1,float(newlevel)))
-        self.levelbox.setlevels(self.levels)
 
     def savenewsub(self, subname):
         leveldict={}
@@ -92,23 +66,20 @@ class Subcomposer(tk.Frame):
         self.set_levels(s.get_dmx_list())
         dispatcher.send("levelchanged")
 
+    def toDmxLevels(self):
+        # the dmx levels we edit and output, range is 0..1 (dmx chan 1 is
+        # the 0 element)
+        out = {}
+        for lev in self.levelbox.levels:
+            out[lev.channelnum] = lev.currentlevel
+        if not out:
+            return []
+        
+        return [out.get(i, 0) for i in range(max(out.keys()) + 1)]
+     
     def sendupdate(self):
-        if not self.dmxdummy:
-            dmxclient.outputlevels(self.levels)
-            self.lastupdate = time.time()
-            self.lastsent = self.levels[:]
+        dmxclient.outputlevels(self.toDmxLevels(), twisted=True)
 
-    def considersendupdate(self, use_after_loop=0):
-        """If use_after_loop is true, it is the period of the after loop."""
-        if self.lastsent != self.levels or time.time() > self.lastupdate + 1:
-            self.sendupdate()
-        if use_after_loop:
-            self.after(use_after_loop, self.considersendupdate, use_after_loop)
-
-    def set_levels(self, levels):
-        oldLen = len(self.levels)
-        self.levels[:] = levels + [0] * (oldLen - len(levels))
-        dispatcher.send("levelchanged")
 
 class EntryCommand(tk.Frame):
     def __init__(self, master, verb="Save", cmd=None):
@@ -131,23 +102,6 @@ class EntryCommand(tk.Frame):
         self.entry.insert(0, text)
 
 
-def open_sub_editing_window(subname, use_mainloop=1, dmxdummy=0):
-    if use_mainloop:
-        toplevel = tk.Tk()
-    else:
-        toplevel = tk.Toplevel()
-    if dmxdummy:
-        dummy_str = ' (dummy)'
-    else:
-        dummy_str = ''
-    toplevel.title("Subcomposer: %s%s" % (subname, dummy_str))
-    sc = Subcomposer(toplevel, use_persistentlevels=0, dmxdummy=dmxdummy)
-    sc.pack(fill='both', expand=1)
-    sc.loadsub(subname)
-    sc.considersendupdate(use_after_loop=10)
-    if use_mainloop:
-        tk.mainloop()
-
 #############################
 
 if __name__ == "__main__":
@@ -162,10 +116,9 @@ if __name__ == "__main__":
     if not opts.no_geometry:
         toplevelat("subcomposer", root)
 
-    sc = Subcomposer(root, dmxdummy=0,
-                     #numchannels=276 # use this to see all the skyline dims
-                     #numchannels=118
-                     )
+    graph = SyncedGraph("subcomposer")
+
+    sc = Subcomposer(root, graph)
     sc.pack()
 
     tk.Label(root,text="Bindings: B1 adjust level; B2 set full; B3 instant bump",
@@ -176,11 +129,7 @@ if __name__ == "__main__":
         sc.loadsub(args[0])
         sc.fill_both_boxes(args[0])
 
-    while 1:
-        try:
-            root.update()
-        except tk.TclError:
-            break
+    task.LoopingCall(sc.sendupdate).start(1)
 
-        sc.considersendupdate()
-        time.sleep(.01)
+    tksupport.install(root,ms=10)
+    prof.run(reactor.run, profile=False)
