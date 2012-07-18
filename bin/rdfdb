@@ -65,6 +65,14 @@ json {"adds" : [[quads]...],
      }
 maybe use some http://json-ld.org/ in there.
 
+proposed rule feature:
+rdfdb should be able to watch a pair of (sourceFile, rulesFile) and
+rerun the rules when either one changes. Should the sourceFile be able
+to specify its own rules file?  That would be easier
+configuration. How do edits work? Not allowed?  Patch the source only?
+Also see the source graph loaded into a different ctx, and you can
+edit that one and see the results in the output context?
+
 Our web ui:
 
 registered clients
@@ -74,10 +82,12 @@ them here. We should be able to take patches that are close in time
 and keep updating the same data (e.g. a stream of changes as the user
 drags a slider) and collapse them into a single edit for clarity.
 
-proposed rule feature:
-rdfdb should be able to watch a pair of (sourceFile, rulesFile) and
-rerun the rules when either one changes. Should the sourceFile be able
-to specify its own rules file? That would be easier configuration.
+Ways to display patches, using labels and creator/subj icons where possible:
+
+  <creator> set <subj>'s <p> to <o>
+  <creator> changed <subj>'s <pred> from <o1> to <o2>
+  <creator> added <o> to <s> <p>
+
 
 """
 from twisted.internet import reactor

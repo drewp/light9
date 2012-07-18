@@ -4,9 +4,10 @@ dmxclient.outputlevels(..)
 
 client id is formed from sys.argv[0] and the PID.  """
 
-import xmlrpclib, os, sys, socket, time
+import xmlrpclib, os, sys, socket, time, logging
 from light9 import networking
 _dmx=None
+log = logging.getLogger('dmxclient')
 
 procname = os.path.basename(sys.argv[0])
 procname = procname.replace('.py', '')
@@ -34,14 +35,14 @@ def outputlevels(levellist,twisted=0,clientid=_id):
         try:
             _dmx.outputlevels(clientid, levellist)
         except socket.error, e:
-            print "dmx server error %s, waiting" % e
+            log.error("dmx server error %s, waiting" % e)
             time.sleep(1)
         except xmlrpclib.Fault,e:
-            print "outputlevels had xml fault: %s" % e
+            log.error("outputlevels had xml fault: %s" % e)
             time.sleep(1)
     else:
         def err(error):
-            print "dmx server error", error
+            log.error("dmx server error %s", error)
             time.sleep(1)
         d = _dmx.callRemote('outputlevels', clientid, levellist)
         d.addErrback(err)
