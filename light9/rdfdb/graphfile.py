@@ -1,5 +1,6 @@
 import logging, traceback
 from twisted.python.filepath import FilePath
+from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM
 from rdflib import Graph
 from light9.rdfdb.patch import Patch
 
@@ -13,7 +14,9 @@ class GraphFile(object):
         self.path, self.uri = path, uri
         self.patch, self.getSubgraph = patch, getSubgraph
 
-        notifier.watch(FilePath(path), callbacks=[self.notify])
+        notifier.watch(FilePath(path),
+                       mask=IN_CLOSE_WRITE | IN_MOVED_FROM,
+                       callbacks=[self.notify])
         self.reread()
       
     def notify(self, notifier, filepath, mask):
