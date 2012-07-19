@@ -20,6 +20,7 @@ from light9 import dmxclient, showconfig, networking, prof
 from light9.uihelpers import toplevelat, bindkeys
 from light9.namespaces import L9
 from light9.tkdnd import initTkdnd, dragSourceRegister
+from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb.patch import Patch
 
@@ -62,8 +63,9 @@ class SubmasterBox(Frame):
     this object owns the level of the submaster (the rdf graph is the
     real authority)
     """
-    def __init__(self, master, sub):
+    def __init__(self, master, sub, session):
         self.sub = sub
+        self.session = session
         bg = sub.graph.value(sub.uri, L9.color, default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
@@ -115,33 +117,36 @@ class SubmasterBox(Frame):
     def updateGraphWithLevel(self, uri, level):
         """in our per-session graph, we maintain SubSetting objects like this:
 
-           [a :SubSetting; :sub ?s; :level ?l]
+           ?session :subSetting [a :SubSetting; :sub ?s; :level ?l]
         """
-        ctx = URIRef("http://example.com/kc/session1")
-        with self.sub.graph.currentState(context=ctx) as graph:
+
+        with self.sub.graph.currentState() as graph:
             adds = set([])
-            for setting in graph.subjects(RDF.type, L9['SubSetting']):
+            for setting in graph.objects(self.session, L9['subSetting']):
                 if graph.value(setting, L9['sub']) == uri:
                     break
             else:
-                setting = URIRef("http://example.com/subsetting/%s" %
+                setting = URIRef(self.session + "/setting/%s" %
                                  random.randrange(999999))
                 adds.update([
-                    (setting, RDF.type, L9['SubSetting'], ctx),
-                    (setting, L9['sub'], uri, ctx),
+                    (self.session, L9['subSetting'], setting, self.session),
+                    (setting, RDF.type, L9['SubSetting'], self.session),
+                    (setting, L9['sub'], uri, self.session),
                     ])
             dels = set([])
             for prev in graph.objects(setting, L9['level']):
-                dels.add((setting, L9['level'], prev, ctx))
-            adds.add((setting, L9['level'], Literal(level), ctx))
+                dels.add((setting, L9['level'], prev, self.session))
+            adds.add((setting, L9['level'], Literal(level), self.session))
 
             if adds != dels:
                 self.sub.graph.patch(Patch(delQuads=dels, addQuads=adds))
 
     def updateLevelFromGraph(self):
         """read rdf level, write it to subbox.slider_var"""
+        
         graph = self.sub.graph
-        for setting in graph.subjects(RDF.type, L9['SubSetting']):
+
+        for setting in graph.objects(self.session, L9['subSetting']):
             if graph.value(setting, L9['sub']) == self.sub.uri:
                 self.pauseTrace = True # don't bounce this update back to server
                 try:
@@ -156,11 +161,12 @@ class SubmasterBox(Frame):
         subprocess.Popen(["bin/subcomposer", "--no-geometry", self.name])
 
 class KeyboardComposer(Frame, SubClient):
-    def __init__(self, root, graph,
+    def __init__(self, root, graph, session,
                  hw_sliders=True):
         Frame.__init__(self, root, bg='black')
         SubClient.__init__(self)
         self.graph = graph
+        self.session = session
         self.submasters = Submasters(graph)
         self.subbox = {} # sub uri : SubmasterBox
         self.slider_table = {} # coords : SubmasterBox
@@ -176,6 +182,7 @@ class KeyboardComposer(Frame, SubClient):
 
         self.graph.addHandler(self.redraw_sliders)
         self.send_levels_loop()
+        self.graph.addHandler(self.rowFromGraph)
 
     def make_buttons(self):
         self.buttonframe = Frame(self, bg='black')
@@ -250,7 +257,7 @@ class KeyboardComposer(Frame, SubClient):
                 rowcount += 1
                 col = 0
 
-            subbox = SubmasterBox(row, sub)
+            subbox = SubmasterBox(row, sub, self.session)
             subbox.place(relx=col / 8, rely=0, relwidth=1 / 8, relheight=1)
             self.subbox[sub.uri] = self.slider_table[(rowcount, col)] = subbox
 
@@ -327,15 +334,31 @@ class KeyboardComposer(Frame, SubClient):
             diff = -1
         self.change_row(self.current_row + diff)
 
-    def change_row(self, row):
+    def rowFromGraph(self):
+        self.change_row(int(self.graph.value(self.session, L9['currentRow'], default=0)), fromGraph=True)
+
+    def change_row(self, row, fromGraph=False):
         old_row = self.current_row
         self.current_row = row
         self.current_row = max(0, self.current_row)
         self.current_row = min(len(self.rows) - 1, self.current_row)
+        try:
+            row = self.rows[self.current_row]
+        except IndexError:
+            # if we're mid-load, this row might appear soon. If we
+            # changed interactively, the user is out of bounds and
+            # needs to be brought back in
+            if fromGraph:
+                return
+            raise
+
         self.unhighlight_row(old_row)
         self.highlight_row(self.current_row)
-        row = self.rows[self.current_row]
         self.keyhints.pack_configure(before=row)
+
+        if not fromGraph:
+            self.graph.patchObject(self.session, self.session, L9['currentRow'],
+                                   Literal(self.current_row))
 
         for col in range(1, 9):
             try:
@@ -420,10 +443,6 @@ class KeyboardComposer(Frame, SubClient):
         sub.name = subname
         sub.temporary = 0
         sub.save()
-
-    def save(self):
-        pickle.dump((self.get_levels(), self.current_row),
-                    file('.keyboardcomposer.savedlevels', 'w'))
 
     def send_frequent_updates(self):
         """called when we get a fade -- send events as quickly as possible"""
@@ -518,6 +537,7 @@ if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option('--no-sliders', action='store_true',
                       help="don't attach to hardware sliders")
+    clientsession.add_option(parser)
     parser.add_option('-v', action='store_true', help="log info level")
     opts, args = parser.parse_args()
 
@@ -529,9 +549,12 @@ if __name__ == "__main__":
     root = Tk()
     initTkdnd(root.tk, 'tkdnd/trunk/')
     
-    tl = toplevelat("Keyboard Composer", existingtoplevel=root)
+    tl = toplevelat("Keyboard Composer - %s" % opts.session,
+                    existingtoplevel=root)
 
-    kc = KeyboardComposer(tl, graph, 
+    session = clientsession.getUri('keyboardcomposer', opts)
+
+    kc = KeyboardComposer(tl, graph, session,
                           hw_sliders=not opts.no_sliders)
     kc.pack(fill=BOTH, expand=1)
 

@@ -212,11 +212,14 @@ class SyncedGraph(object):
     def patchObject(self, context, subject, predicate, newObject):
         """send a patch which removes existing values for (s,p,*,c)
         and adds (s,p,newObject,c). Values in other graphs are not affected"""
-        raise NotImplementedError
+
         existing = []
-        
+        for spo in self._graph.triples((subject, predicate, None),
+                                     context=context):
+            existing.append(spo+(context,))
+        # what layer is supposed to cull out no-op changes?
         self.patch(Patch(
-            delQuads=[],
+            delQuads=existing,
             addQuads=[(subject, predicate, newObject, context)]))
 
     def addHandler(self, func):
