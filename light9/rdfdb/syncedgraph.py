@@ -1,14 +1,16 @@
-from rdflib import ConjunctiveGraph, RDFS, RDF
+from rdflib import ConjunctiveGraph, RDFS, RDF, Graph
 import logging, cyclone.httpclient, traceback, urllib
 from twisted.internet import reactor
 log = logging.getLogger('syncedgraph')
 from light9.rdfdb.patch import Patch, ALLSTMTS
 from light9.rdfdb.rdflibpatch import patchQuads
 
-def sendPatch(putUri, patch):
-    # this will take args for sender, etc
-    body = patch.jsonRepr
-    log.debug("send body: %r" % body)
+def sendPatch(putUri, patch, **kw):
+    """
+    kwargs will become extra attributes in the toplevel json object
+    """
+    body = patch.makeJsonRepr(kw)
+    log.debug("send body: %r", body)
     def ok(done):
         if not str(done.code).startswith('2'):
             raise ValueError("sendPatch request failed %s: %s" % (done.code, done.body))
@@ -64,7 +66,7 @@ class GraphWatchers(object):
 
         this removes the handlers that it gives you
         """
-        self.dependencies()
+        #self.dependencies()
         affectedSubjPreds = set([(s, p) for s, p, o, c in patch.addQuads]+
                                 [(s, p) for s, p, o, c in patch.delQuads])
         affectedPredObjs = set([(p, o) for s, p, o, c in patch.addQuads]+
@@ -94,6 +96,58 @@ class GraphWatchers(object):
         pprint(self._handlersSp)
         
 
+class PatchSender(object):
+    """
+    SyncedGraph may generate patches faster than we can send
+    them. This object buffers and may even collapse patches before
+    they go the server
+    """
+    def __init__(self, target, myUpdateResource):
+        self.target = target
+        self.myUpdateResource = myUpdateResource
+        self._patchesToSend = []
+        self._currentSendPatchRequest = None
+
+    def sendPatch(self, p):
+        self._patchesToSend.append(p)
+        self._continueSending()
+
+    def _continueSending(self):
+        if not self._patchesToSend or self._currentSendPatchRequest:
+            return
+        if len(self._patchesToSend) > 1:
+            log.info("%s patches left to send", len(self._patchesToSend))
+            # this is where we could concatenate little patches into a
+            # bigger one. Often, many statements will cancel each
+            # other out. not working yet:
+            if 0:
+                p = self._patchesToSend[0].concat(self._patchesToSend[1:])
+                print "concat down to"
+                print 'dels'
+                for q in p.delQuads: print q
+                print 'adds'
+                for q in p.addQuads: print q
+                print "----"
+            else:
+                p = self._patchesToSend.pop(0)
+        else:
+            p = self._patchesToSend.pop(0)
+            
+        self._currentSendPatchRequest = sendPatch(
+            self.target, p, senderUpdateUri=self.myUpdateResource)
+        self._currentSendPatchRequest.addCallbacks(self._sendPatchDone,
+                                                   self._sendPatchErr)
+
+    def _sendPatchDone(self, result):
+        self._currentSendPatchRequest = None
+        self._continueSending()
+
+    def _sendPatchErr(self, e):
+        self._currentSendPatchRequest = None
+        log.error(e)
+        self._continueSending()
+        
+
 class SyncedGraph(object):
     """
     graph for clients to use. Changes are synced with the master graph
@@ -111,7 +165,10 @@ class SyncedGraph(object):
         self._watchers = GraphWatchers()
         
         def onPatch(p):
-            patchQuads(_graph, p.delQuads, p.addQuads)
+            """
+            central server has sent us a patch
+            """
+            patchQuads(_graph, p.delQuads, p.addQuads, perfect=True)
             log.info("graph now has %s statements" % len(_graph))
             try:
                 self.updateOnPatch(p)
@@ -128,6 +185,8 @@ class SyncedGraph(object):
         log.info("listening on %s" % port)
         self.register(label)
         self.currentFuncs = [] # stack of addHandler callers
+        self._sender = PatchSender('http://localhost:8051/patches',
+                                   self.updateResource)
 
     def register(self, label):
 
@@ -144,10 +203,21 @@ class SyncedGraph(object):
         log.info("registering with rdfdb")
 
     def patch(self, p):
-        """send this patch to the server and apply it to our local graph and run handlers"""
-        # currently this has to round-trip. But I could apply the
-        # patch here and have the server not bounce it back to me
-        return sendPatch('http://localhost:8051/patches', p)
+        """send this patch to the server and apply it to our local
+        graph and run handlers"""
+        patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
+        self.updateOnPatch(p)
+        self._sender.sendPatch(p)
+
+    def patchObject(self, context, subject, predicate, newObject):
+        """send a patch which removes existing values for (s,p,*,c)
+        and adds (s,p,newObject,c). Values in other graphs are not affected"""
+        raise NotImplementedError
+        existing = []
+        
+        self.patch(Patch(
+            delQuads=[],
+            addQuads=[(subject, predicate, newObject, context)]))
 
     def addHandler(self, func):
         """
@@ -183,6 +253,23 @@ class SyncedGraph(object):
         for func in self._watchers.whoCares(p):
             # todo: forget the old handlers for this func
             self.addHandler(func)
+
+    def currentState(self, context=None):
+        """
+        a graph you can read without being in an addHandler
+        """
+        class Mgr(object):
+            def __enter__(self2):
+                # this should be a readonly view of the existing graph
+                g = Graph()
+                for s in self._graph.triples((None, None, None), context):
+                    g.add(s)
+                return g
+            
+            def __exit__(self, type, val, tb):
+                return
+
+        return Mgr()
 
     def _getCurrentFunc(self):
         if not self.currentFuncs:

@@ -150,18 +150,18 @@ class PersistentSubmaster(Submaster):
             log.info("sub %s changed" % self.name)
         
     def setLevelsFromGraph(self):
-        patchGraph = showconfig.getGraph() # going away
         if hasattr(self, 'levels'):
             self.levels.clear()
         else:
             self.levels = {}
         for lev in self.graph.objects(self.uri, L9['lightLevel']):
             chan = self.graph.value(lev, L9['channel'])
-            val = self.graph.value(lev, L9['level'])
-            name = patchGraph.label(chan)
+
+            name = self.graph.label(chan)
             if not name:
                 log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
                 continue
+            val = self.graph.value(lev, L9['level'])
             self.levels[name] = float(val)
 
     def save(self):

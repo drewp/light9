@@ -1,6 +1,8 @@
 """
 this is a proposal for a ConjunctiveGraph method in rdflib
 """
+import unittest
+from rdflib import ConjunctiveGraph, URIRef as U
 
 def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     """
@@ -29,8 +31,57 @@ def patchQuads(graph, deleteQuads, addQuads, perfect=False):
                 raise ValueError("%r already in %r" % (spoc[:3], spoc[3]))
     graph.addN(addQuads)
 
-import unittest
-from rdflib import ConjunctiveGraph, URIRef as U
+
+
+def graphFromQuads(q):
+    g = ConjunctiveGraph()
+    #g.addN(q) # no effect on nquad output
+    for s,p,o,c in q:
+        #g.get_context(c).add((s,p,o)) # kind of works with broken rdflib nquad serializer code
+        g.store.add((s,p,o), c) # no effect on nquad output
+    return g
+
+def graphFromNQuad(text):
+    """
+    g.parse(data=self.nqOut, format='nquads')
+    makes a graph that serializes to nothing
+    """
+    g1 = ConjunctiveGraph()
+    g1.parse(data=text, format='nquads')
+    g2 = ConjunctiveGraph()
+    for s,p,o,c in g1.quads((None,None,None)):
+        #g2.get_context(c).add((s,p,o))
+        g2.store.add((s,p,o), c)
+    #import pprint; pprint.pprint(g2.store.__dict__)
+    return g2
+
+from rdflib.plugins.serializers.nt import _xmlcharref_encode
+def serializeQuad(g):
+    """replacement for graph.serialize(format='nquads')"""
+    out = ""
+    for s,p,o,c in g.quads((None,None,None)):
+        out += u"%s %s %s %s .\n" % (s.n3(),
+                                p.n3(),
+                                _xmlcharref_encode(o.n3()), 
+                                c.n3())
+    return out
+
+class TestGraphFromQuads(unittest.TestCase):
+    nqOut = '<http://example.com/> <http://example.com/> <http://example.com/> <http://example.com/> .\n'
+    def testSerializes(self):
+        n = U("http://example.com/")
+        g = graphFromQuads([(n,n,n,n)])
+        out = serializeQuad(g)
+        self.assertEqual(out.strip(), self.nqOut.strip())
+
+    def testNquadParserSerializes(self):
+        g = graphFromNQuad(self.nqOut)
+        self.assertEqual(len(g), 1)
+        out = serializeQuad(g)
+        self.assertEqual(out.strip(), self.nqOut.strip())
+        
+
+
 stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
 stmt2 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx2')
 class TestPatchQuads(unittest.TestCase):

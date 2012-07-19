@@ -95,7 +95,7 @@ import twisted.internet.error
 import sys, optparse, logging, json, os
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 sys.path.append(".")
-from light9 import networking, showconfig
+from light9 import networking, showconfig, prof
 from rdflib import ConjunctiveGraph, URIRef, Graph
 from light9.rdfdb.graphfile import GraphFile
 from light9.rdfdb.patch import Patch, ALLSTMTS
@@ -167,9 +167,13 @@ class Db(object):
         log.info("patching graph -%d +%d" % (len(p.delQuads), len(p.addQuads)))
 
         patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
-        
+        senderUpdateUri = getattr(p, 'senderUpdateUri', None)
         self.summarizeToLog()
         for c in self.clients:
+            print "send to %s? %s %s" % (c, c.updateUri, senderUpdateUri)
+            if c.updateUri == senderUpdateUri:
+                # this client has self-applied the patch already
+                continue
             d = c.sendPatch(p)
             d.addErrback(self.clientErrored, c)
         sendToLiveClients(asJson=p.jsonRepr)
@@ -293,4 +297,4 @@ if __name__ == "__main__":
         
         ], db=db))
     log.info("serving on %s" % port)
-    reactor.run()
+    prof.run(reactor.run, profile=False)
