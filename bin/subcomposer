@@ -11,11 +11,13 @@ from light9.dmxchanedit import Levelbox
 from light9 import dmxclient, Patch, Submaster, showconfig, prof
 from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.rdfdb import clientsession
 
 class Subcomposer(tk.Frame):
-    def __init__(self, master, graph):
+    def __init__(self, master, graph, session):
         tk.Frame.__init__(self, master, bg='black')
         self.graph = graph
+        self.session = session
 
         self.levelbox = Levelbox(self, graph)
         self.levelbox.pack(side='top')
@@ -38,18 +40,6 @@ class Subcomposer(tk.Frame):
         for box in [self.savebox, self.loadbox]:
             box.set(subname)
 
-    def save_levels(self, *args):
-        levelfile = file("subcomposer.savedlevels","w")
-        levelfile.write(" ".join(map(str, self.levels)))
-
-    def load_levels(self):
-        try:
-            levelfile = file("subcomposer.savedlevels","r")
-            levels = map(float, levelfile.read().split())
-            self.set_levels(levels)
-        except IOError:
-            pass
-
     def savenewsub(self, subname):
         leveldict={}
         for i,lev in zip(range(len(self.levels)),self.levels):
@@ -59,6 +49,7 @@ class Subcomposer(tk.Frame):
         s=Submaster.Submaster(subname,leveldict=leveldict)
         s.save()
 
+    # this is going to be more like 'tie to sub' and 'untied'
     def loadsub(self, subname):
         """puts a sub into the levels, replacing old level values"""
         s=Submaster.Submasters(showconfig.getGraph()).get_sub_by_name(subname)
@@ -107,17 +98,19 @@ if __name__ == "__main__":
     parser = OptionParser(usage="%prog [subname]")
     parser.add_option('--no-geometry', action='store_true',
                       help="don't save/restore window geometry")
+    clientsession.add_option(parser)
     opts, args = parser.parse_args()
 
     root=tk.Tk()
     root.config(bg='black')
     root.tk_setPalette("#004633")
     if not opts.no_geometry:
-        toplevelat("subcomposer", root)
+        toplevelat("subcomposer - %s" % opts.session, root)
 
     graph = SyncedGraph("subcomposer")
+    session = clientsession.getUri('subcomposer', opts)
 
-    sc = Subcomposer(root, graph)
+    sc = Subcomposer(root, graph, session)
     sc.pack()
 
     tk.Label(root,text="Bindings: B1 adjust level; B2 set full; B3 instant bump",
@@ -130,5 +123,6 @@ if __name__ == "__main__":
 
     task.LoopingCall(sc.sendupdate).start(1)
 
+    root.protocol('WM_DELETE_WINDOW', reactor.stop)
     tksupport.install(root,ms=10)
     prof.run(reactor.run, profile=False)

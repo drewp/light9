@@ -345,8 +345,8 @@ class KeyboardComposer(Frame, SubClient):
         try:
             row = self.rows[self.current_row]
         except IndexError:
-            # if we're mid-load, this row might appear soon. If we
-            # changed interactively, the user is out of bounds and
+            # if we're mid-load, this row might still appear soon. If
+            # we changed interactively, the user is out of bounds and
             # needs to be brought back in
             if fromGraph:
                 return
@@ -548,7 +548,8 @@ if __name__ == "__main__":
 
     root = Tk()
     initTkdnd(root.tk, 'tkdnd/trunk/')
-    
+
+    # this has yet to be moved into the session graph
     tl = toplevelat("Keyboard Composer - %s" % opts.session,
                     existingtoplevel=root)
 
