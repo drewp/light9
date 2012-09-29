@@ -1,20 +1,20 @@
 #!bin/python
 """
 other tools POST themselves to here as subscribers to the graph. They
-are providing a URL we can PUT to with graphs updates.
+are providing a URL we can PUT to with graph updates.
 
 we immediately PUT them back all the contents of the graph as a bunch
 of adds.
 
-later we PUT them back with updates (add/del lists) when there are
+later we PUT them back with patches (del/add lists) when there are
 changes.
 
 If we fail to reach a registered caller, we forget about it for future
-calls. We can PUT empty diffs as a heartbeat to notice disappearing
+calls. We could PUT empty diffs as a heartbeat to notice disappearing
 callers faster.
 
-A caller can submit add/del changes that should be persisted and
-broadcast.
+A caller can submit a patch which we'll persist and broadcast to every
+other client.
 
 Global data undo should probably happen within this service.
 
@@ -45,13 +45,13 @@ shall be used for that
 Bnodes: this rdfdb graph might be able to track bnodes correctly, and
 they make for more compact n3 files. I'm not sure if it's going to be
 hard to keep the client bnodes in sync though. File rereads would be
-hard,if ever a bnode was used across graphs, so that probably should
+hard, if ever a bnode was used across graphs, so that probably should
 not be allowed.
 
 Our API:
 
 GET /  ui
-GET /graph    the whole graph (needed? just for ui browsing?)
+GET /graph    the whole graph, or a query from it (needed? just for ui browsing?)
 PUT /patches  clients submit changes
 GET /patches  (recent) patches from clients
 POST /graphClients clientUpdate={uri} to subscribe
@@ -60,8 +60,8 @@ GET /graphClients  current clients
 format:
 json {"adds" : [[quads]...],
       "deletes": [[quads]],
-      "from" : tooluri,
-      "created":tttt
+      "senderUpdateUri" : tooluri,
+      "created":tttt // maybe to help resolve some conflicts
      }
 maybe use some http://json-ld.org/ in there.
 
@@ -75,19 +75,31 @@ edit that one and see the results in the output context?
 
 Our web ui:
 
-registered clients
+  sections
 
-recent edits, each one says what client it came from. You can reverse
-them here. We should be able to take patches that are close in time
-and keep updating the same data (e.g. a stream of changes as the user
-drags a slider) and collapse them into a single edit for clarity.
+    registered clients
 
-Ways to display patches, using labels and creator/subj icons where possible:
+    recent patches, each one says what client it came from. You can reverse
+    them here. We should be able to take patches that are close in time
+    and keep updating the same data (e.g. a stream of changes as the user
+    drags a slider) and collapse them into a single edit for clarity.
 
-  <creator> set <subj>'s <p> to <o>
-  <creator> changed <subj>'s <pred> from <o1> to <o2>
-  <creator> added <o> to <s> <p>
+        Ways to display patches, using labels and creator/subj icons
+        where possible:
 
+          <creator> set <subj>'s <p> to <o>
+          <creator> changed <subj>'s <pred> from <o1> to <o2>
+          <creator> added <o> to <s> <p>
+
+    raw messages for debugging this client
+
+    ctx urls take you to->
+    files, who's dirty, have we seen external changes, notice big
+    files that are taking a long time to save
+
+    graph contents. plain rdf browser like an outliner or
+    something. clicking any resource from the other displays takes you
+    to this, focused on that resource
 
 """
 from twisted.internet import reactor
@@ -139,6 +151,9 @@ class Client(object):
         return syncedgraph.sendPatch(self.updateUri, p)
 
 class Db(object):
+    """
+    the master graph, all the connected clients, all the files we're watching
+    """
     def __init__(self):
         self.clients = []
         self.graph = ConjunctiveGraph()
@@ -163,6 +178,12 @@ class Db(object):
     def patch(self, p):
         """
         apply this patch to the master graph then notify everyone about it
+
+        dueToFileChange if this is a patch describing an edit we read
+        *from* the file (such that we shouldn't write it back to the file)
+
+        if p has a senderUpdateUri attribute, we won't send this patch
+        back to the sender with that updateUri
         """
         log.info("patching graph -%d +%d" % (len(p.delQuads), len(p.addQuads)))
 
@@ -191,6 +212,13 @@ class Db(object):
                      (c.identifier, len(self.getSubgraph(c.identifier))))
 
     def getSubgraph(self, uri):
+        """
+        this is meant to return a live view of the given subgraph, but
+        if i'm still working around an rdflib bug, it might return a
+        copy
+
+        and it's returning triples, but I think quads would be better
+        """
         # this is returning an empty Graph :(
         #return self.graph.get_context(uri)
 
@@ -253,12 +281,12 @@ def sendToLiveClients(d=None, asJson=None):
 class Live(cyclone.websocket.WebSocketHandler):
     
     def connectionMade(self, *args, **kwargs):
-        log.info("ws opened")
+        log.info("websocket opened")
         liveClients.add(self)
         self.settings.db.sendClientsToAllLivePages()
 
     def connectionLost(self, reason):
-        log.info("ws closed")
+        log.info("websocket closed")
         liveClients.remove(self)
 
     def messageReceived(self, message):

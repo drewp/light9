@@ -7,9 +7,10 @@ from rdflib import ConjunctiveGraph, URIRef as U
 def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     """
     Delete the sequence of given quads. Then add the given quads just
-    like addN would. If perfect is True, we'll error and not touch the
-    graph if any of the deletes isn't in the graph or if any of the
-    adds was already in the graph.
+    like addN would. If perfect is True, we'll error before the
+    deletes or before the adds (not a real transaction) if any of the
+    deletes isn't in the graph or if any of the adds was already in
+    the graph.
     """
     toDelete = []
     for s, p, o, c in deleteQuads:

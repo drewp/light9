@@ -11,6 +11,9 @@ class GraphFile(object):
     one rdf file that we read from, write to, and notice external changes to
     """
     def __init__(self, notifier, path, uri, patch, getSubgraph):
+        """
+        this does not include an initial reread() call
+        """
         self.path, self.uri = path, uri
         self.patch, self.getSubgraph = patch, getSubgraph
 

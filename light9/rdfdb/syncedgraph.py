@@ -151,10 +151,14 @@ class PatchSender(object):
 class SyncedGraph(object):
     """
     graph for clients to use. Changes are synced with the master graph
-    in the rdfdb process. 
-    
+    in the rdfdb process.
+
     This api is like rdflib.Graph but it can also call you back when
     there are graph changes to the parts you previously read.
+
+    If we get out of sync, we abandon our local graph (even any
+    pending local changes) and get the data again from the
+    server.
     """
     def __init__(self, label):
         """
@@ -205,6 +209,11 @@ class SyncedGraph(object):
     def patch(self, p):
         """send this patch to the server and apply it to our local
         graph and run handlers"""
+
+        # these could fail if we're out of sync. One approach:
+        # Rerequest the full state from the server, try the patch
+        # again after that, then give up.
+        
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
         self.updateOnPatch(p)
         self._sender.sendPatch(p)

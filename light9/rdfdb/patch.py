@@ -12,6 +12,11 @@ class Patch(object):
     """
     def __init__(self, jsonRepr=None, addQuads=None, delQuads=None,
                  addGraph=None, delGraph=None):
+        """
+        addQuads/delQuads can be lists or sets, but if we make them internally,
+        they'll be lists
+
+        """
         self._jsonRepr = jsonRepr
         self._addQuads, self._delQuads = addQuads, delQuads
         self._addGraph, self._delGraph = addGraph, delGraph
