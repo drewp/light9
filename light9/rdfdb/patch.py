@@ -1,5 +1,5 @@
 import json, unittest
-from rdflib import ConjunctiveGraph, URIRef
+from rdflib import ConjunctiveGraph, URIRef, URIRef as U
 from light9.rdfdb.rdflibpatch import graphFromNQuad, graphFromQuads, serializeQuad
 
 ALLSTMTS = (None, None, None)
@@ -27,6 +27,24 @@ class Patch(object):
             self._addGraph = graphFromNQuad(body['patch']['adds'])
             if 'senderUpdateUri' in body:
                 self.senderUpdateUri = body['senderUpdateUri']
+
+    @classmethod
+    def fromDiff(cls, oldGraph, newGraph):
+        """
+        make a patch that changes oldGraph to newGraph
+        """
+        old = set(oldGraph.quads(ALLSTMTS))
+        new = set(newGraph.quads(ALLSTMTS))
+        return cls(addQuads=list(new - old), delQuads=list(old - new))
+
+    def __nonzero__(self):
+        """
+        does this patch do anything to a graph?
+        """
+        if self._jsonRepr and self._jsonRepr.strip():
+            raise NotImplementedError()
+        return bool(self._addQuads or self._delQuads or
+                    self._addGraph or self._delGraph)
 
     @property
     def addQuads(self):
@@ -97,3 +115,44 @@ class Patch(object):
                 else:
                     adds.add(q)
         return Patch(delQuads=dels, addQuads=adds)
+
+    def getContext(self):
+        """assumes that all the edits are on the same context"""
+        ctx = None
+        for q in self.addQuads + self.delQuads:
+            if ctx is None:
+                ctx = q[3]
+
+            if ctx != q[3]:
+                raise ValueError("patch applies to multiple contexts, at least %r and %r" % (ctx, q[3]))
+        return ctx
+
+stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
+
+class TestPatchFromDiff(unittest.TestCase):
+    def testEmpty(self):
+        g = ConjunctiveGraph()
+        p = Patch.fromDiff(g, g)
+        self.assert_(not p)
+
+    def testNonEmpty(self):
+        g1 = ConjunctiveGraph()
+        g2 = graphFromQuads([stmt1])
+        p = Patch.fromDiff(g1, g2)
+        self.assert_(p)
+
+    def testNoticesAdds(self):
+        g1 = ConjunctiveGraph()
+        g2 = graphFromQuads([stmt1])
+        p = Patch.fromDiff(g1, g2)
+        self.assertEqual(p.addQuads, [stmt1])
+        self.assertEqual(p.delQuads, [])
+
+    def testNoticesDels(self):
+        g1 = graphFromQuads([stmt1])
+        g2 = ConjunctiveGraph()
+        p = Patch.fromDiff(g1, g2)
+        self.assertEqual(p.addQuads, [])
+        self.assertEqual(p.delQuads, [stmt1])
+        
+        

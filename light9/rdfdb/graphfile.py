@@ -3,6 +3,7 @@ from twisted.python.filepath import FilePath
 from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM
 from rdflib import Graph
 from light9.rdfdb.patch import Patch
+from light9.rdfdb.rdflibpatch import inContext
 
 log = logging.getLogger()
 
@@ -40,17 +41,48 @@ class GraphFile(object):
             log.error("syntax error in %s" % self.path)
             return
 
-        adds = [(s, p, o, self.uri) for s, p, o in new - old]
-        dels = [(s, p, o, self.uri) for s, p, o in old - new]
+        old = inContext(old, self.uri)
+        new = inContext(new, self.uri)
+        print "old %s new %s" % (old, new)
 
-        print "file dels"
-        for s  in dels:
-            print s
-        print "file adds"
-        for s in adds:
-            print s
-        print ""
+        p = Patch.fromDiff(old, new)
+        if p:
+            self.patch(p, dueToFileChange=True)
 
+    def dirty(self, graph):
+        """
+        there are new contents for our file
         
-        if adds or dels:
-            self.patch(Patch(addQuads=adds, delQuads=dels))
+        graph is the rdflib.Graph that contains the contents of the
+        file. It is allowed to change. Note that dirty() will probably
+        do the save later when the graph might be different.
+        
+        after a timer has passed, write it out. Any scheduling issues
+        between files? i don't think so. the timer might be kind of
+        huge, and then we might want to take a hint from a client that
+        it's a good time to save the files that it was editing, like
+        when the mouse moves out of the client's window and might be
+        going towards a text file editor
+        
+        """
+        log.info("%s dirty, %s stmt" % (self.uri, len(graph)))
+
+        self.graphToWrite = graph
+        if self.writeCall:
+            self.writeCall.reset(self.flushDelay)
+        else:
+            self.writeCall = reactor.callLater(self.flushDelay, self.flush)
+
+    def flush(self):
+        self.writeCall = None
+
+        tmpOut = self.path + ".rdfdb-temp"
+        f = open(tmpOut, 'w')
+        t1 = time.time()
+        self.graphToWrite.serialize(destination=f, format='n3')
+        serializeTime = time.time() - t1
+        f.close()
+        self.lastWriteTimestamp = os.path.getmtime(tmpOut)
+        os.rename(tmpOut, self.path)
+        iolog.info("rewrote %s in %.1f ms", self.path, serializeTime * 1000)
+        

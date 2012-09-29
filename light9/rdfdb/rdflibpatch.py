@@ -67,6 +67,14 @@ def serializeQuad(g):
                                 c.n3())
     return out
 
+def inContext(graph, newContext):
+    """
+    make a ConjunctiveGraph where all the triples in the given graph
+    are in newContext
+    """
+    return graphFromQuads([(s,p,o,newContext) for s,p,o in graph])
+    
+
 class TestGraphFromQuads(unittest.TestCase):
     nqOut = '<http://example.com/> <http://example.com/> <http://example.com/> <http://example.com/> .\n'
     def testSerializes(self):
@@ -81,7 +89,6 @@ class TestGraphFromQuads(unittest.TestCase):
         out = serializeQuad(g)
         self.assertEqual(out.strip(), self.nqOut.strip())
         
-
 
 stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
 stmt2 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx2')
