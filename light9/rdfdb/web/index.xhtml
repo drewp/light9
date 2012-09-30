@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>rdfdb</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+  </head>
+  <body>
+    <h1>rdfdb</h1>
+    <p>status: <span id="status">starting...</span></p>
+    
+    <section>
+      <h2>Edits</h2>
+      <div id="patches"></div>
+    </section>
+
+    <p>Clients: <span id="clients"/></p>
+
+    <fieldset>
+      <legend>Messages</legend>
+      <div id="out"></div>
+    </fieldset>
+
+    <script type="text/javascript" src="lib/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="websocket.js"></script>
+    <script type="text/javascript">
+      // <![CDATA[
+      $(function(){
+
+          function onMessage(d) {
+              if (d.clients !== undefined) {
+                  $("#clients").empty().text(JSON.stringify(d.clients));
+              }
+              if (d.patch !== undefined) {
+                  $("#patches").prepend(
+                      $("<fieldset>").addClass("patch")
+                          .append($("<legend>").text("Patch"))
+                          .append($("<div>").addClass("deletes").text(d.patch.deletes))
+                          .append($("<div>").addClass("adds").text(d.patch.adds))
+                  );
+              }
+
+              $('#out').append($('<div>').text(JSON.stringify(d)));
+          }
+          reconnectingWebSocket("ws://localhost:8051/live", onMessage);
+      });
+      // ]]>
+    </script>
+
+  </body>
+</html>

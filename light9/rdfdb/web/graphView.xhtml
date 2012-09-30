@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <title>graphview</title>
+    <link rel="stylesheet" type="text/css" href="style.css"/>
+
+  </head>
+  <body>
+    <!--
+        this page is another graph client who maintains the whole
+        graph all the time
+    -->
+
+    <p>status: <span id="status">starting...</span></p>
+
+    <fieldset>
+      <legend>Messages</legend>
+      <div id="out"></div>
+    </fieldset>
+
+    <p>URI substring: <input type="text" id="uriSubstring"/></p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>subject</th> <th>predicate</th> <th>object</th> <th>context</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+
+    <script type="text/javascript" src="lib/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="websocket.js"></script>
+    <script type="text/javascript" src="syncedgraph.js"></script>
+    <script type="text/javascript">
+      // <![CDATA[
+      $(function(){
+
+      });
+      // ]]>
+    </script>
+  </body>
+</html>

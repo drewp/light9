@@ -1,0 +1,27 @@
+function SyncedGraph(label) {
+    /*
+      like python SyncedGraph but talks over a websocket to
+      rdfdb. This one has an API more conducive to reading and
+      querying.
+    */
+    var self = this;
+
+    
+
+    self.patch = function (p) {
+        throw;
+    }
+    self.nodesWithSubstring = function (subString) {
+
+    }
+    self.quads = function (s, p, o, c) {
+        // any args can be null for wildcard
+    }
+
+
+    function onMessage(d) {
+        $('#out').append($('<div>').text(JSON.stringify(d)));
+    }
+    
+    reconnectingWebSocket("ws://localhost:8051/liveSyncedGraph", onMessage);
+}
