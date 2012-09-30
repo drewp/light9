@@ -1,11 +1,13 @@
-import logging, traceback
+import logging, traceback, os, time
 from twisted.python.filepath import FilePath
+from twisted.internet import reactor
 from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM
 from rdflib import Graph
 from light9.rdfdb.patch import Patch
 from light9.rdfdb.rdflibpatch import inContext
 
-log = logging.getLogger()
+log = logging.getLogger('graphfile')
+iolog = logging.getLogger('io')
 
 class GraphFile(object):
     """
@@ -18,13 +20,28 @@ class GraphFile(object):
         self.path, self.uri = path, uri
         self.patch, self.getSubgraph = patch, getSubgraph
 
+        if not os.path.exists(path):
+            # can't start notify until file exists
+            try:
+                os.makedirs(os.path.dirname(path))
+            except OSError:
+                pass
+            f = open(path, "w")
+            f.close()
+            iolog.info("created %s", path)
+
+        self.flushDelay = 2 # seconds until we have to call flush() when dirty
+        self.writeCall = None # or DelayedCall
+        self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
         notifier.watch(FilePath(path),
                        mask=IN_CLOSE_WRITE | IN_MOVED_FROM,
                        callbacks=[self.notify])
-        self.reread()
       
     def notify(self, notifier, filepath, mask):
-        log.info("file %s changed" % filepath)
+        if filepath.getModificationTime() == self.lastWriteTimestamp:
+            log.debug("file %s changed, but we did this write", filepath)
+            return
+        log.info("file %s changed", filepath)
         try:
             self.reread()
         except Exception:

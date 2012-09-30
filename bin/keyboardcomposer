@@ -119,7 +119,7 @@ class SubmasterBox(Frame):
 
            ?session :subSetting [a :SubSetting; :sub ?s; :level ?l]
         """
-
+        # move to syncedgraph patchMapping
         with self.sub.graph.currentState() as graph:
             adds = set([])
             for setting in graph.objects(self.session, L9['subSetting']):
@@ -127,7 +127,7 @@ class SubmasterBox(Frame):
                     break
             else:
                 setting = URIRef(self.session + "/setting/%s" %
-                                 random.randrange(999999))
+                                 random.randrange(999999999))
                 adds.update([
                     (self.session, L9['subSetting'], setting, self.session),
                     (setting, RDF.type, L9['SubSetting'], self.session),
@@ -143,7 +143,7 @@ class SubmasterBox(Frame):
 
     def updateLevelFromGraph(self):
         """read rdf level, write it to subbox.slider_var"""
-        
+        # move this to syncedgraph readMapping
         graph = self.sub.graph
 
         for setting in graph.objects(self.session, L9['subSetting']):

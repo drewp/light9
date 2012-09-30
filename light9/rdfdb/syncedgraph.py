@@ -144,6 +144,23 @@ class PatchSender(object):
 
     def _sendPatchErr(self, e):
         self._currentSendPatchRequest = None
+        # we're probably out of sync with the master now, since
+        # SyncedGraph.patch optimistically applied the patch to our
+        # local graph already. What happens to this patch? What
+        # happens to further pending patches? Some of the further
+        # patches, especially, may be commutable with the bad one and
+        # might still make sense to apply to the master graph.
+
+        # if someday we are folding pending patches together, this
+        # would be the time to UNDO that and attempt the original
+        # separate patches again
+
+        # this should screen for 409 conflict responses and raise a
+        # special exception for that, so SyncedGraph.sendFailed can
+        # screen for only that type
+
+        # this code is going away; we're going to raise an exception that contains all the pending patches
+        log.error("_sendPatchErr")
         log.error(e)
         self._continueSending()
         
@@ -192,6 +209,31 @@ class SyncedGraph(object):
         self._sender = PatchSender('http://localhost:8051/patches',
                                    self.updateResource)
 
+    def resync(self):
+        """
+        get the whole graph again from the server (e.g. we had a
+        conflict while applying a patch and want to return to the
+        truth).
+
+        To avoid too much churn, we remember our old graph and diff it
+        against the replacement. This way, our callers only see the
+        corrections.
+
+        Edits you make during a resync will surely be lost, so I
+        should just fail them. There should be a notification back to
+        UIs who want to show that we're doing a resync.
+        """
+        return cyclone.httpclient.fetch(
+            url="http://localhost:8051/graph",
+            method="GET",
+            headers={'Accept':'x-trig'},
+            ).addCallback(self._resyncGraph)
+
+    def _resyncGraph(self, response):
+        pass
+        #diff against old entire graph
+        #broadcast that change
+
     def register(self, label):
 
         def done(x):
@@ -216,7 +258,17 @@ class SyncedGraph(object):
         
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
         self.updateOnPatch(p)
-        self._sender.sendPatch(p)
+        self._sender.sendPatch(p).addErrback(self.sendFailed)
+
+    def sendFailed(self, result):
+        """
+        we asked for a patch to be queued and sent to the master, and
+        that ultimately failed because of a conflict
+        """
+        #i think we should receive back all the pending patches,
+        #do a resysnc here,
+        #then requeue all the pending patches (minus the failing one?) after that's done.
+
 
     def patchObject(self, context, subject, predicate, newObject):
         """send a patch which removes existing values for (s,p,*,c)
@@ -230,6 +282,14 @@ class SyncedGraph(object):
         self.patch(Patch(
             delQuads=existing,
             addQuads=[(subject, predicate, newObject, context)]))
+
+    def patchMapping(self, context, subject, predicate, keyPred, valuePred, newKey, newValue):
+        """
+        proposed api for updating things like ?session :subSetting [
+        :sub ?s; :level ?v ]. Keyboardcomposer has an implementation
+        already. There should be a complementary readMapping that gets
+        you a value since that's tricky too
+        """
 
     def addHandler(self, func):
         """

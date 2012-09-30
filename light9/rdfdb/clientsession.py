@@ -4,6 +4,7 @@ multiple instances of that client separate
 """
 from rdflib import URIRef
 from urllib import quote
+from light9 import showconfig
 
 def add_option(parser):
     parser.add_option(
@@ -12,5 +13,5 @@ def add_option(parser):
         default='default')
 
 def getUri(appName, opts):
-    return URIRef("http://example.com/session/%s/%s" %
-                  (appName, quote(opts.session, safe='')))
+    return URIRef("%s/sessions/%s/%s" % (showconfig.showUri(), appName,
+                                         quote(opts.session, safe='')))

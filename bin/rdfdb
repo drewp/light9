@@ -155,27 +155,62 @@ class Db(object):
     the master graph, all the connected clients, all the files we're watching
     """
     def __init__(self):
+        # files from cwd become uris starting with this. *should* be
+        # building uris from the show uri in $LIGHT9_SHOW/URI
+        # instead. Who wants to keep their data in the same dir tree
+        # as the source code?!
+        self.topUri = URIRef("http://light9.bigasterisk.com/")
+
         self.clients = []
         self.graph = ConjunctiveGraph()
 
-        notifier = INotify()
-        notifier.startReading()
+        self.notifier = INotify()
+        self.notifier.startReading()
+        self.graphFiles = {} # context uri : GraphFile
 
-        for inFile in [#"show/dance2012/config.n3",
-                       "show/dance2012/patch.n3",
-                       "show/dance2012/subs/bcools",
-                       "show/dance2012/subs/bwarm",
-                       "show/dance2012/subs/house",
-                       "demo.n3",
-                       ]:
-            self.g = GraphFile(notifier,
-                               inFile,
-                               URIRef("http://example.com/file/%s" %
-                                      os.path.basename(inFile)),
-                               self.patch,
-                               self.getSubgraph)
+        self.findAndLoadFiles()
 
-    def patch(self, p):
+    def findAndLoadFiles(self):
+        self.initialLoad = True
+        try:
+            dirs = [
+                "show/dance2012/sessions",
+                "show/dance2012/subs",
+                "show/dance2012/subterms",
+                ]
+
+            for topdir in dirs:
+                for dirpath, dirnames, filenames in os.walk(topdir):
+                    for base in filenames:
+                        self.watchFile(os.path.join(dirpath, base))
+                # todo: also notice new files in this dir
+
+            self.watchFile("show/dance2012/config.n3")
+            self.watchFile("show/dance2012/patch.n3")
+        finally:
+            self.initialLoad = False
+            
+        self.summarizeToLog()
+
+    def uriFromFile(self, filename):
+        if filename.endswith('.n3'):
+            # some legacy files don't end with n3. when we write them
+            # back this might not go so well
+            filename = filename[:-len('.n3')]
+        return URIRef(self.topUri + filename)
+        
+    def fileForUri(self, ctx):
+        if not ctx.startswith(self.topUri):
+            raise ValueError("don't know what filename to use for %s" % ctx)
+        return ctx[len(self.topUri):] + ".n3"
+
+    def watchFile(self, inFile):
+        ctx = self.uriFromFile(inFile)
+        gf = GraphFile(self.notifier, inFile, ctx, self.patch, self.getSubgraph)
+        self.graphFiles[ctx] = gf
+        gf.reread()
+        
+    def patch(self, p, dueToFileChange=False):
         """
         apply this patch to the master graph then notify everyone about it
 
@@ -185,19 +220,42 @@ class Db(object):
         if p has a senderUpdateUri attribute, we won't send this patch
         back to the sender with that updateUri
         """
-        log.info("patching graph -%d +%d" % (len(p.delQuads), len(p.addQuads)))
+        ctx = p.getContext()
+        log.info("patching graph %s -%d +%d" % (
+            ctx, len(p.delQuads), len(p.addQuads)))
 
         patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
         senderUpdateUri = getattr(p, 'senderUpdateUri', None)
-        self.summarizeToLog()
+        #if not self.initialLoad:
+        #    self.summarizeToLog()
         for c in self.clients:
-            print "send to %s? %s %s" % (c, c.updateUri, senderUpdateUri)
             if c.updateUri == senderUpdateUri:
                 # this client has self-applied the patch already
                 continue
             d = c.sendPatch(p)
             d.addErrback(self.clientErrored, c)
+        if not dueToFileChange:
+            self.dirtyFiles([ctx])
         sendToLiveClients(asJson=p.jsonRepr)
+
+    def dirtyFiles(self, ctxs):
+        """mark dirty the files that we watch in these contexts.
+
+        the ctx might not be a file that we already read; it might be
+        for a new file we have to create, or it might be for a
+        transient context that we're not going to save
+
+        if it's a ctx with no file, error
+        """
+        for ctx in ctxs:
+            g = self.getSubgraph(ctx)
+
+            if ctx not in self.graphFiles:
+                outFile = self.fileForUri(ctx)
+                self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
+                                                 self.patch, self.getSubgraph)
+            
+            self.graphFiles[ctx].dirty(g)
 
     def clientErrored(self, err, c):
         err.trap(twisted.internet.error.ConnectError)
@@ -240,11 +298,6 @@ class Db(object):
             dict(updateUri=c.updateUri, label=c.label)
             for c in self.clients]})        
 
-class Index(PrettyErrorHandler, cyclone.web.RequestHandler):
-    def get(self):
-        self.set_header("Content-Type", "application/xhtml+xml")
-        self.write(open("light9/rdfdb.xhtml").read())
-
 class GraphResource(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
         pass
@@ -257,7 +310,6 @@ class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):
         pass
-
 
 class GraphClients(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
@@ -293,6 +345,13 @@ class Live(cyclone.websocket.WebSocketHandler):
         log.info("got message %s" % message)
         self.sendMessage(message)
 
+class NoExts(cyclone.web.StaticFileHandler):
+    # .xhtml pages can be get() without .xhtml on them
+    def get(self, path, *args, **kw):
+        if path and '.' not in path:
+            path = path + ".xhtml"
+        cyclone.web.StaticFileHandler.get(self, path, *args, **kw)
+
 if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger()
@@ -311,18 +370,21 @@ if __name__ == "__main__":
         raise ValueError("missing --show http://...")
 
     db = Db()
-
+    
+    from twisted.python import log as twlog
+    twlog.startLogging(sys.stdout)
+            
     port = 8051
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
-        (r'/', Index),
         (r'/live', Live),
         (r'/graph', GraphResource),
         (r'/patches', Patches),
         (r'/graphClients', GraphClients),
 
-        (r"/(jquery-1\.7\.2\.min\.js)", cyclone.web.StaticFileHandler,
-         dict(path='lib')),
-        
-        ], db=db))
+        (r'/(.*)', NoExts,
+         {"path" : "light9/rdfdb/web",
+          "default_filename" : "index.xhtml"}),
+
+        ], debug=True, db=db))
     log.info("serving on %s" % port)
     prof.run(reactor.run, profile=False)
