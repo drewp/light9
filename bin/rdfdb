@@ -16,7 +16,12 @@ callers faster.
 A caller can submit a patch which we'll persist and broadcast to every
 other client.
 
-Global data undo should probably happen within this service.
+Global data undo should probably happen within this service. Some
+operations should not support undo, such as updating the default
+position of a window. How will we separate those? A blacklist of
+subj+pred pairs that don't save undo? Or just save the updates like
+everything else, but when you press undo, there's a way to tell which
+updates *should* be part of your app's undo system?
 
 Maybe some subgraphs are for transient data (e.g. current timecode,
 mouse position in curvecalc) that only some listeners want to hear about.

@@ -1,6 +1,6 @@
 from rdflib import ConjunctiveGraph, RDFS, RDF, Graph
 import logging, cyclone.httpclient, traceback, urllib
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 log = logging.getLogger('syncedgraph')
 from light9.rdfdb.patch import Patch, ALLSTMTS
 from light9.rdfdb.rdflibpatch import patchQuads
@@ -109,8 +109,10 @@ class PatchSender(object):
         self._currentSendPatchRequest = None
 
     def sendPatch(self, p):
-        self._patchesToSend.append(p)
+        sendResult = defer.Deferred()
+        self._patchesToSend.append((p, sendResult))
         self._continueSending()
+        return sendResult
 
     def _continueSending(self):
         if not self._patchesToSend or self._currentSendPatchRequest:
@@ -129,14 +131,15 @@ class PatchSender(object):
                 for q in p.addQuads: print q
                 print "----"
             else:
-                p = self._patchesToSend.pop(0)
+                p, sendResult = self._patchesToSend.pop(0)
         else:
-            p = self._patchesToSend.pop(0)
+            p, sendResult = self._patchesToSend.pop(0)
             
         self._currentSendPatchRequest = sendPatch(
             self.target, p, senderUpdateUri=self.myUpdateResource)
         self._currentSendPatchRequest.addCallbacks(self._sendPatchDone,
                                                    self._sendPatchErr)
+        self._currentSendPatchRequest.chainDeferred(sendResult)
 
     def _sendPatchDone(self, result):
         self._currentSendPatchRequest = None

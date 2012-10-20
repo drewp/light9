@@ -28,6 +28,13 @@
       // <![CDATA[
       $(function(){
 
+          function collapseCuries(s) {
+              return s
+                  .replace(/<http:\/\/www.w3.org\/2001\/XMLSchema#/g, function (match, short) { return "xsd:"+short; })
+                  .replace(/<http:\/\/light9.bigasterisk.com\/(.*?)>/g, function (match, short) { return "light9:"+short; })
+                  .replace(/<http:\/\/light9.bigasterisk.com\/show\/dance2012\/sessions\/(.*?)>/g, function (match, short) { return "kcsession:"+short });
+          }
+
           function onMessage(d) {
               if (d.clients !== undefined) {
                   $("#clients").empty().text(JSON.stringify(d.clients));
@@ -36,8 +43,8 @@
                   $("#patches").prepend(
                       $("<fieldset>").addClass("patch")
                           .append($("<legend>").text("Patch"))
-                          .append($("<div>").addClass("deletes").text(d.patch.deletes))
-                          .append($("<div>").addClass("adds").text(d.patch.adds))
+                          .append($("<div>").addClass("deletes").text(collapseCuries(d.patch.deletes)))
+                          .append($("<div>").addClass("adds").text(collapseCuries(d.patch.adds)))
                   );
               }
 

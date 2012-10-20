@@ -1,9 +1,10 @@
 """all the tiny tk helper functions"""
 
 from __future__ import nested_scopes
-from Tkinter import *
-from Tix import *
-from types import StringType
+#from Tkinter import Button
+from rdflib import Literal
+from Tix import Button, Toplevel, Tk, IntVar, Entry, DoubleVar
+from light9.namespaces import L9
 
 windowlocations = {
     'sub' : '425x738+00+00',
@@ -32,21 +33,45 @@ def toplevel_savegeometry(tl,name):
         # it's ok if there's no saved geometry
         pass
 
-def toplevelat(name, existingtoplevel=None):
+def toplevelat(name, existingtoplevel=None, graph=None, session=None):
     tl = existingtoplevel or Toplevel()
     tl.title(name)
 
-    try:
-        f=open(".light9-window-geometry-%s" % name.replace(' ','_'))
-        windowlocations[name]=f.read() # file has no newline
-    except:
-        # it's ok if there's no saved geometry
-        pass
+    lastSaved = [None]
+    setOnce = [False]
+    def setPosFromGraphOnce():
+        """
+        the graph is probably initially empty, but as soon as it gives
+        us one window position, we stop reading them
+        """
+        if setOnce[0]:
+            return
+        geo = graph.value(session, L9.windowGeometry)
+
+        if geo is not None and geo != lastSaved[0]:
+            setOnce[0] = True
+            tl.geometry(geo)
+            lastSaved[0] = geo
+
+    def savePos():
+        geo = tl.geometry()
+        # todo: need a way to filter out the startup window sizes that
+        # weren't set by the user
+        if geo.startswith("1x1") or geo.startswith(("378x85", "378x86")):
+            return
+        if geo == lastSaved[0]:
+            return
+        lastSaved[0] = geo
+        graph.patchObject(session, session, L9.windowGeometry, Literal(geo))
+
+    if graph is not None and session is not None:
+        graph.addHandler(setPosFromGraphOnce)
 
     if name in windowlocations:
         tl.geometry(positionOnCurrentDesktop(windowlocations[name]))
 
-    tl._toplevelat_funcid = tl.bind("<Configure>",lambda ev,tl=tl,name=name: toplevel_savegeometry(tl,name))
+    if graph is not None:
+        tl._toplevelat_funcid = tl.bind("<Configure>",lambda ev,tl=tl,name=name: savePos())
 
     return tl
 

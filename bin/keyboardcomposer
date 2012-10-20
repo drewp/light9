@@ -549,11 +549,10 @@ if __name__ == "__main__":
     root = Tk()
     initTkdnd(root.tk, 'tkdnd/trunk/')
 
-    # this has yet to be moved into the session graph
-    tl = toplevelat("Keyboard Composer - %s" % opts.session,
-                    existingtoplevel=root)
-
     session = clientsession.getUri('keyboardcomposer', opts)
+
+    tl = toplevelat("Keyboard Composer - %s" % opts.session,
+                    existingtoplevel=root, graph=graph, session=session)
 
     kc = KeyboardComposer(tl, graph, session,
                           hw_sliders=not opts.no_sliders)
