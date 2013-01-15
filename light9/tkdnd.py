@@ -72,7 +72,9 @@ def dragSourceRegister(widget,
                        action='copy', datatype='text/uri-list', data=''):
     """
     if the 'data' param is callable, it will be called every time to
-    look up the current data
+    look up the current data.
+
+    If the callable returns None (or data is None to begin with), the drag
     """
     widget.tk.call('tkdnd::drag_source', 'register', widget._w)
 
@@ -82,9 +84,12 @@ def dragSourceRegister(widget,
     # but I don't block my tuple from getting returned (as a tcl list)
 
     def init():
-        return (action, datatype, data() if callable(data) else data)
-    
-    funcId = widget._register(init, 
+        dataValue = data() if callable(data) else data
+        if dataValue is None:
+            return
+        return (action, datatype, dataValue)
+
+    funcId = widget._register(init,
                               widget._substitute,
                               1 # needscleanup
                               )
