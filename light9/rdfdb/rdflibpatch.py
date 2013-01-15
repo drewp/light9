@@ -1,6 +1,11 @@
 """
 this is a proposal for a ConjunctiveGraph method in rdflib
 """
+import sys
+if sys.path[0] == '/usr/lib/python2.7/dist-packages':
+    # nosetests puts this in
+    sys.path = sys.path[1:]
+
 import unittest
 from rdflib import ConjunctiveGraph, URIRef as U
 
@@ -73,7 +78,24 @@ def inContext(graph, newContext):
     are in newContext
     """
     return graphFromQuads([(s,p,o,newContext) for s,p,o in graph])
-    
+
+def contextsForStatement(graph, triple):
+    return [q[3] for q in graph.quads(triple)]
+
+
+A = U("http://a"); B = U("http://b")
+class TestContextsForStatement(unittest.TestCase):
+    def testNotFound(self):
+        g = graphFromQuads([(A,A,A,A)])
+        self.assertEqual(contextsForStatement(g, (B,B,B)), [])
+    def testOneContext(self):
+        g = graphFromQuads([(A,A,A,A), (A,A,B,B)])
+        self.assertEqual(contextsForStatement(g, (A,A,A)), [A])
+    def testTwoContexts(self):
+        g = graphFromQuads([(A,A,A,A), (A,A,A,B)])
+        self.assertEqual(sorted(contextsForStatement(g, (A,A,A))), sorted([A,B]))
+
+
 
 class TestGraphFromQuads(unittest.TestCase):
     nqOut = '<http://example.com/> <http://example.com/> <http://example.com/> <http://example.com/> .\n'
