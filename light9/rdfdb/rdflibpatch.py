@@ -68,7 +68,7 @@ def serializeQuad(g):
     for s,p,o,c in g.quads((None,None,None)):
         out += u"%s %s %s %s .\n" % (s.n3(),
                                 p.n3(),
-                                _xmlcharref_encode(o.n3()), 
+                                _xmlcharref_encode(o.n3()),
                                 c.n3())
     return out
 
@@ -110,7 +110,7 @@ class TestGraphFromQuads(unittest.TestCase):
         self.assertEqual(len(g), 1)
         out = serializeQuad(g)
         self.assertEqual(out.strip(), self.nqOut.strip())
-        
+
 
 stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
 stmt2 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx2')
@@ -134,7 +134,7 @@ class TestPatchQuads(unittest.TestCase):
         patchQuads(g, [stmt1], [stmt1])
         quads = list(g.quads((None,None,None)))
         self.assertEqual(quads, [stmt1])
-        
+
     def testPerfectAddRejectsExistingStmt(self):
         g = ConjunctiveGraph()
         patchQuads(g, [], [stmt1])
@@ -149,7 +149,7 @@ class TestPatchQuads(unittest.TestCase):
     def testPerfectDeleteRejectsAbsentStmt(self):
         g = ConjunctiveGraph()
         self.assertRaises(ValueError, patchQuads, g, [stmt1], [], perfect=True)
-        
+
     def testPerfectDeleteAllowsRemovalOfStmtInMultipleContexts(self):
         g = ConjunctiveGraph()
         patchQuads(g, [], [stmt1, stmt2])
@@ -159,4 +159,4 @@ class TestPatchQuads(unittest.TestCase):
         g = ConjunctiveGraph()
         patchQuads(g, [], [stmt1, stmt1], perfect=True)
         patchQuads(g, [stmt1, stmt1], [], perfect=True)
-        
+

@@ -51,7 +51,7 @@ class Onelevel(tk.Frame):
 
         # channel number -- will turn yellow when being altered
         self.num_lab = tk.Label(self, text=str(self.channelnum),
-                                width=3, bg='grey40', 
+                                width=3, bg='grey40',
                                 fg='white',
                                 font=stdfont,
                                 padx=0, pady=0, bd=0, height=1)
@@ -62,7 +62,7 @@ class Onelevel(tk.Frame):
                                width=14,
                                font=stdfont,
                                anchor='w',
-                               padx=0, pady=0, bd=0, 
+                               padx=0, pady=0, bd=0,
                  height=1, bg='black', fg='white')
         self.graph.addHandler(self.updateLabel)
         self.desc_lab.pack(side='left')
@@ -78,7 +78,7 @@ class Onelevel(tk.Frame):
 
     def updateLabel(self):
          self.desc_lab.config(text=self.graph.label(self.uri))
-        
+
     def setupmousebindings(self):
         def b1down(ev):
             self.desc_lab.config(bg='cyan')
@@ -106,7 +106,7 @@ class Onelevel(tk.Frame):
                            ('<ButtonPress-3>', b3down)):
 
                 w.bind(e,func)
-        
+
     def colorlabel(self):
         """color the level label based on its own text (which is 0..100)"""
         txt=self.level_lab['text'] or "0"
@@ -146,7 +146,7 @@ class Levelbox(tk.Frame):
              f = tk.Frame(parent, bd=0, bg='black')
              f.pack(side='left')
              return f
-        
+
         columnFrames = [make_frame(self) for x in range(cols)]
 
         for i, channel in enumerate(chans): # sort?

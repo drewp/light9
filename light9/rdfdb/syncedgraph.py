@@ -71,13 +71,13 @@ class GraphWatchers(object):
                                 [(s, p) for s, p, o, c in patch.delQuads])
         affectedPredObjs = set([(p, o) for s, p, o, c in patch.addQuads]+
                                 [(p, o) for s, p, o, c in patch.delQuads])
-        
+
         ret = set()
         for (s, p), funcs in self._handlersSp.iteritems():
             if (s, p) in affectedSubjPreds:
                 ret.update(funcs)
                 funcs.clear()
-                
+
         for (p, o), funcs in self._handlersPo.iteritems():
             if (p, o) in affectedPredObjs:
                 ret.update(funcs)
@@ -94,7 +94,7 @@ class GraphWatchers(object):
         log.info("whocares:")
         from pprint import pprint
         pprint(self._handlersSp)
-        
+
 
 class PatchSender(object):
     """
@@ -134,7 +134,7 @@ class PatchSender(object):
                 p, sendResult = self._patchesToSend.pop(0)
         else:
             p, sendResult = self._patchesToSend.pop(0)
-            
+
         self._currentSendPatchRequest = sendPatch(
             self.target, p, senderUpdateUri=self.myUpdateResource)
         self._currentSendPatchRequest.addCallbacks(self._sendPatchDone,
@@ -166,7 +166,7 @@ class PatchSender(object):
         log.error("_sendPatchErr")
         log.error(e)
         self._continueSending()
-        
+
 
 class SyncedGraph(object):
     """
@@ -187,7 +187,7 @@ class SyncedGraph(object):
         """
         _graph = self._graph = ConjunctiveGraph()
         self._watchers = GraphWatchers()
-        
+
         def onPatch(p):
             """
             central server has sent us a patch
@@ -340,7 +340,7 @@ class SyncedGraph(object):
                 for s in self._graph.triples((None, None, None), context):
                     g.add(s)
                 return g
-            
+
             def __exit__(self, type, val, tb):
                 return
 
@@ -365,7 +365,7 @@ class SyncedGraph(object):
     # bnode later. This won't work if the receiver stores bnodes
     # between calls, but probably most of them don't do that (they
     # work from a starting uri)
-    
+
     def value(self, subject=None, predicate=RDF.value, object=None,
               default=None, any=True):
         if object is not None:
@@ -379,7 +379,7 @@ class SyncedGraph(object):
         func = self._getCurrentFunc()
         self._watchers.addSubjPredWatcher(func, subject, predicate)
         return self._graph.objects(subject, predicate)
-    
+
     def label(self, uri):
         return self.value(uri, RDFS.label)
 

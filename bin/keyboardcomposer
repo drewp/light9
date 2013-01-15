@@ -76,11 +76,11 @@ class SubmasterBox(Frame):
         self.slider_var = DoubleVar()
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
-        
+
         self.namelabel = Label(self, font="Arial 7", bg=darkBg,
             fg='white', pady=0)
         self.sub.graph.addHandler(self.updateName)
-        
+
         self.namelabel.pack(side=TOP)
         levellabel = Label(self, textvariable=self.slider_var, font="Arial 7",
             bg='black', fg='white', pady=0)
@@ -100,7 +100,7 @@ class SubmasterBox(Frame):
 
     def cleanup(self):
         self.slider_var.trace_vdelete('w', self._slider_var_trace)
-    
+
     def slider_changed(self, *args):
         self.scale.draw_indicator_colors()
 
@@ -108,7 +108,7 @@ class SubmasterBox(Frame):
             return
         self.updateGraphWithLevel(self.sub.uri, self.slider_var.get())
         # dispatcher.send("level changed") # in progress
-        ###self.send_levels() # use dispatcher? 
+        ###self.send_levels() # use dispatcher?
 
         # needs fixing: plan is to use dispatcher or a method call to tell a hardware-mapping object who changed, and then it can make io if that's a current hw slider
         #if rowcount == self.current_row:
@@ -171,7 +171,7 @@ class KeyboardComposer(Frame, SubClient):
         self.subbox = {} # sub uri : SubmasterBox
         self.slider_table = {} # coords : SubmasterBox
         self.rows = [] # this holds Tk Frames for each row
-        
+
         self.current_row = 0 # should come from session graph
 
         self.use_hw_sliders = hw_sliders
@@ -190,18 +190,18 @@ class KeyboardComposer(Frame, SubClient):
 
         self.sliders_status_var = IntVar()
         self.sliders_status_var.set(self.use_hw_sliders)
-        self.sliders_checkbutton = Checkbutton(self.buttonframe, 
+        self.sliders_checkbutton = Checkbutton(self.buttonframe,
             text="Sliders", variable=self.sliders_status_var,
             command=lambda: self.toggle_slider_connectedness(),
             bg='black', fg='white')
         self.sliders_checkbutton.pack(side=LEFT)
 
-        self.alltozerobutton = Button(self.buttonframe, text="All to Zero", 
+        self.alltozerobutton = Button(self.buttonframe, text="All to Zero",
             command=self.alltozero, bg='black', fg='white')
         self.alltozerobutton.pack(side='left')
 
-        self.save_stage_button = Button(self.buttonframe, text="Save", 
-            command=lambda: self.save_current_stage(self.sub_name.get()), 
+        self.save_stage_button = Button(self.buttonframe, text="Save",
+            command=lambda: self.save_current_stage(self.sub_name.get()),
             bg='black', fg='white')
         self.save_stage_button.pack(side=LEFT)
         self.sub_name = Entry(self.buttonframe, bg='black', fg='white')
@@ -222,7 +222,7 @@ class KeyboardComposer(Frame, SubClient):
     def onLostSub(self, subUri):
         log.info("lost %s", subUri)
         self.graph.addHandler(self.draw_sliders)
-    
+
     def draw_sliders(self):
         for r in self.rows:
             r.destroy()
@@ -231,7 +231,7 @@ class KeyboardComposer(Frame, SubClient):
             b.cleanup()
         self.subbox.clear()
         self.slider_table.clear()
-        
+
         self.tk_focusFollowsMouse()
 
         rowcount = -1
@@ -240,9 +240,9 @@ class KeyboardComposer(Frame, SubClient):
 
         # there are unlikely to be any subs at startup because we
         # probably haven't been called back with the graph data yet
-        
-        withgroups = sorted((self.graph.value(sub.uri, L9['group']), 
-                             self.graph.value(sub.uri, L9['order']), 
+
+        withgroups = sorted((self.graph.value(sub.uri, L9['group']),
+                             self.graph.value(sub.uri, L9['order']),
                              sub)
             for sub in self.submasters.get_all_subs())
         dispatcher.connect(self.onNewSub, "new submaster")
@@ -265,7 +265,7 @@ class KeyboardComposer(Frame, SubClient):
 
             col = (col + 1) % 8
             last_group = group
-            
+
     def toggle_slider_connectedness(self):
         self.use_hw_sliders = not self.use_hw_sliders
         if self.use_hw_sliders:
@@ -297,7 +297,7 @@ class KeyboardComposer(Frame, SubClient):
             upkey, downkey = (upkey.upper(), downkey.upper())
 
             # another what a hack!
-            keylabel = Label(keyhintrow, text='%s\n%s' % (upkey, downkey), 
+            keylabel = Label(keyhintrow, text='%s\n%s' % (upkey, downkey),
                 width=1, font=('Arial', 10), bg='red', fg='white', anchor='c')
             keylabel.pack(side=LEFT, expand=1, fill=X)
             col += 1
@@ -371,7 +371,7 @@ class KeyboardComposer(Frame, SubClient):
                 self.sliders.valueOut("slider%d" % col, 0)
                 continue
             self.send_to_hw(subbox.name, col)
-            
+
     def got_nudger(self, number, direction, full=0):
         try:
             subbox = self.slider_table[(self.current_row, number)]
@@ -400,10 +400,10 @@ class KeyboardComposer(Frame, SubClient):
     def send_to_hw(self, subUri, hwNum):
         if isinstance(self.sliders, DummySliders):
             return
-            
+
         v = round(127 * self.slider_vars[subUri].get())
         chan = "slider%s" % hwNum
-        
+
         # workaround for some rounding issue, where we receive one
         # value and then decide to send back a value that's one step
         # lower.  -5 is a fallback for having no last value.  hopefully
@@ -411,7 +411,7 @@ class KeyboardComposer(Frame, SubClient):
         if abs(v - self.sliders.lastValue.get(chan, -5)) <= 1:
             return
         self.sliders.valueOut(chan, v)
-            
+
     def make_row(self):
         row = Frame(self, bd=2, bg='black')
         row.pack(expand=1, fill=BOTH)
@@ -428,7 +428,7 @@ class KeyboardComposer(Frame, SubClient):
         row['bg'] = 'black'
 
     def get_levels(self):
-        return dict([(uri, box.slider_var.get()) 
+        return dict([(uri, box.slider_var.get())
             for uri, box in self.subbox.items()])
 
     def get_levels_as_sub(self):
@@ -479,7 +479,7 @@ class LevelServerHttp(resource.Resource):
 
     def render_POST(self, request):
         arg = postArgGetter(request)
-        
+
         if request.path == '/fadesub':
             # fadesub?subname=scoop&level=0&secs=.2
             self.name_to_subbox[arg('subname')].scale.fade(
@@ -546,6 +546,9 @@ if __name__ == "__main__":
 
     graph = SyncedGraph("keyboardcomposer")
 
+    # i think this also needs delayed start (like subcomposer has), to have a valid graph
+    # before setting any stuff from the ui
+    
     root = Tk()
     initTkdnd(root.tk, 'tkdnd/trunk/')
 
@@ -572,7 +575,7 @@ if __name__ == "__main__":
             log.warn(e)
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
-    
+
     tksupport.install(root,ms=10)
 
 

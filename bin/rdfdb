@@ -151,7 +151,7 @@ class Client(object):
         self.sendPatch(Patch(
             addQuads=self.db.graph.quads(ALLSTMTS),
             delQuads=[]))
-        
+
     def sendPatch(self, p):
         return syncedgraph.sendPatch(self.updateUri, p)
 
@@ -194,7 +194,7 @@ class Db(object):
             self.watchFile("show/dance2012/patch.n3")
         finally:
             self.initialLoad = False
-            
+
         self.summarizeToLog()
 
     def uriFromFile(self, filename):
@@ -203,7 +203,7 @@ class Db(object):
             # back this might not go so well
             filename = filename[:-len('.n3')]
         return URIRef(self.topUri + filename)
-        
+
     def fileForUri(self, ctx):
         if not ctx.startswith(self.topUri):
             raise ValueError("don't know what filename to use for %s" % ctx)
@@ -214,7 +214,7 @@ class Db(object):
         gf = GraphFile(self.notifier, inFile, ctx, self.patch, self.getSubgraph)
         self.graphFiles[ctx] = gf
         gf.reread()
-        
+
     def patch(self, p, dueToFileChange=False):
         """
         apply this patch to the master graph then notify everyone about it
@@ -259,14 +259,14 @@ class Db(object):
                 outFile = self.fileForUri(ctx)
                 self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
                                                  self.patch, self.getSubgraph)
-            
+
             self.graphFiles[ctx].dirty(g)
 
     def clientErrored(self, err, c):
         err.trap(twisted.internet.error.ConnectError)
         log.info("connection error- dropping client %r" % c)
         self.clients.remove(c)
-        self.sendClientsToAllLivePages()        
+        self.sendClientsToAllLivePages()
 
     def summarizeToLog(self):
         log.info("contexts in graph (%s total stmts):" % len(self.graph))
@@ -289,7 +289,7 @@ class Db(object):
         for s in self.graph.triples(ALLSTMTS, uri):
             g.add(s)
         return g
-    
+
     def addClient(self, updateUri, label):
         [self.clients.remove(c)
          for c in self.clients if c.updateUri == updateUri]
@@ -301,12 +301,12 @@ class Db(object):
     def sendClientsToAllLivePages(self):
         sendToLiveClients({"clients":[
             dict(updateUri=c.updateUri, label=c.label)
-            for c in self.clients]})        
+            for c in self.clients]})
 
 class GraphResource(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
-        pass
-    
+        self.write(self.settings.db.graph.serialize(format='n3'))
+
 class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
     def __init__(self, *args, **kw):
         cyclone.web.RequestHandler.__init__(self, *args, **kw)
@@ -319,7 +319,7 @@ class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
 class GraphClients(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
         pass
-    
+
     def post(self):
         upd = self.get_argument("clientUpdate")
         try:
@@ -336,7 +336,7 @@ def sendToLiveClients(d=None, asJson=None):
         c.sendMessage(j)
 
 class Live(cyclone.websocket.WebSocketHandler):
-    
+
     def connectionMade(self, *args, **kwargs):
         log.info("websocket opened")
         liveClients.add(self)
@@ -375,10 +375,10 @@ if __name__ == "__main__":
         raise ValueError("missing --show http://...")
 
     db = Db()
-    
+
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)
-            
+
     port = 8051
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
         (r'/live', Live),

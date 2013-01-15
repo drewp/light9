@@ -11,7 +11,7 @@ log = logging.getLogger('submaster')
 class Submaster(object):
     "Contain a dictionary of levels, but you didn't need to know that"
     def __init__(self, name, levels):
-        """this sub has a name just for debugging. It doesn't get persisted. 
+        """this sub has a name just for debugging. It doesn't get persisted.
         See PersistentSubmaster.
 
         levels is a dict
@@ -20,16 +20,16 @@ class Submaster(object):
         self.levels = levels
 
         self.temporary = True
-        
+
         if not self.temporary:
             # obsolete
             dispatcher.connect(log.error, 'reload all subs')
-            
+
         log.debug("%s initial levels %s", self.name, self.levels)
 
     def _editedLevels(self):
         pass
-    
+
     def set_level(self, channelname, level, save=True):
         self.levels[Patch.resolve_name(channelname)] = level
         self._editedLevels()
@@ -42,12 +42,12 @@ class Submaster(object):
 
     def get_levels(self):
         return self.levels
-    
+
     def no_nonzero(self):
         return (not self.levels.values()) or not (max(self.levels.values()) > 0)
 
     def __mul__(self, scalar):
-        return Submaster("%s*%s" % (self.name, scalar), 
+        return Submaster("%s*%s" % (self.name, scalar),
                          levels=dict_scale(self.levels, scalar))
     __rmul__ = __mul__
     def max(self, *othersubs):
@@ -64,11 +64,11 @@ class Submaster(object):
         items.sort()
         levels = ' '.join(["%s:%.2f" % item for item in items])
         return "<'%s': [%s]>" % (getattr(self, 'name', 'no name yet'), levels)
-    
+
     def __cmp__(self, other):
         # not sure how useful this is
         return cmp(self.ident(), other.ident())
-    
+
     def __hash__(self):
         return hash(self.ident())
 
@@ -89,23 +89,23 @@ class Submaster(object):
             levels[dmxchan] = max(v, levels[dmxchan])
 
         return levels
-    
+
     def normalize_patch_names(self):
         """Use only the primary patch names."""
         # possibly busted -- don't use unless you know what you're doing
         self.set_all_levels(self.levels.copy())
 
     def get_normalized_copy(self):
-        """Get a copy of this sumbaster that only uses the primary patch 
+        """Get a copy of this sumbaster that only uses the primary patch
         names.  The levels will be the same."""
         newsub = Submaster("%s (normalized)" % self.name, {})
         newsub.set_all_levels(self.levels)
         return newsub
-    
+
     def crossfade(self, othersub, amount):
         """Returns a new sub that is a crossfade between this sub and
-        another submaster.  
-        
+        another submaster.
+
         NOTE: You should only crossfade between normalized submasters."""
         otherlevels = othersub.get_levels()
         keys_set = {}
@@ -115,7 +115,7 @@ class Submaster(object):
 
         xfaded_sub = Submaster("xfade", {})
         for k in all_keys:
-            xfaded_sub.set_level(k, 
+            xfaded_sub.set_level(k,
                                  linear_fade(self.levels.get(k, 0),
                                              otherlevels.get(k, 0),
                                              amount))
@@ -134,21 +134,21 @@ class PersistentSubmaster(Submaster):
 
     def ident(self):
         return self.uri
-        
+
     def _editedLevels(self):
         self.save()
-        
+
     def setName(self):
         log.info("sub update name %s %s", self.uri, self.graph.label(self.uri))
         self.name = self.graph.label(self.uri)
-        
+
     def setLevels(self):
         log.info("sub update levels")
         oldLevels = getattr(self, 'levels', {}).copy()
         self.setLevelsFromGraph()
         if oldLevels != self.levels:
             log.info("sub %s changed" % self.name)
-        
+
     def setLevelsFromGraph(self):
         if hasattr(self, 'levels'):
             self.levels.clear()
@@ -186,7 +186,7 @@ class PersistentSubmaster(Submaster):
 
         graph.serialize(showconfig.subFile(self.name), format="nt")
 
-                                            
+
 def linear_fade(start, end, amount):
     """Fades between two floats by an amount.  amount is a float between
     0 and 1.  If amount is 0, it will return the start value.  If it is 1,
@@ -221,7 +221,7 @@ class Submasters:
     def __init__(self, graph):
         self.submasters = {}
         self.graph = graph
-        
+
         graph.addHandler(self.findSubs)
 
     def findSubs(self):

@@ -55,6 +55,7 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
 
     def savePos():
         geo = tl.geometry()
+
         # todo: need a way to filter out the startup window sizes that
         # weren't set by the user
         if geo.startswith("1x1") or geo.startswith(("378x85", "378x86")):
@@ -80,7 +81,7 @@ def positionOnCurrentDesktop(xform, screenWidth=1920, screenHeight=1440):
     x = int(x) % screenWidth
     y = int(y) % screenHeight
     return "%s+%s+%s" % (size, x, y)
-    
+
 
 def toggle_slider(s):
     if s.get() == 0:
@@ -88,7 +89,7 @@ def toggle_slider(s):
     else:
         s.set(0)
 
-# for lambda callbacks    
+# for lambda callbacks
 def printout(t):
     print t
 
@@ -97,7 +98,7 @@ def printevent(ev):
         if not k.startswith('__'):
             print k,getattr(ev,k)
     print ""
-    
+
 def eventtoparent(ev,sequence):
     "passes an event to the parent, screws up TixComboBoxes"
 
@@ -162,13 +163,13 @@ class Togglebutton(Button):
 
     def _varchanged(self,*args):
         self._setstate(self._variable.get())
-        
+
     def invoke(self,*ev):
         if self._variable:
             self._variable.set(not self.state)
         else:
             self._setstate(not self.state)
-        
+
         if self.oldcommand and self.state: # call command only when state goes to 1
             self.oldcommand()
         return "break"
@@ -198,11 +199,11 @@ class FancyDoubleVar(DoubleVar):
         """
         cbname = self._master._register(callback)
         self._tk.call("trace", "variable", self._name, mode, cbname)
-        
+
         # we build a list of the trace callbacks (the py functrions and the tcl functionnames)
         self.callbacklist[cbname] = mode
 #        print "added trace:",callback,cbname
-        
+
         return cbname
     trace=trace_variable
     def disable_traces(self):
@@ -210,7 +211,7 @@ class FancyDoubleVar(DoubleVar):
 #            DoubleVar.trace_vdelete(self,v[0],k)
             self._tk.call("trace", "vdelete", self._name, mode,cb)
             # but no master delete!
-            
+
     def recreate_traces(self):
         for cb,mode in self.callbacklist.items():
 #            self.trace_variable(v[0],v[1])
@@ -222,15 +223,15 @@ class FancyDoubleVar(DoubleVar):
             self.delete_named(name)
 
         cbname = self.trace_variable('w',callback) # this will register in self.callbacklist too
-        
+
         self.namedtraces[name] = cbname
         return cbname
-        
+
     def delete_named(self, name):
         if name in self.namedtraces:
 
             cbname = self.namedtraces[name]
-            
+
             self.trace_vdelete('w',cbname)
 	    #self._tk.call("trace","vdelete",self._name,'w',cbname)
             print "FancyDoubleVar: successfully deleted trace named %s" % name

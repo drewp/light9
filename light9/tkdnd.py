@@ -122,7 +122,7 @@ def dropTargetRegister(widget, typeList=None,
                                   onDropLeave=hover.restore,
                                   onDropPosition=onDropPosition,
                                   onDrop=wrappedDrop)
-    
+
     if typeList is None:
         typeList = ['*']
     widget.tk.call(*(['tkdnd::drop_target', 'register', widget._w]+typeList))
