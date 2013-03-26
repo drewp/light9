@@ -1,7 +1,7 @@
 import logging, traceback, os, time
 from twisted.python.filepath import FilePath
 from twisted.internet import reactor
-from twisted.internet.inotify import humanReadableMask
+from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM
 from rdflib import Graph
 from light9.rdfdb.patch import Patch
 from light9.rdfdb.rdflibpatch import inContext
@@ -33,25 +33,17 @@ class GraphFile(object):
         self.flushDelay = 2 # seconds until we have to call flush() when dirty
         self.writeCall = None # or DelayedCall
         self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
-
-        # emacs save comes in as IN_MOVE_SELF, maybe
-        
-        # I was hoping not to watch IN_CHANGED and get lots of
-        # half-written files, but emacs doesn't close its files after
-        # a write, so there's no other event. I could try to sleep
-        # until after all the writes are done, but I think the only
-        # bug left is that we'll retry too agressively on a file
-        # that's being written
-
-        from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM, IN_MODIFY, IN_DELETE, IN_DELETE_SELF, IN_CHANGED
-
         notifier.watch(FilePath(path),
-                       mask=IN_CLOSE_WRITE | IN_MOVED_FROM | IN_DELETE | IN_DELETE_SELF | IN_CHANGED | 16383,
+                       mask=IN_CLOSE_WRITE | IN_MOVED_FROM,
                        callbacks=[self.notify])
       
     def notify(self, notifier, filepath, mask):
-        if filepath.getModificationTime() == self.lastWriteTimestamp:
-            log.debug("file %s changed, but we did this write", filepath)
+        try:
+            if filepath.getModificationTime() == self.lastWriteTimestamp:
+                log.debug("file %s changed, but we did this write", filepath)
+                return
+        except OSError as e:
+            log.error("watched file %s: %r" % (filepath, e))
             return
             
         log.info("file %s changed", filepath)
@@ -61,17 +53,13 @@ class GraphFile(object):
             traceback.print_exc()
 
     def reread(self):
-        """update the graph with any diffs from this file
-
-        n3 parser fails on "1.e+0" even though rdflib was emitting that itself
-        """
+        """update the graph with any diffs from this file"""
         old = self.getSubgraph(self.uri)
         new = Graph()
         try:
             new.parse(location=self.path, format='n3')
         except SyntaxError as e:
             print e
-            traceback.print_exc()
             log.error("syntax error in %s" % self.path)
             return
         except IOError as e:
