@@ -17,4 +17,17 @@ def rce(self, exc, val, tb):
         Failure(val, exc, tb).printDetailedTraceback()
 Tkinter.Tk.report_callback_exception = rce
 
+import coloredlogs, logging, time
+log = logging.getLogger()
+
+class CSH(coloredlogs.ColoredStreamHandler):
+    def render_timestamp(self, created):
+        return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(created)) + (
+            "%.3f" % (created % 1)).lstrip('0')
+
+    def render_name(self, name):
+        return name
+
+log.addHandler(CSH(show_hostname=False, show_name=True))
+
 cgitb.enable(format='txt')
