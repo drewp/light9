@@ -10,19 +10,25 @@ class PatchReceiver(object):
     master. See onPatch for what happens when the rdfdb master sends
     us a patch
     """
-    def __init__(self, label, graph, initiallySynced):
+    def __init__(self, graph, label, initiallySynced):
+        """
+        label is what we'll call ourselves to the rdfdb server
+
+        initiallySynced is a deferred that we'll call back when we get
+        the first patch from the server
+        """
         self.graph = graph
         self.initiallySynced = initiallySynced
         
         listen = reactor.listenTCP(0, cyclone.web.Application(handlers=[
-            (r'/update', makePatchEndpoint(self.onPatch)),
+            (r'/update', makePatchEndpoint(self._onPatch)),
         ]))
         port = listen._realPortNumber  # what's the right call for this?
         self.updateResource = 'http://localhost:%s/update' % port
         log.info("listening on %s" % port)
-        self.register(label)
+        self._register(label)
 
-    def onPatch(self, p):
+    def _onPatch(self, p):
         """
         central server has sent us a patch
         """
@@ -39,7 +45,7 @@ class PatchReceiver(object):
             self.initiallySynced.callback(None)
             self.initiallySynced = None
 
-    def register(self, label):
+    def _register(self, label):
 
         def done(x):
             log.debug("registered with rdfdb")

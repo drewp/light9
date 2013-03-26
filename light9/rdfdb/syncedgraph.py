@@ -59,7 +59,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         self.initiallySynced = defer.Deferred()
         _graph = self._graph = ConjunctiveGraph()
 
-        self._receiver = PatchReceiver(label, _graph, self.initiallySynced)
+        self._receiver = PatchReceiver(_graph, label, self.initiallySynced)
         
         self._sender = PatchSender('http://localhost:8051/patches',
                                    self._receiver.updateResource)

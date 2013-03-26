@@ -5,11 +5,14 @@ log = logging.getLogger('syncedgraph')
 
 class AutoDepGraphApi(object):
     """
+    knockoutjs-inspired API for automatically building a dependency
+    tree while reading the graph. See addHandler().
+    
     mixin for SyncedGraph, separated here because these methods work together
     """
 
     def __init__(self):
-        self._watchers = GraphWatchers()
+        self._watchers = _GraphWatchers()
         self.currentFuncs = [] # stack of addHandler callers
     
     def addHandler(self, func):
@@ -102,7 +105,7 @@ class AutoDepGraphApi(object):
     # subjects(RDF.type, t) call
 
 
-class GraphWatchers(object):
+class _GraphWatchers(object):
     """
     store the current handlers that care about graph changes
     """

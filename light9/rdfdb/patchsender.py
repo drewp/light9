@@ -3,25 +3,6 @@ import cyclone.httpclient
 from twisted.internet import defer
 log = logging.getLogger('syncedgraph')
 
-def sendPatch(putUri, patch, **kw):
-    """
-    kwargs will become extra attributes in the toplevel json object
-    """
-    body = patch.makeJsonRepr(kw)
-    log.debug("send body: %r", body)
-    def ok(done):
-        if not str(done.code).startswith('2'):
-            raise ValueError("sendPatch request failed %s: %s" % (done.code, done.body))
-        log.debug("sendPatch finished, response: %s" % done.body)
-        return done
-
-    return cyclone.httpclient.fetch(
-        url=putUri,
-        method='PUT',
-        headers={'Content-Type': ['application/json']},
-        postdata=body,
-        ).addCallback(ok)
-
 class PatchSender(object):
     """
     SyncedGraph may generate patches faster than we can send
@@ -29,6 +10,13 @@ class PatchSender(object):
     they go the server
     """
     def __init__(self, target, myUpdateResource):
+        """
+        target is the URI we'll send patches to
+
+        myUpdateResource is the URI for this sender of patches, which
+        maybe needs to be the actual requestable update URI for
+        sending updates back to us
+        """
         self.target = target
         self.myUpdateResource = myUpdateResource
         self._patchesToSend = []
@@ -93,3 +81,23 @@ class PatchSender(object):
         log.error(e)
         self._continueSending()
 
+def sendPatch(putUri, patch, **kw):
+    """
+    PUT a patch as json to an http server. Returns deferred.
+    
+    kwargs will become extra attributes in the toplevel json object
+    """
+    body = patch.makeJsonRepr(kw)
+    log.debug("send body: %r", body)
+    def ok(done):
+        if not str(done.code).startswith('2'):
+            raise ValueError("sendPatch request failed %s: %s" % (done.code, done.body))
+        log.debug("sendPatch finished, response: %s" % done.body)
+        return done
+
+    return cyclone.httpclient.fetch(
+        url=putUri,
+        method='PUT',
+        headers={'Content-Type': ['application/json']},
+        postdata=body,
+        ).addCallback(ok)

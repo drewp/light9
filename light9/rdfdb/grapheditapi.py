@@ -5,6 +5,8 @@ from light9.rdfdb.patch import Patch
 
 class GraphEditApi(object):
     """
+    fancier graph edits
+    
     mixin for SyncedGraph, separated here because these methods work together
     """
 

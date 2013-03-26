@@ -2,7 +2,10 @@ from rdflib import ConjunctiveGraph
 from light9.rdfdb.rdflibpatch import contextsForStatement as rp_contextsForStatement
 
 class CurrentStateGraphApi(object):
-    
+    """
+    mixin for SyncedGraph, separated here because these methods work together
+    """
+
     def currentState(self, context=None):
         """
         a graph you can read without being in an addHandler
