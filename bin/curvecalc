@@ -24,6 +24,7 @@ log = logging.getLogger()
 
 import run_local
 from light9 import showconfig, prof, networking
+from light9.rdfdb import clientsession
 from light9.curvecalc.curve import Curveset
 from light9.curvecalc import curveview 
 from light9.curvecalc.musicaccess import Music, currentlyPlayingSong
@@ -39,8 +40,8 @@ class SubtermExists(ValueError):
     pass
 
 class Main(object):
-    def __init__(self, graph, opts, song, curveset, subterms, music):
-        self.graph, self.opts, self.song = graph, opts, song
+    def __init__(self, graph, opts, session, curveset, subterms, music):
+        self.graph, self.opts, self.session = graph, opts, session
         self.curveset, self.subterms, self.music = curveset, subterms, music
         self.lastSeenInputTime = 0
 
@@ -59,7 +60,9 @@ class Main(object):
         mainwin.connect("delete-event", lambda *args: reactor.crash())
         def updateTitle():
             # song will soon be a lookup on this curvecalc session
-            mainwin.set_title("curvecalc - %s" % graph.label(song))
+            mainwin.set_title("curvecalc - %s" %
+                              graph.label(
+                                  graph.value(session, L9['currentSong'])))
         graph.addHandler(updateTitle)
         mainwin.parse_geometry("1x1-0+0")
 
@@ -158,8 +161,10 @@ class Main(object):
         master = self.wtree.get_object("subterms")
         [master.remove(c) for c in master.get_children()]
 
-        for st in self.graph.objects(self.song, L9['subterm']):
-            log.info("song %s has subterm %s", self.song, st)
+        song = self.graph.value(self.session, L9['currentSong'])
+        
+        for st in self.graph.objects(song, L9['subterm']):
+            log.info("song %s has subterm %s", song, st)
             add_one_subterm(self.graph,
                             self.graph.value(st, L9['sub']),
                             self.curveset,
@@ -215,7 +220,9 @@ class Main(object):
         self.music.playOrPause(t=times[0] if times else None)
 
     def onSave(self, *args):
-        savekey(self.song, self.subterms, self.curveset)
+        with self.graph.currentState() as g:
+            savekey(g.value(self.session, L9['currentSong']),
+                    self.subterms, self.curveset)
 
     def makeStatusLines(self, master):
         """various labels that listen for dispatcher signals"""
@@ -284,6 +291,27 @@ class Main(object):
             reactor.callLater(1, self.refreshCurveView)
 
 
+class MaxTime(object):
+    """
+    looks up the time in seconds for the session's current song
+    """
+    def __init__(self, graph, session):
+        self.graph, self.session = graph, session
+        graph.addHandler(self.update)
+
+    def update(self):
+        song = self.graph.value(self.session, L9['currentSong'])
+        if song is None:
+            self.maxtime = 0
+            return
+        musicfilename = showconfig.songOnDisk(song)
+        self.maxtime = wavelength(musicfilename)
+        log.info("new max time %r", self.maxtime)
+        dispatcher.send("max time", maxtime=self.maxtime)
+
+    def get(self):
+        return self.maxtime
+
 def main():
     startTime = time.time()
     parser = optparse.OptionParser()
@@ -298,38 +326,51 @@ def main():
                       help="live reload of themes and code")
     parser.add_option("--startup-only", action='store_true',
                       help="quit after loading everything (for timing tests)")
+    clientsession.add_option(parser)
     opts, args = parser.parse_args()
 
     logging.basicConfig(format="%(asctime)s %(levelname)-5s %(name)s %(filename)s:%(lineno)d: %(message)s")
     log.setLevel(logging.DEBUG if opts.debug else logging.INFO)
 
     log.debug("startup: music %s", time.time() - startTime)
-    try:
-        song = URIRef(args[0])
-    except IndexError:
-        song = currentlyPlayingSong()
+
+
+    session = clientsession.getUri('curvecalc', opts)
 
     music = Music()
     graph = SyncedGraph("curvecalc")
 
+    try:
+        song = URIRef(args[0])
+        graph.patchObject(context=session,
+                          subject=session,
+                          predicate=L9['currentSong'],
+                          newObject=song)
+    except IndexError:
+        pass
+
     curveset = Curveset(sliders=opts.sliders)
     subterms = []
 
-    curveset.load(basename=os.path.join(
-        showconfig.curvesDir(),
-        showconfig.songFilenameFromURI(song)),
-                  skipMusic=opts.skip_music)
-
+    def curvesetReload():
+        # not sure if this clears right or not yet
+        song = graph.value(session, L9['currentSong'])
+        if song is None:
+            return
+        curveset.load(basename=os.path.join(
+            showconfig.curvesDir(),
+            showconfig.songFilenameFromURI(song)),
+                      skipMusic=opts.skip_music)
+    graph.addHandler(curvesetReload)
+        
     log.debug("startup: output %s", time.time() - startTime)
     out = Output(subterms, music)
 
-    musicfilename = showconfig.songOnDisk(song)
-    maxtime = wavelength(musicfilename)
-    dispatcher.connect(lambda: maxtime, "get max time", weak=False)
+    mt = MaxTime(graph, session)
+    dispatcher.connect(lambda: mt.get(), "get max time", weak=False)
 
-    start = Main(graph, opts, song, curveset, subterms, music)
+    start = Main(graph, opts, session, curveset, subterms, music)
 
-    dispatcher.send("max time", maxtime=maxtime)
     dispatcher.send("show all")
         
     if opts.startup_only:
@@ -346,8 +387,9 @@ def main():
                 if not times:
                     request.setResponseCode(404)
                     return "not hovering over any time"
-                
-                return json.dumps({"song":song, "hoverTime" : times[0]})
+                with graph.currentState() as g:
+                    song = g.value(session, L9['currentSong'])
+                    return json.dumps({"song": song, "hoverTime" : times[0]})
             raise NotImplementedError()
 
     reactor.listenTCP(networking.curveCalc.port,

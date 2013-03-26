@@ -138,9 +138,13 @@ class ZoomControl(object):
 
         self.redrawzoom()
             
-    def input_time(self,val):
+    def input_time(self, val):
+        """move time cursor to this time"""
         self.lastTime = val
-        x = self.can_for_t(self.lastTime)
+        try:
+            x = self.can_for_t(self.lastTime)
+        except ZeroDivisionError:
+            x = -100
         self.time.set_property("points",
                                goocanvas.Points([(x, 0),
                                                  (x, self.size.height)]))
@@ -182,8 +186,12 @@ class ZoomControl(object):
             return
         y1, y2 = 3, self.size.height - 3
         lip = 6
-        scan = self.can_for_t(self.start)
-        ecan = self.can_for_t(self.end)
+        try:
+            scan = self.can_for_t(self.start)
+            ecan = self.can_for_t(self.end)
+        except ZeroDivisionError:
+            # todo: set the zoom to some clear null state
+            return
 
         self.leftbrack.set_property("points", goocanvas.Points([
             (scan + lip, y1),

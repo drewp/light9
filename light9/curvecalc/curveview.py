@@ -617,9 +617,12 @@ class Curveview(object):
                 points=goocanvas.Points([(0,0), (0,0)]),
                 line_width=2, stroke_color='red')
 
-        self.timelineLine.set_property('points', goocanvas.Points([
-            self.screen_from_world((t, 0)),
-            self.screen_from_world((t, 1))]))
+        try:
+            pts = [self.screen_from_world((t, 0)),
+                   self.screen_from_world((t, 1))]
+        except ZeroDivisionError:
+            pts = [(-1, -1), (-1, -1)]
+        self.timelineLine.set_property('points', goocanvas.Points(pts))
         
         self._time = t
         if self.knobEnabled:
@@ -733,11 +736,15 @@ class Curveview(object):
             tic(endtime - postPad, "post %.1f" % (endtime - postPad))
         
     def _draw_one_tic(self,t,label):
-        x = self.screen_from_world((t,0))[0]
+        try:
+            x = self.screen_from_world((t,0))[0]
+            if not 0 <= x < self.size.width:
+                return
+            x = max(5, x) # cheat left-edge stuff onscreen
+        except ZeroDivisionError:
+            x = -100
+            
         ht = self.size.height
-        if not 0 <= x < self.size.width:
-            return
-        x = max(5, x) # cheat left-edge stuff onscreen
         goocanvas.polyline_new_line(self.curveGroup,
                                     x, ht,
                                     x, ht - 20,
@@ -759,7 +766,10 @@ class Curveview(object):
             step = int(len(visible_points) / maxPointsToDraw)
             linewidth = .8
         for p in visible_points[::step]:
-            x,y = self.screen_from_world(p)
+            try:
+                x,y = self.screen_from_world(p)
+            except ZeroDivisionError:
+                x = y = -100
             linepts.append((int(x) + .5, int(y) + .5))
 
         if self.curve.muted:
@@ -768,7 +778,10 @@ class Curveview(object):
             fill = 'white'
 
         if area:
-            base = self.screen_from_world((0, 0))[1]
+            try:
+                base = self.screen_from_world((0, 0))[1]
+            except ZeroDivisionError:
+                base = -100
             base = base + linewidth / 2
             goocanvas.Polyline(parent=self.curveGroup,
                                points=goocanvas.Points(
@@ -791,7 +804,10 @@ class Curveview(object):
         for i,p in zip(visible_idxs,visible_points):
             rad=3
             worldp = p
-            p = self.screen_from_world(p)
+            try:
+                p = self.screen_from_world(p)
+            except ZeroDivisionError:
+                p = (-100, -100)
             dot = goocanvas.Rect(parent=self.curveGroup,
                                  x=int(p[0] - rad) + .5,
                                  y=int(p[1] - rad) + .5,

@@ -40,8 +40,8 @@ class Expr(object):
 
         def chan(name):
             return Submaster.Submaster(
-                leveldict={Patch.get_dmx_channel(name) : 1.0},
-                temporary=True)
+                name=name,
+                levels={Patch.get_dmx_channel(name) : 1.0})
         glo['chan'] = chan
 
         def smooth_random(speed=1):
@@ -126,7 +126,7 @@ class Subterm:
                 return self.submaster * subexpr_eval
         except Exception, e:
             dispatcher.send("expr_error", sender=self.subexpr, exc=str(e))
-            return Submaster.Submaster('Error: %s' % str(e), temporary=True)
+            return Submaster.Submaster(name='Error: %s' % str(e), levels={})
 
     def __repr__(self):
         return "<Subterm %s %s>" % (self.submaster, self.subexpr)
@@ -139,7 +139,7 @@ def createSubtermGraph(song, subterms):
     """rdf graph describing the subterms, readable by add_subterms_for_song"""
     graph = Graph()
     for subterm in subterms:
-        assert subterm.submaster.name, "submaster has no name"
+        assert subterm.submaster.name, "submaster %r has no name" % subterm.submaster
         uri = URIRef(song + "/subterm/" + subterm.submaster.name)
         graph.add((song, L9['subterm'], uri))
         graph.add((uri, RDF.type, L9['Subterm']))
@@ -149,10 +149,10 @@ def createSubtermGraph(song, subterms):
     return graph
 
 def savekey(song, subterms, curveset):
-    print "saving", song
+    log.info("saving %r", song)
     g = createSubtermGraph(song, subterms)
     g.serialize(graphPathForSubterms(song), format="nt")
 
     curveset.save(basename=os.path.join(showconfig.curvesDir(),
                                         showconfig.songFilenameFromURI(song)))
-    print "saved"
+    log.info("saved")

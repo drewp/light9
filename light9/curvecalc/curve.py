@@ -140,6 +140,7 @@ class Curveset(object):
             self.sliderIgnoreInputUntil = {}
         else:
             self.sliders = None
+        self.markers = Markers()
 
     def sorter(self, name):
         return (not name in ['music', 'smooth_music'], name)
@@ -159,7 +160,6 @@ class Curveset(object):
             curvename = curvename.replace('-','_')
             self.add_curve(curvename,c)
 
-        self.markers = Markers()
         try:
             self.markers.load("%s.markers" % basename)
         except IOError:
