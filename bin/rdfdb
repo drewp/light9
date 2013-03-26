@@ -119,7 +119,9 @@ from rdflib import ConjunctiveGraph, URIRef, Graph
 from light9.rdfdb.graphfile import GraphFile
 from light9.rdfdb.patch import Patch, ALLSTMTS
 from light9.rdfdb.rdflibpatch import patchQuads
-from light9.rdfdb import syncedgraph
+
+from light9.rdfdb.patchsender import sendPatch
+from light9.rdfdb.patchreceiver import makePatchEndpointPutMethod
 
 from twisted.internet.inotify import INotify
 from run_local import log
@@ -155,7 +157,7 @@ class Client(object):
             delQuads=[]))
 
     def sendPatch(self, p):
-        return syncedgraph.sendPatch(self.updateUri, p)
+        return sendPatch(self.updateUri, p)
 
 class WatchedFiles(object):
     """
@@ -340,7 +342,7 @@ class GraphResource(PrettyErrorHandler, cyclone.web.RequestHandler):
 class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
     def __init__(self, *args, **kw):
         cyclone.web.RequestHandler.__init__(self, *args, **kw)
-        p = syncedgraph.makePatchEndpointPutMethod(self.settings.db.patch)
+        p = makePatchEndpointPutMethod(self.settings.db.patch)
         self.put = lambda: p(self)
 
     def get(self):
