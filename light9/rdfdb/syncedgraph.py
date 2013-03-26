@@ -97,7 +97,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         # these could fail if we're out of sync. One approach:
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
-        log.info("%s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
+        log.info("del %s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
         self.runDepsOnNewPatch(p)
         self._sender.sendPatch(p).addErrback(self.sendFailed)
@@ -125,7 +125,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
             # receive its patch correctly. However, we're in a bad
             # state since some dependencies may not have rerun
             traceback.print_exc()
-            log.warn("some dependencies may not have rerun")
+            log.warn("some graph dependencies may not have completely run")
 
         if self.initiallySynced:
             self.initiallySynced.callback(None)
