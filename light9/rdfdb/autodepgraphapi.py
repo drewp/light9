@@ -7,8 +7,15 @@ class AutoDepGraphApi(object):
     """
     knockoutjs-inspired API for automatically building a dependency
     tree while reading the graph. See addHandler().
+
+    This design is more aggressive than knockoutjs, since the obvious
+    query methods like value() all error if you're not in a watched
+    section of code. This is supposed to make it easier to notice
+    dependency mistakes, especially when porting old code to use
+    SyncedGraph.
     
-    mixin for SyncedGraph, separated here because these methods work together
+    This class is a mixin for SyncedGraph, separated here because
+    these methods work together
     """
 
     def __init__(self):
