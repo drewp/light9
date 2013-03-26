@@ -41,7 +41,7 @@ class AutoDepGraphApi(object):
         finally:
             self.currentFuncs.pop()
 
-    def updateOnPatch(self, p):
+    def runDepsOnNewPatch(self, p):
         """
         patch p just happened to the graph; call everyone back who
         might care, and then notice what data they depend on now

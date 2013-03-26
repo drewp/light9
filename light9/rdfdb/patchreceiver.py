@@ -10,45 +10,21 @@ class PatchReceiver(object):
     master. See onPatch for what happens when the rdfdb master sends
     us a patch
     """
-    def __init__(self, graph, label, initiallySynced):
+    def __init__(self, label, onPatch):
         """
         label is what we'll call ourselves to the rdfdb server
 
-        initiallySynced is a deferred that we'll call back when we get
-        the first patch from the server
+        onPatch is what we call back when the server sends a patch
         """
-        self.graph = graph
-        self.initiallySynced = initiallySynced
-        
         listen = reactor.listenTCP(0, cyclone.web.Application(handlers=[
-            (r'/update', makePatchEndpoint(self._onPatch)),
+            (r'/update', makePatchEndpoint(onPatch)),
         ]))
         port = listen._realPortNumber  # what's the right call for this?
         self.updateResource = 'http://localhost:%s/update' % port
         log.info("listening on %s" % port)
         self._register(label)
 
-    def _onPatch(self, p):
-        """
-        central server has sent us a patch
-        """
-        patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
-        log.info("graph now has %s statements" % len(self.graph))
-        try:
-            self.updateOnPatch(p)
-        except Exception:
-            # don't reflect this back to the server; we did
-            # receive its patch correctly.
-            traceback.print_exc()
-
-        if self.initiallySynced:
-            self.initiallySynced.callback(None)
-            self.initiallySynced = None
-
     def _register(self, label):
-
-        def done(x):
-            log.debug("registered with rdfdb")
 
         cyclone.httpclient.fetch(
             url='http://localhost:8051/graphClients',
@@ -56,9 +32,12 @@ class PatchReceiver(object):
             headers={'Content-Type': ['application/x-www-form-urlencoded']},
             postdata=urllib.urlencode([('clientUpdate', self.updateResource),
                                        ('label', label)]),
-            ).addCallbacks(done, log.error)
+            ).addCallbacks(self._done, log.error)
         log.info("registering with rdfdb")
 
+    def _done(self, x):
+        log.debug("registered with rdfdb")
+    
         
 def makePatchEndpointPutMethod(cb):
     def put(self):

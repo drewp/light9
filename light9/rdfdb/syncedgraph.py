@@ -17,7 +17,7 @@ PatchSender - collects and transmits your graph edits
 """
 
 from rdflib import ConjunctiveGraph
-import logging, cyclone.httpclient
+import logging, cyclone.httpclient, traceback
 from twisted.internet import defer
 log = logging.getLogger('syncedgraph')
 from light9.rdfdb.rdflibpatch import patchQuads
@@ -57,9 +57,9 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         with your connection
         """
         self.initiallySynced = defer.Deferred()
-        _graph = self._graph = ConjunctiveGraph()
+        self._graph = ConjunctiveGraph()
 
-        self._receiver = PatchReceiver(_graph, label, self.initiallySynced)
+        self._receiver = PatchReceiver(label, self._onPatch)
         
         self._sender = PatchSender('http://localhost:8051/patches',
                                    self._receiver.updateResource)
@@ -99,7 +99,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         # again after that, then give up.
         log.info("%s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
-        self.updateOnPatch(p)
+        self.runDepsOnNewPatch(p)
         self._sender.sendPatch(p).addErrback(self.sendFailed)
 
     def sendFailed(self, result):
@@ -111,3 +111,22 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         #i think we should receive back all the pending patches,
         #do a resysnc here,
         #then requeue all the pending patches (minus the failing one?) after that's done.
+
+    def _onPatch(self, p):
+        """
+        central server has sent us a patch
+        """
+        patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
+        log.info("graph now has %s statements" % len(self._graph))
+        try:
+            self.runDepsOnNewPatch(p)
+        except Exception:
+            # don't reflect this error back to the server; we did
+            # receive its patch correctly. However, we're in a bad
+            # state since some dependencies may not have rerun
+            traceback.print_exc()
+            log.warn("some dependencies may not have rerun")
+
+        if self.initiallySynced:
+            self.initiallySynced.callback(None)
+            self.initiallySynced = None
