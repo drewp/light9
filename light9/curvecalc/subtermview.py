@@ -71,8 +71,9 @@ def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=F
     # this is what I'd like to have, but the name replacement above is
     # too unclear for me to make the change now
     #get_global_submasters(graph).get_sub_by_name(
-        
-    sub = Submaster.Submaster(graph=graph, name=subname, sub=subUri)
+    
+    # graph.add([(subUri, RDFS.label, Literal(subname))]) # didntknow context yet
+    sub = Submaster.PersistentSubmaster(graph, subUri)
     term = Subterm(sub, Subexpr(curveset, expr, graph))
     subterms.append(term)
 

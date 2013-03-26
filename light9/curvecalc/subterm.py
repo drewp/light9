@@ -135,15 +135,6 @@ class Subterm:
 def graphPathForSubterms(song):
     return showconfig.subtermsForSong(showconfig.songFilenameFromURI(song)) + ".n3"
 
-@prof.logTime
-def read_all_subs(graph):
-    """read all sub files into this graph so when add_one_subterm tries
-    to add, the sub will be available"""
-    subsDir = showconfig.subsDir()
-    for filename in os.listdir(subsDir):
-        # parsing nt is faster, but it should try n3 format if the parsing fails
-        graph.parse(os.path.join(subsDir, filename), format="n3")
-
 def createSubtermGraph(song, subterms):
     """rdf graph describing the subterms, readable by add_subterms_for_song"""
     graph = Graph()

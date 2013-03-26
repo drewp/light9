@@ -29,19 +29,11 @@ from light9.curvecalc import curveview
 from light9.curvecalc.musicaccess import Music, currentlyPlayingSong
 from light9.wavelength import wavelength
 from light9.namespaces import L9
-from light9.curvecalc.subterm import read_all_subs, savekey, graphPathForSubterms
+from light9.curvecalc.subterm import savekey, graphPathForSubterms
 from light9.curvecalc.subtermview import add_one_subterm
 from light9.curvecalc.output import Output
 from light9.gtkpyconsole import togglePyConsole
-
-@prof.logTime
-def makeGraph():
-    graphOrig = showconfig.getGraph()
-    graph = Graph() # a copy, since we're going to add subs into it
-    for s in graphOrig:
-        graph.add(s)
-    read_all_subs(graph)
-    return graph
+from light9.rdfdb.syncedgraph import SyncedGraph
 
 class SubtermExists(ValueError):
     pass
@@ -65,7 +57,10 @@ class Main(object):
         mainwin.show_all()
 
         mainwin.connect("delete-event", lambda *args: reactor.crash())
-        mainwin.set_title("curvecalc - %s" % graph.label(song))
+        def updateTitle():
+            # song will soon be a lookup on this curvecalc session
+            mainwin.set_title("curvecalc - %s" % graph.label(song))
+        graph.addHandler(updateTitle)
         mainwin.parse_geometry("1x1-0+0")
 
         # this is the only one i found that would set the size right,
@@ -74,7 +69,7 @@ class Main(object):
 
 
         wtree.get_object("subterms").connect("add", self.onSubtermChildAdded)
-        self.add_subterms_for_song(song, curveset, subterms)
+        graph.addHandler(self.add_subterms_for_song)
         self.refreshCurveView()       
         
         self.makeStatusLines(wtree.get_object("status"))
@@ -155,12 +150,23 @@ class Main(object):
             raise SubtermExists("already have a subterm named %r" % newname)
         self.graph.add((uri, RDF.type, L9.Subterm))
         self.graph.add((uri, RDFS.label, Literal(newname)))
-        add_one_subterm(self.graph, uri,
-                        self.curveset, self.subterms,
-                        self.wtree.get_object("subterms"),
-                        expr=expr, show=True)
+        self.graph.add((self.song, L9['subterm'], uri))
         if withCurve:
             self.curveset.new_curve(newname)
+
+    def add_subterms_for_song(self):
+        master = self.wtree.get_object("subterms")
+        [master.remove(c) for c in master.get_children()]
+
+        for st in self.graph.objects(self.song, L9['subterm']):
+            log.info("song %s has subterm %s", self.song, st)
+            add_one_subterm(self.graph,
+                            self.graph.value(st, L9['sub']),
+                            self.curveset,
+                            self.subterms,
+                            master,
+                            self.graph.value(st, L9['expression']))
+        master.show_all()
 
     def refreshTheme(self):
         gtk.rc_reparse_all()
@@ -210,18 +216,6 @@ class Main(object):
 
     def onSave(self, *args):
         savekey(self.song, self.subterms, self.curveset)
-
-    def add_subterms_for_song(self, song, curveset, subterms):
-        master = self.wtree.get_object("subterms")
-        for st in self.graph.objects(song, L9['subterm']):
-            log.info("song %s has subterm %s", song, st)
-            add_one_subterm(self.graph,
-                            self.graph.value(st, L9['sub']),
-                            curveset,
-                            subterms,
-                            master,
-                            self.graph.value(st, L9['expression']))
-        master.show_all()
 
     def makeStatusLines(self, master):
         """various labels that listen for dispatcher signals"""
@@ -289,11 +283,6 @@ class Main(object):
         if self.opts.reload:
             reactor.callLater(1, self.refreshCurveView)
 
-    def onReloadSubs(self, *args): # wants to be ctrl-r  too
-        read_all_subs(self.graph) # this will discover new subs (additive only)
-        dispatcher.send('reload all subs') # this rereads each sub from its graph file
-        dispatcher.send("all curves rebuild")
-
 
 def main():
     startTime = time.time()
@@ -321,7 +310,7 @@ def main():
         song = currentlyPlayingSong()
 
     music = Music()
-    graph = makeGraph()
+    graph = SyncedGraph("curvecalc")
 
     curveset = Curveset(sliders=opts.sliders)
     subterms = []
@@ -331,14 +320,6 @@ def main():
         showconfig.songFilenameFromURI(song)),
                   skipMusic=opts.skip_music)
 
-    subtermPath = graphPathForSubterms(song)
-    try:
-        graph.parse(subtermPath, format='n3')
-    except IOError, e:
-        if e.errno != 2:
-            raise
-        log.info("%s not found, starting with empty graph" % subtermPath)
-    
     log.debug("startup: output %s", time.time() - startTime)
     out = Output(subterms, music)
 
