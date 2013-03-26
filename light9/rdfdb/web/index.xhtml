@@ -29,6 +29,8 @@
       $(function(){
 
           function collapseCuries(s) {
+            // this is temporary. The correct thing is to parse the quad (or receive it as a tree) and then make links to the full URIs and display curies of them
+
               return s
                   .replace(/<http:\/\/www.w3.org\/2001\/XMLSchema#/g, function (match, short) { return "xsd:"+short; })
                   .replace(/<http:\/\/light9.bigasterisk.com\/(.*?)>/g, function (match, short) { return "light9:"+short; })

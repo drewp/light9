@@ -1,6 +1,22 @@
 #!bin/python
+"""
+subcomposer
+  session
+  observable(currentSub), a Submaster which tracks the graph
 
+    EditChoice widget
+      can change currentSub to another sub
+
+    Levelbox widget
+      watch observable(currentSub) for a new sub, and also watch currentSub for edits to push to the OneLevel widgets
+
+        OneLevel widget
+          UI edits are caught here and go all the way back to currentSub
+
+
+"""
 from __future__ import division, nested_scopes
+import time, logging
 from optparse import OptionParser
 import logging
 import Tkinter as tk
@@ -10,13 +26,11 @@ from rdflib import URIRef
 
 from run_local import log
 from light9.dmxchanedit import Levelbox
-from light9 import dmxclient, Patch, Submaster, showconfig, prof
+from light9 import dmxclient, Patch, Submaster, prof
 from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb import clientsession
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
-
-log.setLevel(logging.DEBUG)
 
 class _NoNewVal(object):
     pass
@@ -94,6 +108,7 @@ class EditChoice(tk.Frame):
 
 
     def uriChanged(self, newUri):
+        print "chg", newUri
         # i guess i show the label and icon for this
         if newUri is Local:
             self.subIcon.config(text="(local)")
@@ -110,70 +125,98 @@ class Subcomposer(tk.Frame):
     editing. If we don't have a currentSub, then we're actually
     editing a session-local sub called <session> l9:currentSub <sessionLocalSub>
 
+    I'm not sure that Locals should even be PersistentSubmaster with
+    uri and graph storage, but I think that way is making fewer
+    special cases.
+
     Contains an EditChoice widget
 
-    UI actions:
-    - drag a sub uri on here to make it the one we're editing
+    Dependencies:
 
-    - button to clear the currentSub (putting it back to
-      sessionLocalSub, and also resetting sessionLocalSub to be empty
-      again)
+      graph (?session :currentSub ?s) -> self.currentSub
+      self.currentSub -> graph
+      self.currentSub -> self._currentChoice (which might be Local)
+      self._currentChoice (which might be Local) -> self.currentSub
 
-    - drag the sub uri off of here to send it to another receiver, but
-      session local sub is not easily addressable elsewhere
-
-    - make a new sub: transfers the current data (from a shared sub or
-      from the local one) to the new sub. If you're on a local sub,
-      the new sub is named automatically, ideally something brief,
-      pretty distinct, readable, and based on the lights that are
-      on. If you're on a named sub, the new one starts with a
-      'namedsub 2' style name. The uri can also be with a '2' suffix,
-      although maybe that will be stupid. If you change the name
-      before anyone knows about this uri, we could update the current
-      sub's uri to a slug of the new label.
-
-    - rename this sub: not available if you're on a local sub. Sets
-      the label of a named sub. Might update the uri of the named sub
-      if it's new enough that no one else would have that uri. Not
-      sure where we measure that 'new enough' value. Maybe track if
-      the sub has 'never been dragged out of this subcomposer
-      session'? But subs will also show up in other viewers and
-      finders.
+      inside the current sub:
+      graph -> Submaster levels (handled in Submaster)
+      Submaster levels -> OneLevel widget
+      OneLevel widget -> Submaster.editLevel
+      Submaster.editLevel -> graph (handled in Submaster)
 
     """
     def __init__(self, master, graph, session):
         tk.Frame.__init__(self, master, bg='black')
         self.graph = graph
         self.session = session
-        self.currentSub = Submaster.PersistentSubmaster(graph, URIRef('http://hello'))
 
-        self.levelbox = Levelbox(self, graph)
-        self.levelbox.pack(side='top')
+        # this is a PersistentSubmaster (even for local) or None if we're not initialized
+        self.currentSub = Observable(None)
 
-        currentUri = Observable(Local)
+        currentUri = Observable("http://curr")
 
         def pc(val):
-            log.info("change viewed sub to %s", val)
+            print "change viewed sub to", val
         currentUri.subscribe(pc)
 
-        EditChoice(self, self.graph, currentUri).frame.pack(side='top')
+        EditChoice(self, self.graph, self._currentChoice).frame.pack(side='top')
 
-        def alltozero():
-            for lev in self.levelbox.levels:
-                lev.setlevel(0)
+    def setupSubChoiceLinks(self):
 
-        tk.Button(self, text="all to zero", command=alltozero).pack(side='top')
+        def ann():
+            print "currently: session=%s currentSub=%r _currentChoice=%r" % (
+                self.session, self.currentSub(), self._currentChoice())
 
-        dispatcher.connect(self.sendupdate, "levelchanged")
+        @graph.addHandler
+        def graphChanged():
+            s = graph.value(self.session, L9['currentSub'])
+            if s is None:
+                s = self.makeLocal()
+            self.currentSub(Submaster.PersistentSubmaster(graph, s))
 
-    def switchToLocalSub(self, *args):
-        """
-        stop editing a shared sub and go back to our local sub
-        """
+        @self.currentSub.subscribe
+        def subChanged(newSub):
+            if newSub is None:
+                graph.patchObject(self.session,
+                                  self.session, L9['currentSub'], None)
+                return
+            self.sendupdate()
+            graph.patchObject(self.session,
+                              self.session, L9['currentSub'], newSub.uri)
 
-    def fill_both_boxes(self, subname):
-        for box in [self.savebox, self.loadbox]:
-            box.set(subname)
+            if newSub and 'local' in newSub.uri: # wrong- use rdf:type or something?
+                self._currentChoice(Local)
+            else:
+                # i think right here is the point that the last local
+                # becomes garbage, and we could clean it up. 
+                self._currentChoice(newSub.uri)
+
+        dispatcher.connect(self.levelsChanged, "sub levels changed")
+            
+        @self._currentChoice.subscribe
+        def choiceChanged(newChoice):
+            if newChoice is Local:
+                newChoice = self.makeLocal()
+            if newChoice is not None:
+                self.currentSub(Submaster.PersistentSubmaster(
+                    graph, newChoice))
+
+    def levelsChanged(self, sub):
+        if sub == self.currentSub():
+            self.sendupdate()
+        
+    def makeLocal(self):
+        # todo: put a type on this, so subChanged can identify it right
+        # todo: where will these get stored, or are they local to this
+        # subcomposer process and don't use PersistentSubmaster at all?
+        return URIRef("http://local/%s" % time.time())
+        
+    def setupLevelboxUi(self):
+        self.levelbox = Levelbox(self, graph, self.currentSub)
+        self.levelbox.pack(side='top')
+
+        tk.Button(self, text="All to zero",
+             command=lambda *args: self.currentSub().clear()).pack(side='top')
 
     def savenewsub(self, subname):
         leveldict={}
@@ -184,67 +227,12 @@ class Subcomposer(tk.Frame):
         s=Submaster.Submaster(subname,leveldict=leveldict)
         s.save()
 
-    # this is going to be more like 'tie to sub' and 'untied'
-    def loadsub(self, subname):
-        """puts a sub into the levels, replacing old level values"""
-        s=Submaster.Submasters(showconfig.getGraph()).get_sub_by_name(subname)
-        self.set_levels(s.get_dmx_list())
-        dispatcher.send("levelchanged")
-
-    def toDmxLevels(self):
-        # the dmx levels we edit and output, range is 0..1 (dmx chan 1 is
-        # the 0 element)
-        out = {}
-        for lev in self.levelbox.levels:
-            out[lev.channelnum] = lev.currentlevel
-        if not out:
-            return []
-
-        return [out.get(i, 0) for i in range(max(out.keys()) + 1)]
-
     def sendupdate(self):
-        dmxclient.outputlevels(self.toDmxLevels(), twisted=True)
+        d = self.currentSub().get_dmx_list()
+        dmxclient.outputlevels(d, twisted=True)
 
 
-class EntryCommand(tk.Frame):
-    def __init__(self, master, verb="Save", cmd=None):
-        tk.Frame.__init__(self, master, bd=2, relief='raised')
-        tk.Label(self, text="Sub name:").pack(side='left')
-        self.cmd = cmd
-        self.entry = tk.Entry(self)
-        self.entry.pack(side='left', expand=True, fill='x')
-
-        self.entry.bind("<Return>", self.action)
-        tk.Button(self, text=verb, command=self.action).pack(side='left')
-
-    def action(self, *args):
-        subname = self.entry.get()
-        self.cmd(subname)
-        log.info("command %s %s", self.cmd, subname)
-
-    def set(self, text):
-        self.entry.delete(0, 'end')
-        self.entry.insert(0, text)
-
-
-#############################
-
-if __name__ == "__main__":
-    parser = OptionParser(usage="%prog [subname]")
-    parser.add_option('--no-geometry', action='store_true',
-                      help="don't save/restore window geometry")
-    clientsession.add_option(parser)
-    opts, args = parser.parse_args()
-
-    root=tk.Tk()
-    root.config(bg='black')
-    root.tk_setPalette("#004633")
-
-    initTkdnd(root.tk, 'tkdnd/trunk/')
-
-    graph = SyncedGraph("subcomposer")
-    session = clientsession.getUri('subcomposer', opts)
-
+def launch(opts, args, root, graph, session):
     if not opts.no_geometry:
         toplevelat("subcomposer - %s" % opts.session, root, graph, session)
 
@@ -255,11 +243,43 @@ if __name__ == "__main__":
              font="Helvetica -12 italic",anchor='w').pack(side='top',fill='x')
 
     if len(args) == 1:
-        root.config(bg='green') # trying to make these look distinctive
-        sc.loadsub(args[0])
-        sc.fill_both_boxes(args[0])
+        # it might be a little too weird that cmdline arg to this
+        # process changes anything else in the same session. But also
+        # I'm not sure who would ever make 2 subcomposers of the same
+        # session (except when quitting and restarting, to get the
+        # same window pos), so maybe it doesn't matter. But still,
+        # this tool should probably default to making new sessions
+        # usually instead of loading the same one
 
-    task.LoopingCall(sc.sendupdate).start(1)
+    def action(self, *args):
+        subname = self.entry.get()
+        self.cmd(subname)
+        print "sub", self.cmd, subname
+
+    task.LoopingCall(sc.sendupdate).start(10)
+
+
+#############################
+
+if __name__ == "__main__":
+    parser = OptionParser(usage="%prog [suburi]")
+    parser.add_option('--no-geometry', action='store_true',
+                      help="don't save/restore window geometry")
+    clientsession.add_option(parser)
+    opts, args = parser.parse_args()
+
+    logging.basicConfig(level=logging.DEBUG)
+
+    root=tk.Tk()
+    root.config(bg='black')
+    root.tk_setPalette("#004633")
+
+    initTkdnd(root.tk, 'tkdnd/trunk/')
+
+    graph = SyncedGraph("subcomposer")
+    session = clientsession.getUri('subcomposer', opts)
+
+    graph.initiallySynced.addCallback(lambda _: launch(opts, args, root, graph, session))
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
     tksupport.install(root,ms=10)

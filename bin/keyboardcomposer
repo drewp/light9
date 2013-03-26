@@ -120,26 +120,13 @@ class SubmasterBox(Frame):
            ?session :subSetting [a :SubSetting; :sub ?s; :level ?l]
         """
         # move to syncedgraph patchMapping
-        with self.sub.graph.currentState() as graph:
-            adds = set([])
-            for setting in graph.objects(self.session, L9['subSetting']):
-                if graph.value(setting, L9['sub']) == uri:
-                    break
-            else:
-                setting = URIRef(self.session + "/setting/%s" %
-                                 random.randrange(999999999))
-                adds.update([
-                    (self.session, L9['subSetting'], setting, self.session),
-                    (setting, RDF.type, L9['SubSetting'], self.session),
-                    (setting, L9['sub'], uri, self.session),
-                    ])
-            dels = set([])
-            for prev in graph.objects(setting, L9['level']):
-                dels.add((setting, L9['level'], prev, self.session))
-            adds.add((setting, L9['level'], Literal(level), self.session))
 
-            if adds != dels:
-                self.sub.graph.patch(Patch(delQuads=dels, addQuads=adds))
+        self.sub.graph.patchMapping(context=self.session,
+                                    subject=self.session,
+                                    predicate=L9['subSetting'],
+                                    nodeClass=L9['SubSetting'],
+                                    keyPred=L9['sub'], newKey=uri,
+                                    valuePred=L9['level'], newValue=Literal(level))
 
     def updateLevelFromGraph(self):
         """read rdf level, write it to subbox.slider_var"""

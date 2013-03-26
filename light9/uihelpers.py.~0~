@@ -62,11 +62,15 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
 
     def savePos(ev):
         geo = tl.geometry()
-
-        # todo: need a way to filter out the startup window sizes that
-        # weren't set by the user
-        if geo.startswith("1x1") or geo.startswith(("378x85", "378x86")):
+        if not isinstance(ev.widget, Tkinter.Tk):
+            # I think these are due to internal widget size changes,
+            # not the toplevel changing
             return
+        # this is trying to not save all the startup automatic window
+        # sizes. I don't have a better plan for this yet.
+        if graphSetTime[0] == 0 or time.time() < graphSetTime[0] + 3:
+            return
+
         if geo == lastSaved[0]:
             return
         if not setOnce[0]:

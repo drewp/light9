@@ -62,19 +62,19 @@ class Patch(object):
     @property
     def addQuads(self):
         if self._addQuads is None:
-            if self._addGraph is not None:
-                self._addQuads = list(self._addGraph.quads(ALLSTMTS))
-            else:
-                raise
+            if self._addGraph is None:
+                return []
+            self._addQuads = list(quadsWithContextUris(
+                self._addGraph.quads(ALLSTMTS)))
         return self._addQuads
 
     @property
     def delQuads(self):
         if self._delQuads is None:
-            if self._delGraph is not None:
-                self._delQuads = list(self._delGraph.quads(ALLSTMTS))
-            else:
-                raise
+            if self._delGraph is None:
+                return []
+            self._delQuads = list(quadsWithContextUris(
+                self._delGraph.quads(ALLSTMTS)))
         return self._delQuads
 
     @property

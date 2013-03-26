@@ -18,9 +18,8 @@ proposal for new attribute system:
 """
 from __future__ import nested_scopes,division
 import Tkinter as tk
-from rdflib import RDF
+from rdflib import RDF, Literal
 from light9.namespaces import L9
-import louie as dispatcher
 
 stdfont = ('Arial', 9)
 
@@ -36,12 +35,23 @@ class Onelevel(tk.Frame):
         ch:b11-c     a :Channel;
          :output dmx:c54;
          rdfs:label "b11-c" .
+
+    and the level is like this:
+
+       ?editor :currentSub ?sub .
+       ?sub :lightLevel [:channel ?ch; :level ?level] .
+
+    levels come in with self.setTo and go out by the onLevelChange
+    callback. This object does not use the graph for level values,
+    which I'm doing for what I think is efficiency. Unclear why I
+    didn't use Observable for that API.
     """
-    def __init__(self, parent, graph, channelUri):
+    def __init__(self, parent, graph, channelUri, onLevelChange):
         tk.Frame.__init__(self,parent, height=20)
         self.graph = graph
+        self.onLevelChange = onLevelChange
         self.uri = channelUri
-        self.currentlevel = 0 # the level we're displaying, 0..1
+        self.currentLevel = 0 # the level we're displaying, 0..1
 
         # no statement yet
         self.channelnum = int(
@@ -73,7 +83,6 @@ class Onelevel(tk.Frame):
                                   padx=1, pady=0, bd=0, height=1)
         self.level_lab.pack(side='left')
 
-        self.setlevel(0)
         self.setupmousebindings()
 
     def updateLabel(self):
@@ -83,10 +92,10 @@ class Onelevel(tk.Frame):
         def b1down(ev):
             self.desc_lab.config(bg='cyan')
             self._start_y=ev.y
-            self._start_lev=self.currentlevel
+            self._start_lev=self.currentLevel
         def b1motion(ev):
             delta=self._start_y-ev.y
-            self.setlevel(self._start_lev+delta*.005)
+            self.setlevel(max(0, min(1, self._start_lev+delta*.005)))
         def b1up(ev):
             self.desc_lab.config(bg='black')
         def b3up(ev):
@@ -114,28 +123,40 @@ class Onelevel(tk.Frame):
         self.level_lab.config(bg=gradient(lev))
 
     def setlevel(self, newlev):
-        """the main program is telling us to change our
-        display. newlev is 0..1"""
-        self.currentlevel = min(1, max(0, newlev))
-        newlev = "%d" % (self.currentlevel * 100)
+        """UI received a level change, which we put in the graph"""
+        self.onLevelChange(self.uri, newlev)
+
+    def setTo(self, newLevel):
+        """levelbox saw a change in the graph"""
+        self.currentLevel = min(1, max(0, newLevel))
+        newLevel = "%d" % (self.currentLevel * 100)
         olddisplay=self.level_lab.cget('text')
-        if newlev!=olddisplay:
-            self.level_lab.config(text=newlev)
+        if newLevel != olddisplay:
+            self.level_lab.config(text=newLevel)
             self.colorlabel()
-        dispatcher.send("levelchanged", channel=self.uri, newlevel=newlev)
+
 
 class Levelbox(tk.Frame):
-    def __init__(self, parent, graph):
+    """
+    this also watches all the levels in the sub and sets the boxes when they change
+    """
+    def __init__(self, parent, graph, currentSub):
+        """
+        currentSub is an Observable(PersistentSubmaster)
+        """
         tk.Frame.__init__(self,parent)
 
+        self.currentSub = currentSub
         self.graph = graph
         graph.addHandler(self.updateChannels)
+
+        self.currentSub.subscribe(lambda _: graph.addHandler(self.updateLevelValues))
 
     def updateChannels(self):
         """(re)make Onelevel boxes for the defined channels"""
 
         [ch.destroy() for ch in self.winfo_children()]
-        self.levels = [] # Onelevel objects
+        self.levelFromUri = {} # channel : OneLevel
 
         chans = list(self.graph.subjects(RDF.type, L9.Channel))
         chans.sort(key=lambda c: int(self.graph.value(c, L9.output).rsplit('/c')[-1]))
@@ -151,14 +172,33 @@ class Levelbox(tk.Frame):
 
         for i, channel in enumerate(chans): # sort?
             # frame for this channel
-            f = Onelevel(columnFrames[i // rows], self.graph, channel)
+            f = Onelevel(columnFrames[i // rows], self.graph, channel,
+                         self.onLevelChange)
 
-            self.levels.append(f)
+            self.levelFromUri[channel] = f
             f.pack(side='top')
-        #dispatcher.connect(setalevel,"setlevel")
 
-    def setlevels(self,newlevels):
-        """sets levels to the new list of dmx levels (0..1). list can
-        be any length"""
-        for l,newlev in zip(self.levels,newlevels):
-            l.setlevel(newlev)
+    def updateLevelValues(self):
+        """set UI level from graph"""
+        submaster = self.currentSub()
+        if submaster is None:
+            return
+        sub = submaster.uri
+        if sub is None:
+            raise ValueError("currentSub is %r" % submaster)
+
+        remaining = set(self.levelFromUri.keys())
+        for ll in self.graph.objects(sub, L9['lightLevel']):
+            chan = self.graph.value(ll, L9['channel'])
+            lev = self.graph.value(ll, L9['level']).toPython()
+            self.levelFromUri[chan].setTo(lev)
+            remaining.remove(chan)
+        for channel in remaining:
+            self.levelFromUri[channel].setTo(0)
+
+    def onLevelChange(self, chan, newLevel):
+        """UI received a change which we put in the graph"""
+        if self.currentSub() is None:
+            raise ValueError("no currentSub in Levelbox")
+        self.currentSub().editLevel(chan, newLevel)
+

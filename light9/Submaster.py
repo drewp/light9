@@ -9,7 +9,7 @@ from louie import dispatcher
 log = logging.getLogger('submaster')
 
 class Submaster(object):
-    "Contain a dictionary of levels, but you didn't need to know that"
+    """mapping of channels to levels"""
     def __init__(self, name, levels):
         """this sub has a name just for debugging. It doesn't get persisted.
         See PersistentSubmaster.
@@ -67,6 +67,8 @@ class Submaster(object):
 
     def __cmp__(self, other):
         # not sure how useful this is
+        if not isinstance(other, Submaster):
+            return -1
         return cmp(self.ident(), other.ident())
 
     def __hash__(self):
@@ -82,7 +84,8 @@ class Submaster(object):
             try:
                 dmxchan = Patch.get_dmx_channel(k) - 1
             except ValueError:
-                log.error("error trying to compute dmx levels for submaster %s" % self.name)
+                log.error("error trying to compute dmx levels for submaster %s"
+                          % self.name)
                 raise
             if dmxchan >= len(levels):
                 levels.extend([0] * (dmxchan - len(levels) + 1))
@@ -124,6 +127,8 @@ class Submaster(object):
 
 class PersistentSubmaster(Submaster):
     def __init__(self, graph, uri):
+        if uri is None:
+            raise TypeError("uri must be URIRef")
         self.graph, self.uri = graph, uri
         self.graph.addHandler(self.setName)
         self.graph.addHandler(self.setLevels)
@@ -148,6 +153,8 @@ class PersistentSubmaster(Submaster):
         self.setLevelsFromGraph()
         if oldLevels != self.levels:
             log.info("sub %s changed" % self.name)
+            # dispatcher too? this would help subcomposer
+            dispatcher.send("sub levels changed", sub=self)
 
     def setLevelsFromGraph(self):
         if hasattr(self, 'levels'):
@@ -155,16 +162,55 @@ class PersistentSubmaster(Submaster):
         else:
             self.levels = {}
         for lev in self.graph.objects(self.uri, L9['lightLevel']):
+            log.debug(" lightLevel %s %s", self.uri, lev)
             chan = self.graph.value(lev, L9['channel'])
 
             name = self.graph.label(chan)
             if not name:
-                log.error("sub %r has channel %r with no name- leaving out that channel" % (self.name, chan))
+                log.error("sub %r has channel %r with no name- "
+                          "leaving out that channel" % (self.name, chan))
                 continue
             val = self.graph.value(lev, L9['level'])
-            self.levels[name] = float(val)
+            if val is None:
+                raise ValueError("sub %r has lightLevel %r with channel %r "
+                                 "and level %r" % (self.uri, lev, chan, val))
+            log.debug("   new val %r", val)
+            try:
+                self.levels[name] = float(val)
+            except:
+                log.error("name %r val %r" % (name, val))
+                raise
+
+    def saveContext(self):
+        """the context in which we should save all the lightLevel triples for
+        this sub"""
+        with self.graph.currentState() as g:
+            try:
+                ctx = g.contextsForStatement(
+                    (self.uri, RDF.type, L9['Submaster']))[0]
+            except IndexError:
+                raise ValueError(
+                    "no context has %s rdf:type :Submaster, "
+                    "so I don't know where to save this sub's data" % self.uri)
+        return ctx
+
+    def editLevel(self, chan, newLevel):
+        self.graph.patchMapping(self.saveContext(),
+                                subject=self.uri, predicate=L9['lightLevel'],
+                                nodeClass=L9['ChannelSetting'],
+                                keyPred=L9['channel'], newKey=chan,
+                                valuePred=L9['level'],
+                                newValue=Literal(newLevel))
+
+    def clear(self):
+        """set all levels to 0"""
+        with self.graph.currentState() as g:
+            levs = list(g.objects(self.uri, L9['lightLevel']))
+        for lev in levs:
+            self.graph.removeMappingNode(self.saveContext(), lev)
 
     def save(self):
+        raise NotImplementedError("obsolete?")
         if self.temporary:
             log.info("not saving temporary sub named %s",self.name)
             return
@@ -176,7 +222,10 @@ class PersistentSubmaster(Submaster):
             try:
                 chanUri = Patch.get_channel_uri(chan)
             except KeyError:
-                log.error("saving dmx channels with no :Channel node is not supported yet. Give channel %s a URI for it to be saved. Omitting this channel from the sub." % chan)
+                log.error("saving dmx channels with no :Channel node "
+                          "is not supported yet. Give channel %s a URI "
+                          "for it to be saved. Omitting this channel "
+                          "from the sub." % chan)
                 continue
             lev = BNode()
             graph.add((subUri, L9['lightLevel'], lev))

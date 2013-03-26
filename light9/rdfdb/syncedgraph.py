@@ -1,9 +1,15 @@
-from rdflib import ConjunctiveGraph, RDFS, RDF, Graph
-import logging, cyclone.httpclient, traceback, urllib
+from rdflib import ConjunctiveGraph, RDFS, RDF, URIRef
+import logging, cyclone.httpclient, traceback, urllib, random
+from itertools import chain
 from twisted.internet import reactor, defer
 log = logging.getLogger('syncedgraph')
-from light9.rdfdb.patch import Patch, ALLSTMTS
-from light9.rdfdb.rdflibpatch import patchQuads
+from light9.rdfdb.patch import Patch
+from light9.rdfdb.rdflibpatch import patchQuads, contextsForStatement as rp_contextsForStatement
+
+# everybody who writes literals needs to get this
+from rdflibpatch_literal import patch
+patch()
+
 
 def sendPatch(putUri, patch, **kw):
     """
@@ -176,6 +182,12 @@ class SyncedGraph(object):
     This api is like rdflib.Graph but it can also call you back when
     there are graph changes to the parts you previously read.
 
+    You may want to attach to self.initiallySynced deferred so you
+    don't attempt patches before we've heard the initial contents of
+    the graph. It would be ok to accumulate some patches of new
+    material, but usually you won't correctly remove the existing
+    statements unless we have the correct graph.
+
     If we get out of sync, we abandon our local graph (even any
     pending local changes) and get the data again from the
     server.
@@ -185,6 +197,7 @@ class SyncedGraph(object):
         label is a string that the server will display in association
         with your connection
         """
+        self.initiallySynced = defer.Deferred()
         _graph = self._graph = ConjunctiveGraph()
         self._watchers = GraphWatchers()
 
@@ -200,6 +213,11 @@ class SyncedGraph(object):
                 # don't reflect this back to the server; we did
                 # receive its patch correctly.
                 traceback.print_exc()
+
+            if self.initiallySynced:
+                self.initiallySynced.callback(None)
+                self.initiallySynced = None
+
 
         listen = reactor.listenTCP(0, cyclone.web.Application(handlers=[
             (r'/update', makePatchEndpoint(onPatch)),
@@ -258,7 +276,7 @@ class SyncedGraph(object):
         # these could fail if we're out of sync. One approach:
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
-        
+        log.info("%s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
         self.updateOnPatch(p)
         self._sender.sendPatch(p).addErrback(self.sendFailed)
@@ -268,6 +286,7 @@ class SyncedGraph(object):
         we asked for a patch to be queued and sent to the master, and
         that ultimately failed because of a conflict
         """
+        print "sendFailed"
         #i think we should receive back all the pending patches,
         #do a resysnc here,
         #then requeue all the pending patches (minus the failing one?) after that's done.
@@ -275,7 +294,10 @@ class SyncedGraph(object):
 
     def patchObject(self, context, subject, predicate, newObject):
         """send a patch which removes existing values for (s,p,*,c)
-        and adds (s,p,newObject,c). Values in other graphs are not affected"""
+        and adds (s,p,newObject,c). Values in other graphs are not affected.
+
+        newObject can be None, which will remove all (subj,pred,*) statements.
+        """
 
         existing = []
         for spo in self._graph.triples((subject, predicate, None),
@@ -284,16 +306,56 @@ class SyncedGraph(object):
         # what layer is supposed to cull out no-op changes?
         self.patch(Patch(
             delQuads=existing,
-            addQuads=[(subject, predicate, newObject, context)]))
+            addQuads=([(subject, predicate, newObject, context)]
+                      if newObject is not None else [])))
 
-    def patchMapping(self, context, subject, predicate, keyPred, valuePred, newKey, newValue):
+    def patchMapping(self, context, subject, predicate, nodeClass, keyPred, valuePred, newKey, newValue):
         """
-        proposed api for updating things like ?session :subSetting [
-        :sub ?s; :level ?v ]. Keyboardcomposer has an implementation
-        already. There should be a complementary readMapping that gets
-        you a value since that's tricky too
+        creates/updates a structure like this:
+
+           ?subject ?predicate [
+             a ?nodeClass;
+             ?keyPred ?newKey;
+             ?valuePred ?newValue ] .
+
+        There should be a complementary readMapping that gets you a
+        value since that's tricky too
         """
 
+        with self.currentState() as graph:
+            adds = set([])
+            for setting in graph.objects(subject, predicate):
+                if graph.value(setting, keyPred) == newKey:
+                    break
+            else:
+                setting = URIRef(subject + "/map/%s" %
+                                 random.randrange(999999999))
+                adds.update([
+                    (subject, predicate, setting, context),
+                    (setting, RDF.type, nodeClass, context),
+                    (setting, keyPred, newKey, context),
+                    ])
+            dels = set([])
+            for prev in graph.objects(setting, valuePred):
+                dels.add((setting, valuePred, prev, context))
+            adds.add((setting, valuePred, newValue, context))
+
+            if adds != dels:
+                self.patch(Patch(delQuads=dels, addQuads=adds))
+
+    def removeMappingNode(self, context, node):
+        """
+        removes the statements with this node as subject or object, which
+        is the right amount of statements to remove a node that
+        patchMapping made.
+        """
+        p = Patch(delQuads=[spo+(context,) for spo in
+                            chain(self._graph.triples((None, None, node),
+                                                      context=context),
+                                  self._graph.triples((node, None, None),
+                                                      context=context))])
+        self.patch(p)
+                
     def addHandler(self, func):
         """
         run this (idempotent) func, noting what graph values it
@@ -333,12 +395,21 @@ class SyncedGraph(object):
         """
         a graph you can read without being in an addHandler
         """
+        if context is not None:
+            raise NotImplementedError("currentState with context arg")
+
         class Mgr(object):
             def __enter__(self2):
-                # this should be a readonly view of the existing graph
-                g = Graph()
-                for s in self._graph.triples((None, None, None), context):
-                    g.add(s)
+                # this should be a readonly view of the existing
+                # graph, maybe with something to guard against
+                # writes/patches happening while reads are being
+                # done. Typical usage will do some reads on this graph
+                # before moving on to writes.
+                
+                g = ConjunctiveGraph()
+                for s,p,o,c in self._graph.quads((None,None,None)):
+                    g.store.add((s,p,o), c)
+                g.contextsForStatement = lambda t: contextsForStatementNoWildcards(g, t)
                 return g
 
             def __exit__(self, type, val, tb):
@@ -388,7 +459,19 @@ class SyncedGraph(object):
         self._watchers.addPredObjWatcher(func, predicate, object)
         return self._graph.subjects(predicate, object)
 
-    # i find myself wanting 'patch' versions of these calls that tell
+    def contextsForStatement(self, triple):
+        """currently this needs to be in an addHandler section, but it
+        sets no watchers so it won't actually update if the statement
+        was added or dropped from contexts"""
+        func = self._getCurrentFunc()
+        return contextsForStatementNoWildcards(self._graph, triple)
+
+    # i find myself wanting 'patch' (aka enter/leave) versions of these calls that tell
     # you only what results have just appeared or disappeared. I think
     # I'm going to be repeating that logic a lot. Maybe just for the
     # subjects(RDF.type, t) call
+
+def contextsForStatementNoWildcards(g, triple):
+    if None in triple:
+        raise NotImplementedError("no wildcards")
+    return rp_contextsForStatement(g, triple)
