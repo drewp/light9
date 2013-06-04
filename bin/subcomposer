@@ -8,7 +8,7 @@ import louie as dispatcher
 from twisted.internet import reactor, tksupport, task
 from rdflib import URIRef
 
-import run_local
+from run_local import log
 from light9.dmxchanedit import Levelbox
 from light9 import dmxclient, Patch, Submaster, showconfig, prof
 from light9.uihelpers import toplevelat
@@ -16,8 +16,7 @@ from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb import clientsession
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger()
+log.setLevel(logging.DEBUG)
 
 class _NoNewVal(object):
     pass

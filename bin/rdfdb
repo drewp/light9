@@ -122,8 +122,8 @@ from light9.rdfdb.rdflibpatch import patchQuads
 from light9.rdfdb import syncedgraph
 
 from twisted.internet.inotify import INotify
-logging.basicConfig(level=logging.DEBUG)
-log = logging.getLogger()
+from run_local import log
+log.setLevel(logging.DEBUG)
 
 try:
     import sys
