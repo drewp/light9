@@ -1,5 +1,11 @@
+NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch"
+
 tests:
-	bin/python `which nosetests` --no-path-adjustment light9.rdfdb.rdflibpatch
+	eval env/bin/nosetests -x $(NOSEARGS)
+
+tests_watch:
+	eval env/bin/nosetests --with-watch $(NOSEARGS)
+
 
 install_python_deps:
 	env/bin/pip install -r pydeps
