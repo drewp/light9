@@ -94,7 +94,6 @@ class EditChoice(tk.Frame):
 
 
     def uriChanged(self, newUri):
-        print "chg", newUri
         # i guess i show the label and icon for this
         if newUri is Local:
             self.subIcon.config(text="(local)")
@@ -154,7 +153,7 @@ class Subcomposer(tk.Frame):
         currentUri = Observable(Local)
 
         def pc(val):
-            print "change viewed sub to", val
+            log.info("change viewed sub to %s", val)
         currentUri.subscribe(pc)
 
         EditChoice(self, self.graph, currentUri).frame.pack(side='top')
@@ -221,7 +220,7 @@ class EntryCommand(tk.Frame):
     def action(self, *args):
         subname = self.entry.get()
         self.cmd(subname)
-        print "sub", self.cmd, subname
+        log.info("command %s %s", self.cmd, subname)
 
     def set(self, text):
         self.entry.delete(0, 'end')

@@ -42,7 +42,8 @@ def outputlevels(levellist,twisted=0,clientid=_id):
             time.sleep(1)
     else:
         def err(error):
-            log.error("dmx server error %s", error)
+            log.error("dmx server error talking to %s: %s",
+                      networking.dmxServer.url, error.getErrorMessage())
             time.sleep(1)
         d = _dmx.callRemote('outputlevels', clientid, levellist)
         d.addErrback(err)
