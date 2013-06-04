@@ -197,12 +197,22 @@ class WatchedFiles(object):
             self.watchFile(path.path)
             
     def watchFile(self, inFile):
+        """consider adding a GraphFile to self.graphFiles"""
         if not isinstance(inFile, FilePath):
             inFile = FilePath(inFile)
         if not inFile.isfile():
             return
         if inFile.splitext()[1] not in ['.n3']:
             return
+
+        # an n3 file with rules makes it all the way past this reading
+        # and the serialization. Then, on the receiving side, a
+        # SyncedGraph calls graphFromNQuad on the incoming data and
+        # has a parse error. I'm not sure where this should be fixed
+        # yet.
+        if '-rules' in inFile.path:
+            return
+            
         ctx = self.uriFromFile(inFile)
         gf = GraphFile(self.notifier, inFile.path, ctx,
                        self.patch, self.getSubgraph)
