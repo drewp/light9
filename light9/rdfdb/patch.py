@@ -1,8 +1,20 @@
 import json, unittest
-from rdflib import ConjunctiveGraph, URIRef, URIRef as U
+from rdflib import ConjunctiveGraph, Graph, URIRef, URIRef as U
 from light9.rdfdb.rdflibpatch import graphFromNQuad, graphFromQuads, serializeQuad
 
 ALLSTMTS = (None, None, None)
+
+def quadsWithContextUris(quads):
+    """
+    yield the given quads, correcting any context values that are
+    Graphs into URIRefs
+    """
+    for s,p,o,c in quads:
+        if isinstance(c, Graph):
+            c = c.identifier
+        if not isinstance(c, URIRef):
+            raise TypeError("bad quad context type in %r" % ((s,p,o,c),))
+        yield s,p,o,c
 
 class Patch(object):
     """
@@ -16,6 +28,7 @@ class Patch(object):
         addQuads/delQuads can be lists or sets, but if we make them internally,
         they'll be lists
 
+        4th element of a quad must be a URIRef
         """
         self._jsonRepr = jsonRepr
         self._addQuads, self._delQuads = addQuads, delQuads
@@ -27,14 +40,14 @@ class Patch(object):
             self._addGraph = graphFromNQuad(body['patch']['adds'])
             if 'senderUpdateUri' in body:
                 self.senderUpdateUri = body['senderUpdateUri']
-
+                
     @classmethod
     def fromDiff(cls, oldGraph, newGraph):
         """
         make a patch that changes oldGraph to newGraph
         """
-        old = set(oldGraph.quads(ALLSTMTS))
-        new = set(newGraph.quads(ALLSTMTS))
+        old = set(quadsWithContextUris(oldGraph.quads(ALLSTMTS)))
+        new = set(quadsWithContextUris(newGraph.quads(ALLSTMTS)))
         return cls(addQuads=list(new - old), delQuads=list(old - new))
 
     def __nonzero__(self):
@@ -51,7 +64,8 @@ class Patch(object):
         if self._addQuads is None:
             if self._addGraph is None:
                 return []
-            self._addQuads = list(self._addGraph.quads(ALLSTMTS))
+            self._addQuads = list(quadsWithContextUris(
+                self._addGraph.quads(ALLSTMTS)))
         return self._addQuads
 
     @property
@@ -59,7 +73,8 @@ class Patch(object):
         if self._delQuads is None:
             if self._delGraph is None:
                 return []
-            self._delQuads = list(self._delGraph.quads(ALLSTMTS))
+            self._delQuads = list(quadsWithContextUris(
+                self._delGraph.quads(ALLSTMTS)))
         return self._delQuads
 
     @property
