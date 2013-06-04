@@ -10,7 +10,10 @@ class ServiceAddress(object):
     def _url(self):
         graph = getGraph()
         net = graph.value(showUri(), L9['networking'])
-        return str(graph.value(net, self.service))
+        ret = graph.value(net, self.service)
+        if ret is None:
+            raise ValueError("no url for %s %s" % (showUri(), L9['networking']))
+        return str(ret)
 
     @property
     def port(self):
