@@ -109,6 +109,8 @@ Our web ui:
 """
 from twisted.internet import reactor
 import twisted.internet.error
+from twisted.python.filepath import FilePath
+from twisted.internet.inotify import humanReadableMask, IN_CREATE
 import sys, optparse, logging, json, os
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 sys.path.append(".")
@@ -155,94 +157,57 @@ class Client(object):
     def sendPatch(self, p):
         return syncedgraph.sendPatch(self.updateUri, p)
 
-class Db(object):
+class WatchedFiles(object):
     """
-    the master graph, all the connected clients, all the files we're watching
+    find files, notice new files.
+
+    This object watches directories. Each GraphFile watches its own file.
     """
-    def __init__(self):
+    def __init__(self, topDirsToWatch, patch, getSubgraph):
+        self.topDirsToWatch = topDirsToWatch
+        self.patch, self.getSubgraph = patch, getSubgraph
+        
         # files from cwd become uris starting with this. *should* be
         # building uris from the show uri in $LIGHT9_SHOW/URI
         # instead. Who wants to keep their data in the same dir tree
         # as the source code?!
         self.topUri = URIRef("http://light9.bigasterisk.com/")
 
-        self.clients = []
-        self.graph = ConjunctiveGraph()
-
+        self.graphFiles = {} # context uri : GraphFile
+        
         self.notifier = INotify()
         self.notifier.startReading()
-        self.graphFiles = {} # context uri : GraphFile
-
+        
         self.findAndLoadFiles()
 
     def findAndLoadFiles(self):
         self.initialLoad = True
         try:
-            dirs = [
-                "show/dance2012/sessions",
-                "show/dance2012/subs",
-                "show/dance2012/subterms",
-                ]
-
-            for topdir in dirs:
+            for topdir in self.topDirsToWatch:
                 for dirpath, dirnames, filenames in os.walk(topdir):
                     for base in filenames:
                         self.watchFile(os.path.join(dirpath, base))
-                # todo: also notice new files in this dir
-
-            self.watchFile("show/dance2012/config.n3")
-            self.watchFile("show/dance2012/patch.n3")
+                    self.notifier.watch(FilePath(dirpath), autoAdd=True,
+                                        callbacks=[self.dirChange])
         finally:
             self.initialLoad = False
 
-        self.summarizeToLog()
-
-    def uriFromFile(self, filename):
-        if filename.endswith('.n3'):
-            # some legacy files don't end with n3. when we write them
-            # back this might not go so well
-            filename = filename[:-len('.n3')]
-        return URIRef(self.topUri + filename)
-
-    def fileForUri(self, ctx):
-        assert isinstance(ctx, URIRef), ctx
-        if not ctx.startswith(self.topUri):
-            raise ValueError("don't know what filename to use for %s" % ctx)
-        return ctx[len(self.topUri):] + ".n3"
-
+    def dirChange(self, watch, path, mask):
+        if mask & IN_CREATE:
+            self.watchFile(path.path)
+            
     def watchFile(self, inFile):
+        if not isinstance(inFile, FilePath):
+            inFile = FilePath(inFile)
+        if not inFile.isfile():
+            return
+        if inFile.splitext()[1] not in ['.n3']:
+            return
         ctx = self.uriFromFile(inFile)
-        gf = GraphFile(self.notifier, inFile, ctx, self.patch, self.getSubgraph)
+        gf = GraphFile(self.notifier, inFile.path, ctx,
+                       self.patch, self.getSubgraph)
         self.graphFiles[ctx] = gf
         gf.reread()
-
-    def patch(self, p, dueToFileChange=False):
-        """
-        apply this patch to the master graph then notify everyone about it
-
-        dueToFileChange if this is a patch describing an edit we read
-        *from* the file (such that we shouldn't write it back to the file)
-
-        if p has a senderUpdateUri attribute, we won't send this patch
-        back to the sender with that updateUri
-        """
-        ctx = p.getContext()
-        log.info("patching graph %s -%d +%d" % (
-            ctx, len(p.delQuads), len(p.addQuads)))
-
-        patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
-        senderUpdateUri = getattr(p, 'senderUpdateUri', None)
-        #if not self.initialLoad:
-        #    self.summarizeToLog()
-        for c in self.clients:
-            if c.updateUri == senderUpdateUri:
-                # this client has self-applied the patch already
-                continue
-            d = c.sendPatch(p)
-            d.addErrback(self.clientErrored, c)
-        if not dueToFileChange:
-            self.dirtyFiles([ctx])
-        sendToLiveClients(asJson=p.jsonRepr)
 
     def dirtyFiles(self, ctxs):
         """mark dirty the files that we watch in these contexts.
@@ -260,8 +225,62 @@ class Db(object):
                 outFile = self.fileForUri(ctx)
                 self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
                                                  self.patch, self.getSubgraph)
-
+            
             self.graphFiles[ctx].dirty(g)
+
+    def uriFromFile(self, filename):
+        if isinstance(filename, FilePath):
+            filename = filename.path
+        assert filename.endswith('.n3'), filename
+        return URIRef(self.topUri + filename[:-len('.n3')])
+
+    def fileForUri(self, ctx):
+        assert isinstance(ctx, URIRef), ctx
+        if not ctx.startswith(self.topUri):
+            raise ValueError("don't know what filename to use for %s" % ctx)
+        return ctx[len(self.topUri):] + ".n3"
+
+        
+class Db(object):
+    """
+    the master graph, all the connected clients, all the files we're watching
+    """
+    def __init__(self, topDirsToWatch):
+      
+        self.clients = []
+        self.graph = ConjunctiveGraph()
+
+        self.watchedFiles = WatchedFiles(topDirsToWatch,
+                                         self.patch, self.getSubgraph)
+        
+        self.summarizeToLog()
+
+    def patch(self, p, dueToFileChange=False):
+        """
+        apply this patch to the master graph then notify everyone about it
+
+        dueToFileChange if this is a patch describing an edit we read
+        *from* the file (such that we shouldn't write it back to the file)
+
+        if p has a senderUpdateUri attribute, we won't send this patch
+        back to the sender with that updateUri
+        """
+        ctx = p.getContext()
+        log.info("patching graph %s -%d +%d" % (
+            ctx, len(p.delQuads), len(p.addQuads)))
+
+        patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
+        senderUpdateUri = getattr(p, 'senderUpdateUri', None)
+
+        for c in self.clients:
+            if c.updateUri == senderUpdateUri:
+                # this client has self-applied the patch already
+                continue
+            d = c.sendPatch(p)
+            d.addErrback(self.clientErrored, c)
+        if not dueToFileChange:
+            self.watchedFiles.dirtyFiles([ctx])
+        sendToLiveClients(asJson=p.jsonRepr)
 
     def clientErrored(self, err, c):
         err.trap(twisted.internet.error.ConnectError)
@@ -375,7 +394,7 @@ if __name__ == "__main__":
     if not options.show:
         raise ValueError("missing --show http://...")
 
-    db = Db()
+    db = Db(topDirsToWatch=['show/dance2013'])
 
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)

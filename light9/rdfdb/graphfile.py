@@ -38,9 +38,14 @@ class GraphFile(object):
                        callbacks=[self.notify])
       
     def notify(self, notifier, filepath, mask):
-        if filepath.getModificationTime() == self.lastWriteTimestamp:
-            log.debug("file %s changed, but we did this write", filepath)
+        try:
+            if filepath.getModificationTime() == self.lastWriteTimestamp:
+                log.debug("file %s changed, but we did this write", filepath)
+                return
+        except OSError as e:
+            log.error("watched file %s: %r" % (filepath, e))
             return
+            
         log.info("file %s changed", filepath)
         try:
             self.reread()
@@ -57,10 +62,12 @@ class GraphFile(object):
             print e
             log.error("syntax error in %s" % self.path)
             return
+        except IOError as e:
+            log.error("rereading %s: %r" % (self.uri, e))
+            return
 
         old = inContext(old, self.uri)
         new = inContext(new, self.uri)
-        print "old %s new %s" % (old, new)
 
         p = Patch.fromDiff(old, new)
         if p:
