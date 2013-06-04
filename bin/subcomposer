@@ -2,6 +2,7 @@
 
 from __future__ import division, nested_scopes
 from optparse import OptionParser
+import logging
 import Tkinter as tk
 import louie as dispatcher
 from twisted.internet import reactor, tksupport, task
@@ -14,6 +15,9 @@ from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb import clientsession
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
+
+logging.basicConfig(level=logging.DEBUG)
+log = logging.getLogger()
 
 class _NoNewVal(object):
     pass
@@ -148,7 +152,7 @@ class Subcomposer(tk.Frame):
         self.levelbox = Levelbox(self, graph)
         self.levelbox.pack(side='top')
 
-        currentUri = Observable("http://curr")
+        currentUri = Observable(Local)
 
         def pc(val):
             print "change viewed sub to", val
