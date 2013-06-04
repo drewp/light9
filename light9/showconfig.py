@@ -1,38 +1,23 @@
-import time, logging
+import time, logging, warnings
+from twisted.python.filepath import FilePath
 from os import path, getenv
 from rdflib import Graph
 from rdflib import URIRef
 from namespaces import MUS, L9
 log = logging.getLogger('showconfig')
 
-_config = (None, None, None) # graph, mtime, len
+_config = None # graph
 def getGraph():
+    warnings.warn("code that's using showconfig.getGraph should be "
+                  "converted to use the sync graph", stacklevel=2)
     global _config
-    configPath = path.join(root(), 'config.n3')
-
-    # file patch.n3 mtime is not currently being checked
-    
-    now = time.time()
-    diskMtime = path.getmtime(configPath)
-    if diskMtime <= _config[1]:
-        log.debug("config.n3 hasn't changed")
-        graph = _config[0]
-        # i'm scared of some program modifying the graph, and then i
-        # return that from a new getGraph call. Maybe I should be
-        # copying it right here, or doing something clever with
-        # contexts
-        assert len(graph) == _config[2]
-        return _config[0]
-
-    graph = Graph()
-    log.info("reading %s", configPath)
-    graph.parse(configPath, format='n3')
-    patchPath = path.join(root(), "patch.n3")
-    log.info("reading %s", patchPath)
-    graph.parse(patchPath, format="n3")
-    
-    _config = (graph, diskMtime, len(graph))
-    return graph
+    if _config is None:
+        graph = Graph()
+        for f in FilePath(root()).globChildren("*.n3"):
+            log.info("reading %s", f)
+            graph.parse(location=f.path, format='n3')
+        _config = graph
+    return _config
 
 def root():
     r = getenv("LIGHT9_SHOW")
