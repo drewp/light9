@@ -49,19 +49,17 @@ class Patch(object):
     @property
     def addQuads(self):
         if self._addQuads is None:
-            if self._addGraph is not None:
-                self._addQuads = list(self._addGraph.quads(ALLSTMTS))
-            else:
-                raise
+            if self._addGraph is None:
+                return []
+            self._addQuads = list(self._addGraph.quads(ALLSTMTS))
         return self._addQuads
 
     @property
     def delQuads(self):
         if self._delQuads is None:
-            if self._delGraph is not None:
-                self._delQuads = list(self._delGraph.quads(ALLSTMTS))
-            else:
-                raise
+            if self._delGraph is None:
+                return []
+            self._delQuads = list(self._delGraph.quads(ALLSTMTS))
         return self._delQuads
 
     @property
@@ -125,6 +123,9 @@ class Patch(object):
 
             if ctx != q[3]:
                 raise ValueError("patch applies to multiple contexts, at least %r and %r" % (ctx, q[3]))
+        if ctx is None:
+            raise ValueError("patch affects no contexts")
+        assert isinstance(ctx, URIRef), ctx
         return ctx
 
 stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
@@ -156,3 +157,17 @@ class TestPatchFromDiff(unittest.TestCase):
         self.assertEqual(p.delQuads, [stmt1])
         
         
+class TestPatchGetContext(unittest.TestCase):
+    def testEmptyPatchCantGiveContext(self):
+        p = Patch()
+        self.assertRaises(ValueError, p.getContext)
+
+    def testSimplePatchReturnsContext(self):
+        p = Patch(addQuads=[stmt1])
+        self.assertEqual(p.getContext(), U('http://ctx1'))
+
+    def testMultiContextPatchFailsToReturnContext(self):
+        p = Patch(addQuads=[stmt1[:3] + (U('http://ctx1'),),
+                            stmt1[:3] + (U('http://ctx2'),)])
+        self.assertRaises(ValueError, p.getContext)
+                  

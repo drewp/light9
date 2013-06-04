@@ -7,7 +7,7 @@ if sys.path[0] == '/usr/lib/python2.7/dist-packages':
     sys.path = sys.path[1:]
 
 import unittest
-from rdflib import ConjunctiveGraph, URIRef as U
+from rdflib import ConjunctiveGraph, Graph, URIRef as U
 
 def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     """
@@ -66,10 +66,16 @@ def serializeQuad(g):
     """replacement for graph.serialize(format='nquads')"""
     out = ""
     for s,p,o,c in g.quads((None,None,None)):
+        if isinstance(c, Graph):
+            # still not sure why this is Graph sometimes,
+            # already URIRef other times
+            c = c.identifier
+        if '[' in c.n3():
+            import ipdb;ipdb.set_trace()
         out += u"%s %s %s %s .\n" % (s.n3(),
-                                p.n3(),
-                                _xmlcharref_encode(o.n3()),
-                                c.n3())
+                                     p.n3(),
+                                     _xmlcharref_encode(o.n3()),
+                                     c.n3())
     return out
 
 def inContext(graph, newContext):

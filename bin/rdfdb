@@ -205,6 +205,7 @@ class Db(object):
         return URIRef(self.topUri + filename)
 
     def fileForUri(self, ctx):
+        assert isinstance(ctx, URIRef), ctx
         if not ctx.startswith(self.topUri):
             raise ValueError("don't know what filename to use for %s" % ctx)
         return ctx[len(self.topUri):] + ".n3"
