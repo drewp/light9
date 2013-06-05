@@ -50,8 +50,17 @@ class GraphFile(object):
                        callbacks=[self.notify])
       
     def notify(self, notifier, filepath, mask):
-        if filepath.getModificationTime() == self.lastWriteTimestamp:
-            log.debug("file %s changed, but we did this write", filepath)
+        # this is from some other version, and I forget the point. Delete
+#        mask = humanReadableMask(mask)
+#        if mask[0] in ['open', 'access', 'close_nowrite', 'attrib', 'delete_self']:
+#            return
+
+        try:
+            if filepath.getModificationTime() == self.lastWriteTimestamp:
+                log.debug("file %s changed, but we did this write", filepath)
+                return
+        except OSError as e:
+            log.error("watched file %s: %r" % (filepath, e))
             return
             
         log.info("file %s changed", filepath)
