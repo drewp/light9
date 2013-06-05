@@ -52,14 +52,14 @@ class EditChoice(tk.Frame):
 
     - list of recent resources that this choice was set to
     """
-    def __init__(self, parent, graph, resourceObservable):
+    def __init__(self, parent, graph, resourceObservable, label="Editing:"):
         """
         getResource is called to get the URI of the currently
         """
         self.graph = graph
         self.frame = tk.Frame(parent, relief='raised', border=2)
         self.frame.pack(side='top')
-        tk.Label(self.frame, text="Editing:").pack(side='left')
+        tk.Label(self.frame, text=label).pack(side='left')
         self.currentLinkFrame = tk.Frame(self.frame)
         self.currentLinkFrame.pack(side='left')
 
