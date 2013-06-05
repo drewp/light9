@@ -2,9 +2,13 @@
 
 from __future__ import nested_scopes
 #from Tkinter import Button
+import logging, time
 from rdflib import Literal
 from Tix import Button, Toplevel, Tk, IntVar, Entry, DoubleVar
+import Tkinter
 from light9.namespaces import L9
+
+log = logging.getLogger("toplevel")
 
 windowlocations = {
     'sub' : '425x738+00+00',
@@ -39,6 +43,7 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
 
     lastSaved = [None]
     setOnce = [False]
+    graphSetTime = [0]
     def setPosFromGraphOnce():
         """
         the graph is probably initially empty, but as soon as it gives
@@ -47,22 +52,31 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
         if setOnce[0]:
             return
         geo = graph.value(session, L9.windowGeometry)
+        log.debug("setPosFromGraphOnce %s", geo)
 
         if geo is not None and geo != lastSaved[0]:
             setOnce[0] = True
             tl.geometry(geo)
             lastSaved[0] = geo
+            graphSetTime[0] = time.time()
 
-    def savePos():
+    def savePos(ev):
         geo = tl.geometry()
-
-        # todo: need a way to filter out the startup window sizes that
-        # weren't set by the user
-        if geo.startswith("1x1") or geo.startswith(("378x85", "378x86")):
+        if not isinstance(ev.widget, Tkinter.Tk):
+            # I think these are due to internal widget size changes,
+            # not the toplevel changing
             return
+        # this is trying to not save all the startup automatic window
+        # sizes. I don't have a better plan for this yet.
+        if graphSetTime[0] == 0 or time.time() < graphSetTime[0] + 3:
+            return
+
         if geo == lastSaved[0]:
             return
+        if not setOnce[0]:
+            return
         lastSaved[0] = geo
+        log.debug("saving position %s", geo)
         graph.patchObject(session, session, L9.windowGeometry, Literal(geo))
 
     if graph is not None and session is not None:
@@ -72,7 +86,8 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
         tl.geometry(positionOnCurrentDesktop(windowlocations[name]))
 
     if graph is not None:
-        tl._toplevelat_funcid = tl.bind("<Configure>",lambda ev,tl=tl,name=name: savePos())
+        tl._toplevelat_funcid = tl.bind("<Configure>",
+                                        lambda ev,tl=tl,name=name: savePos(ev))
 
     return tl
 
