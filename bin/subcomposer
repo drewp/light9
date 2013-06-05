@@ -30,93 +30,10 @@ from light9 import dmxclient, Patch, Submaster, prof
 from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb import clientsession
-from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
-
-class _NoNewVal(object):
-    pass
-
-class Observable(object):
-    """
-    like knockout's observable. Hopefully this can be replaced by a
-    better python one
-    """
-    def __init__(self, val):
-        self.val = val
-        self.subscribers = set()
-
-    def __call__(self, newVal=_NoNewVal):
-        if newVal is _NoNewVal:
-            return self.val
-        self.val = newVal
-        for s in self.subscribers:
-            s(newVal)
-
-    def subscribe(self, cb, callNow=True):
-        """cb is called with new values, and also right now with the
-        current value unless you opt out"""
-        self.subscribers.add(cb)
-        if callNow:
-            cb(self.val)
-
-class Local(object):
-    """placeholder for the local uri that EditChoice does not
-    manage. Set resourceObservable to Local to indicate that you're
-    unlinked"""
-
-class EditChoice(tk.Frame):
-    """
-    Observable <-> linker UI
-
-    widget for tying some UI to a shared resource for editing, or
-    unlinking it (which means associating it with a local resource
-    that's not named or shared). This object does not own the choice
-    of resource; the caller does.
-    """
-    def __init__(self, parent, graph, resourceObservable):
-        """
-        getResource is called to get the URI of the currently
-        """
-        self.frame = tk.Frame(parent, relief='raised',border=8)
-        self.frame.pack(side='top')
-        tk.Label(self.frame, text="Editing:").pack(side='left')
-        self.currentSubFrame = tk.Frame(self.frame)
-        self.currentSubFrame.pack(side='left')
-
-        self.subIcon = tk.Label(self.currentSubFrame, text="sub1",
-                                borderwidth=2,
-                                relief='raised', padx=10, pady=10)
-        self.subIcon.pack()
-
-        self.resourceObservable = resourceObservable
-        resourceObservable.subscribe(self.uriChanged)
-
-        dragSourceRegister(self.subIcon, 'copy', 'text/uri-list',
-                           self.resourceObservable)
-        def onEv(ev):
-            self.resourceObservable(ev.data)
-            return "link"
-        self.onEv = onEv
-
-        # it would be nice if I didn't receive my own drags here
-        dropTargetRegister(self.subIcon, typeList=["*"], onDrop=onEv,
-                           hoverStyle=dict(background="#555500", bd=3,
-                                           relief='groove'))
-
-        tk.Label(self.currentSubFrame, text="local data (drag sub here)").pack()
-        b=tk.Button(text="unlink", command=self.switchToLocalSub)
-        b.pack()
-
-
-    def uriChanged(self, newUri):
-        print "chg", newUri
-        # i guess i show the label and icon for this
-        if newUri is Local:
-            self.subIcon.config(text="(local)")
-        else:
-            self.subIcon.config(text=newUri)
-
-    def switchToLocalSub(self):
-        self.resourceObservable(Local)
+from light9.tkdnd import initTkdnd
+from light9.namespaces import L9
+from light9.observable import Observable
+from light9.editchoice import EditChoice, Local
 
 
 class Subcomposer(tk.Frame):
@@ -153,11 +70,11 @@ class Subcomposer(tk.Frame):
         # this is a PersistentSubmaster (even for local) or None if we're not initialized
         self.currentSub = Observable(None)
 
-        currentUri = Observable("http://curr")
+        self._currentChoice = Observable(Local)
 
         def pc(val):
-            print "change viewed sub to", val
-        currentUri.subscribe(pc)
+            log.info("change viewed sub to %s", val)
+        self._currentChoice.subscribe(pc)
 
         EditChoice(self, self.graph, self._currentChoice).frame.pack(side='top')
 
@@ -250,11 +167,8 @@ def launch(opts, args, root, graph, session):
         # same window pos), so maybe it doesn't matter. But still,
         # this tool should probably default to making new sessions
         # usually instead of loading the same one
-
-    def action(self, *args):
-        subname = self.entry.get()
-        self.cmd(subname)
-        print "sub", self.cmd, subname
+        graph.patchObject(session,
+                          session, L9['currentSub'], URIRef(args[0]))
 
     task.LoopingCall(sc.sendupdate).start(10)
 
