@@ -199,12 +199,16 @@ class WatchedFiles(object):
             self.watchFile(path.path)
             
     def watchFile(self, inFile):
-        """consider adding a GraphFile to self.graphFiles"""
-        if not isinstance(inFile, FilePath):
-            inFile = FilePath(inFile)
-        if not inFile.isfile():
+        """
+        consider adding a GraphFile to self.graphFiles
+
+        inFile needs to be a relative path, not an absolute (e.g. in a
+        FilePath) because we use its exact relative form in the
+        context URI
+        """
+        if not os.path.isfile(inFile):
             return
-        if inFile.splitext()[1] not in ['.n3']:
+        if os.path.splitext(inFile)[1] not in ['.n3']:
             return
 
         # an n3 file with rules makes it all the way past this reading
@@ -212,11 +216,11 @@ class WatchedFiles(object):
         # SyncedGraph calls graphFromNQuad on the incoming data and
         # has a parse error. I'm not sure where this should be fixed
         # yet.
-        if '-rules' in inFile.path:
+        if '-rules' in inFile:
             return
             
         ctx = self.uriFromFile(inFile)
-        gf = GraphFile(self.notifier, inFile.path, ctx,
+        gf = GraphFile(self.notifier, inFile, ctx,
                        self.patch, self.getSubgraph)
         self.graphFiles[ctx] = gf
         gf.reread()
@@ -241,8 +245,6 @@ class WatchedFiles(object):
             self.graphFiles[ctx].dirty(g)
 
     def uriFromFile(self, filename):
-        if isinstance(filename, FilePath):
-            filename = filename.path
         assert filename.endswith('.n3'), filename
         return URIRef(self.topUri + filename[:-len('.n3')])
 
