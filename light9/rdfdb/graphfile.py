@@ -50,10 +50,9 @@ class GraphFile(object):
                        callbacks=[self.notify])
       
     def notify(self, notifier, filepath, mask):
-        # this is from some other version, and I forget the point. Delete
-#        mask = humanReadableMask(mask)
-#        if mask[0] in ['open', 'access', 'close_nowrite', 'attrib', 'delete_self']:
-#            return
+        maskNames = humanReadableMask(mask)
+        if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib', 'delete_self']:
+            return
 
         try:
             if filepath.getModificationTime() == self.lastWriteTimestamp:
@@ -63,7 +62,7 @@ class GraphFile(object):
             log.error("watched file %s: %r" % (filepath, e))
             return
             
-        log.info("file %s changed", filepath)
+        log.info("file %s changed (%s)", filepath, maskNames)
         try:
             self.reread()
         except Exception:
