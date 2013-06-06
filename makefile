@@ -35,6 +35,7 @@ PYTHON=/usr/bin/python
 create_virtualenv:
 	mkdir -p env
 	virtualenv -p $(PYTHON) env
+	ln -sf ../env/bin/python bin/python
 
 tkdnd_build:
 	cd tkdnd/trunk
