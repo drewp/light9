@@ -35,3 +35,8 @@ PYTHON=/usr/bin/python
 create_virtualenv:
 	mkdir -p env
 	virtualenv -p $(PYTHON) env
+
+tkdnd_build:
+	cd tkdnd/trunk
+	./configure
+	make
