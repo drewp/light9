@@ -13,7 +13,7 @@ def getGraph():
     global _config
     if _config is None:
         graph = Graph()
-        for f in FilePath(root()).globChildren("*.n3"):
+        for f in FilePath(root()).globChildren("*.n3") + FilePath(root()).globChildren("build/*.n3"):
             log.info("reading %s", f)
             graph.parse(location=f.path, format='n3')
         _config = graph
