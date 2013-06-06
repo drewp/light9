@@ -5,7 +5,6 @@
 import sys,os
 sys.path.insert(0,os.path.join(os.path.dirname(sys.argv[0]),".."))
 
-import cgitb
 from twisted.python.failure import Failure
 
 import Tkinter
@@ -30,5 +29,4 @@ class CSH(coloredlogs.ColoredStreamHandler):
 
 log.addHandler(CSH(show_hostname=False, show_name=True))
 
-cgitb.enable(format='txt')
 
