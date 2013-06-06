@@ -52,6 +52,7 @@ class GraphFile(object):
     def notify(self, notifier, filepath, mask):
         maskNames = humanReadableMask(mask)
         if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib', 'delete_self']:
+            log.debug("file %s changed, ignoring %s" % (filepath, maskNames))
             return
 
         try:

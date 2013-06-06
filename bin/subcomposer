@@ -22,16 +22,20 @@ import logging
 import Tkinter as tk
 import louie as dispatcher
 from twisted.internet import reactor, tksupport, task
-from rdflib import URIRef
+from rdflib import URIRef, RDF
 
 from run_local import log
+log.setLevel(logging.DEBUG)
+
 from light9.dmxchanedit import Levelbox
-from light9 import dmxclient, Patch, Submaster, prof
+from light9 import dmxclient, Submaster, prof
+from light9.Patch import get_channel_name
 from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb import clientsession
 from light9.tkdnd import initTkdnd
 from light9.namespaces import L9
+from light9.rdfdb.patch import Patch
 from light9.observable import Observable
 from light9.editchoice import EditChoice, Local
 
@@ -80,9 +84,10 @@ class Subcomposer(tk.Frame):
 
         EditChoice(self, self.graph, self._currentChoice).frame.pack(side='top')
         self.setupSubChoiceLinks()
+        self.setupLevelboxUi()
         
     def setupSubChoiceLinks(self):
-
+        graph = self.graph
         def ann():
             print "currently: session=%s currentSub=%r _currentChoice=%r" % (
                 self.session, self.currentSub(), self._currentChoice())
@@ -129,10 +134,14 @@ class Subcomposer(tk.Frame):
         # todo: put a type on this, so subChanged can identify it right
         # todo: where will these get stored, or are they local to this
         # subcomposer process and don't use PersistentSubmaster at all?
-        return URIRef("http://local/%s" % time.time())
+
+        new = URIRef("http://local/%s" % time.time())
+        self.graph.patch(Patch(addQuads=[(new, RDF.type, L9['Submaster'], self.session)]))
+        
+        return new
         
     def setupLevelboxUi(self):
-        self.levelbox = Levelbox(self, graph, self.currentSub)
+        self.levelbox = Levelbox(self, self.graph, self.currentSub)
         self.levelbox.pack(side='top')
 
         tk.Button(self, text="All to zero",
@@ -142,7 +151,7 @@ class Subcomposer(tk.Frame):
         leveldict={}
         for i,lev in zip(range(len(self.levels)),self.levels):
             if lev!=0:
-                leveldict[Patch.get_channel_name(i+1)]=lev
+                leveldict[get_channel_name(i+1)]=lev
 
         s=Submaster.Submaster(subname,leveldict=leveldict)
         s.save()
@@ -184,8 +193,6 @@ if __name__ == "__main__":
                       help="don't save/restore window geometry")
     clientsession.add_option(parser)
     opts, args = parser.parse_args()
-
-    logging.basicConfig(level=logging.DEBUG)
 
     root=tk.Tk()
     root.config(bg='black')

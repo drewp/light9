@@ -133,9 +133,10 @@ class PersistentSubmaster(Submaster):
         self.graph.addHandler(self.setName)
         self.graph.addHandler(self.setLevels)
         Submaster.__init__(self, self.name, self.levels)
-        self.graph = graph
-        self.uri = uri
         self.temporary = False
+
+        # error faster if we won't be able to find where to save
+        self.saveContext()
 
     def ident(self):
         return self.uri
