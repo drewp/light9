@@ -89,7 +89,7 @@ def sendPatch(putUri, patch, **kw):
     """
     body = patch.makeJsonRepr(kw)
     log.debug("send body: %r", body)
-    def ok(done):
+    def putDone(done):
         if not str(done.code).startswith('2'):
             raise ValueError("sendPatch request failed %s: %s" % (done.code, done.body))
         log.debug("sendPatch finished, response: %s" % done.body)
@@ -100,4 +100,4 @@ def sendPatch(putUri, patch, **kw):
         method='PUT',
         headers={'Content-Type': ['application/json']},
         postdata=body,
-        ).addCallback(ok)
+        ).addCallback(putDone)
