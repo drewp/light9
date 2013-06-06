@@ -1,0 +1,161 @@
+Index: unix/TkDND_XDND.c
+===================================================================
+--- unix/TkDND_XDND.c	(revision 95)
++++ unix/TkDND_XDND.c	(working copy)
+@@ -517,7 +517,7 @@
+     ActionCopy, ActionMove, ActionLink, ActionAsk, ActionPrivate,
+     refuse_drop, ActionDefault
+   };
+-    
++  printf("TkDND_HandleXdndDrop\n");
+   if (interp == NULL) return False;
+   if (XDND_DROP_TIME(xevent) != 0) {
+     time = ((sizeof(Time) == 8 && XDND_DROP_TIME(xevent) < 0)
+Index: CMakeLists.txt
+===================================================================
+--- CMakeLists.txt	(revision 95)
++++ CMakeLists.txt	(working copy)
+@@ -168,7 +168,7 @@
+ ADD_DEFINITIONS   ( -DTKDND_VERSION="${PKG_VERSION}" )
+ 
+ ## Package debug definitions...
+-# ADD_DEFINITIONS   ( -DDEBUG_CLIENTMESSAGE_HANDLER )
++ADD_DEFINITIONS   ( -DDEBUG_CLIENTMESSAGE_HANDLER )
+ 
+ ## ===========================================================================
+ ##  Declare the package shared library target...
+Index: library/tkdnd_unix.tcl
+===================================================================
+--- library/tkdnd_unix.tcl	(revision 95)
++++ library/tkdnd_unix.tcl	(working copy)
+@@ -54,7 +54,7 @@
+   variable _last_mouse_root_y 0
+ 
+   proc debug {msg} {
+-    puts $msg
++    #puts $msg
+   };# debug
+ };# namespace xdnd
+ 
+@@ -69,6 +69,7 @@
+   variable _common_drop_target_types; set _common_drop_target_types {}
+   variable _actionlist
+   variable _drag_source;              set _drag_source $drag_source
++debug "_drop_target clear1"
+   variable _drop_target;              set _drop_target {}
+   variable _actionlist;               set _actionlist  \
+                                            {copy move link ask private}
+@@ -82,6 +83,15 @@
+   return default
+ };# xdnd::_HandleXdndEnter
+ 
++
++proc xdnd::_pointWithinWindow {win rootX rootY} {
++  set x [winfo rootx $win]
++  set y [winfo rooty $win]
++  set w [winfo width $win]
++  set h [winfo height $win]
++  return [expr "$rootX >= $x && $rootX < $x+$w && $rootY >= $y && $rootY < $y+$h"]
++}
++
+ # ----------------------------------------------------------------------------
+ #  Command xdnd::_HandleXdndPosition
+ # ----------------------------------------------------------------------------
+@@ -102,9 +112,19 @@
+   # debug "xdnd::_HandleXdndPosition: drop_target=$drop_target,\
+   #            _drop_target=$_drop_target, rootX=$rootX, rootY=$rootY"
+ 
++  # drop_target may be a parent of the real target.
++
++  # this is all a workaround for 'winfo containing' never returning anything
++  set children [winfo children $drop_target]
++  foreach child $children {
++    if {[_pointWithinWindow $child $rootX $rootY]} {
++      return [_HandleXdndPosition $child $rootX $rootY $drag_source]
++    }
++  }
++    
+   if {![info exists _drag_source] && ![string length $_drag_source]} {
+-    # debug "xdnd::_HandleXdndPosition: no or empty _drag_source:\
+-    #               return refuse_drop"
++    debug "xdnd::_HandleXdndPosition: no or empty _drag_source:\
++                   return refuse_drop"
+     return refuse_drop
+   }
+ 
+@@ -116,7 +136,7 @@
+ 
+   ## Does the new drop target support any of our new types? 
+   set _types [bind $drop_target <<DropTargetTypes>>]
+-  # debug ">> Accepted types: $drop_target $_types"
++  debug ">> Accepted types: $drop_target $_types"
+   if {[llength $_types]} {
+     ## Examine the drop target types, to find at least one match with the drag
+     ## source types...
+@@ -130,7 +150,7 @@
+     }
+   }
+   
+-  # debug "\t($_drop_target) -> ($drop_target)"
++  debug "\t($_drop_target) -> ($drop_target)"
+   if {$drop_target != $_drop_target} {
+     if {[string length $_drop_target]} {
+       ## Call the <<DropLeave>> event.
+@@ -152,6 +172,7 @@
+         uplevel \#0 $cmd
+       }
+     }
++    debug "_drop_target clear2"
+     set _drop_target {}
+ 
+     if {[info exists common_drag_source_types]} {
+@@ -179,15 +200,16 @@
+         set _action [uplevel \#0 $cmd]
+       }
+     }
++    debug "_drop_target set3 $drop_target"
+     set _drop_target $drop_target
+   }
+   
+   set _action refuse_drop
+-  set _drop_target {}
+   if {[info exists common_drag_source_types]} {
+     set _action copy
+     set _common_drag_source_types $common_drag_source_types
+     set _common_drop_target_types $common_drop_target_types
++    debug "_drop_target set5 -> $_drop_target"
+     set _drop_target $drop_target
+     ## Drop target supports at least one type. Send a <<DropPosition>>.
+     set cmd [bind $drop_target <<DropPosition>>]
+@@ -206,6 +228,10 @@
+         ] $cmd]
+       set _action [uplevel \#0 $cmd]
+     }
++  } else {
++    # logic wasn't clear; i'm just guessing this should be the else-clause
++    debug "_drop_target clear4, was $_drop_target"
++    set _drop_target {}
+   }
+   # Return values: copy, move, link, ask, private, refuse_drop, default
+   # debug "xdnd::_HandleXdndPosition: ACTION: $_action"
+@@ -227,7 +253,10 @@
+   variable _drop_target
+   variable _last_mouse_root_x
+   variable _last_mouse_root_y
+-  if {![info exists _drop_target]} {set _drop_target {}}
++  if {![info exists _drop_target]} {
++debug "_drop_target clear6"
++set _drop_target {}
++}
+   # debug "xdnd::_HandleXdndLeave: _drop_target=$_drop_target"
+   if {[info exists _drop_target] && [string length $_drop_target]} {
+     set cmd [bind $_drop_target <<DropLeave>>]
+@@ -273,7 +302,7 @@
+   set rootX $_last_mouse_root_x
+   set rootY $_last_mouse_root_y
+ 
+-  # puts "xdnd::_HandleXdndDrop: $time"
++  puts "xdnd::_HandleXdndDrop: $time $_drop_target"
+ 
+   if {![info exists _drag_source] && ![string length $_drag_source]} {
+     return refuse_drop

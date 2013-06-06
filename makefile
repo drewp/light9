@@ -38,6 +38,8 @@ create_virtualenv:
 	ln -sf ../env/bin/python bin/python
 
 tkdnd_build:
+	# get tkdnd r95 with subversion
+	# then apply tkdnd-patch-on-r95 to that
 	cd tkdnd/trunk
 	./configure
 	make
