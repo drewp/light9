@@ -67,17 +67,20 @@ class Subcomposer(tk.Frame):
         self.graph = graph
         self.session = session
 
-        # this is a PersistentSubmaster (even for local) or None if we're not initialized
-        self.currentSub = Observable(None)
-
+        # this is a URIRef or Local
         self._currentChoice = Observable(Local)
+
+        # this is a PersistentSubmaster (even for local)
+        self.currentSub = Observable(Submaster.PersistentSubmaster(
+                    graph, self.makeLocal()))
 
         def pc(val):
             log.info("change viewed sub to %s", val)
         self._currentChoice.subscribe(pc)
 
         EditChoice(self, self.graph, self._currentChoice).frame.pack(side='top')
-
+        self.setupSubChoiceLinks()
+        
     def setupSubChoiceLinks(self):
 
         def ann():
