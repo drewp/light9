@@ -1,4 +1,5 @@
 #!bin/python
+from run_local import log
 from twisted.internet import gtk2reactor, reactor
 import web, thread, gobject, sys, optparse, logging
 from rdflib import URIRef
@@ -38,8 +39,6 @@ class App:
         self.player.setSong(songLocation(graph, nextSong), play=False)
 
 if __name__ == "__main__":
-    logging.basicConfig()
-    log = logging.getLogger()
     gobject.threads_init() # this is in gtk2reactor too
 
     parser = optparse.OptionParser()
