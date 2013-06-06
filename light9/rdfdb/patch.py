@@ -80,13 +80,13 @@ class Patch(object):
     @property
     def addGraph(self):
         if self._addGraph is None:
-            self._addGraph = graphFromQuads(self._addQuads)
+            self._addGraph = graphFromQuads(self.addQuads)
         return self._addGraph
 
     @property
     def delGraph(self):
         if self._delGraph is None:
-            self._delGraph = graphFromQuads(self._delQuads)
+            self._delGraph = graphFromQuads(self.delQuads)
         return self._delGraph
 
     @property
