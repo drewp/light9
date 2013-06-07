@@ -52,7 +52,7 @@ class XMLRPCServe(xmlrpc.XMLRPC):
         self.calldelay=1/options.updates_per_sec 
 
         print "starting parport connection"
-        self.parportdmx=UsbDMX() #ParportDMX()
+        self.parportdmx = UsbDMX(port=options.dmx_device)
         if os.environ.get('DMXDUMMY',0):
             self.parportdmx.godummy()
         else:
@@ -204,6 +204,8 @@ parser.add_option("-f","--fast-updates",action='store_true',
                         'of the usual reduced output'))
 parser.add_option("-r","--updates-per-sec",type='float',default=20,
                   help=('dmx output frequency'))
+parser.add_option("-d","--dmx-device", default='/dev/dmx0',
+                  help='dmx device name')
 parser.add_option("-n", "--dummy", action="store_true",
                   help="dummy mode, same as DMXDUMMY=1 env variable")
 (options,songfiles)=parser.parse_args()
