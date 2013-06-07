@@ -15,8 +15,8 @@ def get_all_channels():
     return prinames
 
 def get_dmx_channel(name):
-    if name in patch:
-        return patch[name]
+    if str(name) in patch:
+        return patch[str(name)]
 
     try:
         i = int(name)
