@@ -1,7 +1,7 @@
 
 from dmx import Dmx
 
-d = Dmx()
+d = Dmx(port="/dev/dmx1")
 while 1:
-    d.write("\xff" * 100, times=1)
-
+    d.write("\x00" * 100)
+    print "wrote"

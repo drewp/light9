@@ -50,6 +50,10 @@
 #define info(format, arg...) do { printk(KERN_INFO __FILE__ ": " format "\n" , ## arg); } while (0)
 #endif
 
+#ifndef err
+#define err(format, arg...) do { printk(KERN_INFO __FILE__ ": (error) " format "\n" , ## arg); } while (0)
+#endif
+
 /* Version Information */
 #define DRIVER_VERSION "v0.1.20111215"
 #define DRIVER_AUTHOR "Erwin Rol, erwin@erwinrol.com"
@@ -631,8 +635,8 @@ static int dmx_usb_probe(struct usb_interface *interface, const struct usb_devic
 	int retval = -ENOMEM;
 
 	/* See if the device offered us matches what we can accept */
-	if ((udev->descriptor.idVendor != FTDI_VID) ||
-	    (udev->descriptor.idProduct != FTDI_8U232AM_PID)) {
+	if ((le16_to_cpu(udev->descriptor.idVendor) != FTDI_VID) ||
+	    (le16_to_cpu(udev->descriptor.idProduct) != FTDI_8U232AM_PID)) {
 		return -ENODEV;
 	}
 
