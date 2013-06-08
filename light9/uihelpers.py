@@ -54,15 +54,15 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
         geo = graph.value(session, L9.windowGeometry)
         log.debug("setPosFromGraphOnce %s", geo)
 
+        setOnce[0] = True
+        graphSetTime[0] = time.time()
         if geo is not None and geo != lastSaved[0]:
-            setOnce[0] = True
             tl.geometry(geo)
             lastSaved[0] = geo
-            graphSetTime[0] = time.time()
 
     def savePos(ev):
         geo = tl.geometry()
-        if not isinstance(ev.widget, Tkinter.Tk):
+        if not isinstance(ev.widget, (Tk, Tkinter.Tk)):
             # I think these are due to internal widget size changes,
             # not the toplevel changing
             return
