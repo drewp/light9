@@ -1,0 +1,10 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2013/> .
+
+show:dance2013 :networking sh:netHome .
+sh:netHome  
+  :musicPlayer <http://localhost:8040/>;
+  :dmxServer <http://localhost:8030/>;
+  :curveCalc <http://localhost:8060/>;
+  :keyboardComposer <http://localhost:8050/> .
