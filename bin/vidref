@@ -1,4 +1,5 @@
 #!bin/python
+from run_local import log
 import gobject
 gobject.threads_init()
 import gtk
@@ -16,8 +17,6 @@ parser.add_option("-v", "--verbose", action="store_true",
 (options, args) = parser.parse_args()
 
 
-logging.basicConfig()
-log = logging.getLogger()
 log.setLevel(logging.DEBUG)
 # limit the stdout one, but leave debug messages for the gtk logger
 log.handlers[0].setLevel(logging.DEBUG if options.verbose else logging.WARN)
