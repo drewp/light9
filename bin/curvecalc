@@ -322,33 +322,7 @@ class MaxTime(object):
     def get(self):
         return self.maxtime
 
-def main():
-    startTime = time.time()
-    parser = optparse.OptionParser()
-    parser.set_usage("%prog [opts] [songURI]")
-    parser.add_option("--sliders", action='store_true',
-                      help='use hardware sliders')
-    parser.add_option("--skip-music", action='store_true',
-                      help="ignore music and smooth_music curve files")
-    parser.add_option("--debug", action="store_true",
-                      help="log at DEBUG")
-    parser.add_option("--reload", action="store_true",
-                      help="live reload of themes and code")
-    parser.add_option("--startup-only", action='store_true',
-                      help="quit after loading everything (for timing tests)")
-    clientsession.add_option(parser)
-    opts, args = parser.parse_args()
-
-    logging.basicConfig(format="%(asctime)s %(levelname)-5s %(name)s %(filename)s:%(lineno)d: %(message)s")
-    log.setLevel(logging.DEBUG if opts.debug else logging.INFO)
-
-    log.debug("startup: music %s", time.time() - startTime)
-
-
-    session = clientsession.getUri('curvecalc', opts)
-
-    music = Music()
-    graph = SyncedGraph("curvecalc")
+def launch(args, graph, session, opts, startTime, music):
 
     try:
         song = URIRef(args[0])
@@ -405,7 +379,37 @@ def main():
     reactor.listenTCP(networking.curveCalc.port,
                       server.Site(Hover()))
 
+def main():
+    startTime = time.time()
+    parser = optparse.OptionParser()
+    parser.set_usage("%prog [opts] [songURI]")
+    parser.add_option("--sliders", action='store_true',
+                      help='use hardware sliders')
+    parser.add_option("--skip-music", action='store_true',
+                      help="ignore music and smooth_music curve files")
+    parser.add_option("--debug", action="store_true",
+                      help="log at DEBUG")
+    parser.add_option("--reload", action="store_true",
+                      help="live reload of themes and code")
+    parser.add_option("--startup-only", action='store_true',
+                      help="quit after loading everything (for timing tests)")
+    clientsession.add_option(parser)
+    opts, args = parser.parse_args()
 
+    logging.basicConfig(format="%(asctime)s %(levelname)-5s %(name)s %(filename)s:%(lineno)d: %(message)s")
+    log.setLevel(logging.DEBUG if opts.debug else logging.INFO)
+
+    log.debug("startup: music %s", time.time() - startTime)
+
+
+    session = clientsession.getUri('curvecalc', opts)
+
+    music = Music()
+    graph = SyncedGraph("curvecalc")
+
+    graph.initiallySynced.addCallback(
+        lambda _: launch(args, graph, session, opts, startTime, music))
+    
     prof.run(reactor.run, profile=False)
 
 prof.run(main, profile=False)
