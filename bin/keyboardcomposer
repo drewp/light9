@@ -1,6 +1,7 @@
 #!bin/python
 
 from __future__ import division, nested_scopes
+from run_local import log
 import cgi, os, sys, time, subprocess, logging, random
 from optparse import OptionParser
 import webcolors, colorsys
@@ -12,7 +13,6 @@ from Tix import *
 import Tix as tk
 import pickle
 
-import run_local
 from light9.Fadable import Fadable
 from light9.Submaster import Submasters, sub_maxes
 from light9.subclient import SubClient
@@ -142,7 +142,9 @@ class SubmasterBox(Frame):
                     self.pauseTrace = False
 
     def updateName(self):
-        self.namelabel.config(text=self.sub.graph.label(self.sub.uri))
+        def shortUri(u):
+            return '.../' + u.split('/')[-1]
+        self.namelabel.config(text=self.sub.graph.label(self.sub.uri) or shortUri(self.sub.uri))
 
     def launch_subcomposer(self, *args):
         subprocess.Popen(["bin/subcomposer", "--no-geometry", self.name])
@@ -232,8 +234,8 @@ class KeyboardComposer(Frame, SubClient):
                              self.graph.value(sub.uri, L9['order']),
                              sub)
             for sub in self.submasters.get_all_subs())
-        dispatcher.connect(self.onNewSub, "new submaster")
-        dispatcher.connect(self.onLostSub, "lost submaster")
+        #dispatcher.connect(self.onNewSub, "new submaster")
+        #dispatcher.connect(self.onLostSub, "lost submaster")
         log.info("withgroups %s", withgroups)
 
         for group, order, sub in withgroups:
@@ -520,6 +522,18 @@ class Sliders(BCF2000):
             kc.change_row(kc.current_row + diff)
             self.valueOut(name, 0)
 
+def launch(opts, root, graph, session):
+    tl = toplevelat("Keyboard Composer - %s" % opts.session,
+                    existingtoplevel=root, graph=graph, session=session)
+
+    kc = KeyboardComposer(tl, graph, session,
+                          hw_sliders=not opts.no_sliders)
+    kc.pack(fill=BOTH, expand=1)
+
+    for helpline in ["Bindings: B3 mute; C-l edit levels in subcomposer"]:
+        tk.Label(root,text=helpline, font="Helvetica -12 italic",
+                 anchor='w').pack(side='top',fill='x')
+            
 if __name__ == "__main__":
     parser = OptionParser()
     parser.add_option('--no-sliders', action='store_true',
@@ -528,8 +542,7 @@ if __name__ == "__main__":
     parser.add_option('-v', action='store_true', help="log info level")
     opts, args = parser.parse_args()
 
-    logging.basicConfig(level=logging.INFO if opts.v else logging.WARN)
-    log = logging.getLogger('keyboardcomposer')
+    log.setLevel(logging.INFO if opts.v else logging.WARN)
 
     graph = SyncedGraph("keyboardcomposer")
 
@@ -541,16 +554,8 @@ if __name__ == "__main__":
 
     session = clientsession.getUri('keyboardcomposer', opts)
 
-    tl = toplevelat("Keyboard Composer - %s" % opts.session,
-                    existingtoplevel=root, graph=graph, session=session)
-
-    kc = KeyboardComposer(tl, graph, session,
-                          hw_sliders=not opts.no_sliders)
-    kc.pack(fill=BOTH, expand=1)
-
-    for helpline in ["Bindings: B3 mute; C-l edit levels in subcomposer"]:
-        tk.Label(root,text=helpline, font="Helvetica -12 italic",
-                 anchor='w').pack(side='top',fill='x')
+    graph.initiallySynced.addCallback(
+        lambda _: launch(opts, root, graph, session))
 
     if 0: # needs fixing, or maybe it's obsolete because other progs can just patch the rdf graph
         import twisted.internet

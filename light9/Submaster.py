@@ -27,7 +27,7 @@ class Submaster(object):
             # obsolete
             dispatcher.connect(log.error, 'reload all subs')
 
-        log.debug("%s initial levels %s", self.name, self.levels)
+        #log.debug("%s initial levels %s", self.name, self.levels)
 
     def _editedLevels(self):
         pass
@@ -271,7 +271,7 @@ def combine_subdict(subdict, name=None, permanent=False):
 class Submasters:
     "Collection o' Submaster objects"
     def __init__(self, graph):
-        self.submasters = {}
+        self.submasters = {} # uri : Submaster
         self.graph = graph
 
         graph.addHandler(self.findSubs)
@@ -280,11 +280,13 @@ class Submasters:
         current = set()
 
         for s in self.graph.subjects(RDF.type, L9['Submaster']):
+            if self.graph.contains((s, RDF.type, L9['LocalSubmaster'])):
+                continue
             log.info("found sub %s", s)
             if s not in self.submasters:
                 sub = self.submasters[s] = PersistentSubmaster(self.graph, s)
                 dispatcher.send("new submaster", sub=sub)
-                current.add(s)
+            current.add(s)
         for s in set(self.submasters.keys()) - current:
             del self.submasters[s]
             dispatcher.send("lost submaster", subUri=s)
