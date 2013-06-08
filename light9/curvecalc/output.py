@@ -1,13 +1,16 @@
-import time
+import time, logging
 from twisted.internet import reactor
 from light9 import Submaster, dmxclient
 from louie import dispatcher
+log = logging.getLogger("output")
+
+firstWarn = False
 
 class Output:
     lastsendtime=0
     lastsendlevs=None
-    def __init__(self, subterms, music):
-        self.subterms, self.music = subterms, music
+    def __init__(self, music):
+        self.music = music
 
         self.recent_t=[]
         self.later = None
@@ -44,8 +47,14 @@ class Output:
         self.send_dmx(t)
         
     def send_dmx(self,t):
+        global firstWarn
+        if not firstWarn:
+            log.warn("skipping Output.send_dmx")
+            firstWarn = True
+        return
         dispatcher.send("curves to sliders", t=t)
         scaledsubs=[]
+        # this needs to use graph instead
         for st in self.subterms:
             scl = st.scaled(t)
             scaledsubs.append(scl)

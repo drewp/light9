@@ -2,7 +2,9 @@ import math, os, random, logging
 from rdflib import Graph, URIRef, RDF, RDFS, Literal
 from louie import dispatcher
 import light9.Effects
-from light9 import Submaster, showconfig, Patch, prof
+from light9 import Submaster, showconfig, prof
+from light9.Patch import get_dmx_channel
+from light9.rdfdb.patch import Patch
 from light9.namespaces import L9
 log = logging.getLogger()
 
@@ -41,7 +43,7 @@ class Expr(object):
         def chan(name):
             return Submaster.Submaster(
                 name=name,
-                levels={Patch.get_dmx_channel(name) : 1.0})
+                levels={get_dmx_channel(name) : 1.0})
         glo['chan'] = chan
 
         def smooth_random(speed=1):
@@ -107,12 +109,22 @@ class Subexpr:
         return locals()
     expr = property(**expr())
 
-class Subterm:
+class Subterm(object):
     """one Submaster and its Subexpr"""
-    def __init__(self, submaster, subexpr):
-        self.submaster, self.subexpr = submaster, subexpr
-
+    def __init__(self, graph, subterm, saveCtx):
+        self.graph, self.uri = graph, subterm
+        self.ensureExpression(saveCtx)
+        
+    def ensureExpression(self, saveCtx):
+        with self.graph.currentState() as current:
+            if current.value(self.uri, L9['expression']) is None:
+                self.graph.patch(Patch(addQuads=[
+                    (self.uri, L9['expression'], Literal("..."), saveCtx),
+                    ]))
+    
     def scaled(self, t):
+        log.warn("skipping Subterm.scaled")
+        return 0
         subexpr_eval = self.subexpr.eval(t)
         # we prevent any exceptions from escaping, since they cause us to
         # stop sending levels
@@ -129,8 +141,7 @@ class Subterm:
             return Submaster.Submaster(name='Error: %s' % str(e), levels={})
 
     def __repr__(self):
-        return "<Subterm %s %s>" % (self.submaster, self.subexpr)
-
+        return "<Subterm %s>" % self.uri
 
 def graphPathForSubterms(song):
     return showconfig.subtermsForSong(showconfig.songFilenameFromURI(song)) + ".n3"
@@ -148,7 +159,7 @@ def createSubtermGraph(song, subterms):
         graph.add((uri, L9['expression'], Literal(subterm.subexpr.expr)))
     return graph
 
-def savekey(song, subterms, curveset):
+def savekey(song, curveset):
     log.info("saving %r", song)
     g = createSubtermGraph(song, subterms)
     g.serialize(graphPathForSubterms(song), format="nt")

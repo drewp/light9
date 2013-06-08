@@ -11,8 +11,8 @@ log = logging.getLogger()
 keep = []
 
 class Subexprview(object):
-    def __init__(self, se):
-        self.subexpr = se
+    def __init__(self, graph, ownerSubterm):
+        self.graph, self.ownerSubterm = graph, ownerSubterm
 
         self.box = gtk.HBox()
 
@@ -28,65 +28,61 @@ class Subexprview(object):
         self.entryBuffer.connect("deleted-text", self.entry_changed)
         self.entryBuffer.connect("inserted-text", self.entry_changed)
         dispatcher.connect(self.expr_changed, "expr_changed",
-                           sender=self.subexpr)
+                           sender=self.ownerSubterm)
 
-        dispatcher.connect(self.exprError, "expr_error", sender=self.subexpr)
-        log.info("made %r %r" % (id(self), self.__dict__))
+        dispatcher.connect(self.exprError, "expr_error", sender=self.ownerSubterm)
         keep.append(self.__dict__)
 
     def exprError(self, exc):
         self.error.set_text(str(exc))
         
     def expr_changed(self):
+        log.warn("skip expr_changed")
+        return
         e = str(self.subexpr.expr)
         if e != self.entryBuffer.get_text():
             self.entryBuffer.set_text(e, len(e))
             
     def entry_changed(self, *args):
+        log.warn("skip entry_changed")
+        return
         self.subexpr.expr = self.entryBuffer.get_text()
             
 class Subtermview(object):
     """
     has .label and .exprView widgets for you to put in a table
     """
-    def __init__(self, graph, st):
+    def __init__(self, st):
         self.subterm = st
+        self.graph = st.graph
 
-        self.label = gtk.Label("sub %s" % self.subterm.submaster.name)
-
-        sev = Subexprview(self.subterm.subexpr)
+        self.label = gtk.Label("sub")
+        self.graph.addHandler(self.setName)
+        
+        sev = Subexprview(self.graph, self.subterm.uri)
         self.exprView = sev.box
 
-def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=False):
-    assert isinstance(subUri, URIRef), subUri
-    subname = graph.label(subUri)
-    log.info("%s's label is %s" % (subUri, subname))
-    if not subname: # fake sub, like for a chase
-        st = graph.subjects(L9['sub'], subUri).next()
-        subname = graph.label(st)
-        log.info("using parent subterm's name instead. parent %r, name %r" % (st, subname))
-    assert subname, "%s has no name" % subUri
-    if expr is None:
-        expr = '%s(t)' % subname
+    def setName(self):
+        # some of this could be pushed into Submaster
+        sub = self.graph.value(self.subterm.uri, L9['sub'])
+        if sub is None:
+            self.label.set_text("no sub (%s)" % self.subterm.uri)
+            return
+        label = self.graph.label(sub)
+        if label is None:
+            self.label.set_text("sub %s has no label" % sub)
+            return
+        self.label.set_text(label)
 
-    # this is what I'd like to have, but the name replacement above is
-    # too unclear for me to make the change now
-    #get_global_submasters(graph).get_sub_by_name(
+def add_one_subterm(subterm, curveset, master, show=False):
+    stv = Subtermview(subterm)
     
-    # graph.add([(subUri, RDFS.label, Literal(subname))]) # didntknow context yet
-    sub = Submaster.PersistentSubmaster(graph, subUri)
-    term = Subterm(sub, Subexpr(curveset, expr, graph))
-    subterms.append(term)
-
-    stv = Subtermview(graph, term)
     y = master.get_property('n-rows')
     master.attach(stv.label, 0, 1, y, y + 1, xoptions=0, yoptions=0)
     master.attach(stv.exprView, 1, 2, y, y + 1, yoptions=0)
     scrollToRowUponAdd(stv.label)  
     if show:
         master.show_all()
-    return term
-
 
 def scrollToRowUponAdd(widgetInRow):
     """when this table widget is ready, scroll the table so we can see it"""
