@@ -27,6 +27,15 @@ class PatchSender(object):
         self._patchesToSend.append((p, sendResult))
         self._continueSending()
         return sendResult
+        
+    def cancelAll(self):
+        self._patchesToSend[:] = []
+        # we might be in the middle of a post; ideally that would be
+        # aborted, too. Since that's not coded yet, or it might be too late to
+        # abort, what should happen?
+        # 1. this could return deferred until we think our posts have stopped
+        # 2. or, other code could deal for the fact that cancelAll
+        # isn't perfect
 
     def _continueSending(self):
         if not self._patchesToSend or self._currentSendPatchRequest:

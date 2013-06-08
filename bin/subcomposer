@@ -109,12 +109,14 @@ class Subcomposer(tk.Frame):
             graph.patchObject(self.session,
                               self.session, L9['currentSub'], newSub.uri)
 
-            if newSub and 'local' in newSub.uri: # wrong- use rdf:type or something?
-                self._currentChoice(Local)
-            else:
-                # i think right here is the point that the last local
-                # becomes garbage, and we could clean it up. 
-                self._currentChoice(newSub.uri)
+            with graph.currentState() as current:
+                
+                if newSub and (newSub.uri, RDF.type, L9['LocalSubmaster']) in current:
+                    self._currentChoice(Local)
+                else:
+                    # i think right here is the point that the last local
+                    # becomes garbage, and we could clean it up. 
+                    self._currentChoice(newSub.uri)
 
         dispatcher.connect(self.levelsChanged, "sub levels changed")
             
@@ -136,7 +138,10 @@ class Subcomposer(tk.Frame):
         # subcomposer process and don't use PersistentSubmaster at all?
 
         new = URIRef("http://local/%s" % time.time())
-        self.graph.patch(Patch(addQuads=[(new, RDF.type, L9['Submaster'], self.session)]))
+        self.graph.patch(Patch(addQuads=[
+            (new, RDF.type, L9['Submaster'], self.session),
+            (new, RDF.type, L9['LocalSubmaster'], self.session),
+        ]))
         
         return new
         

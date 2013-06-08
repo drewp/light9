@@ -64,6 +64,8 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         self._sender = PatchSender('http://localhost:8051/patches',
                                    self._receiver.updateResource)
         AutoDepGraphApi.__init__(self)
+        # this needs more state to track if we're doing a resync (and
+        # everything has to error or wait) or if we're live
         
     def resync(self):
         """
@@ -79,14 +81,17 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         should just fail them. There should be a notification back to
         UIs who want to show that we're doing a resync.
         """
+        self._sender.cancelAll()
+        # this should be locked so only one resync goes on at once
         return cyclone.httpclient.fetch(
             url="http://localhost:8051/graph",
             method="GET",
-            headers={'Accept':'x-trig'},
+            headers={'Accept':['x-trig']},
             ).addCallback(self._resyncGraph)
 
     def _resyncGraph(self, response):
-        pass
+        log.warn("new graph in")
+        
         #diff against old entire graph
         #broadcast that change
 
@@ -98,7 +103,11 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
         log.info("del %s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
-        patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
+        try:
+            patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
+        except ValueError:
+            self.sendFailed(None)
+            return
         self.runDepsOnNewPatch(p)
         self._sender.sendPatch(p).addErrback(self.sendFailed)
 
@@ -107,9 +116,11 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         we asked for a patch to be queued and sent to the master, and
         that ultimately failed because of a conflict
         """
-        print "sendFailed"
+        log.warn("sendFailed")
+        self.resync()
+        
         #i think we should receive back all the pending patches,
-        #do a resysnc here,
+        #do a resync here,
         #then requeue all the pending patches (minus the failing one?) after that's done.
 
     def _onPatch(self, p):
