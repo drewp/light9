@@ -4,8 +4,10 @@ from rdflib import Graph, RDF
 from rdflib import RDFS, Literal, BNode
 from light9.namespaces import L9, XSD
 from light9.TLUtility import dict_scale, dict_max
-from light9 import Patch, showconfig
+from light9 import showconfig
+from light9.Patch import resolve_name, get_dmx_channel, get_channel_uri, reload_data
 from louie import dispatcher
+from light9.rdfdb.patch import Patch
 log = logging.getLogger('submaster')
 
 class Submaster(object):
@@ -31,7 +33,7 @@ class Submaster(object):
         pass
 
     def set_level(self, channelname, level, save=True):
-        self.levels[Patch.resolve_name(channelname)] = level
+        self.levels[resolve_name(channelname)] = level
         self._editedLevels()
 
     def set_all_levels(self, leveldict):
@@ -82,7 +84,7 @@ class Submaster(object):
             if v == 0:
                 continue
             try:
-                dmxchan = Patch.get_dmx_channel(k) - 1
+                dmxchan = get_dmx_channel(k) - 1
             except ValueError:
                 log.error("error trying to compute dmx levels for submaster %s"
                           % self.name)
@@ -135,9 +137,6 @@ class PersistentSubmaster(Submaster):
         Submaster.__init__(self, self.name, self.levels)
         self.temporary = False
 
-        # error faster if we won't be able to find where to save
-        self.saveContext()
-
     def ident(self):
         return self.uri
 
@@ -182,7 +181,7 @@ class PersistentSubmaster(Submaster):
                 log.error("name %r val %r" % (name, val))
                 raise
 
-    def saveContext(self):
+    def _saveContext(self):
         """the context in which we should save all the lightLevel triples for
         this sub"""
         with self.graph.currentState() as g:
@@ -190,13 +189,16 @@ class PersistentSubmaster(Submaster):
                 ctx = g.contextsForStatement(
                     (self.uri, RDF.type, L9['Submaster']))[0]
             except IndexError:
-                raise ValueError(
-                    "no context has %s rdf:type :Submaster, "
-                    "so I don't know where to save this sub's data" % self.uri)
+                log.info("declaring %s to be a submaster" % self.uri)
+                ctx = self.uri
+                self.graph.patch(Patch(addQuads=[
+                    (self.uri, RDF.type, L9['Submaster'], ctx),
+                    ]))
+
         return ctx
 
     def editLevel(self, chan, newLevel):
-        self.graph.patchMapping(self.saveContext(),
+        self.graph.patchMapping(self._saveContext(),
                                 subject=self.uri, predicate=L9['lightLevel'],
                                 nodeClass=L9['ChannelSetting'],
                                 keyPred=L9['channel'], newKey=chan,
@@ -208,7 +210,7 @@ class PersistentSubmaster(Submaster):
         with self.graph.currentState() as g:
             levs = list(g.objects(self.uri, L9['lightLevel']))
         for lev in levs:
-            self.graph.removeMappingNode(self.saveContext(), lev)
+            self.graph.removeMappingNode(self._saveContext(), lev)
 
     def save(self):
         raise NotImplementedError("obsolete?")
@@ -221,7 +223,7 @@ class PersistentSubmaster(Submaster):
         graph.add((subUri, RDFS.label, Literal(self.name)))
         for chan in self.levels.keys():
             try:
-                chanUri = Patch.get_channel_uri(chan)
+                chanUri = get_channel_uri(chan)
             except KeyError:
                 log.error("saving dmx channels with no :Channel node "
                           "is not supported yet. Give channel %s a URI "
@@ -340,7 +342,7 @@ def get_sub_by_name(name, submasters=None):
         pass
 
     try:
-        subnum = Patch.get_dmx_channel(name)
+        subnum = get_dmx_channel(name)
         s = Submaster("'%s'" % name, leveldict={subnum : 1.0}, temporary=True)
         return s
     except ValueError:
@@ -350,7 +352,7 @@ def get_sub_by_name(name, submasters=None):
     return Submaster('%s' % name)
 
 if __name__ == "__main__":
-    Patch.reload_data()
+    reload_data()
     s = Submasters()
     print s.get_all_subs()
     if 0: # turn this on to normalize all subs
