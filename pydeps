@@ -1,4 +1,4 @@
-#git+git://github.com/RDFLib/rdflib@f5da2a2aca054748877aa7c6d722dc087472a858
+git+git://github.com/RDFLib/rdflib@f5da2a2aca054748877aa7c6d722dc087472a858
 Twisted==13.0.0
 webcolors==1.4
 Louie==1.1
