@@ -13,21 +13,38 @@ show:dance2013 :playList (
   sh:song16 sh:song17
 ) .
 
-sh:song1 a :Song; rdfs:label  "01  [all]";   :songFilename "01- .wav" . 
-sh:song2 a :Song; rdfs:label  "02  [jr/sr]"; :songFilename "02- .wav" . 
-sh:song3 a :Song; rdfs:label  "03  [2]";     :songFilename "03- .wav" . 
-sh:song4 a :Song; rdfs:label  "04  [4]";     :songFilename "04- .wav" . 
-sh:song5 a :Song; rdfs:label  "05  [1]";     :songFilename "05- .wav" . 
-sh:song6 a :Song; rdfs:label  "06  [3]";     :songFilename "06- .wav" . 
-sh:song7 a :Song; rdfs:label  "07  [4]";     :songFilename "07- .wav" . 
-sh:song8 a :Song; rdfs:label  "08  [2]";     :songFilename "08- .wav" . 
-sh:song9 a :Song; rdfs:label  "09  [1]";     :songFilename "09- .wav" . 
-sh:song10 a :Song; rdfs:label "10  [4]";     :songFilename "10- .wav" . 
-sh:song11 a :Song; rdfs:label "11  [3]";     :songFilename "11- .wav" . 
-sh:song12 a :Song; rdfs:label "12  [sr]";    :songFilename "12- .wav" . 
-sh:song13 a :Song; rdfs:label "13  [1]";     :songFilename "13- .wav" . 
-sh:song14 a :Song; rdfs:label "14  [2]";     :songFilename "14- .wav" . 
-sh:song15 a :Song; rdfs:label "15  [3]";     :songFilename "15- .wav" . 
-sh:song16 a :Song; rdfs:label "16  [4]";     :songFilename "16- .wav" . 
-sh:song17 a :Song; rdfs:label "17  [all]";   :songFilename "17- .wav" . 
+sh:song1 a :Song; rdfs:label  "01  [all]";   :songFilename "01-wonderwoman.wav" . 
+sh:song2 a :Song; rdfs:label  "02  [jr/sr]"; :songFilename "02-daffy.wav" . 
+sh:song3 a :Song; rdfs:label  "03  [2]";     :songFilename "03-toystory.wav" . 
+sh:song4 a :Song; rdfs:label  "04  [4]";     :songFilename "04-givinguponlove.wav" . 
+sh:song5 a :Song; rdfs:label  "05  [1]";     :songFilename "05-flintstones.wav" . 
+sh:song6 a :Song; rdfs:label  "06  [3]";     :songFilename "06-looney-out.wav" . 
+sh:song7 a :Song; rdfs:label  "07  [4]";     :songFilename "07-panther.wav" . 
+sh:song8 a :Song; rdfs:label  "08  [2]";     :songFilename "08-cars.wav" . 
+sh:song9 a :Song; rdfs:label  "09  [1]";     :songFilename "09-bettyboop.wav" . 
+sh:song10 a :Song; rdfs:label "10  [4]";     :songFilename "10-samsdance.wav" . 
+sh:song11 a :Song; rdfs:label "11  [3]";     :songFilename "11-spiderman.wav" . 
+sh:song12 a :Song; rdfs:label "12  [sr]";    :songFilename "12-sunnyside.wav" . 
+sh:song13 a :Song; rdfs:label "13  [1]";     :songFilename "13-powderpuff.wav" . 
+sh:song14 a :Song; rdfs:label "14  [2]";     :songFilename "14-shrek.wav" . 
+sh:song15 a :Song; rdfs:label "15  [3]";     :songFilename "15-sailorpossible.wav" . 
+sh:song16 a :Song; rdfs:label "16  [4]";     :songFilename "16-batman.wav" . 
+sh:song17 a :Song; rdfs:label "17  [all]";   :songFilename "17-happyfeet.wav" . 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
