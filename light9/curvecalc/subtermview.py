@@ -1,6 +1,6 @@
 import gtk, logging
 from louie import dispatcher
-from rdflib import RDF, RDFS, Literal
+from rdflib import URIRef
 from light9 import Submaster
 from light9.namespaces import L9
 from light9.curvecalc.subterm import Subterm, Subexpr
@@ -58,6 +58,7 @@ class Subtermview(object):
         self.exprView = sev.box
 
 def add_one_subterm(graph, subUri, curveset, subterms, master, expr=None, show=False):
+    assert isinstance(subUri, URIRef), subUri
     subname = graph.label(subUri)
     log.info("%s's label is %s" % (subUri, subname))
     if not subname: # fake sub, like for a chase

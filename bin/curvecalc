@@ -35,6 +35,7 @@ from light9.curvecalc.subtermview import add_one_subterm
 from light9.curvecalc.output import Output
 from light9.gtkpyconsole import togglePyConsole
 from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.rdfdb.patch import Patch
 from light9.editchoicegtk import EditChoice
 from light9.observable import Observable
 
@@ -157,13 +158,26 @@ class Main(object):
             self.makeSubterm(newname, withCurve=wc)
         dialog.hide()
 
+    def currentSong(self):
+        with self.graph.currentState() as current:
+            return current.value(self.session, L9['currentSong'])
+
+    def songSubtermsContext(self):
+        return self.currentSong()
+
     def makeSubterm(self, newname, withCurve=False, expr=None):
         uri = L9['sub/%s' % newname]
-        if (uri, RDF.type, L9.Subterm) in self.graph:
-            raise SubtermExists("already have a subterm named %r" % newname)
-        self.graph.add((uri, RDF.type, L9.Subterm))
-        self.graph.add((uri, RDFS.label, Literal(newname)))
-        self.graph.add((self.song, L9['subterm'], uri))
+        with self.graph.currentState() as current:
+            if (uri, RDF.type, L9.Subterm) in current:
+                raise SubtermExists("already have a subterm named %r" % newname)
+
+        ctx = self.songSubtermsContext()
+        self.graph.patch(Patch(addQuads=[
+            (uri, RDF.type, L9.Subterm, ctx),
+            (uri, RDFS.label, Literal(newname), ctx),
+            (self.currentSong(), L9['subterm'], uri, ctx),
+            ]))
+            
         if withCurve:
             self.curveset.new_curve(newname)
 

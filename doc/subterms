@@ -1,0 +1,8 @@
+
+
+song
+  -- :subterm -->
+    st
+       -- rdfs:label --> "chase 1"
+       -- :sub --> sub
+       -- :expression --> "curve1(t)"
