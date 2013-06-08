@@ -99,6 +99,11 @@ class AutoDepGraphApi(object):
         self._watchers.addPredObjWatcher(func, predicate, object)
         return self._graph.subjects(predicate, object)
 
+    def contains(self, triple):
+        func = self._getCurrentFunc()
+        self._watchers.addTripleWatcher(func, triple)
+        return triple in self._graph
+        
     def contextsForStatement(self, triple):
         """currently this needs to be in an addHandler section, but it
         sets no watchers so it won't actually update if the statement
@@ -119,6 +124,7 @@ class _GraphWatchers(object):
     def __init__(self):
         self._handlersSp = {} # (s,p): set(handlers)
         self._handlersPo = {} # (p,o): set(handlers)
+        self._handlersSpo = {} # (s,p,o): set(handlers)
 
     def addSubjPredWatcher(self, func, s, p):
         if func is None:
@@ -133,28 +139,37 @@ class _GraphWatchers(object):
     def addPredObjWatcher(self, func, p, o):
         self._handlersPo.setdefault((p, o), set()).add(func)
 
+    def addTripleWatcher(self, func, triple):
+        self._handlersSpo.setdefault(triple, set()).add(func)
+
     def whoCares(self, patch):
         """what handler functions would care about the changes in this patch?
 
         this removes the handlers that it gives you
         """
         #self.dependencies()
+        ret = set()
         affectedSubjPreds = set([(s, p) for s, p, o, c in patch.addQuads]+
                                 [(s, p) for s, p, o, c in patch.delQuads])
-        affectedPredObjs = set([(p, o) for s, p, o, c in patch.addQuads]+
-                                [(p, o) for s, p, o, c in patch.delQuads])
-
-        ret = set()
         for (s, p), funcs in self._handlersSp.iteritems():
             if (s, p) in affectedSubjPreds:
                 ret.update(funcs)
                 funcs.clear()
 
+        affectedPredObjs = set([(p, o) for s, p, o, c in patch.addQuads]+
+                                [(p, o) for s, p, o, c in patch.delQuads])
         for (p, o), funcs in self._handlersPo.iteritems():
             if (p, o) in affectedPredObjs:
                 ret.update(funcs)
                 funcs.clear()
 
+        affectedTriples = set([(s, p, o) for s, p, o, c in patch.addQuads]+
+                              [(s, p, o) for s, p, o, c in patch.delQuads])
+        for triple, funcs in self._handlersSpo.iteritems():
+            if triple in affectedTriples:
+                ret.update(funcs)
+                funcs.clear()
+                
         return ret
 
     def dependencies(self):
