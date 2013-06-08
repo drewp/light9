@@ -99,7 +99,11 @@ class Player(object):
         """
         log.info("preloading %s", songPath)
         assert songPath.startswith("file://"), songPath
-        open(songPath[len("file://"):]).read()
+        try:
+            open(songPath[len("file://"):]).read()
+        except IOError as e:
+            log.error("couldn't preload %s, %r", songPath, e)
+            raise
 
     def currentTime(self):
         try:
