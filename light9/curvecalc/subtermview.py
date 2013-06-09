@@ -1,6 +1,6 @@
 import gtk, logging
 from louie import dispatcher
-from rdflib import Literal
+from rdflib import Literal, URIRef
 from light9.namespaces import L9
 log = logging.getLogger()
 
@@ -58,9 +58,21 @@ class Subtermview(object):
 
         self.label = gtk.Label("sub")
         self.graph.addHandler(self.setName)
+
+        self.label.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
+                            targets=[('text/uri-list', 0, 0)],
+                            actions=gtk.gdk.ACTION_COPY)
+        self.label.connect("drag-data-received", self.onDataReceivedOnLabel)
         
         sev = Subexprview(self.graph, self.subterm.uri, self.subterm.saveContext)
         self.exprView = sev.box
+
+    def onDataReceivedOnLabel(self, widget, context, x, y, selection,
+                       targetType, time):
+        self.graph.patchObject(self.subterm.saveContext,
+                               self.subterm.uri,
+                               L9['sub'],
+                               URIRef(selection.data.strip()))
 
     def setName(self):
         # some of this could be pushed into Submaster

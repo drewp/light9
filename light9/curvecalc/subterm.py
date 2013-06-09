@@ -133,28 +133,3 @@ class Subterm(object):
 
     def __repr__(self):
         return "<Subterm %s>" % self.uri
-
-def graphPathForSubterms(song):
-    return showconfig.subtermsForSong(showconfig.songFilenameFromURI(song)) + ".n3"
-
-def createSubtermGraph(song, subterms):
-    """rdf graph describing the subterms, readable by add_subterms_for_song"""
-    graph = Graph()
-    for subterm in subterms:
-        assert subterm.submaster.name, "submaster %r has no name" % subterm.submaster
-        uri = URIRef(song + "/subterm/" + subterm.submaster.name)
-        graph.add((song, L9['subterm'], uri))
-        graph.add((uri, RDF.type, L9['Subterm']))
-        graph.add((uri, RDFS.label, Literal(subterm.submaster.name)))
-        graph.add((uri, L9['sub'], L9['sub/%s' % subterm.submaster.name]))
-        graph.add((uri, L9['expression'], Literal(subterm.subexpr.expr)))
-    return graph
-
-def savekey(song, curveset):
-    log.info("saving %r", song)
-    g = createSubtermGraph(song, subterms)
-    g.serialize(graphPathForSubterms(song), format="nt")
-
-    curveset.save(basename=os.path.join(showconfig.curvesDir(),
-                                        showconfig.songFilenameFromURI(song)))
-    log.info("saved")

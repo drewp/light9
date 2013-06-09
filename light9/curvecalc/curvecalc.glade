@@ -511,9 +511,9 @@
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <property name="n_columns">2</property>
+                                <signal name="add" handler="onSubtermChildAdded" swapped="no"/>
                                 <signal name="child-added" handler="onSubtermChildAdded" swapped="no"/>
                                 <signal name="map" handler="onSubtermsMap" swapped="no"/>
-                                <signal name="add" handler="onSubtermChildAdded" swapped="no"/>
                                 <child>
                                   <placeholder/>
                                 </child>
@@ -526,9 +526,22 @@
                         </child>
                       </object>
                       <packing>
-                        <property name="expand">True</property>
+                        <property name="expand">False</property>
                         <property name="fill">True</property>
                         <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel" id="newSubZone">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="label" translatable="yes">Drop new sub here</property>
+                        <signal name="drag-data-received" handler="onDragDataInNewSubZone" swapped="no"/>
+                      </object>
+                      <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
@@ -536,21 +549,7 @@
                         <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <child>
-                          <object class="GtkButton" id="button1">
-                            <property name="label" translatable="yes">Reload subs (C-r)</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <property name="use_action_appearance">False</property>
-                            <property name="image">image2</property>
-                            <accelerator key="r" signal="clicked" modifiers="GDK_CONTROL_MASK"/>
-                            <signal name="clicked" handler="onReloadSubs" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <child>
                           <object class="GtkButton" id="button2">
@@ -575,7 +574,7 @@
                       <packing>
                         <property name="expand">False</property>
                         <property name="fill">False</property>
-                        <property name="position">1</property>
+                        <property name="position">2</property>
                       </packing>
                     </child>
                   </object>
