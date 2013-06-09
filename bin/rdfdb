@@ -246,6 +246,9 @@ class WatchedFiles(object):
 
     def uriFromFile(self, filename):
         assert filename.endswith('.n3'), filename
+        if not any(filename.startswith(t) for t in self.topDirsToWatch):
+            raise ValueError("filename %s doesn't start with any of %s" %
+                             (filename, self.topDirsToWatch))
         return URIRef(self.topUri + filename[:-len('.n3')])
 
     def fileForUri(self, ctx):
