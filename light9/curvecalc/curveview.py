@@ -174,9 +174,13 @@ class SelectManip(object):
                                     orig[1])) for i, orig in origPts)
             elif param == 'top':
                 v = self.getWorldValue(event.y)
-                scl = max(0, min(1 / self.origMaxValue, v / self.origMaxValue))
-                self.setPoints((i, (orig[0], orig[1] * scl))
-                               for i, orig in origPts)
+                if self.origMaxValue == 0:
+                    self.setPoints((i, (orig[0], v)) for i, orig in origPts)
+                else:
+                    scl = max(0, min(1 / self.origMaxValue,
+                                     v / self.origMaxValue))
+                    self.setPoints((i, (orig[0], orig[1] * scl))
+                                   for i, orig in origPts)
 
             elif param == 'centerScale':
                 dt = mouseT - self.dragStartTime
