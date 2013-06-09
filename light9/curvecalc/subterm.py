@@ -113,7 +113,10 @@ class Subterm(object):
         """current graph is being passed as an optimization. It should be
         equivalent to use self.graph in here."""
 
-        expr = current.value(self.uri, L9['expression'])
+        objs = list(current.objects(self.uri, L9.expression))
+        if len(objs) > 1:
+            raise ValueError("found multiple expressions for %s: %s" %
+                             (self.uri, objs))
         
         expr = current.value(self.uri, L9['expression'])
         if not expr:
