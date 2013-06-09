@@ -172,15 +172,27 @@ class Main(object):
             self.makeSubterm(newname, withCurve=wc)
         dialog.hide()
 
-    def currentSong(self):
-        with self.graph.currentState() as current:
+    def currentSong(self, current=None):
+        def fin(current):
             return current.value(self.session, L9['currentSong'])
+        if current is None:
+            with self.graph.currentState() as current:
+                return fin(current)
+        else:
+            return fin(current)
 
-    def songSubtermsContext(self):
-        return self.currentSong()
+    def songSubtermsContext(self, current=None):
+        return self.currentSong(current=current)
 
     def makeSubterm(self, newname, withCurve=False, expr=None, sub=None):
-        uri = self.currentSong() + "/sub/%f" % time.time()
+        with self.graph.currentState() as current:
+            song = self.currentSong(current=current)
+            for i in range(1000):
+                uri = song + "/subterm/%d" % i
+                if (uri, None, None) not in current:
+                    break
+            else:
+                raise ValueError("can't pick a name for the new subterm")
 
         ctx = self.songSubtermsContext()
         quads = [

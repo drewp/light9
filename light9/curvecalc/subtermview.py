@@ -35,14 +35,13 @@ class Subexprview(object):
         
     def set_expression_from_graph(self):
         e = str(self.graph.value(self.ownerSubterm, L9['expression']))
-        print "was going to set to %r" % e
+        print "from graph, set to %r" % e
 
         if e != self.entryBuffer.get_text():
             self.entryBuffer.set_text(e, len(e))
             
     def entry_changed(self, *args):
         log.info("want to patch to %r", self.entryBuffer.get_text())
-        return
         self.graph.patchObject(self.saveContext,
                                self.ownerSubterm,
                                L9['expression'],

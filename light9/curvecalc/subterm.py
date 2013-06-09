@@ -100,6 +100,8 @@ class Subterm(object):
             else:
                 # otherwise, return our submaster multiplied by the value 
                 # returned
+                if subexpr_eval == 0:
+                    return Submaster.Submaster("zero", {})
                 subUri = current.value(self.uri, L9['sub'])
                 sub = self.submasters.get_sub_by_uri(subUri)
                 return sub * subexpr_eval
@@ -113,6 +115,7 @@ class Subterm(object):
 
         expr = current.value(self.uri, L9['expression'])
         
+        expr = current.value(self.uri, L9['expression'])
         if not expr:
             dispatcher.send("expr_error", sender=self.uri, exc="no expr, using 0")
             return 0
