@@ -143,6 +143,10 @@ class Patch(object):
         assert isinstance(ctx, URIRef), ctx
         return ctx
 
+    def isNoop(self):
+        return set(self.addQuads) == set(self.delQuads)
+            
+
 stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
 
 class TestPatchFromDiff(unittest.TestCase):

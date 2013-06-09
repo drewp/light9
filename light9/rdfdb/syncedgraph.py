@@ -99,6 +99,10 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         """send this patch to the server and apply it to our local
         graph and run handlers"""
 
+        if p.isNoop():
+            log.info("skipping no-op patch")
+            return
+        
         # these could fail if we're out of sync. One approach:
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
