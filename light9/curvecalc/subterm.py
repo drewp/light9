@@ -71,49 +71,16 @@ class Expr(object):
 
 exprglo = Expr()
         
-class Subexpr:
-    curveset = None
-    def __init__(self,curveset,expr="",graph=None):
+class Subterm(object):
+    """one Submaster and its expression evaluator"""
+    def __init__(self, graph, subterm, saveContext, curveset):
+        self.graph, self.uri = graph, subterm
+        self.saveContext = saveContext
         self.curveset = curveset
-        self.lasteval = None
-        self.expr = expr
-        self.graph = graph
+        self.ensureExpression(saveContext)
+
         self._smooth_random_items = [random.random() for x in range(100)]
         self.submasters = Submaster.get_global_submasters(self.graph)
-
-    def eval(self,t):
-        if self.expr=="":
-            dispatcher.send("expr_error",sender=self,exc="no expr, using 0")
-            return 0
-        glo = self.curveset.globalsdict()
-        glo['t'] = t
-
-        glo = exprglo.exprGlobals(glo, t)
-        glo['getsub'] = lambda name: self.submasters.get_sub_by_name(name)
-        
-        try:
-            self.lasteval = eval(self.expr,glo)
-        except Exception,e:
-            dispatcher.send("expr_error",sender=self,exc=e)
-        else:
-            dispatcher.send("expr_error",sender=self,exc="ok")
-        return self.lasteval
-
-    def expr():
-        doc = "python expression for level as a function of t, using curves"
-        def fget(self):
-            return self._expr
-        def fset(self, value):
-            self._expr = value
-            dispatcher("expr_changed",sender=self)
-        return locals()
-    expr = property(**expr())
-
-class Subterm(object):
-    """one Submaster and its Subexpr"""
-    def __init__(self, graph, subterm, saveCtx):
-        self.graph, self.uri = graph, subterm
-        self.ensureExpression(saveCtx)
         
     def ensureExpression(self, saveCtx):
         with self.graph.currentState() as current:
@@ -121,11 +88,9 @@ class Subterm(object):
                 self.graph.patch(Patch(addQuads=[
                     (self.uri, L9['expression'], Literal("..."), saveCtx),
                     ]))
-    
-    def scaled(self, t):
-        log.warn("skipping Subterm.scaled")
-        return 0
-        subexpr_eval = self.subexpr.eval(t)
+
+    def scaled(self, current, t):
+        subexpr_eval = self.eval(current, t)
         # we prevent any exceptions from escaping, since they cause us to
         # stop sending levels
         try:
@@ -135,10 +100,36 @@ class Subterm(object):
             else:
                 # otherwise, return our submaster multiplied by the value 
                 # returned
-                return self.submaster * subexpr_eval
+                subUri = current.value(self.uri, L9['sub'])
+                sub = self.submasters.get_sub_by_uri(subUri)
+                return sub * subexpr_eval
         except Exception, e:
-            dispatcher.send("expr_error", sender=self.subexpr, exc=str(e))
+            dispatcher.send("expr_error", sender=self.uri, exc=repr(e))
             return Submaster.Submaster(name='Error: %s' % str(e), levels={})
+    
+    def eval(self, current, t):
+        """current graph is being passed as an optimization. It should be
+        equivalent to use self.graph in here."""
+
+        expr = current.value(self.uri, L9['expression'])
+        
+        if not expr:
+            dispatcher.send("expr_error", sender=self.uri, exc="no expr, using 0")
+            return 0
+        glo = self.curveset.globalsdict()
+        glo['t'] = t
+
+        glo = exprglo.exprGlobals(glo, t)
+        glo['getsub'] = lambda name: self.submasters.get_sub_by_name(name)
+        
+        try:
+            self.lasteval = eval(expr, glo)
+        except Exception,e:
+            dispatcher.send("expr_error", sender=self.uri, exc=e)
+            return Submaster.Submaster("zero", {})
+        else:
+            dispatcher.send("expr_error", sender=self.uri, exc="ok")
+        return self.lasteval
 
     def __repr__(self):
         return "<Subterm %s>" % self.uri

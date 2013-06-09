@@ -1,7 +1,8 @@
-import random
+import random, logging
 from itertools import chain
 from rdflib import URIRef, RDF
 from light9.rdfdb.patch import Patch
+log = logging.getLogger('graphedit')
 
 class GraphEditApi(object):
     """
@@ -22,10 +23,12 @@ class GraphEditApi(object):
                                      context=context):
             existing.append(spo+(context,))
         # what layer is supposed to cull out no-op changes?
-        self.patch(Patch(
+        p = Patch(
             delQuads=existing,
             addQuads=([(subject, predicate, newObject, context)]
-                      if newObject is not None else [])))
+                      if newObject is not None else []))
+        log.info("patchObject %r" % p.jsonRepr)
+        self.patch(p)
 
     def patchMapping(self, context, subject, predicate, nodeClass, keyPred, valuePred, newKey, newValue):
         """

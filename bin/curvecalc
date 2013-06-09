@@ -197,7 +197,7 @@ class Main(object):
         
         for st in set(self.graph.objects(song, L9['subterm'])):
             log.info("song %s has subterm %s", song, st)
-            term = Subterm(self.graph, st, self.songSubtermsContext())
+            term = Subterm(self.graph, st, self.songSubtermsContext(), self.curveset)
             add_one_subterm(term, self.curveset, master)
 
         master.show_all()
@@ -368,7 +368,7 @@ def launch(args, graph, session, opts, startTime, music):
     graph.addHandler(curvesetReload)
         
     log.debug("startup: output %s", time.time() - startTime)
-    out = Output(music)
+    out = Output(graph, session, music, curveset)
 
     mt = MaxTime(graph, session)
     dispatcher.connect(lambda: mt.get(), "get max time", weak=False)

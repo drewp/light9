@@ -1,16 +1,18 @@
 import time, logging
 from twisted.internet import reactor
 from light9 import Submaster, dmxclient
+from light9.namespaces import L9
+from light9.curvecalc.subterm import Subterm
+
 from louie import dispatcher
 log = logging.getLogger("output")
 
-firstWarn = False
-
-class Output:
+class Output(object):
     lastsendtime=0
     lastsendlevs=None
-    def __init__(self, music):
-        self.music = music
+    def __init__(self, graph, session, music, curveset):
+        self.graph, self.session, self.music = graph, session, music
+        self.curveset = curveset
 
         self.recent_t=[]
         self.later = None
@@ -46,18 +48,19 @@ class Output:
         dispatcher.send("update period", val=period)
         self.send_dmx(t)
         
-    def send_dmx(self,t):
-        global firstWarn
-        if not firstWarn:
-            log.warn("skipping Output.send_dmx")
-            firstWarn = True
-        return
+    def send_dmx(self, t):
         dispatcher.send("curves to sliders", t=t)
         scaledsubs=[]
-        # this needs to use graph instead
-        for st in self.subterms:
-            scl = st.scaled(t)
-            scaledsubs.append(scl)
+
+        with self.graph.currentState() as current:
+            song = current.value(self.session, L9['currentSong'])
+            for st in current.objects(song, L9['subterm']):
+                # this is getting especially broken to have Output
+                # being able to remake the Subterm on each frame. Some
+                # object should maintain all the subterms for us.
+                scl = Subterm(self.graph, st, None, self.curveset).scaled(current, t)
+                scaledsubs.append(scl)
+                
         out = Submaster.sub_maxes(*scaledsubs)
         levs = out.get_levels()
         now=time.time()

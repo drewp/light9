@@ -20,7 +20,7 @@ class CurrentStateGraphApi(object):
                 # writes/patches happening while reads are being
                 # done. Typical usage will do some reads on this graph
                 # before moving on to writes.
-                
+
                 g = ConjunctiveGraph()
                 for s,p,o,c in self._graph.quads((None,None,None)):
                     g.store.add((s,p,o), c)

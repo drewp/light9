@@ -1,9 +1,7 @@
 import gtk, logging
 from louie import dispatcher
-from rdflib import URIRef
-from light9 import Submaster
+from rdflib import Literal
 from light9.namespaces import L9
-from light9.curvecalc.subterm import Subterm, Subexpr
 log = logging.getLogger()
 
 # inspired by http://www.daa.com.au/pipermail/pygtk/2008-August/015772.html
@@ -11,8 +9,9 @@ log = logging.getLogger()
 keep = []
 
 class Subexprview(object):
-    def __init__(self, graph, ownerSubterm):
+    def __init__(self, graph, ownerSubterm, saveContext):
         self.graph, self.ownerSubterm = graph, ownerSubterm
+        self.saveContext = saveContext
 
         self.box = gtk.HBox()
 
@@ -24,11 +23,9 @@ class Subexprview(object):
         self.box.pack_start(self.error, expand=False)
 
         self.entry.set_buffer(self.entryBuffer)
-        self.expr_changed()
+        self.graph.addHandler(self.set_expression_from_graph)
         self.entryBuffer.connect("deleted-text", self.entry_changed)
         self.entryBuffer.connect("inserted-text", self.entry_changed)
-        dispatcher.connect(self.expr_changed, "expr_changed",
-                           sender=self.ownerSubterm)
 
         dispatcher.connect(self.exprError, "expr_error", sender=self.ownerSubterm)
         keep.append(self.__dict__)
@@ -36,17 +33,20 @@ class Subexprview(object):
     def exprError(self, exc):
         self.error.set_text(str(exc))
         
-    def expr_changed(self):
-        log.warn("skip expr_changed")
-        return
-        e = str(self.subexpr.expr)
+    def set_expression_from_graph(self):
+        e = str(self.graph.value(self.ownerSubterm, L9['expression']))
+        print "was going to set to %r" % e
+
         if e != self.entryBuffer.get_text():
             self.entryBuffer.set_text(e, len(e))
             
     def entry_changed(self, *args):
-        log.warn("skip entry_changed")
+        log.info("want to patch to %r", self.entryBuffer.get_text())
         return
-        self.subexpr.expr = self.entryBuffer.get_text()
+        self.graph.patchObject(self.saveContext,
+                               self.ownerSubterm,
+                               L9['expression'],
+                               Literal(self.entryBuffer.get_text()))
             
 class Subtermview(object):
     """
@@ -59,7 +59,7 @@ class Subtermview(object):
         self.label = gtk.Label("sub")
         self.graph.addHandler(self.setName)
         
-        sev = Subexprview(self.graph, self.subterm.uri)
+        sev = Subexprview(self.graph, self.subterm.uri, self.subterm.saveContext)
         self.exprView = sev.box
 
     def setName(self):
