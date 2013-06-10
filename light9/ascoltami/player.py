@@ -35,10 +35,9 @@ class Player(object):
         #self.watchForMessages(bus)
       
     def watchTime(self):
-
-        self.pollForMessages()
-        
         try:
+            self.pollForMessages()
+            
             t = self.currentTime()
             log.debug("watch %s < %s < %s",
                       self.lastWatchTime, self.autoStopTime, t)
@@ -161,6 +160,8 @@ class Player(object):
 
     def setupAutostop(self):
         dur = self.duration()
+        if dur == 0:
+            raise ValueError("duration=0, can't set autostop")
         self.autoStopTime = (dur - self.autoStopOffset)
         log.info("autostop will be at %s", self.autoStopTime)
         # pipeline.seek can take a stop time, but using that wasn't
