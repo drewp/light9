@@ -161,6 +161,12 @@ class Main(object):
         self.graph.addHandler(self.set_subterms_from_graph)
         
     def onNewSubterm(self, *args):
+        self.makeSubterm("", withCurve=False)
+        return
+
+        # pretty sure i don't want this back, but not completely sure
+        # what the UX should be to get the new curve.
+        
         dialog = self.wtree.get_object("newSubterm")
         # the plan is to autocomplete this on existing subterm names
         # (but let you make one up, too)
