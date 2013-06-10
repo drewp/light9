@@ -684,7 +684,6 @@ Available in functions: nsin/ncos period=amp=1; within(a,b) bef(x) aft(x) compar
   <object class="GtkDialog" id="newCurve">
     <property name="can_focus">False</property>
     <property name="border_width">5</property>
-    <property name="type">popup</property>
     <property name="title" translatable="yes">New curve</property>
     <property name="modal">True</property>
     <property name="window_position">mouse</property>
@@ -755,6 +754,7 @@ Available in functions: nsin/ncos period=amp=1; within(a,b) bef(x) aft(x) compar
           <object class="GtkEntry" id="newCurveName">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
             <property name="is_focus">True</property>
             <property name="invisible_char">●</property>
             <property name="activates_default">True</property>
