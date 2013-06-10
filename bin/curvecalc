@@ -173,21 +173,19 @@ class Main(object):
             self.makeSubterm(newname, withCurve=wc)
         dialog.hide()
 
-    def currentSong(self, current=None):
-        def fin(current):
-            return current.value(self.session, L9['currentSong'])
-        if current is None:
-            with self.graph.currentState() as current:
-                return fin(current)
-        else:
-            return fin(current)
+    def currentSong(self):
 
-    def songSubtermsContext(self, current=None):
-        return self.currentSong(current=current)
+        with self.graph.currentState(
+                tripleFilter=(self.session, L9['currentSong'], None)
+        ) as current:
+            return current.value(self.session, L9['currentSong'])
+
+    def songSubtermsContext(self):
+        return self.currentSong()
 
     def makeSubterm(self, newname, withCurve=False, expr=None, sub=None):
         with self.graph.currentState() as current:
-            song = self.currentSong(current=current)
+            song = self.currentSong()
             for i in range(1000):
                 uri = song + "/subterm/%d" % i
                 if (uri, None, None) not in current:
