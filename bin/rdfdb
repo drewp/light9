@@ -208,6 +208,15 @@ class WatchedFiles(object):
         """
         if not os.path.isfile(inFile):
             return
+        if not any(inFile.startswith(prefix) for prefix in self.topDirsToWatch):
+            for prefix in self.topDirsToWatch:
+                prefixAbs = os.path.abspath(prefix)
+                if inFile.startswith(prefixAbs):
+                    inFile = prefix + inFile[len(prefixAbs):]
+                    break
+            else:
+                raise ValueError("can't correct %s to start with one of %s" %
+                                 (inFile, self.topDirsToWatch))
         if os.path.splitext(inFile)[1] not in ['.n3']:
             return
 
