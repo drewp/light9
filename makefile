@@ -45,3 +45,8 @@ tkdnd_build:
 	cd tkdnd/trunk
 	./configure
 	make
+
+bin/ascoltami2: gst_packages link_to_sys_packages
+
+gst_packages:
+	sudo aptitude install python-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good
