@@ -22,7 +22,7 @@ from rdflib import URIRef, Literal, RDF, RDFS
 import logging
 
 from run_local import log
-from light9 import showconfig, prof, networking
+from light9 import showconfig, networking
 from light9.rdfdb import clientsession
 from light9.curvecalc.curve import Curveset
 from light9.curvecalc import curveview 
@@ -239,6 +239,7 @@ class Main(object):
         reactor.crash()
         # there's a hang after this, maybe in sem_wait in two
         # threads. I don't know whose they are.
+        # This fix affects profilers who want to write output at the end.
         os.kill(os.getpid(), signal.SIGKILL)
 
     def onCollapseAll(self, *args):
@@ -455,8 +456,8 @@ def main():
 
     graph.initiallySynced.addCallback(
         lambda _: launch(args, graph, session, opts, startTime, music))
-    
-    prof.run(reactor.run, profile=False)
 
-prof.run(main, profile=False)
+    reactor.run()
+
+main()
 
