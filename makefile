@@ -18,6 +18,7 @@ SP=env/lib/python2.7/site-packages
 link_to_sys_packages:
 	# http://stackoverflow.com/questions/249283/virtualenv-on-ubuntu-with-no-site-packages
 	ln -sf $(DP)/glib $(SP)/
+	ln -sf $(DP)/gi $(SP)/
 	ln -sf $(DP)/gobject $(SP)/
 	ln -sf $(DP)/cairo $(SP)/
 	ln -sf $(DP)/gtk-2.0 $(SP)/

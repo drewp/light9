@@ -5,7 +5,10 @@ alternate to the mpd music player, for ascoltami
 """
 from __future__ import division
 import time, logging, traceback
-import gst, gobject
+from gi.repository import GObject, Gst
+from twisted.internet import reactor, task
+
+
 log = logging.getLogger()
 
 class Player(object):
@@ -17,41 +20,26 @@ class Player(object):
         It is called with one argument which is the URI of the song that
         just finished."""
         self.autoStopOffset = autoStopOffset
-        self.playbin = self.pipeline = gst.parse_launch("playbin2")
+        self.playbin = self.pipeline = Gst.ElementFactory.make('playbin',None)
+
         self.playStartTime = 0
         self.lastWatchTime = 0
         self.autoStopTime = 0
         self.lastSetSongUri = None
         self.onEOS = onEOS
         
-        # before playbin2:
-        #self.pipeline = gst.parse_launch("filesrc name=file location=%s ! wavparse name=src ! audioconvert ! alsasink name=out" % songFile)
-
-        gobject.timeout_add(50, self.watchTime)
+        task.LoopingCall(self.watchTime).start(.050)
 
         bus = self.pipeline.get_bus()
-        bus.add_signal_watch()
-
-        def on_any(bus, msg):
-            #print bus, msg, msg.type
-            if msg.type == gst.MESSAGE_EOS:
-                if self.onEOS is not None:
-                    self.onEOS(self.getSong())
-        bus.connect('message', on_any)
-
-        def onStreamStatus(bus, message):
-            print "streamstatus", bus, message
-            (statusType, _elem) = message.parse_stream_status()
-            if statusType == gst.STREAM_STATUS_TYPE_ENTER:
-                self.setupAutostop()
-        bus.connect('message::stream-status', onStreamStatus)
-
+        # not working- see notes in pollForMessages
+        #self.watchForMessages(bus)
+      
     def watchTime(self):
+
+        self.pollForMessages()
+        
         try:
-            try:
-                t = self.currentTime()
-            except gst.QueryError:
-                return True
+            t = self.currentTime()
             log.debug("watch %s < %s < %s",
                       self.lastWatchTime, self.autoStopTime, t)
             if self.lastWatchTime < self.autoStopTime < t:
@@ -61,13 +49,46 @@ class Player(object):
             self.lastWatchTime = t
         except:
             traceback.print_exc()
-        return True
 
+    def watchForMessages(self, bus):
+        """this would be nicer than pollForMessages but it's not working for
+        me. It's like add_signal_watch isn't running."""
+        bus.add_signal_watch()
+
+        def onEos(*args):
+            print "onEos", args
+            if self.onEOS is not None:
+                self.onEOS(self.getSong())
+        bus.connect('message::eos', onEos)
+
+        def onStreamStatus(bus, message):
+            print "streamstatus", bus, message
+            (statusType, _elem) = message.parse_stream_status()
+            if statusType == Gst.StreamStatusType.ENTER:
+                self.setupAutostop()
+        bus.connect('message::stream-status', onStreamStatus)
+            
+    def pollForMessages(self):
+        """bus.add_signal_watch seems to be having no effect, but this works"""
+        bus = self.pipeline.get_bus()
+        mt = Gst.MessageType
+        msg = bus.poll(mt.EOS | mt.STREAM_STATUS, 0)
+        if msg is not None:
+            if msg.type == Gst.MessageType.EOS:
+                if self.onEOS is not None:
+                    self.onEOS(self.getSong())
+            if msg.type == Gst.MessageType.STREAM_STATUS:
+                (statusType, _elem) = msg.parse_stream_status()
+                if statusType == Gst.StreamStatusType.ENTER:
+                    self.setupAutostop()
+            
     def seek(self, t):
-        assert self.playbin.seek_simple(
-            gst.FORMAT_TIME,
-            gst.SEEK_FLAG_FLUSH | gst.SEEK_FLAG_ACCURATE | gst.SEEK_FLAG_SKIP,
-            t * gst.SECOND)
+        isSeekable = self.playbin.seek_simple(
+            Gst.Format.TIME,
+            Gst.SeekFlags.FLUSH | Gst.SeekFlags.ACCURATE | Gst.SeekFlags.SKIP,
+            t * Gst.SECOND)
+        if not isSeekable:
+            raise ValueError('seek_simple failed')
         self.playStartTime = time.time()
 
     def setSong(self, songLoc, play=True):
@@ -75,13 +96,13 @@ class Player(object):
         uri like file:///my/proj/light9/show/dance2010/music/07.wav
         """
         log.info("set song to %r" % songLoc)
-        self.pipeline.set_state(gst.STATE_READY)
+        self.pipeline.set_state(Gst.State.READY)
         self.preload(songLoc)
         self.pipeline.set_property("uri", songLoc)
         self.lastSetSongUri = songLoc
         # todo: don't have any error report yet if the uri can't be read
         if play:
-            self.pipeline.set_state(gst.STATE_PLAYING)
+            self.pipeline.set_state(Gst.State.PLAYING)
             self.playStartTime = time.time()
 
     def getSong(self):
@@ -106,17 +127,16 @@ class Player(object):
             raise
 
     def currentTime(self):
-        try:
-            cur, _format = self.playbin.query_position(gst.FORMAT_TIME)
-        except gst.QueryError:
+        success, cur = self.playbin.query_position(Gst.Format.TIME)
+        if not success:
             return 0
-        return cur / gst.SECOND
+        return cur / Gst.SECOND
 
     def duration(self):
-        try:
-            return self.playbin.query_duration(gst.FORMAT_TIME)[0] / gst.SECOND
-        except gst.QueryError:
+        success, dur = self.playbin.query_duration(Gst.Format.TIME)
+        if not success:
             return 0
+        return dur / Gst.SECOND
 
     def states(self):
         """json-friendly object describing the interesting states of
@@ -126,7 +146,7 @@ class Player(object):
                 "pending": {"name":state.value_nick}}
         
     def pause(self):
-        self.pipeline.set_state(gst.STATE_PAUSED)
+        self.pipeline.set_state(Gst.State.PAUSED)
 
     def isAutostopped(self):
         """
@@ -137,7 +157,7 @@ class Player(object):
         return not self.isPlaying() and abs(pos - autoStop) < 1 # i've seen .4 difference here
 
     def resume(self):
-        self.pipeline.set_state(gst.STATE_PLAYING)
+        self.pipeline.set_state(Gst.State.PLAYING)
 
     def setupAutostop(self):
         dur = self.duration()
@@ -148,5 +168,5 @@ class Player(object):
         # hard to remove.
 
     def isPlaying(self):
-        _, state, _ = self.pipeline.get_state()
-        return state == gst.STATE_PLAYING
+        _, state, _ = self.pipeline.get_state(timeout=0)
+        return state == Gst.State.PLAYING

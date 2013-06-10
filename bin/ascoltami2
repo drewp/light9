@@ -1,7 +1,7 @@
 #!bin/python
 from run_local import log
-from twisted.internet import gtk2reactor, reactor
-import web, thread, gobject, sys, optparse, logging
+from twisted.internet import gireactor, reactor
+import web, thread, sys, optparse, logging
 from rdflib import URIRef
 sys.path.append(".")
 from light9.ascoltami.player import Player
@@ -9,21 +9,16 @@ from light9.ascoltami.playlist import Playlist, NoSuchSong
 from light9.ascoltami.webapp import makeWebApp, songUri, songLocation
 from light9 import networking, showconfig
 
+import gi
+gi.require_version('Gst', '1.0')
+from gi.repository import GObject, Gst, Gtk
 
-class App:
+class App(object):
     def __init__(self, graph, show):
         self.graph = graph
         self.player = Player(onEOS=self.onEOS)
         self.show = show
         self.playlist = Playlist.fromShow(graph, show)
-
-    def run(self, musicPort):
-        # the cherrypy server would wedge when vidref pounds on it; this
-        # one seems to run
-        #gtk2reactor.install(useGtk=False)
-        reactor.listenTCP(musicPort, makeWebApp(self))
-        log.info("listening on %s" % musicPort)
-        reactor.run()
 
     def onEOS(self, song):
         self.player.pause()
@@ -39,7 +34,8 @@ class App:
         self.player.setSong(songLocation(graph, nextSong), play=False)
 
 if __name__ == "__main__":
-    gobject.threads_init() # this is in gtk2reactor too
+    GObject.threads_init()
+    Gst.init(None)
 
     parser = optparse.OptionParser()
     parser.add_option('--show',
@@ -55,4 +51,6 @@ if __name__ == "__main__":
             
     graph = showconfig.getGraph()
     app = App(graph, URIRef(options.show))
-    app.run(networking.musicPlayer.port)
+    reactor.listenTCP(networking.musicPlayer.port, makeWebApp(app))
+    log.info("listening on %s" % networking.musicPlayer.port)
+    reactor.run()
