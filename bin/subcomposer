@@ -109,9 +109,9 @@ class Subcomposer(tk.Frame):
             graph.patchObject(self.session,
                               self.session, L9['currentSub'], newSub.uri)
 
-            with graph.currentState() as current:
-                
-                if newSub and (newSub.uri, RDF.type, L9['LocalSubmaster']) in current:
+            localStmt = (newSub.uri, RDF.type, L9['LocalSubmaster'])
+            with graph.currentState(tripleFilter=localStmt) as current:
+                if newSub and localStmt in current:
                     self._currentChoice(Local)
                 else:
                     # i think right here is the point that the last local
@@ -196,9 +196,13 @@ if __name__ == "__main__":
     parser = OptionParser(usage="%prog [suburi]")
     parser.add_option('--no-geometry', action='store_true',
                       help="don't save/restore window geometry")
+    parser.add_option('-v', action='store_true', help="log debug level")
+
     clientsession.add_option(parser)
     opts, args = parser.parse_args()
 
+    log.setLevel(logging.DEBUG if opts.v else logging.INFO)
+    
     root=tk.Tk()
     root.config(bg='black')
     root.tk_setPalette("#004633")

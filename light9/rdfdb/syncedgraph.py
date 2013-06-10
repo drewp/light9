@@ -106,7 +106,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         # these could fail if we're out of sync. One approach:
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
-        log.info("del %s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
+        log.debug("del %s add %s", [q[2] for q in p.delQuads], [q[2] for q in  p.addQuads])
         try:
             patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
         except ValueError:

@@ -148,11 +148,11 @@ class PersistentSubmaster(Submaster):
         self.name = self.graph.label(self.uri)
 
     def setLevels(self):
-        log.info("sub update levels")
+        log.debug("sub update levels")
         oldLevels = getattr(self, 'levels', {}).copy()
         self.setLevelsFromGraph()
         if oldLevels != self.levels:
-            log.info("sub %s changed" % self.name)
+            log.debug("sub %s changed" % self.name)
             # dispatcher too? this would help subcomposer
             dispatcher.send("sub levels changed", sub=self)
 

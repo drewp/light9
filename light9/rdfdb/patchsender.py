@@ -41,7 +41,7 @@ class PatchSender(object):
         if not self._patchesToSend or self._currentSendPatchRequest:
             return
         if len(self._patchesToSend) > 1:
-            log.info("%s patches left to send", len(self._patchesToSend))
+            log.debug("%s patches left to send", len(self._patchesToSend))
             # this is where we could concatenate little patches into a
             # bigger one. Often, many statements will cancel each
             # other out. not working yet:
