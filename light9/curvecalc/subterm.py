@@ -83,37 +83,39 @@ class Subterm(object):
         self.submasters = Submaster.get_global_submasters(self.graph)
         
     def ensureExpression(self, saveCtx):
-        with self.graph.currentState() as current:
+        with self.graph.currentState(tripleFilter=(self.uri, None, None)) as current:
             if current.value(self.uri, L9['expression']) is None:
                 self.graph.patch(Patch(addQuads=[
                     (self.uri, L9['expression'], Literal("..."), saveCtx),
                     ]))
 
-    def scaled(self, current, t):
-        subexpr_eval = self.eval(current, t)
-        # we prevent any exceptions from escaping, since they cause us to
-        # stop sending levels
-        try:
-            if isinstance(subexpr_eval, Submaster.Submaster):
-                # if the expression returns a submaster, just return it
-                return subexpr_eval
-            else:
-                # otherwise, return our submaster multiplied by the value 
-                # returned
-                if subexpr_eval == 0:
-                    return Submaster.Submaster("zero", {})
-                subUri = current.value(self.uri, L9['sub'])
-                sub = self.submasters.get_sub_by_uri(subUri)
-                return sub * subexpr_eval
-        except Exception, e:
-            dispatcher.send("expr_error", sender=self.uri, exc=repr(e))
-            return Submaster.Submaster(name='Error: %s' % str(e), levels={})
-    
+    def scaled(self, t):
+        with self.graph.currentState(tripleFilter=(self.uri, None, None)) as current:
+            subexpr_eval = self.eval(current, t)
+            # we prevent any exceptions from escaping, since they cause us to
+            # stop sending levels
+            try:
+                if isinstance(subexpr_eval, Submaster.Submaster):
+                    # if the expression returns a submaster, just return it
+                    return subexpr_eval
+                else:
+                    # otherwise, return our submaster multiplied by the value 
+                    # returned
+                    if subexpr_eval == 0:
+                        return Submaster.Submaster("zero", {})
+                    subUri = current.value(self.uri, L9['sub'])
+                    sub = self.submasters.get_sub_by_uri(subUri)
+                    return sub * subexpr_eval
+            except Exception, e:
+                dispatcher.send("expr_error", sender=self.uri, exc=repr(e))
+                return Submaster.Submaster(name='Error: %s' % str(e), levels={})
+
+
     def eval(self, current, t):
         """current graph is being passed as an optimization. It should be
         equivalent to use self.graph in here."""
 
-        objs = list(current.objects(self.uri, L9.expression))
+        objs = list(current.objects(self.uri, L9['expression']))
         if len(objs) > 1:
             raise ValueError("found multiple expressions for %s: %s" %
                              (self.uri, objs))

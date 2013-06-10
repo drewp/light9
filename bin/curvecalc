@@ -46,6 +46,7 @@ class Main(object):
         self.graph, self.opts, self.session = graph, opts, session
         self.curveset, self.music = curveset, music
         self.lastSeenInputTime = 0
+        self.currentSubterms = [] # Subterm objects that are synced to the graph
 
         wtree = self.wtree = gtk.Builder()
         wtree.add_from_file("light9/curvecalc/curvecalc.glade")
@@ -211,17 +212,23 @@ class Main(object):
         return uri
                          
     def set_subterms_from_graph(self):
+        """rebuild all the gtktable 'subterms' widgets and the
+        self.currentSubterms list"""
+        song = self.graph.value(self.session, L9['currentSong'])
+
+        newList = []
+        for st in set(self.graph.objects(song, L9['subterm'])):
+            log.info("song %s has subterm %s", song, st)
+            term = Subterm(self.graph, st, self.songSubtermsContext(),
+                               self.curveset)
+            newList.append(term)
+        self.currentSubterms[:] = newList
+
         master = self.wtree.get_object("subterms")
         log.info("removing subterm widgets")
         [master.remove(c) for c in master.get_children()]
-
-        song = self.graph.value(self.session, L9['currentSong'])
-        
-        for st in set(self.graph.objects(song, L9['subterm'])):
-            log.info("song %s has subterm %s", song, st)
-            term = Subterm(self.graph, st, self.songSubtermsContext(), self.curveset)
+        for term in self.currentSubterms:
             add_one_subterm(term, self.curveset, master)
-
         master.show_all()
         log.info("%s table children showing" % len(master.get_children()))
         
@@ -396,12 +403,12 @@ def launch(args, graph, session, opts, startTime, music):
     graph.addHandler(curvesetReload)
         
     log.debug("startup: output %s", time.time() - startTime)
-    out = Output(graph, session, music, curveset)
 
     mt = MaxTime(graph, session)
     dispatcher.connect(lambda: mt.get(), "get max time", weak=False)
 
     start = Main(graph, opts, session, curveset, music)
+    out = Output(graph, session, music, curveset, start.currentSubterms)
 
     dispatcher.send("show all")
         

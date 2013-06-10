@@ -10,8 +10,9 @@ log = logging.getLogger("output")
 class Output(object):
     lastsendtime=0
     lastsendlevs=None
-    def __init__(self, graph, session, music, curveset):
+    def __init__(self, graph, session, music, curveset, currentSubterms):
         self.graph, self.session, self.music = graph, session, music
+        self.currentSubterms = currentSubterms
         self.curveset = curveset
 
         self.recent_t=[]
@@ -52,14 +53,9 @@ class Output(object):
         dispatcher.send("curves to sliders", t=t)
         scaledsubs=[]
 
-        with self.graph.currentState() as current:
-            song = current.value(self.session, L9['currentSong'])
-            for st in current.objects(song, L9['subterm']):
-                # this is getting especially broken to have Output
-                # being able to remake the Subterm on each frame. Some
-                # object should maintain all the subterms for us.
-                scl = Subterm(self.graph, st, None, self.curveset).scaled(current, t)
-                scaledsubs.append(scl)
+        for st in self.currentSubterms:
+            scl = st.scaled(t)
+            scaledsubs.append(scl)
                 
         out = Submaster.sub_maxes(*scaledsubs)
         levs = out.get_levels()
