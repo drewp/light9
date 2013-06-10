@@ -348,7 +348,11 @@ class Db(object):
 
 class GraphResource(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
-        self.write(self.settings.db.graph.serialize(format='n3'))
+        accept = self.request.headers.get('accept', '')
+        format = 'n3'
+        if accept == 'text/plain':
+            format = 'nt'
+        self.write(self.settings.db.graph.serialize(format=format))
 
 class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
     def __init__(self, *args, **kw):
