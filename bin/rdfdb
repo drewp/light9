@@ -218,6 +218,12 @@ class WatchedFiles(object):
         # yet.
         if '-rules' in inFile:
             return
+
+        # for legacy versions, compile all the config stuff you want
+        # read into one file called config.n3. New versions won't read
+        # it.
+        if inFile.endswith("config.n3"):
+            return
             
         ctx = self.uriFromFile(inFile)
         gf = GraphFile(self.notifier, inFile, ctx,
