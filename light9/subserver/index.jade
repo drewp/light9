@@ -1,0 +1,15 @@
+doctype html
+html
+  head
+    title subserver
+    link(rel='stylesheet', href='style.css')
+  body
+    h1 subserver
+
+    div(data-bind="foreach: subs")
+      div(data-bind="text: JSON.stringify($data)")
+
+    script(src="jquery-1.7.2.min.js")
+    script(src="knockout-2.2.1.js")
+    script(src="websocket.js")
+    script(src="gui.js")

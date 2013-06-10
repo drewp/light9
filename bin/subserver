@@ -1,26 +1,99 @@
-# keep the database of submasters, and mix up the current client
-# requests into dmx levels for dmxserver
+#!bin/python
+"""
+live web display of all existing subs with pictures, mainly for
+dragging them into CC
+"""
+from run_local import log
+from twisted.internet import reactor
+import twisted.internet.error
+import sys, optparse, logging, json, os, subprocess
+import cyclone.web, cyclone.httpclient, cyclone.websocket
+from light9.rdfdb.syncedgraph import SyncedGraph
+import pyjade.utils
 
-class SubServe:
-    """call the server with these messages"""
+try:
+    import sys
+    sys.path.append("../homeauto/lib")
+    sys.path.append("/home/drewp/projects/homeauto/lib")
+    from cycloneerr import PrettyErrorHandler
+except ImportError:
+    class PrettyErrorHandler(object):
+        pass
+        
+liveClients = set()
+def sendToLiveClients(d=None, asJson=None):
+    j = asJson or json.dumps(d)
+    for c in liveClients:
+        c.sendMessage(j)
+
+class Live(cyclone.websocket.WebSocketHandler):
+    def connectionMade(self, *args, **kwargs):
+        log.info("websocket opened")
+        liveClients.add(self)
+        self.settings.onNewClient()
+
+    def connectionLost(self, reason):
+        log.info("websocket closed")
+        liveClients.remove(self)
+
+    def messageReceived(self, message):
+        log.info("got message %s" % message)
+        self.sendMessage(message)
+        
+class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
+    # .xhtml pages can be get() without .xhtml on them
+    def get(self, path, *args, **kw):
+        if path == '':
+            return self.respondStaticJade("light9/subserver/index.jade")
+
+        if path == 'gui.js':
+            return self.responseStaticCoffee('light9/subserver/gui.coffee')
+            
+        oddlyPlaced = {
+            "websocket.js":        "light9/rdfdb/web/websocket.js",
+            "jquery-1.7.2.min.js": "light9/rdfdb/web/lib/jquery-1.7.2.min.js",
+        }
+        if path in oddlyPlaced:
+            self.write(open(oddlyPlaced[path]).read())
+            return
+
+        cyclone.web.StaticFileHandler.get(self, path, *args, **kw)
+
+    def respondStaticJade(self, src):
+        html = pyjade.utils.process(open(src).read())
+        self.write(html)
+
+    def responseStaticCoffee(self, src):
+        self.write(subprocess.check_output([
+            '/usr/bin/coffee', '--compile', '--print', src]))
+        
+if __name__ == "__main__":
+    parser = optparse.OptionParser()
+    parser.add_option("-v", "--verbose", action="store_true",
+                      help="logging.DEBUG")
+    (options, args) = parser.parse_args()
+
+    log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
+
+    graph = SyncedGraph("subserver")
+
+    d = {}
+    def updateSubs():
+        d.clear()
+        d.update({'subs':['a', 'b']})
+        sendToLiveClients(d=d)
+    def onNewClient():
+        sendToLiveClients(d=d)
+        
+    graph.addHandler(updateSubs)
     
-    def allSubs(self):
-        """list of all the known subs"""
-
-    def output(self,levels):
-        """pass a dict of {sub : level} mappings"""
-
-def editsub
-
-
-class SubClient:
-    """each client can receive these messages"""
     
-    def subAdded(self,newsub):
-        """sub was just added to the db"""
-
-    def subRemove(self,pastsub):
-        """this sub is about to be removed from the db"""
-
-    def subChange(self,sub):
-        """this is a new version of an existing sub"""
+    port = 8052
+    reactor.listenTCP(port, cyclone.web.Application(handlers=[
+        (r'/live', Live),
+        (r'/(.*)', Static,
+         {"path" : "light9/subserver",
+          "default_filename" : "index.jade"}),
+        ], debug=True, graph=graph, onNewClient=onNewClient))
+    log.info("serving on %s" % port)
+    reactor.run()

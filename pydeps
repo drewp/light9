@@ -13,3 +13,4 @@ ipdb==0.7
 # waiting for https://github.com/xolox/python-coloredlogs/pull/1
 git+git://github.com/drewp/python-coloredlogs@9803112ddf7d4cd7dd001912ad1aa482fb8383f6
 genshi==0.7
+pyjade==2.0.2
