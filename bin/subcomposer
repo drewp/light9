@@ -158,7 +158,7 @@ class Subcomposer(tk.Frame):
             if lev!=0:
                 leveldict[get_channel_name(i+1)]=lev
 
-        s=Submaster.Submaster(subname,leveldict=leveldict)
+        s=Submaster.Submaster(subname, levels=leveldict)
         s.save()
 
     def sendupdate(self):

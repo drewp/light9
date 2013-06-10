@@ -29,7 +29,7 @@ def chase(t, ontime=0.5, offset=0.2, onval=1.0,
             continue
         lev[dmx] = value
 
-    return Submaster.Submaster(leveldict=lev, temporary=True)
+    return Submaster.Submaster(name="chase" ,levels=lev)
 
 def stack(t, names=None, fade=0):
     """names is list of URIs. returns a submaster that stacks the the inputs
@@ -52,7 +52,7 @@ def stack(t, names=None, fade=0):
         else:
             break
     
-    return Submaster.Submaster(leveldict=lev, temporary=True)
+    return Submaster.Submaster(name="stack", levels=lev)
 
 def configExprGlobals():
     graph = showconfig.getGraph()

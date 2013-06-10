@@ -311,11 +311,6 @@ class Submasters:
     def get_sub_by_uri(self, uri):
         return self.submasters[uri]
 
-def fullsub(*chans):
-    """Make a submaster with chans at full."""
-    return Submaster('%r' % chans,
-        leveldict=dict([(c, 1.0) for c in chans]), temporary=True)
-
 # a global instance of Submasters, created on demand
 _submasters = None
 
@@ -338,20 +333,20 @@ def get_sub_by_name(name, submasters=None):
 
     try:
         val = int(name)
-        s = Submaster("#%d" % val, leveldict={val : 1.0}, temporary=True)
+        s = Submaster("#%d" % val, levels={val : 1.0})
         return s
     except ValueError:
         pass
 
     try:
         subnum = get_dmx_channel(name)
-        s = Submaster("'%s'" % name, leveldict={subnum : 1.0}, temporary=True)
+        s = Submaster("'%s'" % name, levels={subnum : 1.0})
         return s
     except ValueError:
         pass
 
     # make an error sub
-    return Submaster('%s' % name)
+    return Submaster('%s' % name, levels=ValueError)
 
 if __name__ == "__main__":
     reload_data()
