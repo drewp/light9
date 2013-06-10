@@ -45,9 +45,7 @@ class GraphFile(object):
 
         from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM, IN_MODIFY, IN_DELETE, IN_DELETE_SELF, IN_CHANGED
 
-        notifier.watch(FilePath(path),
-                       mask=IN_CLOSE_WRITE | IN_MOVED_FROM | IN_DELETE | IN_DELETE_SELF | IN_CHANGED | 16383,
-                       callbacks=[self.notify])
+        notifier.watch(FilePath(path), callbacks=[self.notify])
       
     def notify(self, notifier, filepath, mask):
         maskNames = humanReadableMask(mask)
