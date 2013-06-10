@@ -70,6 +70,7 @@ class Curve(object):
         """returns index of new point"""
         i = bisect(self.points, (new_pt[0],None))
         self.points.insert(i,new_pt)
+        # missing a check that this isn't the same X as the neighbor point
         return i
 
     def set_points(self, updates):
