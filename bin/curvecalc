@@ -222,19 +222,19 @@ class Main(object):
 
         newList = []
         for st in set(self.graph.objects(song, L9['subterm'])):
-            log.info("song %s has subterm %s", song, st)
+            log.debug("song %s has subterm %s", song, st)
             term = Subterm(self.graph, st, self.songSubtermsContext(),
                                self.curveset)
             newList.append(term)
         self.currentSubterms[:] = newList
 
         master = self.wtree.get_object("subterms")
-        log.info("removing subterm widgets")
+        log.debug("removing subterm widgets")
         [master.remove(c) for c in master.get_children()]
         for term in self.currentSubterms:
             add_one_subterm(term, self.curveset, master)
         master.show_all()
-        log.info("%s table children showing" % len(master.get_children()))
+        log.debug("%s table children showing" % len(master.get_children()))
         
     def refreshTheme(self):
         gtk.rc_reparse_all()
