@@ -72,6 +72,22 @@ class Curve(object):
         self.points.insert(i,new_pt)
         return i
 
+    def set_points(self, updates):
+        for i, pt in updates:
+            self.points[i] = pt
+            
+        x = None
+        for p in self.points:
+            if p[0] <= x:
+                raise ValueError("overlapping points")
+            x = p[0]
+
+    def pop_point(self, i):
+        return self.points.pop(i)
+            
+    def remove_point(self, pt):
+        self.points.remove(pt)
+            
     def indices_between(self, x1, x2, beyond=0):
         leftidx = max(0, bisect(self.points, (x1,None)) - beyond)
         rightidx = min(len(self.points),

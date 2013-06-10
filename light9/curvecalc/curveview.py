@@ -56,7 +56,7 @@ class Sketch:
                 to_remove.append(i)
 
         for i in to_remove:
-            self.curveview.curve.points.remove(pts[i])
+            self.curveview.curve.remove_point(pts[i])
             finalPoints.remove(pts[i])
 
         # the simplified curve may now be too far away from some of
@@ -153,25 +153,36 @@ class SelectManip(object):
             left = origPts[0][1][0]
             right = origPts[-1][1][0]
             width = right - left
+            dontCross = .001
 
             clampLo = left if param == 'right' else self.dragRange[0]
             clampHi = right if param == 'left' else self.dragRange[1]
 
+            def clamp(x, lo, hi):
+                return max(lo, min(hi, x))
+            
             mouseT = self.getWorldTime(event.x)
-            clampedT = max(clampLo, min(clampHi, mouseT))
+            clampedT = clamp(mouseT, clampLo + dontCross, clampHi - dontCross)
+
             dt = clampedT - self.dragStartTime
 
             if param == 'x':
                 self.setPoints((i, (orig[0] + dt, orig[1]))
                                for i, orig in origPts)
             elif param == 'left':
-                self.setPoints((i, (left + dt +
-                                    (orig[0] - left) / width * (width - dt),
-                                    orig[1])) for i, orig in origPts)
+                self.setPoints((
+                    i,
+                    (left + dt +
+                     (orig[0] - left) / width *
+                     clamp(width - dt, dontCross, right - clampLo - dontCross),
+                     orig[1])) for i, orig in origPts)
             elif param == 'right':
-                self.setPoints((i, (left +
-                                    (orig[0] - left) / width * (width + dt),
-                                    orig[1])) for i, orig in origPts)
+                self.setPoints((
+                    i,
+                    (left +
+                     (orig[0] - left) / width *
+                     clamp(width + dt, dontCross, clampHi - left - dontCross),
+                     orig[1])) for i, orig in origPts)
             elif param == 'top':
                 v = self.getWorldValue(event.y)
                 if self.origMaxValue == 0:
@@ -186,8 +197,9 @@ class SelectManip(object):
                 dt = mouseT - self.dragStartTime
                 rad = width / 2
                 tMid = left + rad
-                maxScl = (rad + self.maxPointMove) / rad
-                newWidth = max(0, min((rad + dt) / rad, maxScl)) * width
+                maxScl = (rad + self.maxPointMove - dontCross) / rad
+                newWidth = max(dontCross / width,
+                               min((rad + dt) / rad, maxScl)) * width
                 self.setPoints((i,
                                 (tMid +
                                  ((orig[0] - left) / width - .5) * newWidth,
@@ -465,7 +477,7 @@ class Curveview(object):
         idx = self.curve.index_before(self.current_time())
         if idx is not None:
             pos = self.curve.points[idx]
-            self.curve.points[idx] = (pos[0], value)
+            self.curve.set_points([(idx, (pos[0], value))])
             self.update_curve()
 
     def slider_in(self, curve, value=None):
@@ -516,8 +528,11 @@ class Curveview(object):
         self.selectionChanged()
 
     def getDragRange(self, idxs):
-        """if you're dragging these points, what's the most time you
-        can move left and right before colliding with another point"""
+        """
+        if you're dragging these points, what's the most time you can move
+        left and right before colliding (exactly) with another
+        point
+        """
         maxLeft = maxRight = 99999
         cp = self.curve.points
         for i in idxs:
@@ -535,8 +550,7 @@ class Curveview(object):
         return maxLeft, maxRight
 
     def setPoints(self, updates):
-        for i, pt in updates:
-            self.curve.points[i] = pt
+        self.curve.set_points(updates)
         self.update_curve()
         
     def selectionChanged(self):
@@ -669,13 +683,12 @@ class Curveview(object):
         
         self.size = self.canvas.get_allocation()
  
-        cp = self.curve.points
         visible_x = (self.world_from_screen(0,0)[0],
                      self.world_from_screen(self.size.width, 0)[0])
 
         visible_idxs = self.curve.indices_between(visible_x[0], visible_x[1],
                                                   beyond=1)
-        visible_points = [cp[i] for i in visible_idxs]
+        visible_points = [self.curve.points[i] for i in visible_idxs]
 
         if getattr(self, 'curveGroup', None):
             self.curveGroup.remove()
@@ -874,7 +887,7 @@ class Curveview(object):
         while idxs:
             i = idxs.pop()
 
-            self.curve.points.pop(i)
+            self.curve.pop_point(i)
             newsel = []
             newidxs = []
             for si in range(len(self.selected_points)):
@@ -936,9 +949,11 @@ class Curveview(object):
             return
         if not event.state & 256:
             return # not lmb-down
-        cp = self.curve.points
-        moved=0
 
+        # this way is accumulating error and also making it harder to
+        # undo (e.g. if the user moves far out of the window or
+        # presses esc or something). Instead, we should be resetting
+        # the points to their start pos plus our total offset.
         cur = self.world_from_screen(event.x, event.y)
         if self.last_mouse_world:
             delta = (cur[0] - self.last_mouse_world[0],
@@ -946,7 +961,17 @@ class Curveview(object):
         else:
             delta = 0,0
         self.last_mouse_world = cur
+
+        moved = self.translate_points(delta)
         
+        if moved:
+            self.update_curve()
+
+    def translate_points(self, delta):
+        moved = False
+        
+        cp = self.curve.points
+        updates = []
         for idx in self.selected_points:
 
             newp = [cp[idx][0] + delta[0], cp[idx][1] + delta[1]]
@@ -957,11 +982,11 @@ class Curveview(object):
                 continue
             if idx<len(cp)-1 and newp[0] >= cp[idx+1][0]:
                 continue
-            moved=1
-            cp[idx] = tuple(newp)
-        if moved:
-            self.update_curve()
-
+            moved = True
+            updates.append((idx, tuple(newp)))
+        self.curve.set_points(updates)
+        return moved
+            
     def unselect(self):
         self.select_indices([])
 
