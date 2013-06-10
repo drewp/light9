@@ -19,6 +19,7 @@ proposal for new attribute system:
 from __future__ import nested_scopes,division
 import Tkinter as tk
 from rdflib import RDF, Literal
+from decimal import Decimal
 from light9.namespaces import L9
 
 stdfont = ('Arial', 9)
@@ -191,6 +192,9 @@ class Levelbox(tk.Frame):
         for ll in self.graph.objects(sub, L9['lightLevel']):
             chan = self.graph.value(ll, L9['channel'])
             lev = self.graph.value(ll, L9['level']).toPython()
+            if isinstance(lev, Decimal):
+                 lev = float(lev)
+            assert isinstance(lev, (int, long, float)), repr(lev)
             self.levelFromUri[chan].setTo(lev)
             remaining.remove(chan)
         for channel in remaining:

@@ -43,10 +43,17 @@ class GraphEditApi(object):
         value since that's tricky too
         """
 
-        with self.currentState() as graph:
+        # as long as currentState is expensive and has the
+        # tripleFilter optimization, this looks like a mess. If
+        # currentState became cheap, a lot of code here could go away.
+        
+        with self.currentState(tripleFilter=(subject, predicate, None)) as current:
             adds = set([])
-            for setting in graph.objects(subject, predicate):
-                if graph.value(setting, keyPred) == newKey:
+            for setting in current.objects(subject, predicate):
+                with self.currentState(tripleFilter=(setting, keyPred, None)) as current2:
+                
+                    match = current2.value(setting, keyPred) == newKey
+                if match:
                     break
             else:
                 setting = URIRef(subject + "/map/%s" %
@@ -56,8 +63,10 @@ class GraphEditApi(object):
                     (setting, RDF.type, nodeClass, context),
                     (setting, keyPred, newKey, context),
                     ])
+
+        with self.currentState(tripleFilter=(setting, valuePred, None)) as current:
             dels = set([])
-            for prev in graph.objects(setting, valuePred):
+            for prev in current.objects(setting, valuePred):
                 dels.add((setting, valuePred, prev, context))
             adds.add((setting, valuePred, newValue, context))
 

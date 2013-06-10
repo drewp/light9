@@ -184,10 +184,10 @@ class PersistentSubmaster(Submaster):
     def _saveContext(self):
         """the context in which we should save all the lightLevel triples for
         this sub"""
-        with self.graph.currentState() as g:
+        typeStmt = (self.uri, RDF.type, L9['Submaster'])
+        with self.graph.currentState(tripleFilter=typeStmt) as current:
             try:
-                ctx = g.contextsForStatement(
-                    (self.uri, RDF.type, L9['Submaster']))[0]
+                ctx = current.contextsForStatement(typeStmt)[0]
             except IndexError:
                 log.info("declaring %s to be a submaster" % self.uri)
                 ctx = self.uri
