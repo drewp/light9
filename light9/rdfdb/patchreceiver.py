@@ -43,7 +43,7 @@ def makePatchEndpointPutMethod(cb):
     def put(self):
         try:
             p = Patch(jsonRepr=self.request.body)
-            log.info("received patch -%d +%d" % (len(p.delGraph), len(p.addGraph)))
+            log.debug("received patch -%d +%d" % (len(p.delGraph), len(p.addGraph)))
             cb(p)
         except:
             traceback.print_exc()

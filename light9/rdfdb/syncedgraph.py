@@ -133,7 +133,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         central server has sent us a patch
         """
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
-        log.info("graph now has %s statements" % len(self._graph))
+        log.debug("graph now has %s statements" % len(self._graph))
         try:
             self.runDepsOnNewPatch(p)
         except Exception:
