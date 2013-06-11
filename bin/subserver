@@ -9,6 +9,8 @@ import twisted.internet.error
 import sys, optparse, logging, json, os, subprocess
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 from light9.rdfdb.syncedgraph import SyncedGraph
+from rdflib import RDF
+from light9.namespaces import L9
 import pyjade.utils
 
 try:
@@ -41,7 +43,6 @@ class Live(cyclone.websocket.WebSocketHandler):
         self.sendMessage(message)
         
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
-    # .xhtml pages can be get() without .xhtml on them
     def get(self, path, *args, **kw):
         if path == '':
             return self.respondStaticJade("light9/subserver/index.jade")
@@ -79,8 +80,17 @@ if __name__ == "__main__":
 
     d = {}
     def updateSubs():
+
+        subs = []
+        for sub in graph.subjects(RDF.type, L9['Submaster']):
+            rec = {'uri' : sub}
+            rec['isLocal'] = graph.contains((sub, RDF.type,
+                                             L9['LocalSubmaster']))
+            rec['label'] = graph.label(sub)
+            subs.append(rec)
+        
         d.clear()
-        d.update({'subs':['a', 'b']})
+        d.update({'subs': subs})
         sendToLiveClients(d=d)
     def onNewClient():
         sendToLiveClients(d=d)

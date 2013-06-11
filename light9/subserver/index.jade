@@ -4,10 +4,23 @@ html
     title subserver
     link(rel='stylesheet', href='style.css')
   body
-    h1 subserver
+    h1 Submasters
 
+    div
+      input(type='checkbox', data-bind='checked: showLocal', id='showLocal')
+      label(for='showLocal') show local
+    
     div(data-bind="foreach: subs")
-      div(data-bind="text: JSON.stringify($data)")
+      // ko if: $parent.showLocal() || !isLocal
+      a(class='sub', data-bind="css: {local: isLocal},
+                                attr: {href: uri}")
+        div(data-bind="if: isLocal") (local)
+        div
+          | Label
+          input(type="text", data-bind="value: label")
+        div
+          img()
+      // /ko
 
     script(src="jquery-1.7.2.min.js")
     script(src="knockout-2.2.1.js")
