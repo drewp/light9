@@ -53,11 +53,16 @@ class GraphFile(object):
     def notify(self, notifier, filepath, mask):
         maskNames = humanReadableMask(mask)
         if maskNames[0] == 'delete_self':
-            log.warn("%s delete_self event: need to dump the stmts from "
-                     "this file", filepath)
-            # this is happening surprisingly often, even to files that
-            # are still there
+            if not filepath.exists():
+                log.warn("%s delete_self event: need to dump the stmts from "
+                         "this file", filepath)
+            else:
+                log.warn("%s delete_self event but file is here. ignoring",
+                         filepath)
             return
+
+        # we could filter these out in the watch() call, but I want
+        # the debugging
         if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib']:
             log.debug("%s %s event, ignoring" % (filepath, maskNames))
             return

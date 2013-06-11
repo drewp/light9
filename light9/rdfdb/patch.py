@@ -1,5 +1,6 @@
 import json, unittest
-from rdflib import ConjunctiveGraph, Graph, URIRef, URIRef as U
+from rdflib import ConjunctiveGraph, Graph, URIRef, URIRef as U, Literal
+from light9.namespaces import XSD
 from light9.rdfdb.rdflibpatch import graphFromNQuad, graphFromQuads, serializeQuad
 
 ALLSTMTS = (None, None, None)
@@ -40,6 +41,25 @@ class Patch(object):
             self._addGraph = graphFromNQuad(body['patch']['adds'])
             if 'senderUpdateUri' in body:
                 self.senderUpdateUri = body['senderUpdateUri']
+
+    def __str__(self):
+        def shorten(n):
+            if isinstance(n, Literal):
+                if n.datatype == XSD['double']:
+                    return str(n.toPython())
+            if isinstance(n, URIRef):
+                for long, short in [
+                        ("http://light9.bigasterisk.com/", "l9"),
+                        
+                ]:
+                    if n.startswith(long):
+                        return short+":"+n[len(long):]
+            return n.n3()
+        def formatQuad(quad):
+            return " ".join(shorten(n) for n in quad)
+        delLines = ["  -%s" % formatQuad(q) for q in self.delQuads]
+        addLines = ["  +%s" % formatQuad(q) for q in self.addQuads]
+        return "\nPatch:\n" + "\n".join(delLines) + "\n" + "\n".join(addLines)
                 
     @classmethod
     def fromDiff(cls, oldGraph, newGraph):
