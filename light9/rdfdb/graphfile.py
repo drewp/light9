@@ -29,6 +29,7 @@ class GraphFile(object):
             except OSError:
                 pass
             f = open(path, "w")
+            f.write("#new\n")
             f.close()
             iolog.info("%s created", path)
             self.lastWriteTimestamp = os.path.getmtime(path)
@@ -89,6 +90,15 @@ class GraphFile(object):
         old = self.getSubgraph(self.uri)
         new = Graph()
         try:
+            contents = open(self.path).read()
+            if contents.startswith("#new"):
+                log.debug("%s ignoring empty contents of my new file", self.path)
+                # this is a new file we're starting, and we should not
+                # patch our graph as if it had just been cleared. We
+                # shouldn't even be here reading this, but
+                # lastWriteTimestamp didn't work.
+                return
+
             new.parse(location=self.path, format='n3')
         except SyntaxError as e:
             print e

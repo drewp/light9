@@ -145,7 +145,7 @@ class Subcomposer(tk.Frame):
         addQuads = [(repl(s), p, repl(o), newUri) for s,p,o,c in delQuads]
         # patch can't span contexts yet
         self.graph.patch(Patch(addQuads=addQuads, delQuads=[]))
-        #self.graph.patch(Patch(addQuads=[], delQuads=delQuads))
+        self.graph.patch(Patch(addQuads=[], delQuads=delQuads))
         
         
     def setupSubChoiceLinks(self):
