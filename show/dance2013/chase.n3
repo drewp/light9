@@ -1,0 +1,84 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix ch: <http://light9.bigasterisk.com/theater/piedmont/channel/> .
+@prefix chase: <http://light9.bigasterisk.com/chase/> .
+
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+
+chase:colors a :Chase; :channels (
+ch:oran1 ch:gree1 ch:blue1 ch:red1 
+ch:oran2 ch:gree2 ch:blue2 ch:red2 
+ch:oran3 ch:gree2 ch:blue2 ch:red2 
+ch:oran4 ) .
+
+chase:colors1 a :Chase; :channels (ch:red1 ch:gree1 ch:oran1 ch:blue1) .
+chase:colors2 a :Chase; :channels (ch:red2 ch:gree2 ch:oran2 ch:blue2) .
+chase:colors3 a :Chase; :channels (ch:red3 ch:gree3 ch:oran3 ch:blue3) .
+chase:colors4 a :Chase; :channels (ch:red4 ch:gree4 ch:oran4 ch:blue4) .
+
+chase:colorrb a :Chase; :channels (
+ch:blue1 ch:red1 
+ch:blue2 ch:red2 
+ch:blue2 ch:red2 
+ ) .
+
+chase:backcolors a :Chase; rdfs:comment "back non-white, brightness order"; 
+  :channels (
+ch:b16-r2
+ch:b15-r1-warm
+ch:b26-l-purple
+ch:b22-l-warm
+ch:b24-c-red
+ch:b25-r-cool
+ch:b32-l1-cool
+ch:b33-c-red
+) .
+
+chase:scoop a :Chase; :channels (
+ch:cyc-left
+ch:cyc-right
+ch:cyc-right
+ch:cyc-mid
+ch:upleft
+ch:upright
+ch:down-c-P
+ch:up-l
+ch:down-c-P
+ch:up-r
+ch:up-r
+ch:cyc-left
+ch:cyc-mid
+ch:cyc-mid
+ch:upleft
+ch:up-l
+ch:cyc-mid
+ch:upright
+) .
+
+# left to right
+chase:fronts a :Chase; :channels (
+ch:front4-r
+ch:front5-l
+ch:front6-pool
+ch:front11-c
+ch:front8-r
+ch:front9-l
+ch:front10-r2
+) .
+
+chase:frontsrand a :Chase; :channels (
+ch:front9-l
+ch:front6-pool
+ch:front5-l
+ch:front4-r
+ch:front6-pool
+ch:front9-l
+ch:front8-r
+ch:front11-c
+ch:front5-l
+ch:front8-r
+ch:front4-r
+) .
+
+chase:cycline a :Chase; :channels (ch:cyc-left ch:cyc-mid ch:cyc-right ) .
+chase:cycpong a :Chase; :channels (ch:cyc-left ch:cyc-mid ch:cyc-right ch:cyc-mid) .
