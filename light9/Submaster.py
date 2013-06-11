@@ -187,6 +187,8 @@ class PersistentSubmaster(Submaster):
         typeStmt = (self.uri, RDF.type, L9['Submaster'])
         with self.graph.currentState(tripleFilter=typeStmt) as current:
             try:
+                log.debug("submaster's type statement is in %r" %
+                          list(current.contextsForStatement(typeStmt)))
                 ctx = current.contextsForStatement(typeStmt)[0]
             except IndexError:
                 log.info("declaring %s to be a submaster" % self.uri)
@@ -211,6 +213,17 @@ class PersistentSubmaster(Submaster):
             levs = list(g.objects(self.uri, L9['lightLevel']))
         for lev in levs:
             self.graph.removeMappingNode(self._saveContext(), lev)
+
+    def allQuads(self):
+        """all the quads for this sub"""
+        quads = []
+        with self.graph.currentState() as current:
+            quads.extend(current.quads((self.uri, None, None)))
+            for s,p,o,c in quads:
+                if p == L9['lightLevel']:
+                    quads.extend(current.quads((o, None, None)))
+        return quads
+
 
     def save(self):
         raise NotImplementedError("obsolete?")

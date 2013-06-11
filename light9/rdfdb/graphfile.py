@@ -20,6 +20,8 @@ class GraphFile(object):
         self.path, self.uri = path, uri
         self.patch, self.getSubgraph = patch, getSubgraph
 
+        self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
+
         if not os.path.exists(path):
             # can't start notify until file exists
             try:
@@ -28,11 +30,12 @@ class GraphFile(object):
                 pass
             f = open(path, "w")
             f.close()
-            iolog.info("created %s", path)
+            iolog.info("%s created", path)
+            self.lastWriteTimestamp = os.path.getmtime(path)
+
 
         self.flushDelay = 2 # seconds until we have to call flush() when dirty
         self.writeCall = None # or DelayedCall
-        self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
 
         # emacs save comes in as IN_MOVE_SELF, maybe
         
@@ -49,19 +52,25 @@ class GraphFile(object):
       
     def notify(self, notifier, filepath, mask):
         maskNames = humanReadableMask(mask)
-        if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib', 'delete_self']:
-            log.debug("file %s changed, ignoring %s" % (filepath, maskNames))
+        if maskNames[0] == 'delete_self':
+            log.warn("%s delete_self event: need to dump the stmts from "
+                     "this file", filepath)
+            # this is happening surprisingly often, even to files that
+            # are still there
+            return
+        if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib']:
+            log.debug("%s %s event, ignoring" % (filepath, maskNames))
             return
 
         try:
             if filepath.getModificationTime() == self.lastWriteTimestamp:
-                log.debug("file %s changed, but we did this write", filepath)
+                log.debug("%s changed, but we did this write", filepath)
                 return
         except OSError as e:
-            log.error("watched file %s: %r" % (filepath, e))
+            log.error("%s: %r" % (filepath, e))
             return
             
-        log.info("file %s changed (%s)", filepath, maskNames)
+        log.info("%s needs reread because of %s event", filepath, maskNames)
         try:
             self.reread()
         except Exception:
@@ -79,10 +88,10 @@ class GraphFile(object):
         except SyntaxError as e:
             print e
             traceback.print_exc()
-            log.error("syntax error in %s" % self.path)
+            log.error("%s syntax error", self.path)
             return
         except IOError as e:
-            log.error("rereading %s: %r" % (self.uri, e))
+            log.error("%s rereading %s: %r", self.path, self.uri, e)
             return
 
         old = inContext(old, self.uri)
@@ -90,11 +99,12 @@ class GraphFile(object):
 
         p = Patch.fromDiff(old, new)
         if p:
+            log.debug("%s applying patch for changes in file", self.path)
             self.patch(p, dueToFileChange=True)
 
     def dirty(self, graph):
         """
-        there are new contents for our file
+        there are new contents to write to our file
         
         graph is the rdflib.Graph that contains the contents of the
         file. It is allowed to change. Note that dirty() will probably
@@ -108,7 +118,7 @@ class GraphFile(object):
         going towards a text file editor
         
         """
-        log.info("%s dirty, %s stmt" % (self.uri, len(graph)))
+        log.info("%s dirty, needs write", self.path)
 
         self.graphToWrite = graph
         if self.writeCall:
@@ -127,5 +137,5 @@ class GraphFile(object):
         f.close()
         self.lastWriteTimestamp = os.path.getmtime(tmpOut)
         os.rename(tmpOut, self.path)
-        iolog.info("rewrote %s in %.1f ms", self.path, serializeTime * 1000)
+        iolog.info("%s rewrote in %.1f ms", self.path, serializeTime * 1000)
         

@@ -7,7 +7,7 @@ class Local(object):
     manage. Set resourceObservable to Local to indicate that you're
     unlinked"""
 
-class EditChoice(tk.Frame):
+class EditChoice(object):
     """
     Observable <-> linker UI
 

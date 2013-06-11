@@ -196,6 +196,7 @@ class WatchedFiles(object):
 
     def dirChange(self, watch, path, mask):
         if mask & IN_CREATE:
+            log.debug("%s created; consider adding a watch", path)
             self.watchFile(path.path)
             
     def watchFile(self, inFile):
@@ -238,7 +239,22 @@ class WatchedFiles(object):
         gf = GraphFile(self.notifier, inFile, ctx,
                        self.patch, self.getSubgraph)
         self.graphFiles[ctx] = gf
+        log.info("%s do initial read", inFile)
         gf.reread()
+
+    def aboutToPatch(self, ctx):
+        """
+        warn us that a patch is about to come to this context. it's more
+        straightforward to create the new file now
+        """
+    
+        g = self.getSubgraph(ctx)
+
+        if ctx not in self.graphFiles:
+            outFile = self.fileForUri(ctx)
+            log.info("starting new file %r", outFile)
+            self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
+                                             self.patch, self.getSubgraph)
 
     def dirtyFiles(self, ctxs):
         """mark dirty the files that we watch in these contexts.
@@ -251,12 +267,6 @@ class WatchedFiles(object):
         """
         for ctx in ctxs:
             g = self.getSubgraph(ctx)
-
-            if ctx not in self.graphFiles:
-                outFile = self.fileForUri(ctx)
-                self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
-                                                 self.patch, self.getSubgraph)
-            
             self.graphFiles[ctx].dirty(g)
 
     def uriFromFile(self, filename):
@@ -301,6 +311,9 @@ class Db(object):
         log.info("patching graph %s -%d +%d" % (
             ctx, len(p.delQuads), len(p.addQuads)))
 
+        if hasattr(self, 'watchedFiles'): # not during startup
+            self.watchedFiles.aboutToPatch(ctx)
+        
         patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
         senderUpdateUri = getattr(p, 'senderUpdateUri', None)
 

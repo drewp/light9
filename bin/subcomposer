@@ -18,17 +18,17 @@ subcomposer
 from __future__ import division, nested_scopes
 import time, logging
 from optparse import OptionParser
-import logging
+import logging, urllib
 import Tkinter as tk
 import louie as dispatcher
 from twisted.internet import reactor, tksupport, task
-from rdflib import URIRef, RDF
+from rdflib import URIRef, RDF, RDFS, Literal
 
 from run_local import log
 log.setLevel(logging.DEBUG)
 
 from light9.dmxchanedit import Levelbox
-from light9 import dmxclient, Submaster, prof
+from light9 import dmxclient, Submaster, prof, showconfig
 from light9.Patch import get_channel_name
 from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
@@ -71,7 +71,10 @@ class Subcomposer(tk.Frame):
         self.graph = graph
         self.session = session
 
-        # this is a URIRef or Local
+        # this is a URIRef or Local. Strangely, the Local case still
+        # has a uri, which you can get from
+        # self.currentSub.uri. Probably that should be on the Local
+        # object too, or maybe Local should be a subclass of URIRef
         self._currentChoice = Observable(Local)
 
         # this is a PersistentSubmaster (even for local)
@@ -82,9 +85,68 @@ class Subcomposer(tk.Frame):
             log.info("change viewed sub to %s", val)
         self._currentChoice.subscribe(pc)
 
-        EditChoice(self, self.graph, self._currentChoice).frame.pack(side='top')
+        ec = self.editChoice = EditChoice(self, self.graph, self._currentChoice)
+        ec.frame.pack(side='top')
+
+        ec.subIcon.bind("<ButtonPress-1>", self.clickSubIcon)
         self.setupSubChoiceLinks()
         self.setupLevelboxUi()
+
+    def clickSubIcon(self, *args):
+        box = tk.Toplevel(self.editChoice.frame)
+        box.wm_transient(self.editChoice.frame)
+        tk.Label(box, text="Name this sub:").pack()
+        e = tk.Entry(box)
+        e.pack()
+        b = tk.Button(box, text="Make global")
+        b.pack()
+        def clicked(*args):
+            self.makeGlobal(newName=e.get())
+            box.destroy()
+            
+        b.bind("<Button-1>", clicked)
+        e.focus()
+        
+    def makeGlobal(self, newName):
+        """promote our local submaster into a non-local, named one"""
+        uri = self.currentSub().uri
+        newUri = showconfig.showUri() + ("/sub/%s" %
+                                         urllib.quote(newName, safe=''))
+        with self.graph.currentState(
+                tripleFilter=(uri, None, None)) as current:
+            if (uri, RDF.type, L9['LocalSubmaster']) not in current:
+                raise ValueError("%s is not a local submaster" % uri)
+            if (newUri, None, None) in current:
+                raise ValueError("new uri %s is in use" % newUri)
+                
+        # the local submaster was storing in ctx=self.session, but now
+        # we want it to be in ctx=uri
+
+        self.relocateSub(newUri, newName)
+
+        # these are in separate patches for clarity as i'm debugging this
+        self.graph.patch(Patch(addQuads=[
+            (newUri, RDFS.label, Literal(newName), newUri),
+        ], delQuads=[
+            (newUri, RDF.type, L9['LocalSubmaster'], newUri),
+                           ]))
+        self.graph.patchObject(self.session,
+                               self.session, L9['currentSub'], newUri)
+        
+    def relocateSub(self, newUri, newName):
+        # maybe this goes in Submaster
+        uri = self.currentSub().uri
+
+        def repl(u):
+            if u == uri:
+                return newUri
+            return u
+        delQuads = self.currentSub().allQuads()
+        addQuads = [(repl(s), p, repl(o), newUri) for s,p,o,c in delQuads]
+        # patch can't span contexts yet
+        self.graph.patch(Patch(addQuads=addQuads, delQuads=[]))
+        #self.graph.patch(Patch(addQuads=[], delQuads=delQuads))
+        
         
     def setupSubChoiceLinks(self):
         graph = self.graph
@@ -133,7 +195,9 @@ class Subcomposer(tk.Frame):
             self.sendupdate()
         
     def makeLocal(self):
-        # todo: put a type on this, so subChanged can identify it right
+        """
+        change our display to a local submaster
+        """
         # todo: where will these get stored, or are they local to this
         # subcomposer process and don't use PersistentSubmaster at all?
 
