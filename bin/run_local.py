@@ -35,3 +35,6 @@ def setTerminalTitle(s):
         print "\033]0;%s\007" % s # not escaped/protected correctly
 
 setTerminalTitle(sys.argv[0])
+
+# see http://www.youtube.com/watch?v=3cIOT9kM--g for commands that make
+# profiles and set background images
