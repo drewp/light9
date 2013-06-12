@@ -30,4 +30,8 @@ class CSH(coloredlogs.ColoredStreamHandler):
 log.addHandler(CSH(show_hostname=False, show_name=True))
 
 
+def setTerminalTitle(s):
+    if os.environ.get('TERM', '') in ['xterm']:
+        print "\033]0;%s\007" % s # not escaped/protected correctly
 
+setTerminalTitle(sys.argv[0])
