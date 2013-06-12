@@ -8,7 +8,8 @@ gobject.threads_init()
 import gtk
 import sys, logging, optparse
 sys.path.append(".")
-from light9.vidref.main import Main
+from light9.vidref.main import Gui
+
 
  # find replay dirs correctly. show multiple
  # replays. trash. reorder/pin. dump takes that are too short; they're
@@ -26,6 +27,8 @@ log.handlers[0].setLevel(logging.DEBUG if options.verbose else logging.WARN)
 logging.getLogger("restkit.client").setLevel(logging.WARN)
 
 
-start=Main()
+        
+start=Gui()
+
 reactor.run()
 
