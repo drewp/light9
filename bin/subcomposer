@@ -79,7 +79,7 @@ class Subcomposer(tk.Frame):
 
         # this is a PersistentSubmaster (even for local)
         self.currentSub = Observable(Submaster.PersistentSubmaster(
-                    graph, self.makeLocal()))
+                    graph, self.switchToLocal()))
 
         def pc(val):
             log.info("change viewed sub to %s", val)
@@ -158,7 +158,7 @@ class Subcomposer(tk.Frame):
         def graphChanged():
             s = graph.value(self.session, L9['currentSub'])
             if s is None:
-                s = self.makeLocal()
+                s = self.switchToLocal()
             self.currentSub(Submaster.PersistentSubmaster(graph, s))
 
         @self.currentSub.subscribe
@@ -185,7 +185,7 @@ class Subcomposer(tk.Frame):
         @self._currentChoice.subscribe
         def choiceChanged(newChoice):
             if newChoice is Local:
-                newChoice = self.makeLocal()
+                newChoice = self.switchToLocal()
             if newChoice is not None:
                 self.currentSub(Submaster.PersistentSubmaster(
                     graph, newChoice))
@@ -194,14 +194,14 @@ class Subcomposer(tk.Frame):
         if sub == self.currentSub():
             self.sendupdate()
         
-    def makeLocal(self):
+    def switchToLocal(self):
         """
         change our display to a local submaster
         """
         # todo: where will these get stored, or are they local to this
         # subcomposer process and don't use PersistentSubmaster at all?
 
-        new = URIRef("http://local/%s" % time.time())
+        new = URIRef("http://light9.bigasterisk.com/sub/local/%s" % time.time())
         self.graph.patch(Patch(addQuads=[
             (new, RDF.type, L9['Submaster'], self.session),
             (new, RDF.type, L9['LocalSubmaster'], self.session),
