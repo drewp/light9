@@ -15,6 +15,10 @@ class GraphFile(object):
     """
     def __init__(self, notifier, path, uri, patch, getSubgraph):
         """
+        uri is the context for the triples in this file. We assume
+        sometimes that we're the only ones with triples in this
+        context.
+        
         this does not include an initial reread() call
         """
         self.path, self.uri = path, uri
@@ -32,6 +36,8 @@ class GraphFile(object):
             f.write("#new\n")
             f.close()
             iolog.info("%s created", path)
+            # this was supposed to cut out some extra reads but it
+            # didn't work:
             self.lastWriteTimestamp = os.path.getmtime(path)
 
 
@@ -55,8 +61,9 @@ class GraphFile(object):
         maskNames = humanReadableMask(mask)
         if maskNames[0] == 'delete_self':
             if not filepath.exists():
-                log.warn("%s delete_self event: need to dump the stmts from "
-                         "this file", filepath)
+                log.info("%s delete_self", filepath)
+                self.fileGone()
+                return
             else:
                 log.warn("%s delete_self event but file is here. ignoring",
                          filepath)
@@ -82,6 +89,15 @@ class GraphFile(object):
         except Exception:
             traceback.print_exc()
 
+    def fileGone(self):
+        """
+        our file is gone; remove the statements from that context
+        """
+        myQuads = [(s,p,o,self.uri) for s,p,o in self.getSubgraph(self.uri)]
+        log.debug("dropping all statements from context %s", self.uri)
+        if myQuads:
+            self.patch(Patch(delQuads=myQuads), dueToFileChange=True)
+            
     def reread(self):
         """update the graph with any diffs from this file
 

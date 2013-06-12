@@ -246,8 +246,13 @@ class WatchedFiles(object):
         """
         warn us that a patch is about to come to this context. it's more
         straightforward to create the new file now
+
+        this is meant to make the file before we add triples, so we
+        wouldn't see the blank file and lose those triples. But it
+        didn't work, so there are other measures that make us not lose
+        the triples from a new file. Calling this before patching the
+        graph is still a reasonable thing to do, though.
         """
-    
         g = self.getSubgraph(ctx)
 
         if ctx not in self.graphFiles:
@@ -311,7 +316,7 @@ class Db(object):
         log.info("patching graph %s -%d +%d" % (
             ctx, len(p.delQuads), len(p.addQuads)))
 
-        if hasattr(self, 'watchedFiles'): # not during startup
+        if hasattr(self, 'watchedFiles'): # not available during startup
             self.watchedFiles.aboutToPatch(ctx)
         
         patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)

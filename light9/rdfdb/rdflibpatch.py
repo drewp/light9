@@ -81,7 +81,7 @@ def serializeQuad(g):
 def inContext(graph, newContext):
     """
     make a ConjunctiveGraph where all the triples in the given graph
-    are in newContext
+    are now in newContext
     """
     return graphFromQuads([(s,p,o,newContext) for s,p,o in graph])
 
