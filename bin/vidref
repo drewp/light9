@@ -1,5 +1,8 @@
 #!bin/python
 from run_local import log
+from twisted.internet import gtk2reactor
+gtk2reactor.install()
+from twisted.internet import reactor
 import gobject
 gobject.threads_init()
 import gtk
@@ -24,5 +27,5 @@ logging.getLogger("restkit.client").setLevel(logging.WARN)
 
 
 start=Main()
-gtk.main()
+reactor.run()
 
