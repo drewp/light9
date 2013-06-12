@@ -71,12 +71,20 @@ class Player(object):
         """bus.add_signal_watch seems to be having no effect, but this works"""
         bus = self.pipeline.get_bus()
         mt = Gst.MessageType
-        msg = bus.poll(mt.EOS | mt.STREAM_STATUS, 0)
+        msg = bus.poll(mt.EOS | mt.STREAM_STATUS | mt.ERROR,# | mt.ANY,
+                       0)
         if msg is not None:
-            if msg.type == Gst.MessageType.EOS:
+            log.debug("bus message: %r %r", msg.src, msg.type)
+            # i'm trying to catch here a case where the pulseaudio
+            # output has an error, since that's otherwise kind of
+            # mysterious to diagnose. I don't think this is exactly
+            # working.
+            if msg.type == mt.ERROR:
+                log.error(repr(msg.parse_error()))
+            if msg.type == mt.EOS:
                 if self.onEOS is not None:
                     self.onEOS(self.getSong())
-            if msg.type == Gst.MessageType.STREAM_STATUS:
+            if msg.type == mt.STREAM_STATUS:
                 (statusType, _elem) = msg.parse_stream_status()
                 if statusType == Gst.StreamStatusType.ENTER:
                     self.setupAutostop()
