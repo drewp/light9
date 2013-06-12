@@ -42,6 +42,8 @@ if __name__ == "__main__":
         help='show URI, like http://light9.bigasterisk.com/show/dance2008', default=showconfig.showUri())
     parser.add_option("-v", "--verbose", action="store_true",
                       help="logging.DEBUG")
+    parser.add_option("--twistedlog", action="store_true",
+                      help="twisted logging")
     (options, args) = parser.parse_args()
 
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
@@ -51,6 +53,9 @@ if __name__ == "__main__":
             
     graph = showconfig.getGraph()
     app = App(graph, URIRef(options.show))
+    if options.twistedlog:
+        from twisted.python import log as twlog
+        twlog.startLogging(sys.stderr)
     reactor.listenTCP(networking.musicPlayer.port, makeWebApp(app))
     log.info("listening on %s" % networking.musicPlayer.port)
     reactor.run()

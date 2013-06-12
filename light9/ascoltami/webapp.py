@@ -5,7 +5,7 @@ from light9.namespaces import L9
 from light9.showconfig import getSongsFromShow, songOnDisk
 from rdflib import URIRef
 from web.contrib.template import render_genshi
-render = render_genshi([sibpath(__file__, ".")])
+render = render_genshi([sibpath(__file__, ".")], auto_reload=True)
 
 try:
     import sys

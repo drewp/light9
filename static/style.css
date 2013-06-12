@@ -56,3 +56,6 @@ body {
 .timeRow {
     margin: 14px;
 }
+.stalled {
+    opacity: .5;
+}

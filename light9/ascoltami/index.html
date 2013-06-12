@@ -14,15 +14,17 @@
     <h1>ascoltami on ${host}</h1>
     <div class="songs"/>
 
-    <div>Song: <span id="currentSong"/></div>
-    <div>Time: <span id="currentTime"/></div>
-    <div>Left: <span id="leftTime"/></div>
-    <div>Until autostop: <span id="leftAutoStopTime"/></div>
-    <div>States: <span id="states"/></div>
-    <div class="timeRow">
-      <div id="timeSlider"/>
+    <div class="dimStalled">
+      <div>Song: <span id="currentSong"/></div>
+      <div>Time: <span id="currentTime"/></div>
+      <div>Left: <span id="leftTime"/></div>
+      <div>Until autostop: <span id="leftAutoStopTime"/></div>
+      <div>Update freq: requested <span id="updateReq"/>, actual <span id="updateActual"/></div>
+      <div>States: <span id="states"/></div>
+      <div class="timeRow">
+        <div id="timeSlider"/>
+      </div>
     </div>
-
     <div class="commands">
       <button id="cmd-stop" class="playMode">Stop<div class="key">s</div></button>
       <button id="cmd-play" class="playMode">Play <div class="key">p</div></button>
@@ -33,15 +35,19 @@
       <button id="cmd-out0">Output 0</button>
       <button id="cmd-out1">Output 1</button>
     </div>
-
-    <p><button onclick="window.open('/', '_blank', 'scrollbars=1,resizable=1,titlebar=0,location=0')">reopen this in a simpler window</button></p>
     
-    todo: go button actions, display next action
-    <a href="">reload</a>
+    <p>Running on <span id="nav"/></p>
+    todo: display next action
+    <p><button onclick="window.open('/', '_blank', 'scrollbars=1,resizable=1,titlebar=0,location=0')">reopen this in a simpler window</button></p>
+    <p><a href="">reload</a></p>
 
 <script type="text/javascript">
 // <![CDATA[
 $(function () {
+
+    $("#nav").text(navigator.userAgent);
+    var updateFreq = (navigator.userAgent.indexOf("Linux") != -1) ? 10 : 2;
+    $("#updateReq").text(updateFreq);
 
     var times = { // need to get these from server
 	intro: 4,
@@ -145,12 +151,34 @@ $(function () {
 	window.mozRequestAnimationFrame || 
 	window.webkitRequestAnimationFrame;
 
+    var recentUpdates = [];
+    function onUpdate() {
+        recentUpdates.push(+new Date());
+        recentUpdates = recentUpdates.slice(Math.max(recentUpdates.length - 5, 0));
+        refreshUpdateFreqs();
+    }
+
+    function refreshUpdateFreqs() {
+        if (recentUpdates.length > 1) {
+          if (+new Date() - recentUpdates[recentUpdates.length - 1] > 1000) {
+            $("#updateActual").text("(stalled)");
+            $(".dimStalled").addClass("stalled");
+            return;
+          }
+
+          var avgMs = (recentUpdates[recentUpdates.length - 1] - recentUpdates[0]) / (recentUpdates.length - 1);
+          $("#updateActual").text(Math.round(1000 / avgMs));
+        }
+    }
+    setInterval(refreshUpdateFreqs, 2000);
+
     function updateLoop() {
 	var whenDone = function () {
 	    setTimeout(function () { 
 		raf(updateLoop);
-	    }, 50);
+	    }, 1000 / updateFreq);
 	};
+        onUpdate();
 	updateCurrent(whenDone);
     }
     updateLoop();
