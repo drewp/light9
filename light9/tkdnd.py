@@ -48,11 +48,9 @@ class Hover(object):
         for k, v in self.style.items():
             self.oldStyle[k] = self.widget.cget(k)
         self.widget.configure(**self.style)
-        print "set with", ev
         return ev.action
 
     def restore(self, ev):
-        print "restore", self.oldStyle
         self.widget.configure(**self.oldStyle)
 
 def initTkdnd(tk, tkdndBuildDir):
