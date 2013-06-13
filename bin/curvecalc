@@ -430,7 +430,8 @@ def launch(args, graph, session, opts, startTime, music):
                 if not times:
                     request.setResponseCode(404)
                     return "not hovering over any time"
-                with graph.currentState() as g:
+                with graph.currentState(
+                        tripleFilter=(session, L9['currentSong'], None)) as g:
                     song = g.value(session, L9['currentSong'])
                     return json.dumps({"song": song, "hoverTime" : times[0]})
             raise NotImplementedError()
