@@ -19,7 +19,7 @@ from light9.subclient import SubClient
 from light9 import dmxclient, showconfig, networking, prof
 from light9.uihelpers import toplevelat, bindkeys
 from light9.namespaces import L9
-from light9.tkdnd import initTkdnd, dragSourceRegister
+from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb.patch import Patch
@@ -235,7 +235,7 @@ class KeyboardComposer(Frame, SubClient):
             group = self.graph.value(sub.uri, L9['group'])
 
             if col == 0 or group != last_group:
-                row = self.make_row()
+                row = self.make_row(group)
                 rowcount += 1
                 col = 0
 
@@ -394,13 +394,39 @@ class KeyboardComposer(Frame, SubClient):
             return
         self.sliders.valueOut(chan, v)
 
-    def make_row(self):
+    def make_row(self, group):
+        """group is a URI or None"""
         row = Frame(self, bd=2, bg='black')
+        row.subGroup = group
+        def onDrop(ev):
+            self.change_group(sub=URIRef(ev.data), row=row)
+            return "link"
+        
+        dropTargetRegister(row, onDrop=onDrop, typeList=['*'],
+                           hoverStyle=dict(background="#555500"))
+        
         row.pack(expand=1, fill=BOTH)
         self.setup_key_nudgers(row)
         self.rows.append(row)
         return row
 
+    def change_group(self, sub, row):
+        """update this sub's group, and maybe other sub groups as needed, so
+        this sub displays in this row"""
+        group = row.subGroup
+        self.graph.patchObject(
+            context=self.session,
+            subject=sub, predicate=L9['group'], newObject=group)
+
+    def subs_in_row(self, row):
+        """uris of the submasters displayed in this row. untested"""
+        rowNum = self.rows.index(row) + 1
+        ret = set()
+        for coords, subbox in self.slider_table.items():
+            if coords[0] == rowNum:
+                ret.add(subbox.sub.uri)
+        return ret
+            
     def highlight_row(self, row):
         row = self.rows[row]
         row['bg'] = 'red'
