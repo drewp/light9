@@ -31,6 +31,8 @@ class MusicTime(object):
     def getLatest(self):
         """
         dict with 't' and 'song', etc.
+
+        Note that this may be called in a gst camera capture thread.
         """
         if not hasattr(self, 'position'):
             return {'t' : 0, 'song' : None}

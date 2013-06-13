@@ -120,6 +120,14 @@ class VideoRecordSink(gst.Element):
                 args = imagesToSave.get()
                 self.saveImg(*args)
                 imagesToSave.task_done()
+
+                # this is not an ideal place for snapshotRequests
+                # since imagesToSave is allowed to get backed up with
+                # image writes, yet we would still want the next new
+                # image to be used for the snapshot. chainfunc should
+                # put snapshot images in a separate-but-similar queue
+                # to imagesToSave, and then another watcher could use
+                # those to satisfy snapshot requests
                 try:
                     req = self.snapshotRequests.get(block=False)
                 except Empty:
@@ -135,9 +143,8 @@ class VideoRecordSink(gst.Element):
     def chainfunc(self, pad, buffer):
         position = self.musicTime.getLatest()
 
-        if not position['song']:
-            print "no song" # todo: this prints too much when the player has no song
-            return gst.FLOW_OK
+        # if music is not playing and there's no pending snapshot
+        # request, we could skip the image conversions here.
 
         try:
             cap = buffer.caps[0]
@@ -151,6 +158,10 @@ class VideoRecordSink(gst.Element):
         return gst.FLOW_OK
 
     def saveImg(self, position, img, bufferTimestamp):
+        if not position['song']:
+            print "no song"
+            return 
+        
         t1 = time.time()
         outDir = takeDir(songDir(position['song']), position['started'])
         outFilename = "%s/%08.03f.jpg" % (outDir, position['t'])
