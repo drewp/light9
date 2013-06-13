@@ -3,6 +3,13 @@ class Model
     @subs = ko.observable([])
     @showLocal = ko.observable(false)
 
+  snapshot: (sub) =>
+    $.ajax({
+      url: "snapshot"
+      type: "POST"
+      data: {about: sub.uri}
+    })
+
 model = new Model()
 
 # this sort of works to stop clicks in <input> from following the

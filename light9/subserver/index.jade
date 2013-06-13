@@ -19,7 +19,11 @@ html
           | Label
           input(type="text", data-bind="value: label")
         div
-          img()
+          img(data-bind="attr: {src: img}")
+        div
+          button(data-bind="click: $root.snapshot")
+            New snapshot
+            
       // /ko
 
     #status
