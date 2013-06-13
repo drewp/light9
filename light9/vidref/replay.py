@@ -16,6 +16,9 @@ def takeDir(songDir, startTime):
     """
     return os.path.join(songDir, str(int(startTime)))
 
+def snapshotDir():
+    return os.path.expanduser("~/light9-vidref/snapshot")
+    
 class ReplayViews(object):
     """
     the whole list of replay windows. parent is the scrolling area for
@@ -160,6 +163,7 @@ class ReplayView(object):
             replayPanel.pack_start(stack, False, False, 0)
 
         parent.pack_start(replayPanel, False, False)
+        log.debug("packed ReplayView %s" % replayPanel)
         self.replayPanel = replayPanel
 
     def destroy(self):

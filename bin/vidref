@@ -2,14 +2,16 @@
 from run_local import log
 from twisted.internet import gtk2reactor
 gtk2reactor.install()
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 import gobject
 gobject.threads_init()
 import gtk
-import sys, logging, optparse
+import sys, logging, optparse, json
 sys.path.append(".")
+from light9 import networking
 from light9.vidref.main import Gui
-
+from light9.vidref.replay import snapshotDir
+import cyclone.web, cyclone.httpclient, cyclone.websocket
 
  # find replay dirs correctly. show multiple
  # replays. trash. reorder/pin. dump takes that are too short; they're
@@ -27,8 +29,38 @@ log.handlers[0].setLevel(logging.DEBUG if options.verbose else logging.WARN)
 logging.getLogger("restkit.client").setLevel(logging.WARN)
 
 
+class Snapshot(cyclone.web.RequestHandler):
+    @defer.inlineCallbacks
+    def post(self):
+        # save next pic
+        # return /snapshot/path
+        try:
+            outputFilename = yield self.settings.gui.snapshot()
+
+            assert outputFilename.startswith(snapshotDir())
+            out = networking.vidref.path(
+                "snapshot/%s" % outputFilename[len(snapshotDir()):].lstrip('/'))
+            
+            self.write(json.dumps({'snapshot': out}))
+            self.set_header("Location", out)
+            self.set_status(303)
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            raise
+
+class SnapshotPic(cyclone.web.StaticFileHandler):
+    pass
+
         
-start=Gui()
+gui = Gui()
+
+port = networking.vidref.port
+reactor.listenTCP(port, cyclone.web.Application(handlers=[
+    (r'/snapshot', Snapshot),
+    (r'/snapshot/(.*)', SnapshotPic, {"path": snapshotDir()}),
+    ], debug=True, gui=gui))
+log.info("serving on %s" % port)
 
 reactor.run()
 

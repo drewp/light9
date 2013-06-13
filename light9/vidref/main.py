@@ -51,6 +51,10 @@ class Gui(object):
 
         gobject.timeout_add(1000 // framerate, self.updateLoop)
 
+
+    def snapshot(self):
+        return self.pipeline.snapshot()
+        
     def attachLog(self, textBuffer):
         """write log lines to this gtk buffer"""
         class ToBuffer(logging.Handler):

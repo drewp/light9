@@ -4,8 +4,9 @@ import gst, gobject, time, logging, os, traceback
 import gtk
 import Image
 from threading import Thread
-from Queue import Queue
-from light9.vidref.replay import framerate, songDir, takeDir
+from twisted.internet import defer
+from Queue import Queue, Empty
+from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
 log = logging.getLogger()
 
 class Pipeline(object):
@@ -13,7 +14,29 @@ class Pipeline(object):
         self.musicTime = musicTime
         self.liveVideoXid = liveVideoXid
         self.recordingTo = recordingTo
-    
+        self.snapshotRequests = Queue()
+
+        try:
+            os.makedirs(snapshotDir())
+        except OSError:
+            pass
+
+    def snapshot(self):
+        """
+        returns deferred to the path (which is under snapshotDir()) where
+        we saved the image. This callback comes from another thread,
+        but I haven't noticed that being a problem yet.
+        """
+        d = defer.Deferred()
+        def req(frame):
+            filename = "%s/%s.jpg" % (snapshotDir(), time.time())
+            log.debug("received snapshot; saving in %s", filename)
+            frame.save(filename)
+            d.callback(filename)
+        log.debug("requesting snapshot")
+        self.snapshotRequests.put(req)
+        return d
+        
     def setInput(self, name):
         sourcePipe = {
             "auto": "autovideosrc name=src1",
@@ -45,7 +68,7 @@ class Pipeline(object):
             with gtk.gdk.lock:
                 self.recordingTo.set_text(t)
             self._lastRecText = t
-        recSink = VideoRecordSink(self.musicTime, setRec)
+        recSink = VideoRecordSink(self.musicTime, setRec, self.snapshotRequests)
         self.pipeline.add(recSink)
 
         tee = makeElem("tee")
@@ -76,9 +99,10 @@ class VideoRecordSink(gst.Element):
                                         gst.PAD_ALWAYS,
                                         gst.caps_new_any())
 
-    def __init__(self, musicTime, updateRecordingTo):
+    def __init__(self, musicTime, updateRecordingTo, snapshotRequests):
         gst.Element.__init__(self)
         self.updateRecordingTo = updateRecordingTo
+        self.snapshotRequests = snapshotRequests
         self.sinkpad = gst.Pad(self._sinkpadtemplate, "sink")
         self.add_pad(self.sinkpad)
         self.sinkpad.set_chain_function(self.chainfunc)
@@ -96,6 +120,13 @@ class VideoRecordSink(gst.Element):
                 args = imagesToSave.get()
                 self.saveImg(*args)
                 imagesToSave.task_done()
+                try:
+                    req = self.snapshotRequests.get(block=False)
+                except Empty:
+                    pass
+                else:
+                    req(args[1])
+                    self.snapshotRequests.task_done()
         
         t = Thread(target=imageSaver)
         t.setDaemon(True)
