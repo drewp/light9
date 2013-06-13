@@ -14,7 +14,8 @@ import Tix as tk
 import pickle
 
 from light9.Fadable import Fadable
-from light9.Submaster import Submasters, sub_maxes
+from light9.Submaster import Submasters, sub_maxes, PersistentSubmaster
+from light9.Patch import get_channel_uri
 from light9.subclient import SubClient
 from light9 import dmxclient, showconfig, networking, prof
 from light9.uihelpers import toplevelat, bindkeys
@@ -448,9 +449,16 @@ class KeyboardComposer(Frame, SubClient):
     def save_current_stage(self, subname):
         log.info("saving current levels as %s", subname)
         sub = self.get_levels_as_sub()
-        sub.name = subname
-        sub.temporary = 0
-        sub.save()
+
+        newUri = showconfig.showUri() + "/sub/%s" % subname
+        ps = PersistentSubmaster(self.graph, newUri)
+        ps.changeName(subname)
+        for chanName, v in sub.get_levels().items():
+            chan = get_channel_uri(str(chanName))
+            ps.editLevel(chan, v)
+            
+        self.sub_name.delete(0, tk.END)
+
 
     def send_frequent_updates(self):
         """called when we get a fade -- send events as quickly as possible"""

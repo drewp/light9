@@ -143,6 +143,9 @@ class PersistentSubmaster(Submaster):
     def _editedLevels(self):
         self.save()
 
+    def changeName(self, newName):
+        self.graph.patchObject(self.uri, self.uri, RDFS.label, Literal(newName))
+        
     def setName(self):
         log.info("sub update name %s %s", self.uri, self.graph.label(self.uri))
         self.name = self.graph.label(self.uri)
