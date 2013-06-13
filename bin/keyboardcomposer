@@ -87,7 +87,6 @@ class SubmasterBox(Frame):
             bg='black', fg='white', pady=0)
         levellabel.pack(side=TOP)
         self.scale.pack(side=BOTTOM, expand=1, fill=BOTH)
-        bindkeys(self, "<Control-Key-l>", self.launch_subcomposer)
 
         for w in [self, self.namelabel, levellabel]:
             dragSourceRegister(w, 'copy', 'text/uri-list', sub.uri)
@@ -146,9 +145,6 @@ class SubmasterBox(Frame):
         def shortUri(u):
             return '.../' + u.split('/')[-1]
         self.namelabel.config(text=self.sub.graph.label(self.sub.uri) or shortUri(self.sub.uri))
-
-    def launch_subcomposer(self, *args):
-        subprocess.Popen(["bin/subcomposer", "--no-geometry", self.name])
 
 class KeyboardComposer(Frame, SubClient):
     def __init__(self, root, graph, session,
@@ -557,7 +553,7 @@ def launch(opts, root, graph, session):
                           hw_sliders=not opts.no_sliders)
     kc.pack(fill=BOTH, expand=1)
 
-    for helpline in ["Bindings: B3 mute; C-l edit levels in subcomposer"]:
+    for helpline in ["Bindings: B3 mute"]:
         tk.Label(root,text=helpline, font="Helvetica -12 italic",
                  anchor='w').pack(side='top',fill='x')
             
