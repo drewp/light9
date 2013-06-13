@@ -204,14 +204,6 @@ class KeyboardComposer(Frame, SubClient):
 
         self.stop_frequent_update_time = 0
 
-    def onNewSub(self, sub):
-        log.info("new %s", sub)
-        self.graph.addHandler(self.draw_sliders)
-
-    def onLostSub(self, subUri):
-        log.info("lost %s", subUri)
-        self.graph.addHandler(self.draw_sliders)
-
     def draw_sliders(self):
         for r in self.rows:
             r.destroy()
@@ -223,6 +215,9 @@ class KeyboardComposer(Frame, SubClient):
 
         self.tk_focusFollowsMouse()
 
+        self.submasters.findSubs() # trigger graph load, but we read
+                                   # from get_all_subs, below
+        
         rowcount = -1
         col = 0
         last_group = None
@@ -234,8 +229,6 @@ class KeyboardComposer(Frame, SubClient):
                              self.graph.value(sub.uri, L9['order']),
                              sub)
             for sub in self.submasters.get_all_subs())
-        #dispatcher.connect(self.onNewSub, "new submaster")
-        #dispatcher.connect(self.onLostSub, "lost submaster")
         log.info("withgroups %s", withgroups)
 
         for group, order, sub in withgroups:

@@ -281,7 +281,7 @@ def combine_subdict(subdict, name=None, permanent=False):
 
     return maxes
 
-class Submasters:
+class Submasters(object):
     "Collection o' Submaster objects"
     def __init__(self, graph):
         self.submasters = {} # uri : Submaster
