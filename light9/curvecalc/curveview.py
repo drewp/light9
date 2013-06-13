@@ -2,6 +2,7 @@ from __future__ import division
 import math, time, logging
 import gtk, goocanvas
 import louie as dispatcher
+from rdflib import Literal
 from light9.curvecalc.zoomcontrol import RegionZoom
 from light9.curvecalc import cursors
 from light9.curvecalc.curve import introPad, postPad
@@ -1183,6 +1184,8 @@ class Curvesetview(object):
         self.newcurvename.set('')
         
     def add_curve(self, name, slider=None, knobEnabled=False):
+        if isinstance(name, Literal):
+            name = str(name)
         curve = self.curveset.curves[name]
         f = CurveRow(name, curve, self.curveset.markers,
                      slider, knobEnabled, self.zoomControl)
@@ -1192,9 +1195,12 @@ class Curvesetview(object):
         f.curveView.goLive()
 
     def row(self, name):
+        if isinstance(name, Literal):
+            name = str(name)
         matches = [r for r in self.allCurveRows if r.name == name]
         if not matches:
-            raise ValueError("no curveRow named %r" % name)
+            raise ValueError("no curveRow named %r. only %s" %
+                             (name, [r.name for r in self.allCurveRows]))
         return matches[0]
 
     def goLive(self):

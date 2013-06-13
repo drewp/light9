@@ -90,6 +90,9 @@ class Main(object):
         
         self.makeStatusLines(wtree.get_object("status"))
 
+
+        self.acceptDragsOnCurveViews()
+        
         def connect(w):
             w.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
                             targets=[('text/uri-list', 0, 0)],
@@ -110,6 +113,34 @@ class Main(object):
         # may not work
         wtree.get_object("paned1").set_position(600)
 
+    def acceptDragsOnCurveViews(self):
+        w = self.wtree.get_object("curves")
+        w.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
+                        targets=[('text/uri-list', 0, 0)],
+                        actions=gtk.gdk.ACTION_COPY)
+        def recv(widget, context, x, y, selection,
+                       targetType, time):
+            subUri = URIRef(selection.data.strip())
+            print "into curves", subUri
+            with self.graph.currentState(
+                    tripleFilter=(subUri, RDFS.label, None)) as current:
+                subName = current.label(subUri)
+
+            try:
+                self.makeSubterm(subName, withCurve=True,
+                                 sub=subUri,
+                                 expr="%s(t)" % subName)
+            except SubtermExists:
+                # we're not making sure the expression/etc are
+                # correct-- user mihgt need to fix things
+                pass
+            curveView = self.curvesetView.row(subName).curveView
+            t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
+            print "time", t
+            curveView.add_points([(t - .5, 0),
+                                  (t, 1)])
+        w.connect("drag-data-received", recv)
+        
     def onDataReceived(self, widget, context, x, y, selection,
                        targetType, time):
         data = selection.data.strip()
@@ -125,7 +156,6 @@ class Main(object):
             pass
         curveView = self.curvesetView.row(subName).curveView
         t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
-        print "time", t
         curveView.add_points([(t - .5, 0),
                               (t, 1)])
 
@@ -190,6 +220,15 @@ class Main(object):
         return self.currentSong()
 
     def makeSubterm(self, newname, withCurve=False, expr=None, sub=None):
+        """
+        raises SubtermExists if we had a subterm with a sub with the given
+        name. what about a no-sub term with the same label? who knows
+        """
+        assert isinstance(newname, Literal), repr(newname)
+        if withCurve:
+            self.curveset.new_curve(newname, renameIfExisting=False)
+        if newname in self.all_subterm_labels():
+            raise SubtermExists("have a subterm who sub is named %r" % newname)
         with self.graph.currentState() as current:
             song = self.currentSong()
             for i in range(1000):
@@ -211,10 +250,24 @@ class Main(object):
             quads.append((uri, L9['expression'], Literal(expr), ctx))
         self.graph.patch(Patch(addQuads=quads))
             
-        if withCurve:
-            self.curveset.new_curve(newname)
         return uri
-                         
+
+    def all_subterm_labels(self):
+        """
+        Literal labels of subs in subterms. doesn't currently include labels of the
+        subterm resources. I'm not sure what I'm going to do with
+        those.
+        """
+        labels = []
+        with self.graph.currentState() as current:
+            for st in current.objects(
+                    current.value(self.session, L9['currentSong']),
+                    L9['subterm']):
+                sub = current.value(st, L9['sub'])
+                if sub is not None:
+                    labels.append(current.label(sub))
+        return labels
+        
     def set_subterms_from_graph(self):
         """rebuild all the gtktable 'subterms' widgets and the
         self.currentSubterms list"""
@@ -285,6 +338,7 @@ class Main(object):
         self.music.playOrPause(t=times[0] if times else None)
 
     def onSave(self, *args):
+        # only doing curves still. I hope to eliminate all this.
         with self.graph.currentState() as g:
             song = g.value(self.session, L9['currentSong'])
 

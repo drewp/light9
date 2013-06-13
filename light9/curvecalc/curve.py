@@ -2,6 +2,7 @@ from __future__ import division
 import glob, time, logging, ast
 from bisect import bisect_left,bisect
 import louie as dispatcher
+from rdflib import Literal
 
 from bcf2000 import BCF2000
 
@@ -143,7 +144,7 @@ class Curveset(object):
     curves = None # curvename : curve
     def __init__(self, sliders=False):
         """sliders=True means support the hardware sliders"""
-        self.curves = {} # name : Curve
+        self.curves = {} # name (str) : Curve
         self.curveName = {} # reverse
         self.sliderCurve = {} # slider number (1 based) : curve name
         self.sliderNum = {} # reverse
@@ -194,6 +195,8 @@ class Curveset(object):
         return sorted(self.curves.keys(), key=self.sorter)
             
     def add_curve(self,name,curve):
+        if isinstance(name, Literal):
+            name = str(name) 
         if name in self.curves:
             raise ValueError("can't add a second curve named %r" % name)
         self.curves[name] = curve
@@ -218,9 +221,13 @@ class Curveset(object):
     def get_time_range(self):
         return 0, dispatcher.send("get max time")[0][1]
 
-    def new_curve(self,name):
+    def new_curve(self, name, renameIfExisting=True):
+        if isinstance(name, Literal):
+            name = str(name)
         if name=="":
             print "no name given"
+            return
+        if not renameIfExisting and name in self.curves:
             return
         while name in self.curves:
            name=name+"-1"
