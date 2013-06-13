@@ -159,7 +159,6 @@ class VideoRecordSink(gst.Element):
 
     def saveImg(self, position, img, bufferTimestamp):
         if not position['song']:
-            print "no song"
             return 
         
         t1 = time.time()
