@@ -77,7 +77,8 @@ class Subtermview(object):
         # some of this could be pushed into Submaster
         sub = self.graph.value(self.subterm.uri, L9['sub'])
         if sub is None:
-            self.label.set_text("no sub (%s)" % self.subterm.uri)
+            tail = self.subterm.uri.rsplit('/', 1)[-1]
+            self.label.set_text("no sub (%s)" % tail)
             return
         label = self.graph.label(sub)
         if label is None:

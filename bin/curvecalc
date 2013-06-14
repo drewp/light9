@@ -89,30 +89,18 @@ class Main(object):
         self.refreshCurveView()       
         
         self.makeStatusLines(wtree.get_object("status"))
-
-
+        self.setupNewSubZone()
         self.acceptDragsOnCurveViews()
-        
-        def connect(w):
-            w.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
-                            targets=[('text/uri-list', 0, 0)],
-                            actions=gtk.gdk.ACTION_COPY)
-            w.connect("drag-data-received", self.onDataReceived)
-        #connect(mainwin)
-        # that's not enough- deeper windows don't accept the
-        # event. 
-        #mainwin.forall(connect) # not very effective
-
-        wtree.get_object("newSubZone").drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
-                            targets=[('text/uri-list', 0, 0)],
-                            actions=gtk.gdk.ACTION_COPY)
-        
-        # this probably isn't rerunning often enough to catch new data
-        #connect(wtree.get_object("subterms")) # works for that area
-
+                
         # may not work
         wtree.get_object("paned1").set_position(600)
 
+    def setupNewSubZone(self):
+        wtree.get_object("newSubZone").drag_dest_set(
+            flags=gtk.DEST_DEFAULT_ALL,
+            targets=[('text/uri-list', 0, 0)],
+            actions=gtk.gdk.ACTION_COPY)
+        
     def acceptDragsOnCurveViews(self):
         w = self.wtree.get_object("curves")
         w.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
@@ -141,33 +129,18 @@ class Main(object):
                                   (t, 1)])
         w.connect("drag-data-received", recv)
         
-    def onDataReceived(self, widget, context, x, y, selection,
+    def onDragDataInNewSubZone(self, widget, context, x, y, selection,
                        targetType, time):
-        data = selection.data.strip()
+        data = URIRef(selection.data.strip())
         if '?' in data:
             self.handleSubtermDrop(data)
             return
-        uri = URIRef(data)
-        subName = self.graph.label(uri)
-        
-        try:
-            self.makeSubterm(subName, withCurve=True)
-        except SubtermExists:
-            pass
-        curveView = self.curvesetView.row(subName).curveView
-        t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
-        curveView.add_points([(t - .5, 0),
-                              (t, 1)])
-
-    def onDragDataInNewSubZone(self, widget, context, x, y, selection,
-                       targetType, time):
-        self.makeSubterm(newname="cx", withCurve=True,
-                         sub=URIRef(selection.data.strip()))
+        self.makeSubterm(newname="cx", withCurve=True, sub=data)
         
     def handleSubtermDrop(self, data):
         params = parse_qsl(data.split('?')[1])
         flattened = dict(params)
-        self.makeSubterm(flattened['subtermName'],
+        self.makeSubterm(Literal(flattened['subtermName']),
                          expr=flattened['subtermExpr'])
 
         for cmd, name in params:

@@ -459,7 +459,7 @@ class Curveview(object):
         here'
         """
         # maybe self.canvas.get_pointer would be ok for this? i didn't try it
-        if self.entered:
+        if self.entered and hasattr(self, 'lastMouseX'):
             t = self.world_from_screen(self.lastMouseX, 0)[0]
             return t
         return None
