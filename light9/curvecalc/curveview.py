@@ -1142,6 +1142,7 @@ class Curvesetview(object):
             self.add_curve(c) 
 
         dispatcher.connect(self.add_curve, "add_curve", sender=self.curveset)
+        dispatcher.connect(self.set_featured_curves, "set_featured_curves")
         
         self.newcurvename = gtk.EntryBuffer("", 0)
 
@@ -1158,6 +1159,18 @@ class Curvesetview(object):
         dispatcher.send("all curves lose selection")
         self.curvesVBox.get_parent().grab_focus()
 
+    def curveRow_from_name(self, name):
+        for cr in self.allCurveRows:
+            if cr.name == name:
+                return cr
+        raise ValueError("couldn't find curveRow named %r" % name)
+
+    def set_featured_curves(self, curveNames):
+        """bring these curves to the top of the stack"""
+        for n in curveNames[::-1]:
+            self.curvesVBox.reorder_child(self.curveRow_from_name(n).box,
+                                          gtk.PACK_START)
+        
     def onKeyPress(self, widget, event):
         if not self.live: # workaround for old instances living past reload()
             return

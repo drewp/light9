@@ -9,9 +9,10 @@ log = logging.getLogger()
 keep = []
 
 class Subexprview(object):
-    def __init__(self, graph, ownerSubterm, saveContext):
+    def __init__(self, graph, ownerSubterm, saveContext, curveset):
         self.graph, self.ownerSubterm = graph, ownerSubterm
         self.saveContext = saveContext
+        self.curveset = curveset
 
         self.box = gtk.HBox()
 
@@ -27,9 +28,20 @@ class Subexprview(object):
         self.entryBuffer.connect("deleted-text", self.entry_changed)
         self.entryBuffer.connect("inserted-text", self.entry_changed)
 
+        self.entry.connect("focus-in-event", self.onFocus)
+        
         dispatcher.connect(self.exprError, "expr_error", sender=self.ownerSubterm)
         keep.append(self.__dict__)
 
+    def onFocus(self, *args):
+        curveNames = self.curveset.curveNamesInOrder()
+        currentExpr = self.entryBuffer.get_text()
+
+        usedCurves = [n for n in curveNames if n in currentExpr]
+        usedCurves.sort()
+        
+        dispatcher.send("set_featured_curves", curveNames=usedCurves)
+        
     def exprError(self, exc):
         self.error.set_text(str(exc))
         
@@ -51,7 +63,7 @@ class Subtermview(object):
     """
     has .label and .exprView widgets for you to put in a table
     """
-    def __init__(self, st):
+    def __init__(self, st, curveset):
         self.subterm = st
         self.graph = st.graph
 
@@ -63,7 +75,7 @@ class Subtermview(object):
                             actions=gtk.gdk.ACTION_COPY)
         self.label.connect("drag-data-received", self.onDataReceivedOnLabel)
         
-        sev = Subexprview(self.graph, self.subterm.uri, self.subterm.saveContext)
+        sev = Subexprview(self.graph, self.subterm.uri, self.subterm.saveContext, curveset)
         self.exprView = sev.box
 
     def onDataReceivedOnLabel(self, widget, context, x, y, selection,
@@ -87,7 +99,7 @@ class Subtermview(object):
         self.label.set_text(label)
 
 def add_one_subterm(subterm, curveset, master, show=False):
-    stv = Subtermview(subterm)
+    stv = Subtermview(subterm, curveset)
     
     y = master.get_property('n-rows')
     master.attach(stv.label, 0, 1, y, y + 1, xoptions=0, yoptions=0)

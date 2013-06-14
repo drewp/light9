@@ -110,6 +110,17 @@ class Subterm(object):
                 dispatcher.send("expr_error", sender=self.uri, exc=repr(e))
                 return Submaster.Submaster(name='Error: %s' % str(e), levels={})
 
+    def curves_used_by_expr(self):
+        """names of curves that are (maybe) used in this expression"""
+
+        with self.graph.currentState(tripleFilter=(self.uri, None, None)) as current:
+            expr = current.value(self.uri, L9['expression'])
+
+        used = []
+        for name in self.curveset.curveNamesInOrder():
+            if name in expr:
+                used.append(name)
+        return used
 
     def eval(self, current, t):
         """current graph is being passed as an optimization. It should be
