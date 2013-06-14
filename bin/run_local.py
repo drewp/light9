@@ -34,7 +34,8 @@ def setTerminalTitle(s):
     if os.environ.get('TERM', '') in ['xterm']:
         print "\033]0;%s\007" % s # not escaped/protected correctly
 
-setTerminalTitle(sys.argv[0])
+if 'listsongs' not in sys.argv[0]:
+    setTerminalTitle(sys.argv[0])
 
 # see http://www.youtube.com/watch?v=3cIOT9kM--g for commands that make
 # profiles and set background images
