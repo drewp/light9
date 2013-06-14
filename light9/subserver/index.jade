@@ -12,8 +12,7 @@ html
     
     div(data-bind="foreach: subs")
       // ko if: $parent.showLocal() || !isLocal
-      a(class='sub', data-bind="css: {local: isLocal},
-                                attr: {href: uri}")
+      a.resource.sub(data-bind="css: {local: isLocal}, attr: {href: uri}")
         div(data-bind="if: isLocal") (local)
         div
           | Label

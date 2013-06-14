@@ -45,11 +45,9 @@ class Live(cyclone.websocket.WebSocketHandler):
         
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
     def get(self, path, *args, **kw):
-        if path == '':
-            return self.respondStaticJade("light9/subserver/index.jade")
-
-        if path == 'gui.js':
-            return self.responseStaticCoffee('light9/subserver/gui.coffee')
+        if path in ['', 'chases']:
+            return self.respondStaticJade("light9/subserver/%s.jade" %
+                                          (path or 'index'))
             
         oddlyPlaced = {
             "websocket.js":        "light9/rdfdb/web/websocket.js",
@@ -58,6 +56,11 @@ class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
         if path in oddlyPlaced:
             self.write(open(oddlyPlaced[path]).read())
             return
+
+        if path.endswith(".js") and path not in ['knockout-2.2.1.js']:
+            return self.responseStaticCoffee(
+                'light9/subserver/%s' %
+                path.replace(".js", ".coffee")) # potential security hole
 
         cyclone.web.StaticFileHandler.get(self, path, *args, **kw)
 
@@ -121,6 +124,15 @@ if __name__ == "__main__":
         
         d.clear()
         d.update({'subs': subs})
+
+        d['chases'] = []
+        for chase in sorted(graph.subjects(RDF.type, L9['Chase'])):
+            fakeLabel = chase.rsplit('/', 1)[-1]
+            d['chases'].append({
+                'uri': chase,
+                'label': fakeLabel,
+            })
+        
         sendToLiveClients(d=d)
     def onNewClient():
         sendToLiveClients(d=d)

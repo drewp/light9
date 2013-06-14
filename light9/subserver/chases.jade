@@ -1,0 +1,22 @@
+doctype html
+html
+  head
+    title subserver
+    link(rel='stylesheet', href='style.css')
+  body
+    h1 Chases
+
+    div(data-bind="foreach: chases")
+      div.resource.chase
+        | Chase
+        a(data-bind="attr: {href: uri}, text: label")
+        h2 Subterms
+        ul(data-bind="foreach: $parent.subtermExprs($data)")
+          li: a.resource(data-bind="attr: {href: $root.subtermLink($parent.label, $data)}, text: $data")
+
+    #status
+      
+    script(src="jquery-1.7.2.min.js")
+    script(src="knockout-2.2.1.js")
+    script(src="websocket.js")
+    script(src="chases.js")
