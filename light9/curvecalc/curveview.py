@@ -1049,6 +1049,8 @@ class CurveRow(object):
         self.update_ui_to_collapsed_state()
 
     def destroy(self):
+        self.curveView.entered = False  # help suppress bad position events
+        del self.curveView
         self.box.destroy()
         
     def initCurveView(self):
