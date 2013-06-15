@@ -178,6 +178,9 @@ class Main(object):
         if dialog.run() == 1:
             self.curveset.new_curve(entry.get_text())
         dialog.hide()
+
+    def onRedrawCurves(self, *args):
+        dispatcher.send("all curves rebuild")
         
     def onSubtermsMap(self, *args):
         # if this was called too soon, like in __init__, the gtktable
