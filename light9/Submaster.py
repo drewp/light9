@@ -327,6 +327,9 @@ class Submasters(object):
     def get_sub_by_uri(self, uri):
         return self.submasters[uri]
 
+    def get_sub_by_name(self, name):
+        return get_sub_by_name(name, self)
+
 # a global instance of Submasters, created on demand
 _submasters = None
 
@@ -344,8 +347,9 @@ def get_sub_by_name(name, submasters=None):
     if not submasters:
         submasters = get_global_submasters()
 
-    if name in submasters.get_all_sub_names():
-        return submasters.get_sub_by_name(name)
+    # get_all_sub_names went missing. needs rework
+    #if name in submasters.get_all_sub_names():
+    #    return submasters.get_sub_by_name(name)
 
     try:
         val = int(name)

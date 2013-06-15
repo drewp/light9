@@ -140,6 +140,7 @@ class Subterm(object):
 
         glo = exprglo.exprGlobals(glo, t)
         glo['getsub'] = lambda name: self.submasters.get_sub_by_name(name)
+        glo['chan'] = lambda name: Submaster.Submaster("chan", {get_dmx_channel(name): 1})
         
         try:
             self.lasteval = eval(expr, glo)
