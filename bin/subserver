@@ -76,7 +76,7 @@ class Snapshot(PrettyErrorHandler, cyclone.web.RequestHandler):
     @defer.inlineCallbacks
     def post(self):
         about = URIRef(self.get_argument("about"))
-        response = yield cyclone.httpclient.fetch(networking.vidref.path("snapshot"), method="POST")
+        response = yield cyclone.httpclient.fetch(networking.vidref.path("snapshot"), method="POST", timeout=1)
 
         snapUri = URIRef(json.loads(response.body)['snapshot'])
         # vidref could write about when it was taken, etc. would it be
