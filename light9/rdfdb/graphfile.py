@@ -58,33 +58,34 @@ class GraphFile(object):
         notifier.watch(FilePath(path), callbacks=[self.notify])
       
     def notify(self, notifier, filepath, mask):
-        maskNames = humanReadableMask(mask)
-        if maskNames[0] == 'delete_self':
-            if not filepath.exists():
-                log.info("%s delete_self", filepath)
-                self.fileGone()
-                return
-            else:
-                log.warn("%s delete_self event but file is here. ignoring",
-                         filepath)
-            return
-
-        # we could filter these out in the watch() call, but I want
-        # the debugging
-        if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib']:
-            log.debug("%s %s event, ignoring" % (filepath, maskNames))
-            return
-
         try:
-            if filepath.getModificationTime() == self.lastWriteTimestamp:
-                log.debug("%s changed, but we did this write", filepath)
+            maskNames = humanReadableMask(mask)
+            if maskNames[0] == 'delete_self':
+                if not filepath.exists():
+                    log.info("%s delete_self", filepath)
+                    self.fileGone()
+                    return
+                else:
+                    log.warn("%s delete_self event but file is here. ignoring",
+                             filepath)
                 return
-        except OSError as e:
-            log.error("%s: %r" % (filepath, e))
-            return
-            
-        log.info("%s needs reread because of %s event", filepath, maskNames)
-        try:
+
+            # we could filter these out in the watch() call, but I want
+            # the debugging
+            if maskNames[0] in ['open', 'access', 'close_nowrite', 'attrib']:
+                log.debug("%s %s event, ignoring" % (filepath, maskNames))
+                return
+
+            try:
+                if filepath.getModificationTime() == self.lastWriteTimestamp:
+                    log.debug("%s changed, but we did this write", filepath)
+                    return
+            except OSError as e:
+                log.error("%s: %r" % (filepath, e))
+                return
+
+            log.info("%s needs reread because of %s event", filepath, maskNames)
+
             self.reread()
         except Exception:
             traceback.print_exc()
