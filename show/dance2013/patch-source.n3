@@ -89,3 +89,8 @@
 [ :name "rgb2-g"; :output dmx:c81 ] .
 [ :name "rgb2-b"; :output dmx:c82 ] .
 
+[ :name "rgb3-mode"; :output dmx:c87 ] .
+[ :name "rgb3-r"; :output dmx:c88 ] .
+[ :name "rgb3-g"; :output dmx:c89 ] .
+[ :name "rgb3-b"; :output dmx:c90 ] .
+

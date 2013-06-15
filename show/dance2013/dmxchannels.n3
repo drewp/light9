@@ -89,4 +89,8 @@ dmx:c84 :dmxAddress 84 .
 dmx:c85 :dmxAddress 85 .
 dmx:c86 :dmxAddress 86 .
 dmx:c87 :dmxAddress 87 .
+dmx:c88 :dmxAddress 88 .
+dmx:c89 :dmxAddress 89 .
+dmx:c90 :dmxAddress 90 .
+dmx:c91 :dmxAddress 91 .
 
