@@ -52,7 +52,7 @@ class XMLRPCServe(xmlrpc.XMLRPC):
         self.calldelay=1/options.updates_per_sec 
 
         print "starting parport connection"
-        self.parportdmx = UsbDMX(port=options.dmx_device)
+        self.parportdmx = UsbDMX(dimmers=87, port=options.dmx_device)
         if os.environ.get('DMXDUMMY',0):
             self.parportdmx.godummy()
         else:
