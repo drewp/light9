@@ -447,7 +447,23 @@ class KeyboardComposer(Frame, SubClient):
         return dict([(uri, box.slider_var.get())
             for uri, box in self.subbox.items()])
 
-    def get_levels_as_sub(self):
+    def get_levels_as_sub(self, graph=None):
+        """this has to depend on the graph to get called back enough"""
+        if graph is None:
+            graph = self.graph
+        # but it was using all synced values accidentally
+        for setting in graph.objects(self.session, L9['subSetting']):
+            level = graph.value(setting, L9['level'])
+            if level != 0:
+                sub = graph.value(setting, L9['sub'])
+                for ll in graph.objects(sub, L9['lightLevel']):
+                    graph.value(ll, L9['channel'])
+                    graph.value(ll, L9['level'])
+
+        # this is the older code, which uses some local objects
+        # that are (supposedly) synced to the graph. It's a waste,
+        # since I think the previous graph code just fetched all this
+        # same data
         scaledsubs = [self.submasters.get_sub_by_uri(sub) * level
             for sub, level in self.get_levels().items() if level > 0.0]
         maxes = sub_maxes(*scaledsubs)
@@ -455,7 +471,10 @@ class KeyboardComposer(Frame, SubClient):
 
     def save_current_stage(self, subname):
         log.info("saving current levels as %s", subname)
-        sub = self.get_levels_as_sub()
+        with self.graph.currentState() as current:
+            sub = self.get_levels_as_sub(graph=current)
+
+        log.debug("new sub for reference: %r", sub)
 
         newUri = showconfig.showUri() + "/sub/%s" % subname
         ps = PersistentSubmaster(self.graph, newUri)
@@ -465,7 +484,6 @@ class KeyboardComposer(Frame, SubClient):
             ps.editLevel(chan, v)
             
         self.sub_name.delete(0, tk.END)
-
 
     def send_frequent_updates(self):
         """called when we get a fade -- send events as quickly as possible"""
