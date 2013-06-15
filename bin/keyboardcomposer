@@ -64,9 +64,10 @@ class SubmasterBox(Frame):
     this object owns the level of the submaster (the rdf graph is the
     real authority)
     """
-    def __init__(self, master, sub, session):
+    def __init__(self, master, sub, session, col, row):
         self.sub = sub
         self.session = session
+        self.col, self.row = col, row
         bg = sub.graph.value(sub.uri, L9.color, default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
@@ -96,7 +97,7 @@ class SubmasterBox(Frame):
         sub.graph.addHandler(self.updateLevelFromGraph)
 
         # initial position
-#        self.send_to_hw(sub.name, col + 1) # needs fix
+        # stil need? dispatcher.send("send_to_hw", sub=sub.uri, hwCol=col + 1)
 
     def cleanup(self):
         self.slider_var.trace_vdelete('w', self._slider_var_trace)
@@ -107,12 +108,10 @@ class SubmasterBox(Frame):
         if self.pauseTrace:
             return
         self.updateGraphWithLevel(self.sub.uri, self.slider_var.get())
-        # dispatcher.send("level changed") # in progress
-        ###self.send_levels() # use dispatcher?
 
         # needs fixing: plan is to use dispatcher or a method call to tell a hardware-mapping object who changed, and then it can make io if that's a current hw slider
-        #if rowcount == self.current_row:
-        #    self.send_to_hw(sub.name, col + 1)
+        dispatcher.send("send_to_hw", sub=self.sub.uri, hwCol=self.col + 1,
+                        boxRow=self.row)
 
     def updateGraphWithLevel(self, uri, level):
         """in our per-session graph, we maintain SubSetting objects like this:
@@ -236,7 +235,7 @@ class KeyboardComposer(Frame, SubClient):
                 rowcount += 1
                 col = 0
 
-            subbox = SubmasterBox(row, sub, self.session)
+            subbox = SubmasterBox(row, sub, self.session, col, rowcount)
             subbox.place(relx=col / 8, rely=0, relwidth=1 / 8, relheight=1)
             self.subbox[sub.uri] = self.slider_table[(rowcount, col)] = subbox
 
@@ -262,6 +261,7 @@ class KeyboardComposer(Frame, SubClient):
                 log.info("no hardware sliders")
                 self.sliders = DummySliders()
                 self.use_hw_sliders = False
+            dispatcher.connect(self.send_to_hw, 'send_to_hw')
         else:
             self.sliders = DummySliders()
 
@@ -349,7 +349,8 @@ class KeyboardComposer(Frame, SubClient):
                 self.sliders.valueOut("button-upper%d" % col, False)
                 self.sliders.valueOut("slider%d" % col, 0)
                 continue
-            self.send_to_hw(subbox.name, col)
+            self.send_to_hw(sub=subbox.sub.uri, hwCol=col,
+                            boxRow=self.current_row)
 
     def got_nudger(self, number, direction, full=0):
         try:
@@ -374,14 +375,24 @@ class KeyboardComposer(Frame, SubClient):
             subbox = self.slider_table[(self.current_row, col)]
         except KeyError:
             return # no slider assigned at that column
-        subbox.scale.set(value)
+        subbox.slider_var.set(value)
 
-    def send_to_hw(self, subUri, hwNum):
+    def send_to_hw(self, sub, hwCol, boxRow):
         if isinstance(self.sliders, DummySliders):
             return
 
-        v = round(127 * self.slider_vars[subUri].get())
-        chan = "slider%s" % hwNum
+        assert isinstance(sub, URIRef), repr(subUri)
+
+        if boxRow != self.current_row:
+            return
+        
+        try:
+            level = self.get_levels()[sub]
+        except KeyError:
+            log.warn("%r not in %r", sub, self.get_levels())
+            raise
+        v = round(127 * level)
+        chan = "slider%s" % hwCol
 
         # workaround for some rounding issue, where we receive one
         # value and then decide to send back a value that's one step
