@@ -4,8 +4,8 @@
 
 show:dance2013 :networking sh:netHome .
 sh:netHome  
-  :musicPlayer <http://localhost:8040/>;
-  :dmxServer <http://localhost:8030/>;
-  :curveCalc <http://localhost:8060/>;
-  :keyboardComposer <http://localhost:8050/>;
-  :vidref <http://plus:8053/> .
+  :musicPlayer <http://plus:8040/>;
+  :dmxServer <http://plus:8030/>;
+  :curveCalc <http://plus:8060/>;
+  :keyboardComposer <http://plus:8050/>;
+  :vidref <http://amp:8053/> .
