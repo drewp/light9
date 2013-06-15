@@ -81,3 +81,11 @@
 [ :name "house3"; :output dmx:c71 ] .
 [ :name "house2"; :output dmx:c72 ] .
 
+[ :name "rgb1-r"; :output dmx:c73 ] .
+[ :name "rgb1-g"; :output dmx:c74 ] .
+[ :name "rgb1-b"; :output dmx:c75 ] .
+
+[ :name "rgb2-r"; :output dmx:c80 ] .
+[ :name "rgb2-g"; :output dmx:c81 ] .
+[ :name "rgb2-b"; :output dmx:c82 ] .
+
