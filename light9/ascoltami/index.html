@@ -93,7 +93,10 @@ $(function () {
     $.getJSON("songs", {}, function (data, status) {
 	$.each(data.songs, function (i, song) {
 	    var button = $("<button>");
-	    button.text(song.label);
+            // link is just for dragging, not clicking
+            var link = $("<a>").text(song.label).attr("href", song.uri);
+            link.click(function () { button.click(); return false; }); 
+            button.append(link);
 	    button.data(song);
 	    button.click(function () {
 		$.post("song", button.data("uri"), 
