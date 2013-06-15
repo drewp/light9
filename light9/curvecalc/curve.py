@@ -170,6 +170,13 @@ class Curveset(object):
         This fires 'add_curve' dispatcher events to announce the new curves.
         """
         log.info("Curveset.load %s", basename)
+        dispatcher.send("clear_curves")
+        self.curves.clear()
+        self.curveName.clear()
+        self.sliderCurve.clear()
+        self.sliderNum.clear()
+        self.markers = Markers()
+        
         for filename in sorted(glob.glob("%s-*"%basename), key=self.sorter):
             curvename = filename[filename.rfind('-')+1:]
             if skipMusic and curvename in ['music', 'smooth_music']:

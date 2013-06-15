@@ -62,7 +62,10 @@ class Music:
         return done
 
     def _bodyReceived(self, data):
-        dispatcher.send("input time", val=data['t'])
+        if 't' in data:
+            dispatcher.send("input time", val=data['t'])
+        if 'song' in data:
+            dispatcher.send("current_player_song", song=URIRef(data['song']))
         return data['t'] # pass along to the real receiver
     
     def playOrPause(self, t=None):

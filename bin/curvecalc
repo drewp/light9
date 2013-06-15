@@ -78,6 +78,25 @@ class Main(object):
             songChoice(graph.value(session, L9['currentSong']))
         graph.addHandler(setSong)
         # next here, watch songChoice and patch the graph
+        def songToGraph(newSong):
+            graph.patchObject(context=session, subject=session,
+                              predicate=L9['currentSong'], newObject=newSong)
+        songChoice.subscribe(songToGraph)
+        def current_player_song(song):
+            # (this is run on every frame)
+            ps = wtree.get_object("playerSong")
+            if URIRef(ps.get_uri()) != song:
+                print "update playerSong"
+                def setLabel():
+                    ps.set_label(graph.label(song))
+                graph.addHandler(setLabel)
+                ps.set_uri(song)
+            if song != songChoice():
+                if wtree.get_object("followPlayerSongChoice").get_active():
+                    songChoice(song)
+                
+        self.current_player_song = current_player_song
+        dispatcher.connect(current_player_song, "current_player_song")
         
         ec = EditChoice(graph, songChoice, label="Editing song:")
         wtree.get_object("currentSongEditChoice").add(ec)

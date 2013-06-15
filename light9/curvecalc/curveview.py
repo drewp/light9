@@ -1048,6 +1048,9 @@ class CurveRow(object):
         self.initCurveView()
         self.update_ui_to_collapsed_state()
 
+    def destroy(self):
+        self.box.destroy()
+        
     def initCurveView(self):
         self.curveView.widget.show()
         self.curveView.widget.set_size_request(-1, 100)
@@ -1141,6 +1144,7 @@ class Curvesetview(object):
         for c in curveset.curveNamesInOrder():
             self.add_curve(c) 
 
+        dispatcher.connect(self.clear_curves, "clear_curves")
         dispatcher.connect(self.add_curve, "add_curve", sender=self.curveset)
         dispatcher.connect(self.set_featured_curves, "set_featured_curves")
         
@@ -1153,6 +1157,11 @@ class Curvesetview(object):
     def __del__(self):
         print "del curvesetview", id(self) 
 
+    def clear_curves(self):
+        """curveset is about to re-add all new curves"""
+        while self.allCurveRows:
+            self.allCurveRows.pop().destroy()
+        
     def takeFocus(self, *args):
         """the whole curveset's eventbox is what gets the focus, currently, so
         keys like 'c' can work in it"""
