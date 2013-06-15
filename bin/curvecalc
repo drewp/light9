@@ -96,7 +96,7 @@ class Main(object):
         wtree.get_object("paned1").set_position(600)
 
     def setupNewSubZone(self):
-        wtree.get_object("newSubZone").drag_dest_set(
+        self.wtree.get_object("newSubZone").drag_dest_set(
             flags=gtk.DEST_DEFAULT_ALL,
             targets=[('text/uri-list', 0, 0)],
             actions=gtk.gdk.ACTION_COPY)
@@ -135,7 +135,10 @@ class Main(object):
         if '?' in data:
             self.handleSubtermDrop(data)
             return
-        self.makeSubterm(newname="cx", withCurve=True, sub=data)
+        with self.graph.currentState(tripleFilter=(data, None, None)) as current:
+            subName = current.label(data)
+        self.makeSubterm(newname=subName, withCurve=True, sub=data,
+                         expr="%s(t)" % subName)
         
     def handleSubtermDrop(self, data):
         params = parse_qsl(data.split('?')[1])
