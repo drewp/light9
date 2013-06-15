@@ -19,6 +19,7 @@ proposal for new attribute system:
 from __future__ import nested_scopes,division
 import Tkinter as tk
 from rdflib import RDF, Literal
+import math
 from decimal import Decimal
 from light9.namespaces import L9
 
@@ -162,7 +163,7 @@ class Levelbox(tk.Frame):
         chans = list(self.graph.subjects(RDF.type, L9.Channel))
         chans.sort(key=lambda c: int(self.graph.value(c, L9.output).rsplit('/c')[-1]))
         cols = 2
-        rows = len(chans) // cols
+        rows = int(math.ceil(len(chans) / cols))
 
         def make_frame(parent):
              f = tk.Frame(parent, bd=0, bg='black')
