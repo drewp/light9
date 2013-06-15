@@ -4,7 +4,7 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-show:dance2013 :musicRoot "show/dance2013/music" .
+show:dance2013 :musicRoot "show/dance2013/music/norm/pad" .
 
 show:dance2013 :playList (
   sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
