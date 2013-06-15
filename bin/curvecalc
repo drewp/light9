@@ -190,7 +190,7 @@ class Main(object):
         self.graph.addHandler(self.set_subterms_from_graph)
         
     def onNewSubterm(self, *args):
-        self.makeSubterm("", withCurve=False)
+        self.makeSubterm(Literal(""), withCurve=False)
         return
 
         # pretty sure i don't want this back, but not completely sure
