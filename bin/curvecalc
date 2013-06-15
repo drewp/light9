@@ -76,6 +76,7 @@ class Main(object):
 
         def setSong():
             songChoice(graph.value(session, L9['currentSong']))
+            dispatcher.send("song_has_changed")
         graph.addHandler(setSong)
         # next here, watch songChoice and patch the graph
         def songToGraph(newSong):

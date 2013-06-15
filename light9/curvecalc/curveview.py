@@ -1149,6 +1149,7 @@ class Curvesetview(object):
         dispatcher.connect(self.clear_curves, "clear_curves")
         dispatcher.connect(self.add_curve, "add_curve", sender=self.curveset)
         dispatcher.connect(self.set_featured_curves, "set_featured_curves")
+        dispatcher.connect(self.song_has_changed, "song_has_changed")
         
         self.newcurvename = gtk.EntryBuffer("", 0)
 
@@ -1163,6 +1164,9 @@ class Curvesetview(object):
         """curveset is about to re-add all new curves"""
         while self.allCurveRows:
             self.allCurveRows.pop().destroy()
+
+    def song_has_changed(self):
+        self.zoomControl.redrawzoom()
         
     def takeFocus(self, *args):
         """the whole curveset's eventbox is what gets the focus, currently, so
