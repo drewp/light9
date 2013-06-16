@@ -5,7 +5,11 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://light9.bigasterisk.com/show/dance2013/song1> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song1/subterm/23>,
-        <http://light9.bigasterisk.com/show/dance2013/song1/subterm/24> .
+        <http://light9.bigasterisk.com/show/dance2013/song1/subterm/24>,
+        <http://light9.bigasterisk.com/show/dance2013/song1/subterm/25>,
+        <http://light9.bigasterisk.com/show/dance2013/song1/subterm/26>,
+        <http://light9.bigasterisk.com/show/dance2013/song1/subterm/27>,
+        <http://light9.bigasterisk.com/show/dance2013/song1/subterm/28> .
 
 <http://light9.bigasterisk.com/show/dance2013/song1/sub/1370731059.446663> a ns1:Subterm ;
     rdfs:label "" ;
@@ -115,11 +119,30 @@
 
 <http://light9.bigasterisk.com/show/dance2013/song1/subterm/23> a ns1:Subterm ;
     rdfs:label "cyan" ;
-    ns1:expression "cyan(t)" ;
+    ns1:expression "" ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/cyan> .
 
 <http://light9.bigasterisk.com/show/dance2013/song1/subterm/24> a ns1:Subterm ;
     rdfs:label "anotherfront" ;
-    ns1:expression "anotherfront(t)" ;
-    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/anotherfront> .
+    ns1:expression "" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/red> .
+
+<http://light9.bigasterisk.com/show/dance2013/song1/subterm/25> a ns1:Subterm ;
+    rdfs:label "rainbow" ;
+    ns1:expression "rainbow_env(t)*hsv(t*.6,1,1)" .
+
+<http://light9.bigasterisk.com/show/dance2013/song1/subterm/26> a ns1:Subterm ;
+    rdfs:label "fos" ;
+    ns1:expression "fos(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/fos> .
+
+<http://light9.bigasterisk.com/show/dance2013/song1/subterm/27> a ns1:Subterm ;
+    rdfs:label "patio" ;
+    ns1:expression "patio(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/patio> .
+
+<http://light9.bigasterisk.com/show/dance2013/song1/subterm/28> a ns1:Subterm ;
+    rdfs:label "song1" ;
+    ns1:expression "song1(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song1> .
 

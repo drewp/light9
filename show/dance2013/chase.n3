@@ -13,27 +13,19 @@ ch:oran4 ) .
 
 chase:colors1 a :Chase; :channels (ch:red1 ch:gree1 ch:oran1 ch:blue1) .
 chase:colors2 a :Chase; :channels (ch:red2 ch:gree2 ch:oran2 ch:blue2) .
+
+"missing tons of lights" is rdfs:comment of chase:colors3, chase:colors4 .
 chase:colors3 a :Chase; :channels (ch:red3 ch:gree3 ch:oran3 ch:blue3) .
 chase:colors4 a :Chase; :channels (ch:red4 ch:gree4 ch:oran4 ch:blue4) .
 
+# 2013 ok
 chase:colorrb a :Chase; :channels (
 ch:blue1 ch:red1 
 ch:blue2 ch:red2 
 ch:blue2 ch:red2 
  ) .
 
-chase:backcolors a :Chase; rdfs:comment "back non-white, brightness order"; 
-  :channels (
-ch:b16-r2
-ch:b15-r1-warm
-ch:b26-l-purple
-ch:b22-l-warm
-ch:b24-c-red
-ch:b25-r-cool
-ch:b32-l1-cool
-ch:b33-c-red
-) .
-
+# 2013 ok
 chase:backchase a :Chase ;
 :channels (
 ch:b11-down-l
@@ -50,6 +42,7 @@ ch:b34-r
 ch:b35-down-r
 ) .
 
+# 2013 ok
 chase:scoop a :Chase; :channels (
 ch:cyc-left
 ch:cyc-right
@@ -68,27 +61,21 @@ ch:upright
 
 # left to right
 chase:frontchase a :Chase; :channels (
-ch:front4-r
 ch:front5-l
 ch:front6-pool
-ch:front11-c
 ch:front8-r
-ch:front9-l
-ch:front10-r2
 ) .
 
 chase:frontsrand a :Chase; :channels (
-ch:front9-l
+ch:sharlyn
 ch:front6-pool
 ch:front5-l
-ch:front4-r
 ch:front6-pool
-ch:front9-l
+ch:sharlyn
 ch:front8-r
-ch:front11-c
 ch:front5-l
 ch:front8-r
-ch:front4-r
+
 ) .
 
 chase:cycline a :Chase; :channels (ch:cyc-left ch:cyc-mid ch:cyc-right ) .

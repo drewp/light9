@@ -1,0 +1,24 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/song15> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song15/subterm/0>,
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/2> .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/0> a ns1:Subterm ;
+    rdfs:label "strobebright" ;
+    ns1:expression "strobebright(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/strobebright> .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/1> a ns1:Subterm ;
+    rdfs:label "" ;
+    ns1:expression "chan('strobespeed')*.980" .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/2> a ns1:Subterm ;
+    rdfs:label "full" ;
+    ns1:expression "full(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+

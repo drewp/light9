@@ -1,0 +1,30 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/song3> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song3/subterm/0>,
+        <http://light9.bigasterisk.com/show/dance2013/song3/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song3/subterm/2>,
+        <http://light9.bigasterisk.com/show/dance2013/song3/subterm/3> .
+
+<http://light9.bigasterisk.com/show/dance2013/song3/subterm/0> a ns1:Subterm ;
+    rdfs:label "backchase" ;
+    ns1:expression "backchase_env(t) * chase(t+.1, names=backchase, ontime=0.5, offset=0.0)" .
+
+<http://light9.bigasterisk.com/show/dance2013/song3/subterm/1> a ns1:Subterm ;
+    rdfs:label "bwarm" ;
+    ns1:expression "bwarm(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/bwarm> .
+
+<http://light9.bigasterisk.com/show/dance2013/song3/subterm/2> a ns1:Subterm ;
+    rdfs:label "song3" ;
+    ns1:expression "song3(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song3> .
+
+<http://light9.bigasterisk.com/show/dance2013/song3/subterm/3> a ns1:Subterm ;
+    rdfs:label "full" ;
+    ns1:expression "full(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+
