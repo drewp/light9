@@ -66,9 +66,9 @@ class GraphFile(object):
                     self.fileGone()
                     return
                 else:
-                    log.warn("%s delete_self event but file is here. ignoring",
+                    log.warn("%s delete_self event but file is here. "
+                             "probably a new version moved in",
                              filepath)
-                return
 
             # we could filter these out in the watch() call, but I want
             # the debugging
