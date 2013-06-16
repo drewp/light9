@@ -1,5 +1,6 @@
 from light9.showconfig import getSongsFromShow, songOnDisk
 from light9.namespaces import L9
+from rdflib import URIRef
 
 class NoSuchSong(ValueError):
     """Raised when a song is requested that doesn't exist (e.g. one
@@ -8,7 +9,28 @@ class NoSuchSong(ValueError):
 class Playlist(object):
     def __init__(self, graph, playlistUri):
         self.graph = graph
-        self.songs = list(graph.items(playlistUri))
+
+        # this should be fixed to share with getSongsFromShow. See note in that one for why I had to stop using graph.items
+        self.songs = [
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song1"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song2"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song3"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song4"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song5"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song6"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song7"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song8"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song9"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song10"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song11"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song12"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song13"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song14"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song15"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song16"),
+            URIRef("http://light9.bigasterisk.com/show/dance2013/song17"),
+        ]
+        
     def nextSong(self, currentSong):
         """Returns the next song in the playlist or raises NoSuchSong if 
         we are at the end of the playlist."""

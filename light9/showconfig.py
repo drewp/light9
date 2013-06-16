@@ -74,7 +74,28 @@ def getSongsFromShow(graph, show):
     playList = graph.value(show, L9['playList'])
     if not playList:
         raise ValueError("%r has no l9:playList" % show)
-    songs = list(graph.items(playList))
+    songs = [
+        # this was graph.items(playlistUri) but i was getting other
+        # items from a totally different list! seems like bnode
+        # corruption.
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song1"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song2"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song3"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song4"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song5"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song6"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song7"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song8"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song9"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song10"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song11"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song12"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song13"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song14"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song15"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song16"),
+        URIRef("http://light9.bigasterisk.com/show/dance2013/song17"),
+    ]
 
     return songs
 
