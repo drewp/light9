@@ -1,11 +1,74 @@
-@prefix ns1: <http://purl.org/dc/terms/> .
-@prefix ns2: <http://light9.bigasterisk.com/> .
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix ns2: <http://purl.org/dc/terms/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2013/sub/house> ns2:image <http://amp:8053/snapshot/1371318806.48.jpg> .
+<http://light9.bigasterisk.com/show/dance2013/sub/backblue> ns1:image <http://amp:8053/snapshot/1371344746.74.jpg> .
 
-<http://amp:8053/snapshot/1371318806.48.jpg> ns1:created "2013-06-15T10:53:04.978989-07:00"^^xsd:dateTime .
+<http://light9.bigasterisk.com/show/dance2013/sub/blue> ns1:image <http://amp:8053/snapshot/1371344665.76.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/bwarm> ns1:image <http://amp:8053/snapshot/1371344672.41.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/center> ns1:image <http://amp:8053/snapshot/1371344989.21.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/cross> ns1:image <http://amp:8053/snapshot/1371344971.19.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/cyc> ns1:image <http://amp:8053/snapshot/1371344725.58.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/edge> ns1:image <http://amp:8053/snapshot/1371344711.37.jpg>,
+        <http://amp:8053/snapshot/1371344715.71.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/fos> ns1:image <http://amp:8053/snapshot/1371344734.83.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/fronts> ns1:image <http://amp:8053/snapshot/1371344681.47.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/green> ns1:image <http://amp:8053/snapshot/1371344702.56.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house> ns1:image <http://amp:8053/snapshot/1371318806.48.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange> ns1:image <http://amp:8053/snapshot/1371344692.23.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/pool1> ns1:image <http://amp:8053/snapshot/1371344944.56.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/pool2> ns1:image <http://amp:8053/snapshot/1371344947.9.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/pool3> ns1:image <http://amp:8053/snapshot/1371344952.16.jpg> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/upscoop> ns1:image <http://amp:8053/snapshot/1371345001.91.jpg> .
+
+<http://amp:8053/snapshot/1371318806.48.jpg> ns2:created "2013-06-15T10:53:04.978989-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344665.76.jpg> ns2:created "2013-06-15T18:04:03.852259-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344672.41.jpg> ns2:created "2013-06-15T18:04:10.487907-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344681.47.jpg> ns2:created "2013-06-15T18:04:19.550404-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344692.23.jpg> ns2:created "2013-06-15T18:04:30.300160-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344702.56.jpg> ns2:created "2013-06-15T18:04:40.643454-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344711.37.jpg> ns2:created "2013-06-15T18:04:49.454657-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344715.71.jpg> ns2:created "2013-06-15T18:04:53.793636-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344725.58.jpg> ns2:created "2013-06-15T18:05:03.661553-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344734.83.jpg> ns2:created "2013-06-15T18:05:12.915700-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344746.74.jpg> ns2:created "2013-06-15T18:05:24.823677-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344944.56.jpg> ns2:created "2013-06-15T18:08:42.649303-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344947.9.jpg> ns2:created "2013-06-15T18:08:45.992916-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344952.16.jpg> ns2:created "2013-06-15T18:08:50.235259-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344971.19.jpg> ns2:created "2013-06-15T18:09:09.255564-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371344989.21.jpg> ns2:created "2013-06-15T18:09:27.304663-07:00"^^xsd:dateTime .
+
+<http://amp:8053/snapshot/1371345001.91.jpg> ns2:created "2013-06-15T18:09:39.993991-07:00"^^xsd:dateTime .
 

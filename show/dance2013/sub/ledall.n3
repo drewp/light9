@@ -1,0 +1,54 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/ledall> a ns1:Submaster ;
+    rdfs:label "ledall" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371344878.11/map/194090483>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/248821710>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/454350191>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/525106738>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/534588560>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/778221299>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/84324393>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/88919451>,
+        <http://light9.bigasterisk.com/sub/local/1371344878.11/map/946938584> .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/194090483> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-r> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/248821710> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-r> ;
+    ns1:level 7.35e-01 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/454350191> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
+    ns1:level 7.45e-01 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/525106738> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-b> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/534588560> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-r> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/778221299> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-b> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/84324393> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-g> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/88919451> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-g> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1371344878.11/map/946938584> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-g> ;
+    ns1:level 7.55e-01 .
+

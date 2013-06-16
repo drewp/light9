@@ -6,14 +6,34 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/cyan> a ns1:Submaster ;
     rdfs:label "cyan" ;
-    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371278153.45/map/586385345>,
-        <http://light9.bigasterisk.com/sub/local/1371278153.45/map/817317922> .
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/225503322>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/242573118>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/445976342>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/869476263>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/904382830>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/964005173> .
 
-<http://light9.bigasterisk.com/sub/local/1371278153.45/map/586385345> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/front11-c> ;
+<http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/225503322> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-b> ;
     ns1:level 1e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1371278153.45/map/817317922> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/front12-crap> ;
+<http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/242573118> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-g> ;
     ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/445976342> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
+    ns1:level 4.85e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/869476263> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-g> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/904382830> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-b> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/cyan/map/964005173> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-g> ;
+    ns1:level 4.65e-01 .
 
