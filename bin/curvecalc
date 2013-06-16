@@ -134,14 +134,17 @@ class Main(object):
                     tripleFilter=(subUri, RDFS.label, None)) as current:
                 subName = current.label(subUri)
 
-            try:
-                self.makeSubterm(subName, withCurve=True,
-                                 sub=subUri,
-                                 expr="%s(t)" % subName)
-            except SubtermExists:
-                # we're not making sure the expression/etc are
-                # correct-- user mihgt need to fix things
-                pass
+            if '?' in subUri:
+                subName = self.handleSubtermDrop(subUri)
+            else:
+                try:
+                    self.makeSubterm(subName, withCurve=True,
+                                     sub=subUri,
+                                     expr="%s(t)" % subName)
+                except SubtermExists:
+                    # we're not making sure the expression/etc are
+                    # correct-- user mihgt need to fix things
+                    pass
             curveView = self.curvesetView.row(subName).curveView
             t = self.lastSeenInputTime # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
             print "time", t
@@ -169,6 +172,7 @@ class Main(object):
         for cmd, name in params:
             if cmd == 'curve':
                 self.curveset.new_curve(name)
+        return name
 
     def onNewCurve(self, *args):
         dialog = self.wtree.get_object("newCurve")
