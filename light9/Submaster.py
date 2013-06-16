@@ -306,7 +306,7 @@ class Submasters(object):
         for s in set(self.submasters.keys()) - current:
             del self.submasters[s]
             dispatcher.send("lost submaster", subUri=s)
-        log.info("findSubs finished %s", self.submasters)
+        log.info("findSubs finished, %s subs", len(self.submasters))
 
     def get_all_subs(self):
         "All Submaster objects"
