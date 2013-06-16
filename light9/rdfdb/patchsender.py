@@ -1,4 +1,4 @@
-import logging
+import logging, time
 import cyclone.httpclient
 from twisted.internet import defer
 log = logging.getLogger('syncedgraph')
@@ -96,12 +96,17 @@ def sendPatch(putUri, patch, **kw):
     
     kwargs will become extra attributes in the toplevel json object
     """
+    t1 = time.time()
     body = patch.makeJsonRepr(kw)
-    log.debug("send body: %r", body)
+    jsonTime = time.time() - t1
+    intro = body[:200]
+    if len(body) > 200:
+        intro = intro + "..."
+    log.debug("send body (rendered %.1fkB in %.1fms): %s", len(body) / 1024, jsonTime * 1000, intro)
     def putDone(done):
         if not str(done.code).startswith('2'):
             raise ValueError("sendPatch request failed %s: %s" % (done.code, done.body))
-        log.debug("sendPatch finished, response: %s" % done.body)
+        log.debug("sendPatch finished, response: %r" % done.body)
         return done
 
     return cyclone.httpclient.fetch(
