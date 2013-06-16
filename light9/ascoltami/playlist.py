@@ -30,6 +30,8 @@ class Playlist(object):
             URIRef("http://light9.bigasterisk.com/show/dance2013/song16"),
             URIRef("http://light9.bigasterisk.com/show/dance2013/song17"),
         ]
+        # probably fixed with the patch in https://github.com/RDFLib/rdflib/issues/305
+        #self.songs = list(graph.items(playlistUri))
         
     def nextSong(self, currentSong):
         """Returns the next song in the playlist or raises NoSuchSong if 

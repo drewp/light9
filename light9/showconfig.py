@@ -96,6 +96,8 @@ def getSongsFromShow(graph, show):
         URIRef("http://light9.bigasterisk.com/show/dance2013/song16"),
         URIRef("http://light9.bigasterisk.com/show/dance2013/song17"),
     ]
+    # probably fixed with the patch in https://github.com/RDFLib/rdflib/issues/305
+    #songs = list(graph.items(playList))
 
     return songs
 
