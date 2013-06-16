@@ -55,7 +55,7 @@ class Main(object):
         mainwin.connect("destroy", self.onQuit)
         wtree.connect_signals(self)
         gtk.rc_parse("theme/marble-ice/gtk-2.0/gtkrc")
-        gtk.rc_parse_string("""style "default" {font_name = "sans 7"}""")
+        gtk.rc_parse_string("""style "default" {font_name = "sans 9"}""")
         if self.opts.reload:
             self.refreshTheme()
         mainwin.show_all()
