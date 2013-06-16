@@ -6,7 +6,11 @@
 
 <http://light9.bigasterisk.com/show/dance2013/song15> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song15/subterm/0>,
         <http://light9.bigasterisk.com/show/dance2013/song15/subterm/1>,
-        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/2> .
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/2>,
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/3>,
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/4>,
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/5>,
+        <http://light9.bigasterisk.com/show/dance2013/song15/subterm/6> .
 
 <http://light9.bigasterisk.com/show/dance2013/song15/subterm/0> a ns1:Subterm ;
     rdfs:label "strobebright" ;
@@ -21,4 +25,23 @@
     rdfs:label "full" ;
     ns1:expression "full(t)" ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/3> a ns1:Subterm ;
+    rdfs:label "pulserainbow" ;
+    ns1:expression "pulserainbow_env(t) * hsv(t*1,1,1)*(smooth_music(t+.08)>.5)" .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/4> a ns1:Subterm ;
+    rdfs:label "song15dial" ;
+    ns1:expression "song15dial(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song15dial> .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/5> a ns1:Subterm ;
+    rdfs:label "cycmid" ;
+    ns1:expression "cycmid(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/cycmid> .
+
+<http://light9.bigasterisk.com/show/dance2013/song15/subterm/6> a ns1:Subterm ;
+    rdfs:label "ledall" ;
+    ns1:expression "cycmid(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/ledall> .
 
