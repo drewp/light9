@@ -13,6 +13,7 @@ class Expr(object):
     e.g. chases"""
     def __init__(self):
         self.effectGlobals = light9.Effects.configExprGlobals()
+        self._smooth_random_items = [random.random() for x in range(100)]
     
     def exprGlobals(self, startDict, t):
         """globals dict for use by expressions"""
@@ -79,7 +80,6 @@ class Subterm(object):
         self.curveset = curveset
         self.ensureExpression(saveContext)
 
-        self._smooth_random_items = [random.random() for x in range(100)]
         self.submasters = Submaster.get_global_submasters(self.graph)
         
     def ensureExpression(self, saveCtx):
