@@ -1,6 +1,6 @@
 from __future__ import division
 from random import Random
-import logging
+import logging, colorsys
 import light9.Submaster as Submaster
 from chase import chase as chase_logic
 import showconfig
@@ -31,6 +31,17 @@ def chase(t, ontime=0.5, offset=0.2, onval=1.0,
 
     return Submaster.Submaster(name="chase" ,levels=lev)
 
+def hsv(h, s, v, light='all', centerScale=.5):
+    r,g,b = colorsys.hsv_to_rgb(h % 1.0, s, v)
+    lev = {}
+    if light in ['left', 'all']:
+        lev[73], lev[74], lev[75] = r,g,b
+    if light in ['right', 'all']:
+        lev[80], lev[81], lev[82] = r,g,b
+    if light in ['center', 'all']:
+        lev[88], lev[89], lev[90] = r*centerScale,g*centerScale,b*centerScale
+    return Submaster.Submaster(name='hsv', levels=lev)
+    
 def stack(t, names=None, fade=0):
     """names is list of URIs. returns a submaster that stacks the the inputs
 
@@ -66,4 +77,5 @@ def configExprGlobals():
 
     ret['chase'] = chase
     ret['stack'] = stack
+    ret['hsv'] = hsv
     return ret
