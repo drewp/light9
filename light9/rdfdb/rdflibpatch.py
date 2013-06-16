@@ -64,7 +64,7 @@ def graphFromNQuad(text):
 from rdflib.plugins.serializers.nt import _xmlcharref_encode
 def serializeQuad(g):
     """replacement for graph.serialize(format='nquads')"""
-    out = ""
+    out = []
     for s,p,o,c in g.quads((None,None,None)):
         if isinstance(c, Graph):
             # still not sure why this is Graph sometimes,
@@ -72,11 +72,11 @@ def serializeQuad(g):
             c = c.identifier
         if '[' in c.n3():
             import ipdb;ipdb.set_trace()
-        out += u"%s %s %s %s .\n" % (s.n3(),
+        out.append(u"%s %s %s %s .\n" % (s.n3(),
                                      p.n3(),
                                      _xmlcharref_encode(o.n3()),
-                                     c.n3())
-    return out
+                                     c.n3()))
+    return ''.join(out)
 
 def inContext(graph, newContext):
     """
