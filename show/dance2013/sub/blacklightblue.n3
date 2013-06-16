@@ -1,0 +1,49 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue> a ns1:Submaster ;
+    rdfs:label "blacklightblue" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/357697437>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/397994674>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/464167328>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/550490919>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/554959832>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/568009520>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/577107331>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/580091697> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/357697437> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue1> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/397994674> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue3> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/464167328> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-b> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/550490919> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blacklight> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/554959832> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
+    ns1:level 4.8e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/568009520> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue4> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/577107331> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-b> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blacklightblue/map/580091697> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue2> ;
+    ns1:level 1e+00 .
+

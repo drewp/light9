@@ -1,0 +1,42 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song11/subterm/0>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/2>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/3>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/4>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/5> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/0> a ns1:Subterm ;
+    rdfs:label "full" ;
+    ns1:expression "full(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/1> a ns1:Subterm ;
+    rdfs:label "" ;
+    ns1:expression "chase1(t)*chase(t, names=backchase,ontime=.2,offset=0.0)" .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/2> a ns1:Subterm ;
+    rdfs:label "center" ;
+    ns1:expression "center(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/center> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/3> a ns1:Subterm ;
+    rdfs:label "upscoop" ;
+    ns1:expression "upscoop(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/upscoop> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/4> a ns1:Subterm ;
+    rdfs:label "cyc" ;
+    ns1:expression "cyc(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/cyc> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/5> a ns1:Subterm ;
+    rdfs:label "song11orange" ;
+    ns1:expression "song11orange(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song11orange> .
+

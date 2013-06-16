@@ -1,0 +1,66 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song8/subterm/0>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/2>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/3>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/4>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/5>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/6>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/7>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/8>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/9> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/0> a ns1:Subterm ;
+    rdfs:label "pool3" ;
+    ns1:expression "pool3(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/pool3> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/1> a ns1:Subterm ;
+    rdfs:label "pool2" ;
+    ns1:expression "pool2(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/pool2> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/2> a ns1:Subterm ;
+    rdfs:label "pool1" ;
+    ns1:expression "pool1(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/pool1> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/3> a ns1:Subterm ;
+    rdfs:label "fronts" ;
+    ns1:expression "fronts(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/fronts> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/4> a ns1:Subterm ;
+    rdfs:label "full" ;
+    ns1:expression "full(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/5> a ns1:Subterm ;
+    rdfs:label "strobebright" ;
+    ns1:expression "strobebright(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/strobebright> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/6> a ns1:Subterm ;
+    rdfs:label "" ;
+    ns1:expression "chan('strobespeed')*.98" .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/7> a ns1:Subterm ;
+    rdfs:label "center" ;
+    ns1:expression "center(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/center> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/8> a ns1:Subterm ;
+    rdfs:label "song8warm" ;
+    ns1:expression "song8warm(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song8warm> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/9> a ns1:Subterm ;
+    rdfs:label "song8sixty" ;
+    ns1:expression "song8sixty(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song8sixty> .
+

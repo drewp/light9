@@ -34,6 +34,22 @@ ch:b32-l1-cool
 ch:b33-c-red
 ) .
 
+chase:backchase a :Chase ;
+:channels (
+ch:b11-down-l
+ch:b12-l
+ch:b13-blue
+ch:b14-cross
+ch:b16-edge-l
+ch:b22-pool1
+ch:b25-pool2
+ch:b31-edge-r
+ch:b32-blue
+ch:b33-cross
+ch:b34-r
+ch:b35-down-r
+) .
+
 chase:scoop a :Chase; :channels (
 ch:cyc-left
 ch:cyc-right
@@ -42,21 +58,16 @@ ch:cyc-mid
 ch:upleft
 ch:upright
 ch:down-c-P
-ch:up-l
-ch:down-c-P
-ch:up-r
-ch:up-r
 ch:cyc-left
 ch:cyc-mid
 ch:cyc-mid
 ch:upleft
-ch:up-l
 ch:cyc-mid
 ch:upright
 ) .
 
 # left to right
-chase:fronts a :Chase; :channels (
+chase:frontchase a :Chase; :channels (
 ch:front4-r
 ch:front5-l
 ch:front6-pool
