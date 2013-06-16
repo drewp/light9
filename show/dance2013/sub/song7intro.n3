@@ -1,0 +1,89 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro> a ns1:Submaster ;
+    rdfs:label "song7intro" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/123203911>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/200264598>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/263018769>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/418200912>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/425201147>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/51640083>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/520699470>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/523802448>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/542382058>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/580785220>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/58208396>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/619468435>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/673870323>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/823601095>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/839484608>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/876587681> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/123203911> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue2> ;
+    ns1:level 4.6e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/200264598> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-b> ;
+    ns1:level 4.6e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/263018769> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue1> ;
+    ns1:level 4.6e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/418200912> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
+    ns1:level 2.208e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/425201147> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-r> ;
+    ns1:level 3.3075e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/51640083> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b32-blue> ;
+    ns1:level 3.007e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/520699470> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-r> ;
+    ns1:level 4.3785e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/523802448> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/red4> ;
+    ns1:level 6.3e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/542382058> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b13-blue> ;
+    ns1:level 6.2e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/580785220> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/red2> ;
+    ns1:level 6.3e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/58208396> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-b> ;
+    ns1:level 4.6e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/619468435> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/red1> ;
+    ns1:level 6.3e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/673870323> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-r> ;
+    ns1:level 4.536e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/823601095> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue4> ;
+    ns1:level 4.6e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/839484608> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/red3> ;
+    ns1:level 6.3e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/song7intro/map/876587681> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue3> ;
+    ns1:level 4.6e-01 .
+

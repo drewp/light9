@@ -4,9 +4,50 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2013/song7> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song7/subterm/0> .
+<http://light9.bigasterisk.com/show/dance2013/song7> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song7/subterm/0>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/2>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/3>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/4>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/5>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/6>,
+        <http://light9.bigasterisk.com/show/dance2013/song7/subterm/7> .
 
 <http://light9.bigasterisk.com/show/dance2013/song7/subterm/0> a ns1:Subterm ;
     rdfs:label "" ;
     ns1:expression "" .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/1> a ns1:Subterm ;
+    rdfs:label "song7intro" ;
+    ns1:expression "song7intro(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song7intro> .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/2> a ns1:Subterm ;
+    rdfs:label "song7yel" ;
+    ns1:expression "song7yel(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song7yel2> .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/3> a ns1:Subterm ;
+    rdfs:label "red" ;
+    ns1:expression "red(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/red> .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/4> a ns1:Subterm ;
+    rdfs:label "song7end" ;
+    ns1:expression "song7end(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song7end> .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/5> a ns1:Subterm ;
+    rdfs:label "full" ;
+    ns1:expression "full(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/6> a ns1:Subterm ;
+    rdfs:label "center" ;
+    ns1:expression "center(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/center> .
+
+<http://light9.bigasterisk.com/show/dance2013/song7/subterm/7> a ns1:Subterm ;
+    rdfs:label "alternatergb" ;
+    ns1:expression "alternatergb_env(t) * (hsv(t*1,1,1, light='left')*nsin(t*2*60/170) + hsv(t*1,1,1,light='right')*(1-nsin(t*2*60/170)))" .
 

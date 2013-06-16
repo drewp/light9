@@ -6,6 +6,7 @@
 
 <http://light9.bigasterisk.com/show/dance2013/song8> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song8/subterm/0>,
         <http://light9.bigasterisk.com/show/dance2013/song8/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song8/subterm/10>,
         <http://light9.bigasterisk.com/show/dance2013/song8/subterm/2>,
         <http://light9.bigasterisk.com/show/dance2013/song8/subterm/3>,
         <http://light9.bigasterisk.com/show/dance2013/song8/subterm/4>,
@@ -24,6 +25,11 @@
     rdfs:label "pool2" ;
     ns1:expression "pool2(t)" ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/pool2> .
+
+<http://light9.bigasterisk.com/show/dance2013/song8/subterm/10> a ns1:Subterm ;
+    rdfs:label "song8black" ;
+    ns1:expression "song8black(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song8black> .
 
 <http://light9.bigasterisk.com/show/dance2013/song8/subterm/2> a ns1:Subterm ;
     rdfs:label "pool1" ;

@@ -5,7 +5,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://light9.bigasterisk.com/show/dance2013/song9> ns1:subterm <http://light9.bigasterisk.com/show/dance2013/song9/subterm/0>,
-        <http://light9.bigasterisk.com/show/dance2013/song9/subterm/1> .
+        <http://light9.bigasterisk.com/show/dance2013/song9/subterm/1>,
+        <http://light9.bigasterisk.com/show/dance2013/song9/subterm/2> .
 
 <http://light9.bigasterisk.com/show/dance2013/song9/subterm/0> a ns1:Subterm ;
     rdfs:label "song9" ;
@@ -16,4 +17,9 @@
     rdfs:label "full" ;
     ns1:expression "full(t)" ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/full> .
+
+<http://light9.bigasterisk.com/show/dance2013/song9/subterm/2> a ns1:Subterm ;
+    rdfs:label "song9black" ;
+    ns1:expression "song9black(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song9black> .
 
