@@ -1,16 +1,21 @@
 doctype html
 html
   head
-    title chases
+    title effects
     link(rel='stylesheet', href='style.css')
   body
-    h1 Chases
+    h1 Effects
 
+    div(data-bind="foreach: moreExprs")
+      div.resource.chase
+        span(data-bind="text: label")
+        | 
+        a.resource(data-bind="attr: {href: $root.subtermLink(label, expr)}, text: expr")
+    
     div(data-bind="foreach: chases")
       div.resource.chase
         | Chase
         a(data-bind="attr: {href: uri}, text: label")
-        h2 Subterms
         ul(data-bind="foreach: $parent.subtermExprs($data)")
           li: a.resource(data-bind="attr: {href: $root.subtermLink($parent.label, $data)}, text: $data")
 

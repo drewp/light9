@@ -1,17 +1,26 @@
 class Model
   constructor: ->
     @chases = ko.observable([])
+    @moreExprs = [
+      {label: "rainbow", expr: "hsv(t*1,1,1)"},
+      {label: "pulserainbow", expr: "hsv(t*1,1,1)*nsin(t*2)"},
+      {label: "stacrainbow", expr: "hsv(t*1,1,1)*(nsin(t*2)>.7)"},
+      {label: "alternatergb", expr: "hsv(t*1,1,1, light='left')*nsin(t*3) + hsv(t*1,1,1,light='right')*(1-nsin(t*3))"},
+      {label: "frontchase", expr: "chase(t, names=frontchase, ontime=.3, offset=-.11)"},
+      {label: "bumpyhues", expr: "hsv(t*.5,.4,1)*notch(t*.01)"},
+      ]
 
   subtermLink: (label, expr) =>
     "http://chase?"+$.param({
       subtermName: label
-      subtermExpr: expr
-      curve: label
+      subtermExpr: label + '_env(t) * ' + expr
+      curve: label + '_env'
     })
   subtermExprs: (chase) =>
     [
-      'LABEL(t) * chase(t, names=LABEL, ontime=0.5, offset=0.2)'.replace(/LABEL/g, chase.label)
+      'chase(t, names=LABEL, ontime=0.5, offset=0.2)'.replace(/LABEL/g, chase.label)
     ]
+  
 
 
 model = new Model()
