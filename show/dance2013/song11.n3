@@ -9,7 +9,10 @@
         <http://light9.bigasterisk.com/show/dance2013/song11/subterm/2>,
         <http://light9.bigasterisk.com/show/dance2013/song11/subterm/3>,
         <http://light9.bigasterisk.com/show/dance2013/song11/subterm/4>,
-        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/5> .
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/5>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/6>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/7>,
+        <http://light9.bigasterisk.com/show/dance2013/song11/subterm/8> .
 
 <http://light9.bigasterisk.com/show/dance2013/song11/subterm/0> a ns1:Subterm ;
     rdfs:label "full" ;
@@ -18,7 +21,7 @@
 
 <http://light9.bigasterisk.com/show/dance2013/song11/subterm/1> a ns1:Subterm ;
     rdfs:label "" ;
-    ns1:expression "chase1(t)*chase(t, names=backchase,ontime=.2,offset=0.0)" .
+    ns1:expression "chase1(t)*chase(t, names=backchase,ontime=60/116/2,offset=0.0)" .
 
 <http://light9.bigasterisk.com/show/dance2013/song11/subterm/2> a ns1:Subterm ;
     rdfs:label "center" ;
@@ -39,4 +42,17 @@
     rdfs:label "song11orange" ;
     ns1:expression "song11orange(t)" ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/song11orange> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/6> a ns1:Subterm ;
+    rdfs:label "orange" ;
+    ns1:expression "orange(t)" ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/orange> .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/7> a ns1:Subterm ;
+    rdfs:label "stacrainbow" ;
+    ns1:expression "stacrainbow_env(t) * hsv(t*60/117*4,1,1)*(nsin(t*60/117*4)>.3)" .
+
+<http://light9.bigasterisk.com/show/dance2013/song11/subterm/8> a ns1:Subterm ;
+    rdfs:label "" ;
+    ns1:expression "cyc_music(t)*chase(t, names=cycpong, ontime=60./116*.5, offset=0.0)" .
 
