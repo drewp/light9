@@ -15,33 +15,16 @@ body {
     background: black;
     color: white;
     margin: 2px;
-font-size: 115%;
+    font-size: 115%;
 }
 button a {
- color: white;
+    color: white;
 }
 .songs button:hover {
     color: black;
-    background: yellow;
-}
-body { 
-    background: black;
-    color: white;
-    font-style: sans-serif;
-}
-.commands button {
-    background: black;
-    color: white;
-    padding: 20px
-}
-.commands button.active {
-    background: red;
+    background: #333;
 }
 
-.songs button:hover {
-    color: black;
-    background: yellow;
-}
 .commands button {
     background: black;
     color: white;
