@@ -375,7 +375,14 @@ class KeyboardComposer(Frame, SubClient):
             subbox = self.slider_table[(self.current_row, col)]
         except KeyError:
             return # no slider assigned at that column
-        subbox.slider_var.set(value)
+
+        if hasattr(self, 'pendingHwSet'):
+            import twisted.internet.error
+            try:
+                self.pendingHwSet.cancel()
+            except twisted.internet.error.AlreadyCalled:
+                pass
+        self.pendingHwSet = reactor.callLater(.01, subbox.slider_var.set, value)
 
     def send_to_hw(self, sub, hwCol, boxRow):
         if isinstance(self.sliders, DummySliders):
