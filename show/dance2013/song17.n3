@@ -39,9 +39,9 @@
 
 <http://light9.bigasterisk.com/show/dance2013/song17/subterm/5> a ns1:Subterm ;
     rdfs:label "backchase" ;
-    ns1:expression "backchase_env(t) * chase(t, names=backchase, ontime=0.2, offset=0.0)" .
+    ns1:expression "backchase_env(t) * chase(t, names=backchase, ontime=60./134/2, offset=0.0)" .
 
 <http://light9.bigasterisk.com/show/dance2013/song17/subterm/6> a ns1:Subterm ;
     rdfs:label "cycpong" ;
-    ns1:expression "cycpong_env(t) * chase(t, names=cycpong, ontime=0.4, offset=0.2)" .
+    ns1:expression "cycpong_env(t) * chase(t, names=cycpong, ontime=60./102.-.2, offset=0.2)" .
 
