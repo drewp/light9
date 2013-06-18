@@ -94,7 +94,10 @@ $(function () {
 	$.each(data.songs, function (i, song) {
 	    var button = $("<button>");
             // link is just for dragging, not clicking
-            var link = $("<a>").text(song.label).attr("href", song.uri);
+            var link = $("<a>");
+            link.append($("<span>").addClass("num").text(song.label.slice(0,2)));
+            link.append($("<span>").text(song.label.slice(2)));
+            link.attr("href", song.uri);
             link.click(function () { button.click(); return false; }); 
             button.append(link);
 	    button.data(song);

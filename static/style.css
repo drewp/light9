@@ -45,3 +45,8 @@ button a {
 .stalled {
     opacity: .5;
 }
+.num {
+font-size: 27px;
+color: rgb(233, 122, 122);
+display: inline-block; 
+    }
