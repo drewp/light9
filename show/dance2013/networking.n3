@@ -6,6 +6,7 @@ show:dance2013 :networking sh:netHome .
 sh:netHome  
   :musicPlayer <http://plus:8040/>;
   :dmxServer <http://plus:8030/>;
+  :oscDmxServer <udp://plus:9050/>;
   :curveCalc <http://plus:8060/>;
   :keyboardComposer <http://plus:8050/>;
   :vidref <http://amp:8053/> .

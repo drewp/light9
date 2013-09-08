@@ -35,6 +35,7 @@ class ServiceAddress(object):
         return self.url + str(more)
 
 dmxServer = ServiceAddress(L9['dmxServer'])
+oscDmxServer = ServiceAddress(L9['oscDmxServer'])
 musicPlayer = ServiceAddress(L9['musicPlayer'])
 keyboardComposer = ServiceAddress(L9['keyboardComposer'])
 curveCalc = ServiceAddress(L9['curveCalc'])

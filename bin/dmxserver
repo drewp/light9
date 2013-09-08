@@ -28,10 +28,37 @@ from twisted.web import xmlrpc, server
 import sys,time,os
 from optparse import OptionParser
 import run_local
+import txosc.dispatch, txosc.async
 from light9.io import ParportDMX, UsbDMX
 
 from light9.updatefreq import Updatefreq
 from light9 import networking
+
+
+class ReceiverApplication(object):
+    """
+    receive UDP OSC messages. address is /dmx/1 for dmx channel 1,
+    arguments are 0-1 floats for that channel and any number of
+    following channels.
+    """
+    def __init__(self, port, lightServer):
+        self.port = port
+        self.lightServer = lightServer
+        self.receiver = txosc.dispatch.Receiver()
+        self.receiver.addCallback("/dmx/*", self.pixel_handler)
+        self._server_port = reactor.listenUDP(
+            self.port,
+            txosc.async.DatagramServerProtocol(self.receiver),
+            interface='0.0.0.0')
+        print "Listening OSC on udp port %s" % (self.port)
+
+    def pixel_handler(self, message, address):
+        # this is already 1-based though I don't know why
+        startChannel = int(message.address.split('/')[2])
+        levels = [a.value for a in message.arguments]
+        allLevels = [0] * (startChannel - 1) + levels
+        self.lightServer.xmlrpc_outputlevels("osc@%s" % startChannel,
+                                             allLevels)
 
 class XMLRPCServe(xmlrpc.XMLRPC):
     def __init__(self,options):
@@ -215,8 +242,13 @@ print options
 if options.dummy:
     os.environ['DMXDUMMY'] = "1"
 
+
 port = networking.dmxServer.port
 print "starting xmlrpc server on port %s" % port
-reactor.listenTCP(port,server.Site(XMLRPCServe(options)))
+xmlrpcServe = XMLRPCServe(options)
+reactor.listenTCP(port,server.Site(xmlrpcServe))
+
+oscApp = ReceiverApplication(9051, xmlrpcServe)
+
 reactor.run()
 
