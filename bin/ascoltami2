@@ -1,6 +1,6 @@
 #!bin/python
 from run_local import log
-from twisted.internet import gireactor, reactor
+from twisted.internet import reactor
 import web, thread, sys, optparse, logging
 from rdflib import URIRef
 sys.path.append(".")
