@@ -1,0 +1,16 @@
+
+when KC rereads subs, it loses its red frame on the active row, but i
+think the row is still correctly active.
+
+KC should have a DefaultGroup type that i can put on a group
+
+song3 fadein has led artifact
+
+song3 get bpm right
+
+onstage monitors for music, especially if we can't get the auto-quieter box fixed
+
+can't believe i never tried offsetting the hues of the leds from different angles- probably would have made dancer faces and shapes stand out well
+
+the chase routine really seems to have a stutter in it
+
