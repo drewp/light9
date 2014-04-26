@@ -1,0 +1,232 @@
+curvecalc, with all curves:
+
+  music                  /\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\/
+  music_smooth           /\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\//\/\/
+  slider1 (song02)
+  slider2 (end_scene)
+  slider3 (cyc)
+  pad1x (effect_strobe)
+  pad1y (effect_strobe[rate])
+  pad1p
+  
+-----------------------------------------------------------------------------------------------------------
+curvedb has access to the curves and can write them. temporary edit
+state like the selection and view area is held in the gui. curvedb
+ensures that points have increasing and unique times. api:
+
+  observable visibleCurves(song), can change later
+  
+  getRange(curve, t1, t2) may also take resolution. this is for gui to
+    draw and for effect preview to show off an effect.  also returns
+    markers
+
+  liveInputPoint(curve, t, value) a controller has asked for this value. wipe out old points as appropriate.
+
+  addPoint(curve, t, value) a gui has added a point. this may cause a new curve to start existing.
+
+  movePoint(curve, t, newT, newValue) gui has tried to edit a point. we might not allow it.
+
+  transformPoints(curve, ts, scale, newStart, newEnd, newWidth) multi-point operations. input point list by their times.
+
+  observable curveUpdated(curve) curve or marker data changed. This might return a version number for the curve data.
+  
+-----------------------------------------------------------------------------------------------------------
+curveedit draws the curves and manages selection. It draws current
+playback time. Song->curves mapping comes from rdfdb. current playback probably does too.
+
+  state:
+    song
+    viewRange times
+
+    currentCurve: for highlighting on gui or quneo when you edit it
+    selection: points on curves, but do they have to get updated
+      constantly as you drag them around? could use pt indices but
+      that might get awkward at other resolutions
+    
+    graphs (each graph may have multiple curves in it)
+
+  api:
+    selectPoint(curve, t)
+
+    startRangeSelect(curve, t)
+    dragRangeSelect(curve, t)
+    endRangeSelect(curve, t)
+
+edit markers too.
+    
+mute happens in here? maybe i never used it.
+    
+rows never scroll out of view; they can just get very tiny. maybe
+support multiple curves in the same row, like for one effect.
+
+rows appear when you use them in the song.
+
+from a curve you need to see what effects use it. just a single intensity on a single sub is a common case.
+
+-----------------------------------------------------------------------------------------------------------
+data model:
+
+show
+  controlMapping (describes how this control should initially behave in a song)
+    [
+      control: pad5
+      effect: [
+        type: chase
+        code: out ???? don't know curves yet
+      ]
+    ]
+
+song1
+  controlMapping
+    [
+      control: pad5
+      curve: curve1
+    ]
+  row1 (only used for display)
+    curve1
+  curve1
+    points
+  effect1
+    type: sub
+    code: out = sub('stageleft', intensity=curve1)
+  effect2
+    type: sub
+    code: out = sub('stageright', intensity=curve2)
+  effect3
+    type: chase
+    code: out = ... (curve3)
+
+-----------------------------------------------------------------------------------------------------------
+many controls are mapped to standard subs or effects.
+
+
+using an unmapped slider gives you a default (or random) new sub, to be changed later to the right look.
+
+touching anything should accent its row in curvecalc; touching a CC row shuold light up its pad on quneo.
+
+touching anything starts recording it. when you let go, points stop
+being made, and they might connect to what was there before. when
+you're holding a pad down at all, existing points you pass over get
+deleted. sliders have this too, but instead of reading pad pressure,
+they have a fixed amount of time that they erase after each value
+change (and no slider output is attempted).
+
+CC expressions are drawn in their rows. most exprs are no
+
+row structure (settings are per-song):
+  input controller name (slider1 or pad1x)
+  points: ...
+  connect_to_input: song01.intensity
+   or
+  connect_to_input: chase.offset
+   or
+  connect_to_input: chase.speed
+
+  you can connect to multiple inputs.
+
+
+a thing to be able to do quickly:
+
+  have
+
+    slider1 -> song02.intensity: ___/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\___
+
+  want to add in some silhouette, so we need this new mapped curve row:
+
+    slider1 -> song02.intensity: ___/~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\___
+    slider8 -> silhouette0.intens: __________________________________________
+
+  then i animate to this:
+
+    slider1 -> song02.intensity: ___/~~~~~~~~~~~\___/~~~~~~~~~~~~~~~~~~~\___
+    slider8 -> silhouette0.intens: _____________/~~~\_______________________
+
+  to add that row, i went to CC, 'add row', picked from not-yet-used
+  input controls, picked from all the effect types (including subs),
+  made a new instance of silhouette, and made a new row that's all
+  zeros.
+
+  Input picker:
+  +------------------------------------------------------------+
+  | Existing nodes:                                            |
+  |   song02                                                   |
+  |   cyc                                                      |
+  |   blink0                                                   |
+  |     + intensity                                            |
+  |     + term1                                                |
+  |     + term2                                                |
+  |                                                            |
+  | Make new node (and connect to its 'intensity' input):      |
+  |   blink                                                    |
+  |   song03                                                   |
+  |   song04                                                   |
+  +------------------------------------------------------------+
+
+
+-----------------------------------------------------------------------------------------------------------
+
+separate effect program:
+
+goals:
+  visualize effects, including time-based ones
+  make new expression effects
+
+state:
+  current effect being shown (follows the last-touched effect in curvecalc, or you can pick one)
+
+
+vis of a chase effect (readonly):
+
+  beat   |     |     |     |     |     |     |     |     |
+  chan1  __/~~\__/~~\__/~~\__/~~\__/~~\__/~~\__/~~\__/~~\
+  chan2  ___/~~\__/~~\__/~~\__/~~\__/~~\__/~~\__/~~\__/~~\
+
+  you'd edit the incoming offsets, fade speeds, etc according to what the effect supports.
+
+  this ui also shows you what input params you could be editing, and what quneo sliders they're mapped to:
+
+    ( ) ( )
+    | | | |
+    | | | |
+
+    cyc_strobe effect mapping:
+      padx "music sensitivity"
+      pady "intensity"
+      slider1 "music time offset"
+      slider2 "sustain"
+      slider3 "side separation"
+
+vis of a rgb effect:
+
+   color1:  (rgb stripes)
+   color2:  (rgb stripes)
+
+-----------------------------------------------------------------------------------------------------------
+
+blink to music:
+
+
+'blink' sub effect:
+  subs: [cyc]
+  intensity: (envelope curve)
+  term1: (music curve)
+  term2: (another curve)
+  term3:
+
+  output = intens * (term1 + term2 + term3)
+
+
+-----------------------------------------------------------------------------------------------------------
+
+quneo settings UI webpage:
+
+shows pad mappings.
+-----------------------------------------------------------------------------------------------------------
+
+how do you make a button that drops the stage to just blue light?
+
+is a Pi camera good for taking stage shots? or just my DSLR?
+
+see inputmapping.html
+
+
