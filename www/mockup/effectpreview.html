@@ -1,0 +1,382 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8" />
+    <style>
+     body {
+       font-family: sans;
+       font-size: 8px;
+         background: black;
+         color: gray;
+     }
+     a {
+       color: #aff;
+     }
+     canvas {
+       outline: 1px solid gray;
+     }
+     svg {
+pointer-events: none;
+     }
+.markers text {
+ fill: white;
+    }
+.timelineArea {
+    display: inline-block;
+    }
+     .codeLine {
+       margin-bottom: 3em;
+       position: relative;
+       border: 1px solid #dfdfdf;
+         padding: 5px;
+     }
+     .codeLine canvas {
+       display: block;
+     }
+     code {
+       display: block;
+       font-size: 14px;
+       margin: 20px 0;
+       padding: 5px;
+         color: white;
+       background: rgba(34, 34 34, 0.52);
+     }
+     .alignStartTime {
+       margin-left: 150px;
+     }
+     .codeLine .inputs, .codeLine .output {
+     }
+     .codeLine .inputs {
+     }
+     .codeLine .output {
+     }
+     .codeLine svg.arrows {
+       position: absolute;
+     }
+     .timelineArea {
+       position: relative;
+     }
+     svg.markers {
+       position: absolute;
+       top: 0;
+       left: 150px;
+       right: 0;
+       bottom: 0;
+     }
+.adjustable {
+    border: 2px dashed rgb(72, 72, 252);
+padding: 0 4px;
+    background: rgba(109, 109, 253, 0.38);
+    }
+.markers path {
+stroke:#ffffff;
+       stroke-width:1;
+       opacity:0.31660232
+    }
+    </style>
+  </head>
+  <body>
+    <h1>
+      Effect chase1
+    </h1>
+    <div>
+      (&lt;--&gt; timeline adjusters)
+    </div>
+    <div class="timelineArea">
+      <!-- times + beats + now, extends under the rest -->
+      <svg class="markers">
+        <text x="0" y="10"> 0sec </text><path d="m0,20 0,2000"></path>
+        <text x="80" y="10"> 10 </text><path d="m30,20 0,2000"></path>
+        <text x="160" y="10"> 20 </text><path d="m60,20 0,2000"></path>
+        <text x="240" y="10"> 30 </text><path d="m90,20 0,2000"></path>
+        <text x="320" y="10"> 40 </text><path d="m120,20 0,2000"></path>
+      </svg>
+
+      <div class="codeLine">
+        <style>
+          .arrows path {
+fill:none;stroke:#ffffff;stroke-width:2.10000000000000009;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none;marker-end:url(#Arrow2Mend);opacity:0.31660232
+           }
+        </style>
+        <svg class="arrows">
+          <defs id="defs4">
+            <marker orient="auto" refY="0.0" refX="0.0" id="Arrow2Mend" style="overflow:visible;">
+              <path style="fill-rule:evenodd;stroke-width:0.62500000;stroke-linejoin:round;"
+                    d="M 8.7185878,4.0337352 L -2.2072895,0.016013256 L 8.7185884,-4.0017078 C 6.9730900,-1.6296469 6.9831476,1.6157441 8.7185878,4.0337352 z "
+                    transform="scale(0.6) rotate(180) translate(0,0)" />
+            </marker>
+          </defs>
+          <path class="arrow" d="m0,0"></path>
+        </svg>
+        <div class="inputs">
+        </div>
+        <code><span class="out" id="out1var">hue</span> = nsin(t * <span class="adjustable" data-param="sinTimeCoeff">.5</span> + 2pi * <span class="adjustable" data-param="sinTimeOffset">0</span>)</code>
+        <div class="alignStartTime">
+          <canvas class="output" id="out1"></canvas>
+        </div>
+      </div>
+
+      <div class="codeLine">
+        <svg class="arrows"> <defs></defs>
+          <path class="arrow" d="m0,0"></path>
+          <path class="arrow" d="m0,0"></path>
+          <path class="arrow" d="m0,0"></path>
+        </svg>
+        <div class="inputs">
+          <div class="alignStartTime">
+            <canvas class="input" id="in1"></canvas>
+          </div>
+          <div class="alignStartTime">
+            <canvas class="input" id="in2"></canvas>
+          </div>
+        </div>
+        <code><span id="out2var">val</span> = <span id="in21var">backchase</span> * (<span id="in22var">music</span> &gt; <span class="adjustable" data-param="valThresh">.3</span>)</code>
+        <div class="alignStartTime">
+          <canvas class="output" id="out2"></canvas>
+        </div>
+      </div>
+
+      <div class="codeLine">
+        <svg class="arrows"> <defs></defs><path class="arrow" d="m0,0"></path> </svg>
+        <div class="inputs">
+        </div>
+        <code><span id="out3var">out</span> = hsv2rgb(hue, <span class="adjustable" data-param="sat">1.0</span>, val)</code>
+        <div class="alignStartTime">
+          <canvas class="output" id="out3"></canvas>
+        </div>
+      </div>
+</div>
+    <style>
+     .dragValue {
+       position: absolute;
+       left: 98px;
+       top: 168px;
+       width: 300px;
+       background: rgba(80,80,80,0.64);
+       color: white;
+       border: 1px solid black;
+       box-shadow: 5px 5px 73px black;
+       font-size: 26px;
+         -webkit-user-select: none;
+
+     }
+     .dragValue table {
+       width: 100%;
+       border-collapse: collapse;
+       }
+     .dragValue table tr.current td {
+         background: rgba(128, 128, 128, 0.71);
+       }
+     .dragValue table td {
+         border-left: 1px solid black;
+       height: 80px;
+       }
+     .dragValue table .low { }
+     .dragValue table .high { text-align: right; }
+
+     div.newValue {
+       position: absolute;
+display: inline-block;
+border: 1px solid black;
+border-radius: 50%;
+padding: 3px;
+         font-size: 20px;
+         color: black;
+background: rgb(241, 241, 144);
+box-shadow: 3px 4px 12px rgba(0, 0, 0, 0.23);
+                }
+    </style>
+    <div class="dragValue">
+      Editing .5 to <span class="newValue">.5</span>
+      <table>
+        <tr data-bounds="0 1"><td class="low">0 ||||||||||</td><td class="high">|||||||||| 1</td></tr>
+        <tr data-bounds=".4 .6"><td class="low">.4 | | | | |</td><td class="high">| | | | | .6</td></tr>
+        <tr data-bounds=".49 .51"><td class="low">.49</td><td class="high">.51</td></tr>
+      </table>
+      <div class="newValue">.5</div>
+    </div>
+
+    <script src="/lib/jquery-2.0.3.min.js"></script>
+    <script src="/lib/rickshaw/71877d994a/vendor/d3.min.js"></script>
+    <script type="text/javascript">
+    window.onload = function () {
+        
+        var _music = [];
+        for (var x=0; x<1000; x++) {
+            _music.push(Math.random());
+        }
+        function musicCurve(x) {
+            return _music[Math.round(x)];
+        }
+        var params = {
+            sinTimeCoeff: .1,
+            sinTimeOffset: 0,
+            valThresh: .5,
+            sat: 1
+        };
+        
+        function hue(x) { return Math.sin(x * params.sinTimeCoeff + 6.28 * params.sinTimeOffset) * .5 + .5; }
+        function valFunc(x) { return (x > 100 && x < 300) * (musicCurve(x) > params.valThresh); }
+        
+        function drawCurve(canvas, func) {
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.strokeStyle = '#ffffff';
+            ctx.fillStyle = '#666';
+            ctx.strokeWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            for (var x = 0; x < canvas.width; x += 2) {
+                var y = func(x);
+                ctx.lineTo(x, canvas.height * (1 - y));
+            }
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.fill();
+            ctx.stroke();
+        }
+        function drawRgb(canvas) {
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            var step = 1;
+            for (var x = 0; x < canvas.width; x+= step) {
+                var vv = (valFunc(x) * .5 * 100);
+                ctx.fillStyle = ('hsl('+
+                                 (360 * hue(x))+','+
+                                 (params.sat * 100)+'%,'+
+                                 vv+'%'+
+                                 ')');
+                if (vv > 0) {
+                    ctx.fillRect(x, 0, step, canvas.height);
+                } // else leave it transparent
+            }
+        }
+
+        function drawTimeCoords(svg) {
+            // use KO on svg templates
+        }
+        function routePath(svg, src, dest) {
+            var parent = $(svg).position();
+            var srcPos = src.position();           
+            var destPos = dest.position();
+            var startDown = srcPos.left < 150;
+            if (startDown) { 
+                srcPos.left += src.width() / 2;
+                srcPos.top += src.height();
+                destPos.top += dest.height() / 2;
+            } else {
+                srcPos.top += src.height() / 2;
+                destPos.left += dest.width() / 2;
+            }
+            
+            var d = "";
+            var px = parent.left, py = parent.top;
+            d += "m" + (srcPos.left - px) + "," + (srcPos.top - py);
+            if (startDown) {
+                d += "L" + (srcPos.left - px) + "," + (destPos.top - py);
+            } else {
+                if (destPos.left < srcPos.left) {
+                    d += "L" + (destPos.left - px) + "," + (srcPos.top - py);
+                } else {
+                    d += "L" + (srcPos.left - px - 10) + "," + (srcPos.top - py);
+                    var ymid = srcPos.top + src.height() / 2 + 5;
+                    d += "L" + (srcPos.left - px - 10) + "," + (ymid - py);
+                    d += "L" + (destPos.left - px) + "," + (ymid - py);
+                }
+            }
+            d += "L" + (destPos.left - px) + "," + (destPos.top - py);
+            return d;
+        }
+        function connectElems(svg, src, dest) {
+            // this is wrong; it's not a proper path object
+            var path = document.createElementNS('svg', 'path');
+            svg.appendChild(path);
+
+            // workaround- use spare path nodes
+            for (var i = 1; i < svg.children.length; i++) {
+                path = svg.children[i];
+                if (path.getAttribute('d') == 'm0,0') {
+                    break;
+                }
+            }
+            
+            path.classList.add('arrow');
+            path.setAttribute('d', routePath(svg, src, dest));
+        }
+        
+        function connectVars() {
+            connectElems($("#out1").closest(".codeLine").find(".arrows")[0], $("#out1var"), $("#out1"));
+            connectElems($("#out2").closest(".codeLine").find(".arrows")[0], $("#out2var"), $("#out2"));
+            connectElems($("#out3").closest(".codeLine").find(".arrows")[0], $("#out3var"), $("#out3"));
+
+            connectElems($("#out2").closest(".codeLine").find(".arrows")[0], $("#in1"), $("#in21var"));
+            connectElems($("#out2").closest(".codeLine").find(".arrows")[0], $("#in2"), $("#in22var"));
+        }
+        function redrawAll() {
+            $("canvas").each(function (i, canvas) {
+                canvas.width = 500;
+                canvas.height = 30;
+            });
+            drawCurve($("#out1")[0], hue)
+            drawCurve($("#in1")[0], function (x) { return x > 100 && x < 300; })
+            drawCurve($("#in2")[0], function (x) { return musicCurve(x); })
+            drawCurve($("#out2")[0], valFunc);
+            drawRgb($("#out3")[0]);
+
+            $("svg.arrows").each(function (i, svg) {
+
+            });
+            drawTimeCoords($(".markers"));
+            connectVars();
+        }
+        redrawAll();
+        
+
+        var adjusting = null;
+        var adjustParam = "";
+        $(".dragValue").hide();
+        $(".adjustable").mousedown(function (ev) {
+            $(".dragValue").show();
+            adjusting = $(ev.target);
+            adjustParam = adjusting.attr('data-param');
+            $(".dragValue").css({left: adjusting.offset().left - 150,
+                                 top: adjusting.offset().top - 120});
+        });
+        $("body, .dragValue").mouseup(function (ev) {
+            $(".dragValue").hide();
+        });
+        $(".dragValue").mousemove(function (ev) {
+            var dv = $(".dragValue").position();
+            $(".dragValue div.newValue").css({left: ev.pageX - dv.left - 15, top: ev.pageY - dv.top - 35});
+            var row = $(ev.target).closest('tr');
+            $(".dragValue tr").removeClass('current');
+            if (!row.length) {
+                // revert
+                return;
+            } 
+            row.addClass('current');
+
+            var rx = row.offset().left;
+            var frac = (ev.pageX - rx) / row.width();
+
+            var bounds = row.attr('data-bounds').split(" ");
+            var newValue = parseFloat(bounds[0]) * (1 - frac) + parseFloat(bounds[1]) * frac;
+            newValue = Math.round(newValue * 1000) / 1000;
+            valueChanged(newValue);
+            });
+        function valueChanged(newValue) {
+            if (adjusting) {
+                adjusting.text(newValue);
+            }
+            $(".dragValue .newValue").text(newValue);
+            params[adjustParam] = newValue;
+            drawCurve($("#out1")[0], hue)
+            drawCurve($("#out2")[0], valFunc);
+            drawRgb($("#out3")[0]);
+        };
+
+    };
+    </script>
+  </body>
+</html>

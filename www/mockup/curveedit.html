@@ -1,0 +1,96 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8" />
+    <style>
+    body {
+ font-family: sans;
+        font-size: 8px;
+        }
+a {
+    color: #aff;
+    }
+      canvas {
+       
+     }
+.curveRow {
+border-top: 1px solid rgb(185, 185, 185);
+background: rgb(75, 75, 75);
+    }
+    </style>
+  </head>
+  <body>
+
+    <div>
+    Editing song: [song1] unlink Player is on song [song2] [x] follow player
+    </div>
+
+    <div>
+    timeline
+      <div>
+  0 10 20 30 40 50 60 70 80 90 100 110 120
+      </div>
+
+      <div id="sampleCurveRow">
+        <div class="curveRow"> <a href="#">curve1</a> <canvas></canvas> </div>
+      </div>
+      <script src="/lib/jquery-2.0.3.min.js"></script>
+      <script type="text/javascript">
+    window.onload = function () {
+        var row = $("#sampleCurveRow");
+        for (var i=0; i<50; i++) {
+            row.parent().append(row.clone());
+        }
+        var expandNear = 0;
+        var animating = false;
+        function redrawAll() {
+            $("canvas").each(function (i, canvas) {
+                canvas.width = 900;
+                var near = Math.abs(Math.round(expandNear / 20) - i);
+                canvas.height = Math.max(10, Math.min(150, 30 / near ));
+                
+                var ctx = canvas.getContext('2d');
+                ctx.strokeStyle = 'white';
+                ctx.strokeWidth = 3;
+                var _rand = i * 13763;
+                var rand = function() {
+                    _rand = (_rand * 64874) % 7646;
+                    return (_rand % 1000) / 1000;
+                };
+                var ww = Math.pow(rand(), 3) * 900;
+                var t = (+new Date() / 1000);
+                var pts = [];
+                var zoom = animating ? (.6 + 4 * (Math.sin(t) + 1)) : 1;
+                for (var x = 0; x < 900; x += Math.max(1, ww * Math.pow(rand(), 2))) {
+                    var x2 = x * zoom;
+
+                    var y = rand();
+                    if (rand() > .8) {
+                        y = 0;
+                    }
+                    pts.push([x2, canvas.height * (1 - y)]);
+                }
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height);
+                pts.forEach(function (pt) {
+                    ctx.lineTo(pt[0], pt[1]);
+                });
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.fill();
+            });
+        }
+        var loop = function () {
+            redrawAll();
+            setTimeout(loop, 50);
+        };
+        redrawAll();
+        $('body').click(function() { animating = true; loop(); });
+        $('body').mousemove(function (ev) {
+            expandNear = ev.pageY;
+            redrawAll();
+        });
+    };
+    </script>
+  </body>
+</html>
