@@ -1,0 +1,24 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+<http://ex/effect/song1/opening> a :Curve;
+  rdfs:label "opening";
+  :points "0.0 0 183.695203336 0" .
+  
+
+  
+
+# :Effect replaces :Subterm
+<http://ex/effect/song1/openingLook> a :Effect;
+  :code "out = sub('stageleft', intensity=curve1)";
+  # save the code as an AST also, to get all the links? web page was
+  # going to parse it anyway. but, sometimes it will have a syntax
+  # error. Can code with errors just parse to a bogus AST that saves
+  # the string with errors (and also the uri links found inside)?
+  # Still missing: multiple lines of code with multiple outputs. What's an output?
+  :dep <http://ex/effect/song1/opening>, <http://light9.bigasterisk.com/show/dance2014/sub/stageleft>
+  .
+
+<http://light9.bigasterisk.com/show/dance2014/song1> a :Song;
+  :effect   <http://ex/effect/song1/openingLook>
+  .
