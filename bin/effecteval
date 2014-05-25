@@ -1,0 +1,96 @@
+#!bin/python
+from run_local import log
+from twisted.internet import reactor
+import cyclone.web, cyclone.websocket
+import sys, optparse, logging, subprocess
+from rdflib import URIRef, RDF
+
+sys.path.append(".")
+from light9 import networking, showconfig
+from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.namespaces import L9, DCTERMS
+
+sys.path.append("../homeauto/lib")
+sys.path.append("/home/drewp/projects/homeauto/lib")
+from cycloneerr import PrettyErrorHandler
+
+class EffectEdit(cyclone.web.RequestHandler):
+    def get(self):
+        self.write(open("light9/effecteval/effect.html").read())
+
+class EffectData(cyclone.websocket.WebSocketHandler):
+    """
+    stays alive for the life of the effect page
+    """
+    def connectionMade(self, *args, **kwargs):
+        log.info("websocket opened")
+        self.uri = URIRef(self.get_argument('uri'))
+        self.sendMessage({'hello': repr(self)})
+
+        self.graph = self.settings.graph
+        self.graph.addHandler(self.updateClient)
+
+    def updateClient(self):
+        # todo: if client has dropped, abort and don't get any more
+        # graph updates
+        self.sendMessage({'code': self.graph.value(self.uri, L9['code'])})
+        
+    def connectionLost(self, reason):
+        log.info("websocket closed")
+
+    def messageReceived(self, message):
+        log.info("got message %s" % message)
+        # write a patch back to the graph
+        
+class App(object):
+    def __init__(self, show):
+        self.show = show
+        self.graph = SyncedGraph("effectEval")
+        SFH = cyclone.web.StaticFileHandler
+        self.cycloneApp = cyclone.web.Application(handlers=[
+            (r'/()', SFH,
+             {'path': 'light9/effecteval', 'default_filename': 'index.html'}),
+            (r'/effect', EffectEdit),
+            (r'/(websocket\.js)', SFH, {'path': 'light9/rdfdb/web/'}),
+            (r'/(knockout-2\.2\.1\.js)', SFH, {'path': 'light9/subserver/'}),
+            (r'/effect\.js', StaticCoffee, {'src': 'light9/effecteval/effect.coffee'}),
+            (r'/effectData', EffectData),
+            (r'/static/(.*)', SFH, {'path': 'static/'}),
+        ], debug=True, graph=self.graph)
+        #graph.initiallySynced.addCallback(
+
+        # see bin/subserver
+
+class StaticCoffee(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def initialize(self, src):
+        super(StaticCoffee, self).initialize()
+        self.src = src
+    def get(self):
+        self.set_header('Content-Type', 'application/javascript')
+        self.write(subprocess.check_output([
+            '/usr/bin/coffee', '--compile', '--print', self.src]))
+
+        
+if __name__ == "__main__":
+    parser = optparse.OptionParser()
+    parser.add_option('--show',
+        help='show URI, like http://light9.bigasterisk.com/show/dance2008',
+                      default=showconfig.showUri())
+    parser.add_option("-v", "--verbose", action="store_true",
+                      help="logging.DEBUG")
+    parser.add_option("--twistedlog", action="store_true",
+                      help="twisted logging")
+    (options, args) = parser.parse_args()
+
+    log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
+
+    if not options.show:
+        raise ValueError("missing --show http://...")
+            
+    app = App(URIRef(options.show))
+    if options.twistedlog:
+        from twisted.python import log as twlog
+        twlog.startLogging(sys.stderr)
+    reactor.listenTCP(networking.effectEval.port, app.cycloneApp)
+    log.info("listening on %s" % networking.effectEval.port)
+    reactor.run()
