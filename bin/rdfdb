@@ -436,19 +436,13 @@ if __name__ == "__main__":
     log = logging.getLogger()
 
     parser = optparse.OptionParser()
-    parser.add_option('--show',
-        help='show URI, like http://light9.bigasterisk.com/show/dance2008',
-                      default=showconfig.showUri())
     parser.add_option("-v", "--verbose", action="store_true",
                       help="logging.DEBUG")
     (options, args) = parser.parse_args()
 
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
-    if not options.show:
-        raise ValueError("missing --show http://...")
-
-    db = Db(topDirsToWatch=['show/dance2013'])
+    db = Db(topDirsToWatch=[os.environ['LIGHT9_SHOW']])
 
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)
