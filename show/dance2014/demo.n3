@@ -1,6 +1,7 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
+# curvedb writes these. point data might be in separate files
 <http://ex/effect/song1/opening> a :Curve;
   rdfs:label "opening";
   :points "0.0 0 183.695203336 0" .

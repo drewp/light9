@@ -41,6 +41,22 @@ class EffectData(cyclone.websocket.WebSocketHandler):
     def messageReceived(self, message):
         log.info("got message %s" % message)
         # write a patch back to the graph
+
+def effectDmxDict(graph, effect):
+    
+        
+class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def get(self):
+        uri = URIRef(self.get_argument('uri'))
+        # return dmx dict for that effect
+        self.write(effectDmxDict(self.settings.graph, uri))
+        
+class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def get(self):
+        song = URIRef(self.get_argument('song'))
+        effects = effectsForSong(self.settings.graph, song)
+        self.write(maxDict(effectDmxDict(e) for e in effects))
+        # return dmx dict for all effects in the song, already combined
         
 class App(object):
     def __init__(self, show):
@@ -56,6 +72,8 @@ class App(object):
             (r'/effect\.js', StaticCoffee, {'src': 'light9/effecteval/effect.coffee'}),
             (r'/effectData', EffectData),
             (r'/static/(.*)', SFH, {'path': 'static/'}),
+            (r'/effect/eval', EffectEval),
+            (r'/songEffects/eval', SongEffectsEval),
         ], debug=True, graph=self.graph)
         #graph.initiallySynced.addCallback(
 
