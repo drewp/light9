@@ -56,6 +56,8 @@ class Curve(object):
 
         i = bisect_left(self.points,(t,None))-1
 
+        if i == -1:
+            return self.points[0][1]
         if self.points[i][0]>t:
             return self.points[i][1]
         if i>=len(self.points)-1:
