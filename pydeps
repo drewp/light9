@@ -1,4 +1,4 @@
-git+git://github.com/RDFLib/rdflib@f5da2a2aca054748877aa7c6d722dc087472a858
+rdflib==4.1.2
 Twisted==14.0.0
 webcolors==1.4
 Louie==1.1
@@ -10,8 +10,7 @@ ipython==2.1.0
 nose==1.3.3
 nose-alert==0.9.0
 ipdb==0.8
-# waiting for https://github.com/xolox/python-coloredlogs/pull/1
-git+git://github.com/drewp/python-coloredlogs@9803112ddf7d4cd7dd001912ad1aa482fb8383f6
+coloredlogs==0.5
 genshi==0.7
 pyjade==2.2.0
 python-dateutil==2.2
