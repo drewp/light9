@@ -1,16 +1,18 @@
 #!bin/python
 from run_local import log
 from twisted.internet import reactor
-import cyclone.web, cyclone.websocket
-import sys, optparse, logging, subprocess
+from twisted.internet.defer import inlineCallbacks
+import cyclone.web, cyclone.websocket, cyclone.httpclient
+import sys, optparse, logging, subprocess, json, re
 from rdflib import URIRef, RDF
 
 sys.path.append(".")
-from light9 import networking, showconfig
+from light9 import networking, showconfig, Submaster
 from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.curvecalc.curve import Curve
 from light9.namespaces import L9, DCTERMS
 
-sys.path.append("../homeauto/lib")
+sys.path.append("/my/proj/homeauto/lib")
 sys.path.append("/home/drewp/projects/homeauto/lib")
 from cycloneerr import PrettyErrorHandler
 
@@ -42,14 +44,63 @@ class EffectData(cyclone.websocket.WebSocketHandler):
         log.info("got message %s" % message)
         # write a patch back to the graph
 
-def effectDmxDict(graph, effect):
+def uriFromCode(s):
+    # i thought this was something a graph could do with its namespace manager
+    if s.startswith('sub:'):
+        return URIRef('http://light9.bigasterisk.com/show/dance2014/sub/' + s[4:])
+    if s.startswith('song1:'):
+        return URIRef('http://ex/effect/song1/' + s[6:])
+    raise NotImplementedError
+        
+class EffectNode(object):
+    def __init__(self, graph, uri):
+        self.graph, self.uri = graph, uri
     
+    def eval(self, songTime):
+        with self.graph.currentState(tripleFilter=(self.uri, L9['code'], None)) as g:
+            code = g.value(self.uri, L9['code'])
+        # consider http://waxeye.org/ for a parser that can be used in py and js
+        m = re.match(r'^out = sub\((.*?), intensity=(.*?)\)', code)
+        if not m:
+            raise NotImplementedError
+        sub = uriFromCurie(m.group(1))
+        intensityCurve = uriFromCurie(m.group(2))
+
+        print vars()
+        
+def effectDmxDict(graph, effect, songTime):
+    subs = Submaster.get_global_submasters(graph)
+
+    curve = URIRef("http://ex/effect/song1/opening")
+    c = Curve()
+    with graph.currentState(tripleFilter=(curve, None, None)) as g:
+        c.set_from_string(g.value(curve, L9['points']))
+
+    with graph.currentState(tripleFilter=(effect, None, None)) as g:
+        print 'got code', g.value(effect, L9['code'])
+        en = EffectNode(graph, effect)
+
+        en.eval(songTime)
+        
+        sub = subs.get_sub_by_uri(URIRef("http://light9.bigasterisk.com/show/dance2014/sub/stageleft"))
+        level = c.eval(songTime)
+        scaledSubs = [sub * level]
+
+        out = Submaster.sub_maxes(*scaledSubs)
+        levels_dict = out.get_levels()
+        dmx = out.get_dmx_list()
+        return json.dumps(dmx)
+
         
 class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
+    @inlineCallbacks
     def get(self):
-        uri = URIRef(self.get_argument('uri'))
         # return dmx dict for that effect
-        self.write(effectDmxDict(self.settings.graph, uri))
+        uri = URIRef(self.get_argument('uri'))
+        response = yield cyclone.httpclient.fetch(
+            networking.musicPlayer.path('time'))
+        songTime = json.loads(response.body)['t']
+        self.write(effectDmxDict(self.settings.graph, uri, songTime))
         
 class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):

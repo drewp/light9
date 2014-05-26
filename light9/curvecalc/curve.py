@@ -41,6 +41,15 @@ class Curve(object):
         self.points.sort()
         dispatcher.send("points changed",sender=self)
 
+    def set_from_string(self, pts):
+        self.points[:] = []
+        vals = pts.split()
+        pairs = zip(vals[0::2], vals[1::2])
+        for x, y in pairs:
+            self.points.append((float(x), ast.literal_eval(y)))
+        self.points.sort()
+        dispatcher.send("points changed",sender=self)
+        
     def save(self,filename):
         if filename.endswith('-music') or filename.endswith('_music'):
             print "not saving music track"
@@ -53,7 +62,6 @@ class Curve(object):
     def eval(self, t, allow_muting=True):
         if self.muted and allow_muting:
             return 0
-
         i = bisect_left(self.points,(t,None))-1
 
         if i == -1:
