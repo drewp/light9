@@ -379,6 +379,8 @@ class GraphResource(PrettyErrorHandler, cyclone.web.RequestHandler):
         format = 'n3'
         if accept == 'text/plain':
             format = 'nt'
+        elif accept == 'application/n-quads':
+            format = 'nquads'
         self.write(self.settings.db.graph.serialize(format=format))
 
 class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
