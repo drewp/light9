@@ -1,0 +1,49 @@
+http://neil.fraser.name/writing/sync/
+
+
+file persistence could be just another client with deliberate huge
+latency to save on disk writes?
+
+
+    ------------------
+    server master
+
+    per-client shadow
+
+
+
+    client shadow
+
+    client master
+    ------------------
+
+
+client edits write to clientmaster. client also reads from there.
+When the last update is done,
+
+
+
+
+graph: (s1 p1 o1)
+
+client1 writes a loose patch: del (s1 p1 *), add (s1 p1 o2)
+
+client2 gets in another loose patch first: del (s1 p1 *), add (s1 p1 o3)
+
+on the server, we make an invertible patch: del (s1 p1 o1), add (s1 p1 o2)
+
+then another invertible patch: del (s1 p1 o2), add (s1 p1 o3)
+
+some clients need this patch: del (s1 p1 o1), add (s1 p1 o3)
+client1 needs this patch: del (s1 p1 o1), add (s1 p1 o2)
+
+
+---------
+
+graph: ()
+
+client1 writes a patch: add (s1, p1, o1)
+client2 writes a patch: add (s1, p1, o1)
+
+on the server, client2's patch is rewritten to no-op.
+
