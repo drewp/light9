@@ -1,6 +1,8 @@
 <map version="0.9.0">
 <!-- To view this file, download free mind mapping software FreeMind from http://freemind.sourceforge.net -->
-<node CREATED="1308025572397" ID="ID_1355747502" MODIFIED="1308033060768" TEXT="light9 show">
+<node CREATED="1308025572397" ID="ID_1355747502" MODIFIED="1371409376023" TEXT="light9 show">
+<icon BUILTIN="full-2"/>
+<icon BUILTIN="full-3"/>
 <node CREATED="1308025596553" ID="ID_1538302866" MODIFIED="1308026605686" POSITION="right" TEXT="prep audio">
 <node CREATED="1308026634879" ID="ID_410530634" MODIFIED="1308026653906" TEXT="17 songs uses about 2GB of prep space"/>
 <node CREATED="1308025708206" ID="ID_1275526826" MODIFIED="1308025710518" TEXT="record from CD">
