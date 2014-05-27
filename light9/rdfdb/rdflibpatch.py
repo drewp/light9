@@ -16,27 +16,38 @@ def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     deletes or before the adds (not a real transaction) if any of the
     deletes isn't in the graph or if any of the adds was already in
     the graph.
+
+    These input quads use URIRef for the context, unlike some rdflib
+    APIs that use a Graph(identifier=...) for the context.
     """
     toDelete = []
-    for s, p, o, c in deleteQuads:
-        stmt = (s, p, o)
+    for spoc in deleteQuads:
+        if not isinstance(spoc[3], U):
+            raise TypeError("please pass URIRef contexts to patchQuads")
+
         if perfect:
-            if not any(graph.store.triples(stmt, c)):
-                raise ValueError("%r not in %r" % (stmt, c))
+            if inGraph(spoc, graph):
+                toDelete.append(spoc)
             else:
-                toDelete.append((c, stmt))
+                raise ValueError("%r not in %r" % (spoc[:3], spoc[3]))
         else:
-            graph.store.remove(stmt, context=c)
-    for c, stmt in toDelete:
-        graph.store.remove(stmt, context=c)
+            graph.remove(spoc)
+    for spoc in toDelete:
+        graph.remove(spoc)
 
     if perfect:
         addQuads = list(addQuads)
         for spoc in addQuads:
-            if spoc in graph:
+            if inGraph(spoc, graph):
                 raise ValueError("%r already in %r" % (spoc[:3], spoc[3]))
     graph.addN(addQuads)
 
+def inGraph(spoc, graph):
+    """
+    c is just a URIRef.
+    Workaround for https://github.com/RDFLib/rdflib/issues/398
+    """
+    return (spoc[:3] + (Graph(identifier=spoc[3]),)) in graph.quads()
 
 
 def graphFromQuads(q):
@@ -48,18 +59,9 @@ def graphFromQuads(q):
     return g
 
 def graphFromNQuad(text):
-    """
-    g.parse(data=self.nqOut, format='nquads')
-    makes a graph that serializes to nothing
-    """
     g1 = ConjunctiveGraph()
     g1.parse(data=text, format='nquads')
-    g2 = ConjunctiveGraph()
-    for s,p,o,c in g1.quads((None,None,None)):
-        #g2.get_context(c).add((s,p,o))
-        g2.store.add((s,p,o), c)
-    #import pprint; pprint.pprint(g2.store.__dict__)
-    return g2
+    return g1
 
 from rdflib.plugins.serializers.nt import _xmlcharref_encode
 def serializeQuad(g):
@@ -118,15 +120,17 @@ class TestGraphFromQuads(unittest.TestCase):
         self.assertEqual(out.strip(), self.nqOut.strip())
 
 
-stmt1 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx1')
-stmt2 = U('http://a'), U('http://b'), U('http://c'), U('http://ctx2')
+A = U("http://a"); B = U("http://b"); C = U("http://c")
+CTX1 = U('http://ctx1'); CTX2 = U('http://ctx2')
+stmt1 = A, B, C, CTX1
+stmt2 = A, B, C, CTX2
 class TestPatchQuads(unittest.TestCase):
     def testAddsToNewContext(self):
         g = ConjunctiveGraph()
         patchQuads(g, [], [stmt1])
         self.assert_(len(g), 1)
         quads = list(g.quads((None,None,None)))
-        self.assertEqual(quads, [stmt1])
+        self.assertEqual(quads, [(A, B, C, Graph(identifier=CTX1))])
 
     def testDeletes(self):
         g = ConjunctiveGraph()
@@ -139,7 +143,7 @@ class TestPatchQuads(unittest.TestCase):
         g = ConjunctiveGraph()
         patchQuads(g, [stmt1], [stmt1])
         quads = list(g.quads((None,None,None)))
-        self.assertEqual(quads, [stmt1])
+        self.assertEqual(quads, [(A, B, C, Graph(identifier=CTX1))])
 
     def testPerfectAddRejectsExistingStmt(self):
         g = ConjunctiveGraph()
@@ -156,6 +160,11 @@ class TestPatchQuads(unittest.TestCase):
         g = ConjunctiveGraph()
         self.assertRaises(ValueError, patchQuads, g, [stmt1], [], perfect=True)
 
+    def testPerfectDeleteRejectsStmtFromOtherGraph(self):
+        g = ConjunctiveGraph()
+        patchQuads(g, [], [stmt2])
+        self.assertRaises(ValueError, patchQuads, g, [stmt1], [], perfect=True)
+        
     def testPerfectDeleteAllowsRemovalOfStmtInMultipleContexts(self):
         g = ConjunctiveGraph()
         patchQuads(g, [], [stmt1, stmt2])
