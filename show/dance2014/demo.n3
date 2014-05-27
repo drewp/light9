@@ -34,7 +34,13 @@ ch:house-side     a :Channel;
   # going to parse it anyway. but, sometimes it will have a syntax
   # error. Can code with errors just parse to a bogus AST that saves
   # the string with errors (and also the uri links found inside)?
-  # Still missing: multiple lines of code with multiple outputs. What's an output?
+  #
+  # Another option- separate just the uri chunks:
+  #   :code ("out = sub(" sub:stageleft ", intensity=" song1:opening ")")
+  # so at least the links are visible in this file.
+  #
+  # Still missing: multiple lines of code with multiple outputs. What's
+  # an output?
   :dep <http://ex/effect/song1/opening>, <http://light9.bigasterisk.com/show/dance2014/sub/stageleft>
   .
 

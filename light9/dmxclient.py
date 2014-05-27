@@ -47,6 +47,7 @@ def outputlevels(levellist,twisted=0,clientid=_id):
             time.sleep(1)
         d = _dmx.callRemote('outputlevels', clientid, levellist)
         d.addErrback(err)
+        return d
 
 dummy = os.getenv('DMXDUMMY')
 if dummy:

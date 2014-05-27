@@ -1,4 +1,4 @@
-import logging, traceback
+import logging, traceback, time
 from rdflib import ConjunctiveGraph
 from light9.rdfdb.rdflibpatch import contextsForStatement as rp_contextsForStatement
 log = logging.getLogger("currentstate")
@@ -25,18 +25,20 @@ class CurrentStateGraphApi(object):
                 # done. Typical usage will do some reads on this graph
                 # before moving on to writes.
 
+                t1 = time.time()
                 g = ConjunctiveGraph()
                 for s,p,o,c in self._graph.quads(tripleFilter):
                     g.store.add((s,p,o), c)
 
                 if tripleFilter == (None, None, None):
-                    self2.logThisCopy(g)
+                    self2.logThisCopy(g, time.time() - t1)
                     
                 g.contextsForStatement = lambda t: contextsForStatementNoWildcards(g, t)
                 return g
 
-            def logThisCopy(self, g):
-                log.info("copied graph %s statements because of this:" % len(g))
+            def logThisCopy(self, g, sec):
+                log.info("copied graph %s statements (%.1f ms) "
+                         "because of this:" % (len(g), sec * 1000))
                 for frame in traceback.format_stack(limit=4)[:-2]:
                     for line in frame.splitlines():
                         log.info("  "+line)

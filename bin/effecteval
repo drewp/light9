@@ -1,13 +1,13 @@
 #!bin/python
 from run_local import log
-from twisted.internet import reactor
+from twisted.internet import reactor, task
 from twisted.internet.defer import inlineCallbacks
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-import sys, optparse, logging, subprocess, json, re
+import sys, optparse, logging, subprocess, json, re, time
 from rdflib import URIRef, RDF
 
 sys.path.append(".")
-from light9 import networking, showconfig, Submaster
+from light9 import networking, showconfig, Submaster, dmxclient
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.curvecalc.curve import Curve
 from light9.namespaces import L9, DCTERMS
@@ -55,60 +55,83 @@ def uriFromCode(s):
 class EffectNode(object):
     def __init__(self, graph, uri):
         self.graph, self.uri = graph, uri
-    
-    def eval(self, songTime):
-        with self.graph.currentState(tripleFilter=(self.uri, L9['code'], None)) as g:
-            code = g.value(self.uri, L9['code'])
-        # consider http://waxeye.org/ for a parser that can be used in py and js
-        m = re.match(r'^out = sub\((.*?), intensity=(.*?)\)', code)
+        self.graph.addHandler(self.prepare)
+
+    def prepare(self):
+        self.code = self.graph.value(self.uri, L9['code'])
+        m = re.match(r'^out = sub\((.*?), intensity=(.*?)\)', self.code)
         if not m:
             raise NotImplementedError
-        sub = uriFromCurie(m.group(1))
-        intensityCurve = uriFromCurie(m.group(2))
-
-        print vars()
+        subUri = uriFromCode(m.group(1))
+        subs = Submaster.get_global_submasters(self.graph)
+        self.sub = subs.get_sub_by_uri(subUri)
         
-def effectDmxDict(graph, effect, songTime):
-    subs = Submaster.get_global_submasters(graph)
-
-    curve = URIRef("http://ex/effect/song1/opening")
-    c = Curve()
-    with graph.currentState(tripleFilter=(curve, None, None)) as g:
-        c.set_from_string(g.value(curve, L9['points']))
-
-    with graph.currentState(tripleFilter=(effect, None, None)) as g:
-        print 'got code', g.value(effect, L9['code'])
-        en = EffectNode(graph, effect)
-
-        en.eval(songTime)
-        
-        sub = subs.get_sub_by_uri(URIRef("http://light9.bigasterisk.com/show/dance2014/sub/stageleft"))
-        level = c.eval(songTime)
-        scaledSubs = [sub * level]
-
-        out = Submaster.sub_maxes(*scaledSubs)
-        levels_dict = out.get_levels()
-        dmx = out.get_dmx_list()
-        return json.dumps(dmx)
+        intensityCurve = uriFromCode(m.group(2))
+        self.curve = Curve()
+        self.curve.set_from_string(self.graph.value(intensityCurve, L9['points']))
+                
+    def eval(self, songTime):
+        # consider http://waxeye.org/ for a parser that can be used in py and js
+        level = self.curve.eval(songTime)
+        scaledSubs = self.sub * level
+        return scaledSubs
 
         
 class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
     @inlineCallbacks
     def get(self):
-        # return dmx dict for that effect
+        # return dmx list for that effect
         uri = URIRef(self.get_argument('uri'))
         response = yield cyclone.httpclient.fetch(
             networking.musicPlayer.path('time'))
         songTime = json.loads(response.body)['t']
-        self.write(effectDmxDict(self.settings.graph, uri, songTime))
-        
+
+        node = EffectNode(self.settings.graph, uri)
+        outSub = node.eval(songTime)
+        self.write(json.dumps(outSub.get_dmx_list()))
+
+
+# Completely not sure where the effect background loop should
+# go. Another process could own it, and get this request repeatedly:
 class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
         song = URIRef(self.get_argument('song'))
         effects = effectsForSong(self.settings.graph, song)
+        raise NotImplementedError
         self.write(maxDict(effectDmxDict(e) for e in effects))
         # return dmx dict for all effects in the song, already combined
-        
+
+# Or, we could own that loop, like this:
+@inlineCallbacks
+def effectLoop(graph):
+    t1 = time.time()
+    response = json.loads((yield cyclone.httpclient.fetch(
+        networking.musicPlayer.path('time'))).body)
+    song = URIRef(response['song'])
+    songTime = response['t']
+    # Possibilities to make this shut up about graph copies:
+    # - implement the cheap readonly currentState response
+    # - do multiple little currentState calls (in this code) over just
+    #   the required triples
+    # - use addHandler instead and only fire dmx when there is a data
+    #   change (and also somehow call it when there is a time change)
+
+    outSubs = []
+    with graph.currentState(tripleFilter=(song, L9['effect'], None)) as g:
+        for effectUri in g.objects(song, L9['effect']):
+            node = EffectNode(graph, effectUri)
+            outSubs.append(node.eval(songTime))
+        out = Submaster.sub_maxes(*outSubs)
+        # out.get_levels() for a more readable view
+        dmx = out.get_dmx_list()
+
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug("send dmx: %r", out.get_levels())
+        yield dmxclient.outputlevels(dmx, twisted=True)
+
+    loopTime = time.time() - t1
+    log.debug('loopTime %.1f ms', 1000 * loopTime)
+    
 class App(object):
     def __init__(self, show):
         self.show = show
@@ -126,9 +149,10 @@ class App(object):
             (r'/effect/eval', EffectEval),
             (r'/songEffects/eval', SongEffectsEval),
         ], debug=True, graph=self.graph)
-        #graph.initiallySynced.addCallback(
+        self.graph.initiallySynced.addCallback(self.launch)
 
-        # see bin/subserver
+    def launch(self, *args):
+        task.LoopingCall(effectLoop, self.graph).start(1)    
 
 class StaticCoffee(PrettyErrorHandler, cyclone.web.RequestHandler):
     def initialize(self, src):

@@ -334,7 +334,11 @@ class Submasters(object):
 _submasters = None
 
 def get_global_submasters(graph):
-    """Get (and make on demand) the global instance of Submasters."""
+    """
+    Get (and make on demand) the global instance of
+    Submasters. Cached, but the cache is not correctly using the graph
+    argument. The first graph you pass will stick in the cache.
+    """
     global _submasters
     if _submasters is None:
         _submasters = Submasters(graph)
