@@ -17,13 +17,13 @@ def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     deletes isn't in the graph or if any of the adds was already in
     the graph.
 
-    These input quads use URIRef for the context, unlike some rdflib
-    APIs that use a Graph(identifier=...) for the context.
+    These input quads use URIRef for the context, but
+    Graph(identifier=) is also allowed (which is what you'll get
+    sometimes from rdflib APIs).
     """
     toDelete = []
     for spoc in deleteQuads:
-        if not isinstance(spoc[3], U):
-            raise TypeError("please pass URIRef contexts to patchQuads")
+        spoc = fixContextToUri(spoc)
 
         if perfect:
             if inGraph(spoc, graph):
@@ -38,10 +38,16 @@ def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     if perfect:
         addQuads = list(addQuads)
         for spoc in addQuads:
+            spoc = fixContextToUri(spoc)
             if inGraph(spoc, graph):
                 raise ValueError("%r already in %r" % (spoc[:3], spoc[3]))
     graph.addN(addQuads)
 
+def fixContextToUri(spoc):
+    if not isinstance(spoc[3], U):
+        return spoc[:3] + (spoc[3].identifier,)
+    return spoc
+    
 def inGraph(spoc, graph):
     """
     c is just a URIRef.
@@ -102,7 +108,8 @@ class TestContextsForStatement(unittest.TestCase):
     def testTwoContexts(self):
         g = graphFromQuads([(A,A,A,A), (A,A,A,B)])
         self.assertEqual(sorted(contextsForStatement(g, (A,A,A))), sorted([A,B]))
-
+    # There's a case where contextsForStatement was returning a Graph
+    # with identifier, which I've fixed without a test
 
 
 class TestGraphFromQuads(unittest.TestCase):
