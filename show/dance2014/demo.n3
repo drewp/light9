@@ -7,19 +7,7 @@
 @prefix ch: <http://light9.bigasterisk.com/theater/piedmont/channel/> .
 @prefix dmx: <http://light9.bigasterisk.com/dmx/> .
 
-dmx:c68 :dmxAddress 68 .
 
-ch:house-side     a :Channel;
-         :output dmx:c68;
-         rdfs:label "house-side" .
-
-<http://light9.bigasterisk.com/show/dance2014/sub/stageleft> a :Submaster ;
-    rdfs:label "houseside" ;
-    :lightLevel <http://light9.bigasterisk.com/sub/local/1371346683.43/map/579807785> .
-
-<http://light9.bigasterisk.com/sub/local/1371346683.43/map/579807785> a :ChannelSetting ;
-    :channel <http://light9.bigasterisk.com/theater/piedmont/channel/house-side> ;
-    :level 1e+00 .
 
 # curvedb writes these. point data might be in separate files
 <http://ex/effect/song1/opening> a :Curve;
@@ -29,7 +17,7 @@ ch:house-side     a :Channel;
 
 # :Effect replaces :Subterm
 <http://ex/effect/song1/openingLook> a :Effect;
-  :code "out = sub(sub:stageleft, intensity=song1:opening)";
+  :code "out = sub(sub:s2, intensity=song1:opening)";
   # save the code as an AST also, to get all the links? web page was
   # going to parse it anyway. but, sometimes it will have a syntax
   # error. Can code with errors just parse to a bogus AST that saves
@@ -41,7 +29,7 @@ ch:house-side     a :Channel;
   #
   # Still missing: multiple lines of code with multiple outputs. What's
   # an output?
-  :dep <http://ex/effect/song1/opening>, <http://light9.bigasterisk.com/show/dance2014/sub/stageleft>
+  :dep <http://ex/effect/song1/opening>, <http://light9.bigasterisk.com/show/dance2014/sub/s2>
   .
 
 <http://light9.bigasterisk.com/show/dance2014/song1>

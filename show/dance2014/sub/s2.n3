@@ -1,0 +1,14 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/s2> a ns1:Submaster ;
+    rdfs:label "s2" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1401175515.38/map/105963414> .
+
+<http://light9.bigasterisk.com/sub/local/1401175515.38/map/105963414> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/upleft> ;
+    ns1:level 6.4e-01 .
+

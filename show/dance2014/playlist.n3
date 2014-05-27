@@ -1,0 +1,66 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2014/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+show:dance2014 :musicRoot "show/dance2014/music" .
+
+show:dance2014 :playList (
+  sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
+  sh:song6  sh:song7  sh:song8  sh:song9  sh:song10
+  sh:song11 sh:song12 sh:song13 sh:song14 sh:song15
+  sh:song16 sh:song17
+) .
+
+sh:song1 a :Song; rdfs:label  "01-countdown-trim.wav";      :songFilename "01-countdown-trim.wav" .
+sh:song2 a :Song; rdfs:label  "02-hatandcane-resample.wav"; :songFilename "02-hatandcane-resample.wav" .
+sh:song3 a :Song; rdfs:label  "03-mix.wav";                 :songFilename "03-mix.wav" .
+sh:song4 a :Song; rdfs:label  "04-tappin_happy.wav";        :songFilename "04-tappin_happy.wav" .
+sh:song5 a :Song; rdfs:label  "05-whenim64-trim.wav";       :songFilename "05-whenim64-trim.wav" .
+sh:song6 a :Song; rdfs:label  "06-taylor22-fix-trim.wav";   :songFilename "06-taylor22-fix-trim.wav" .
+sh:song7 a :Song; rdfs:label  "07-mix.wav";                 :songFilename "07-mix.wav" .
+sh:song8 a :Song; rdfs:label  "08-mix.wav";                 :songFilename "08-mix.wav" .
+sh:song9 a :Song; rdfs:label  "09-teafor2-trim.wav";        :songFilename "09-teafor2-trim.wav" .
+sh:song10 a :Song; rdfs:label "10-42ndst-wav.wav";          :songFilename "10-42ndst-wav.wav" .
+sh:song11 a :Song; rdfs:label "11-mix.wav";                 :songFilename "11-mix.wav" .
+sh:song12 a :Song; rdfs:label "12-5678-trim.wav";           :songFilename "12-5678-trim.wav" .
+sh:song13 a :Song; rdfs:label "13-abc-trim.wav";            :songFilename "13-abc-trim.wav" .
+sh:song14 a :Song; rdfs:label "14-mix.wav";                 :songFilename "14-mix.wav" .
+sh:song15 a :Song; rdfs:label "15-123-trim.wav";            :songFilename "15-123-trim.wav" .
+sh:song16 a :Song; rdfs:label "16-mix.wav";                 :songFilename "16-mix.wav" .
+sh:song17 a :Song; rdfs:label "17-mix.wav";                 :songFilename "17-mix.wav" .
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
