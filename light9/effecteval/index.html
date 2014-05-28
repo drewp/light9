@@ -7,9 +7,13 @@
   <body>
     All effect instances:
     <!-- subscribe to a query of all effects and their songs -->
-    <ul>
-      <li><a href="effect?uri=http://ex/effect/song1/openingLook">song1 -> opening look</a></li>
-      <li><a href="effect?uri=http://ex/effect/song1/full">song1 -> full</a></li>
+    <ul data-bind="foreach: songs">
+      <li>
+        <a data-bind="attr: {href: uri}">Song <span data-bind="text: label"></span></a>
+      </li>
+      <ul data-bind="foreach: effects">
+        <li><a data-bind="attr: {href: 'effect?'+jQuery.param({uri: $data})}, text: $data"></a></li>
+      </ul>
     </ul>
     <script src="static/jquery-2.1.1.min.js"></script>
     <script src="static/knockout-3.1.0.js"></script>

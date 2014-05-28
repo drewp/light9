@@ -20,7 +20,23 @@ class EffectEdit(cyclone.web.RequestHandler):
     def get(self):
         self.write(open("light9/effecteval/effect.html").read())
 
-class EffectData(cyclone.websocket.WebSocketHandler):
+class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
+    def connectionMade(self, *args, **kwargs):
+        self.graph = self.settings.graph
+        self.graph.addHandler(self.updateClient)
+        
+    def updateClient(self):
+        # todo: abort if client is gone
+        playlist = self.graph.value(showconfig.showUri(), L9['playList'])
+        songs = list(self.graph.items(playlist))
+        out = []
+        for s in songs:
+            out.append({'uri': s, 'label': self.graph.label(s)})
+            out[-1]['effects'] = sorted(self.graph.objects(s, L9['effect']))
+        self.sendMessage({'songs': out})
+        
+        
+class EffectUpdates(cyclone.websocket.WebSocketHandler):
     """
     stays alive for the life of the effect page
     """
@@ -68,8 +84,14 @@ class EffectNode(object):
         
         intensityCurve = uriFromCode(m.group(2))
         self.curve = Curve()
+
+        # read from disk ok? how do we know to reread? start with
+        # mtime. the mtime check could be done occasionally so on
+        # average we read at most one curve's mtime per effectLoop.       
+        
         self.curve.set_from_string(self.graph.value(intensityCurve, L9['points']))
-                
+
+        
     def eval(self, songTime):
         # consider http://waxeye.org/ for a parser that can be used in py and js
         level = self.curve.eval(songTime)
@@ -107,27 +129,29 @@ def effectLoop(graph):
     t1 = time.time()
     response = json.loads((yield cyclone.httpclient.fetch(
         networking.musicPlayer.path('time'))).body)
-    song = URIRef(response['song'])
-    songTime = response['t']
-    # Possibilities to make this shut up about graph copies:
-    # - implement the cheap readonly currentState response
-    # - do multiple little currentState calls (in this code) over just
-    #   the required triples
-    # - use addHandler instead and only fire dmx when there is a data
-    #   change (and also somehow call it when there is a time change)
+    if response['song'] is not None:
+        song = URIRef(response['song'])
+        songTime = response['t']
+        # Possibilities to make this shut up about graph copies:
+        # - implement the cheap readonly currentState response
+        # - do multiple little currentState calls (in this code) over just
+        #   the required triples
+        # - use addHandler instead and only fire dmx when there is a data
+        #   change (and also somehow call it when there is a time change)
 
-    outSubs = []
-    with graph.currentState(tripleFilter=(song, L9['effect'], None)) as g:
-        for effectUri in g.objects(song, L9['effect']):
-            node = EffectNode(graph, effectUri)
-            outSubs.append(node.eval(songTime))
-        out = Submaster.sub_maxes(*outSubs)
-        # out.get_levels() for a more readable view
-        dmx = out.get_dmx_list()
+        outSubs = []
+        with graph.currentState(tripleFilter=(song, L9['effect'], None)) as g:
+            for effectUri in g.objects(song, L9['effect']):
+                # these should be built once, not per (frequent) update
+                node = EffectNode(graph, effectUri)
+                outSubs.append(node.eval(songTime))
+            out = Submaster.sub_maxes(*outSubs)
+            # out.get_levels() for a more readable view
+            dmx = out.get_dmx_list()
 
-        if log.isEnabledFor(logging.DEBUG):
-            log.debug("send dmx: %r", out.get_levels())
-        yield dmxclient.outputlevels(dmx, twisted=True)
+            if log.isEnabledFor(logging.DEBUG):
+                log.debug("send dmx: %r", out.get_levels())
+            yield dmxclient.outputlevels(dmx, twisted=True)
 
     loopTime = time.time() - t1
     log.debug('loopTime %.1f ms', 1000 * loopTime)
@@ -136,6 +160,10 @@ class App(object):
     def __init__(self, show):
         self.show = show
         self.graph = SyncedGraph("effectEval")
+        self.graph.initiallySynced.addCallback(self.launch)
+
+    def launch(self, *args):
+        task.LoopingCall(effectLoop, self.graph).start(1)    
         SFH = cyclone.web.StaticFileHandler
         self.cycloneApp = cyclone.web.Application(handlers=[
             (r'/()', SFH,
@@ -150,10 +178,8 @@ class App(object):
             (r'/effect/eval', EffectEval),
             (r'/songEffects/eval', SongEffectsEval),
         ], debug=True, graph=self.graph)
-        self.graph.initiallySynced.addCallback(self.launch)
-
-    def launch(self, *args):
-        task.LoopingCall(effectLoop, self.graph).start(1)    
+        reactor.listenTCP(networking.effectEval.port, self.cycloneApp)
+        log.info("listening on %s" % networking.effectEval.port)
 
 class StaticCoffee(PrettyErrorHandler, cyclone.web.RequestHandler):
     def initialize(self, src):
@@ -185,6 +211,4 @@ if __name__ == "__main__":
     if options.twistedlog:
         from twisted.python import log as twlog
         twlog.startLogging(sys.stderr)
-    reactor.listenTCP(networking.effectEval.port, app.cycloneApp)
-    log.info("listening on %s" % networking.effectEval.port)
     reactor.run()
