@@ -3,14 +3,15 @@ from run_local import log
 from twisted.internet import reactor, task
 from twisted.internet.defer import inlineCallbacks
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-import sys, optparse, logging, subprocess, json, re, time
-from rdflib import URIRef, RDF
+import sys, optparse, logging, subprocess, json, re, time, traceback
+from rdflib import URIRef, RDF, Literal
 
 sys.path.append(".")
 from light9 import networking, showconfig, Submaster, dmxclient
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.curvecalc.curve import Curve
-from light9.namespaces import L9, DCTERMS
+from light9.namespaces import L9, DCTERMS, RDF
+from light9.rdfdb.patch import Patch
 
 sys.path.append("/my/proj/homeauto/lib")
 sys.path.append("/home/drewp/projects/homeauto/lib")
@@ -20,6 +21,24 @@ class EffectEdit(cyclone.web.RequestHandler):
     def get(self):
         self.write(open("light9/effecteval/effect.html").read())
 
+class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def post(self):
+        song = URIRef(self.get_argument('uri'))
+        drop = URIRef(self.get_argument('drop'))
+        ctx = song
+        now = time.time()
+        effect = song + "/effect/e-%f" % now
+        curve = song + "/curve/c-%f" % now
+        self.settings.graph.patch(Patch(addQuads=[
+            (song, L9['effect'], effect, ctx),
+            (effect, RDF.type, L9['Effect'], ctx),
+            (effect, L9['code'],
+             Literal('out = sub(%s, intensity=%s)' % (drop.n3(), curve.n3())),
+             ctx),
+            (curve, RDF.type, L9['Curve'], ctx),
+            (curve, L9['points'], Literal('0 0'), ctx),
+            ]))
+        
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
     def connectionMade(self, *args, **kwargs):
         self.graph = self.settings.graph
@@ -66,6 +85,8 @@ def uriFromCode(s):
         return URIRef('http://light9.bigasterisk.com/show/dance2014/sub/' + s[4:])
     if s.startswith('song1:'):
         return URIRef('http://ex/effect/song1/' + s[6:])
+    if (s[0], s[-1]) == ('<', '>'):
+        return URIRef(s[1:-1])
     raise NotImplementedError
         
 class EffectNode(object):
@@ -88,8 +109,12 @@ class EffectNode(object):
         # read from disk ok? how do we know to reread? start with
         # mtime. the mtime check could be done occasionally so on
         # average we read at most one curve's mtime per effectLoop.       
-        
-        self.curve.set_from_string(self.graph.value(intensityCurve, L9['points']))
+
+        pts = self.graph.value(intensityCurve, L9['points'])
+        if pts is None:
+            log.info("curve %r has no points" % intensityCurve)
+        else:
+            self.curve.set_from_string(pts)
 
         
     def eval(self, songTime):
@@ -127,32 +152,36 @@ class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
 @inlineCallbacks
 def effectLoop(graph):
     t1 = time.time()
-    response = json.loads((yield cyclone.httpclient.fetch(
-        networking.musicPlayer.path('time'))).body)
-    if response['song'] is not None:
-        song = URIRef(response['song'])
-        songTime = response['t']
-        # Possibilities to make this shut up about graph copies:
-        # - implement the cheap readonly currentState response
-        # - do multiple little currentState calls (in this code) over just
-        #   the required triples
-        # - use addHandler instead and only fire dmx when there is a data
-        #   change (and also somehow call it when there is a time change)
+    try:
+        response = json.loads((yield cyclone.httpclient.fetch(
+            networking.musicPlayer.path('time'))).body)
+        if response['song'] is not None:
+            song = URIRef(response['song'])
+            songTime = response['t']
+            # Possibilities to make this shut up about graph copies:
+            # - implement the cheap readonly currentState response
+            # - do multiple little currentState calls (in this code) over just
+            #   the required triples
+            # - use addHandler instead and only fire dmx when there is a data
+            #   change (and also somehow call it when there is a time change)
 
-        outSubs = []
-        with graph.currentState(tripleFilter=(song, L9['effect'], None)) as g:
-            for effectUri in g.objects(song, L9['effect']):
-                # these should be built once, not per (frequent) update
-                node = EffectNode(graph, effectUri)
-                outSubs.append(node.eval(songTime))
-            out = Submaster.sub_maxes(*outSubs)
-            # out.get_levels() for a more readable view
-            dmx = out.get_dmx_list()
+            outSubs = []
+            with graph.currentState(tripleFilter=(song, L9['effect'], None)) as g:
+                for effectUri in g.objects(song, L9['effect']):
+                    # these should be built once, not per (frequent) update
+                    node = EffectNode(graph, effectUri)
+                    outSubs.append(node.eval(songTime))
+                out = Submaster.sub_maxes(*outSubs)
+                # out.get_levels() for a more readable view
+                dmx = out.get_dmx_list()
 
-            if log.isEnabledFor(logging.DEBUG):
-                log.debug("send dmx: %r", out.get_levels())
-            yield dmxclient.outputlevels(dmx, twisted=True)
-
+                if log.isEnabledFor(logging.DEBUG):
+                    log.debug("send dmx: %r", out.get_levels())
+                yield dmxclient.outputlevels(dmx, twisted=True)
+    except Exception:
+        traceback.print_exc()
+        time.sleep(1)
+        
     loopTime = time.time() - t1
     log.debug('loopTime %.1f ms', 1000 * loopTime)
     
@@ -176,6 +205,7 @@ class App(object):
             (r'/songEffectsUpdates', SongEffectsUpdates),
             (r'/static/(.*)', SFH, {'path': 'static/'}),
             (r'/effect/eval', EffectEval),
+            (r'/songEffects', SongEffects),
             (r'/songEffects/eval', SongEffectsEval),
         ], debug=True, graph=self.graph)
         reactor.listenTCP(networking.effectEval.port, self.cycloneApp)

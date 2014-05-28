@@ -3,17 +3,21 @@
   <head>
     <title>effecteval</title>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="static/style.css">
   </head>
   <body>
-    All effect instances:
+    <h1>All effect instances</h1>
     <!-- subscribe to a query of all effects and their songs -->
-    <ul data-bind="foreach: songs">
+    <ul data-bind="foreach: songs" class="twoColList">
       <li>
-        <a data-bind="attr: {href: uri}">Song <span data-bind="text: label"></span></a>
+        <a class="song" data-bind="attr: {href: uri}">Song <span data-bind="text: label"></span></a>
+        <ul>
+          <!-- ko foreach: effects -->
+          <li><a class="effect" data-bind="attr: {href: 'effect?'+jQuery.param({uri: $data})}, text: $data"></a></li>
+          <!-- /ko -->
+          <li class="dropTarget" data-bind="event: {dragover: $root.dragover, dragenter: $root.dragover, drop: function(data, event) { $root.drop(uri, event); }}">Add another (drop a sub or effect class)</li>
+        </ul>
       </li>
-      <ul data-bind="foreach: effects">
-        <li><a data-bind="attr: {href: 'effect?'+jQuery.param({uri: $data})}, text: $data"></a></li>
-      </ul>
     </ul>
     <script src="static/jquery-2.1.1.min.js"></script>
     <script src="static/knockout-3.1.0.js"></script>

@@ -3,11 +3,13 @@
   <head>
     <title>effect</title>
     <meta charset="utf-8" />
+    <link rel="stylesheet" href="static/style.css">
+
   </head>
   <body>
-    <a href="./">Effects</a> / <a data-bind="attr: {href: uri}, text: uri"></a>
+    <a href="./">Effects</a> / <a class="effect" data-bind="attr: {href: uri}, text: uri"></a>
 
-    <div>code: <input type="text" size="100" data-bind="value: code"></input></div>
+    <div>code: <input type="text" size="160" data-bind="value: code"></input></div>
     
     <script src="static/jquery-2.1.1.min.js"></script>
     <script src="static/knockout-3.1.0.js"></script>

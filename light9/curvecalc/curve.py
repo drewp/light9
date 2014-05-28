@@ -62,6 +62,8 @@ class Curve(object):
     def eval(self, t, allow_muting=True):
         if self.muted and allow_muting:
             return 0
+        if not self.points:
+            raise ValueError("curve has no points")
         i = bisect_left(self.points,(t,None))-1
 
         if i == -1:

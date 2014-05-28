@@ -3,6 +3,13 @@ body {
     color: white;
     font-family: sans-serif;
 }
+
+
+a {
+color: rgb(97, 97, 255);
+
+    }
+
 .songs {
     -moz-column-width:205px;
     -webkit-column-width:205px;
@@ -46,7 +53,42 @@ button a {
     opacity: .5;
 }
 .num {
-font-size: 27px;
-color: rgb(233, 122, 122);
-display: inline-block; 
-    }
+    font-size: 27px;
+    color: rgb(233, 122, 122);
+    display: inline-block; 
+}
+
+.dropTarget {
+    padding: 5px;
+    border: 2px dashed gray;
+    font-style: italic;
+    color: rgb(78, 90, 107);
+}
+.twoColList {
+    -webkit-column-width: 24em;
+}
+.twoColList > li {
+    margin-bottom: 13px;
+}
+
+.song {
+    color: rgb(85, 221, 85);
+}
+.song:before {
+
+    content: "♫";
+    color: black;
+    background: rgb(85, 221, 85);
+    border-radius: 30%;
+}
+
+.effect:before {
+    content: "⛖";
+}
+
+.song:before, .effect:before {
+    margin-right: 3px;
+    text-decoration: none !important;
+    font-size: 140%;
+
+}
