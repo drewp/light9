@@ -49,15 +49,7 @@ class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
             return self.respondStaticJade("light9/subserver/%s.jade" %
                                           (path or 'index'))
             
-        oddlyPlaced = {
-            "websocket.js":        "light9/rdfdb/web/websocket.js",
-            "jquery-1.7.2.min.js": "light9/rdfdb/web/lib/jquery-1.7.2.min.js",
-        }
-        if path in oddlyPlaced:
-            self.write(open(oddlyPlaced[path]).read())
-            return
-
-        if path.endswith(".js") and path not in ['knockout-2.2.1.js']:
+        if path.endswith(".js"):
             return self.responseStaticCoffee(
                 'light9/subserver/%s' %
                 path.replace(".js", ".coffee")) # potential security hole
@@ -144,6 +136,7 @@ if __name__ == "__main__":
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
         (r'/live', Live),
         (r'/snapshot', Snapshot),
+        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
         (r'/(.*)', Static,
          {"path" : "light9/subserver",
           "default_filename" : "index.jade"}),
