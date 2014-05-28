@@ -99,11 +99,25 @@ class AutoDepGraphApi(object):
         self._watchers.addPredObjWatcher(func, predicate, object)
         return self._graph.subjects(predicate, object)
 
+    def items(self, listUri):
+        """generator. Having a chain of watchers on the results is not
+        well-tested yet"""
+        chain = set([listUri])
+        while listUri:
+            item = self.value(listUri, RDF.first)
+            if item:
+                yield item
+            listUri = self.value(listUri, RDF.rest)
+            if listUri in chain:
+                raise ValueError("List contains a recursive rdf:rest reference")
+            chain.add(listUri)
+
+        
     def contains(self, triple):
         func = self._getCurrentFunc()
         self._watchers.addTripleWatcher(func, triple)
         return triple in self._graph
-        
+
     def contextsForStatement(self, triple):
         """currently this needs to be in an addHandler section, but it
         sets no watchers so it won't actually update if the statement
