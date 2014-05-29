@@ -56,7 +56,12 @@ class Curve(object):
         dispatcher.send("points changed",sender=self)
 
     def points_as_string(self):
-        return ' '.join("%s %r" % p for p in self.points)
+        def outVal(x):
+            if isinstance(x, basestring): # markers
+                return x
+            return "%.4g" % x
+        return ' '.join("%s %s" % (outVal(p[0]), outVal(p[1]))
+                        for p in self.points)
         
     def save(self,filename):
         # this is just around for markers, now
@@ -204,7 +209,7 @@ class Curveset(object):
         if self.currentSong is None:
             return
 
-        for uri in self.graph.objects(self.currentSong, L9['curve']):
+        for uri in sorted(self.graph.objects(self.currentSong, L9['curve'])):
             pts = self.graph.value(uri, L9['points'])
             c = Curve(uri, pointsStorage='file' if pts is None else 'graph')
             if pts is not None:
