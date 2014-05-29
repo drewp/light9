@@ -119,7 +119,7 @@ from rdflib import ConjunctiveGraph, URIRef, Graph
 from light9.rdfdb.graphfile import GraphFile
 from light9.rdfdb.patch import Patch, ALLSTMTS
 from light9.rdfdb.rdflibpatch import patchQuads
-
+from light9.rdfdb.file_vs_uri import correctToTopdirPrefix, fileForUri, uriFromFile
 from light9.rdfdb.patchsender import sendPatch
 from light9.rdfdb.patchreceiver import makePatchEndpointPutMethod
 
@@ -165,16 +165,10 @@ class WatchedFiles(object):
 
     This object watches directories. Each GraphFile watches its own file.
     """
-    def __init__(self, topDirsToWatch, patch, getSubgraph):
-        self.topDirsToWatch = topDirsToWatch
+    def __init__(self, dirUriMap, patch, getSubgraph):
+        self.dirUriMap = dirUriMap # {abspath : uri prefix}
         self.patch, self.getSubgraph = patch, getSubgraph
         
-        # files from cwd become uris starting with this. *should* be
-        # building uris from the show uri in $LIGHT9_SHOW/URI
-        # instead. Who wants to keep their data in the same dir tree
-        # as the source code?!
-        self.topUri = URIRef("http://light9.bigasterisk.com/")
-
         self.graphFiles = {} # context uri : GraphFile
         
         self.notifier = INotify()
@@ -185,7 +179,7 @@ class WatchedFiles(object):
     def findAndLoadFiles(self):
         self.initialLoad = True
         try:
-            for topdir in self.topDirsToWatch:
+            for topdir in self.dirUriMap:
                 for dirpath, dirnames, filenames in os.walk(topdir):
                     for base in filenames:
                         self.watchFile(os.path.join(dirpath, base))
@@ -209,15 +203,8 @@ class WatchedFiles(object):
         """
         if not os.path.isfile(inFile):
             return
-        if not any(inFile.startswith(prefix) for prefix in self.topDirsToWatch):
-            for prefix in self.topDirsToWatch:
-                prefixAbs = os.path.abspath(prefix)
-                if inFile.startswith(prefixAbs):
-                    inFile = prefix + inFile[len(prefixAbs):]
-                    break
-            else:
-                raise ValueError("can't correct %s to start with one of %s" %
-                                 (inFile, self.topDirsToWatch))
+
+        inFile = correctToTopdirPrefix(self.dirUriMap, inFile)
         if os.path.splitext(inFile)[1] not in ['.n3']:
             return
 
@@ -235,7 +222,7 @@ class WatchedFiles(object):
         if inFile.endswith("config.n3"):
             return
             
-        ctx = self.uriFromFile(inFile)
+        ctx = uriFromFile(self.dirUriMap, inFile)
         gf = GraphFile(self.notifier, inFile, ctx,
                        self.patch, self.getSubgraph)
         self.graphFiles[ctx] = gf
@@ -256,7 +243,7 @@ class WatchedFiles(object):
         g = self.getSubgraph(ctx)
 
         if ctx not in self.graphFiles:
-            outFile = self.fileForUri(ctx)
+            outFile = fileForUri(self.dirUriMap, ctx)
             log.info("starting new file %r", outFile)
             self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
                                              self.patch, self.getSubgraph)
@@ -274,30 +261,17 @@ class WatchedFiles(object):
             g = self.getSubgraph(ctx)
             self.graphFiles[ctx].dirty(g)
 
-    def uriFromFile(self, filename):
-        assert filename.endswith('.n3'), filename
-        if not any(filename.startswith(t) for t in self.topDirsToWatch):
-            raise ValueError("filename %s doesn't start with any of %s" %
-                             (filename, self.topDirsToWatch))
-        return URIRef(self.topUri + filename[:-len('.n3')])
-
-    def fileForUri(self, ctx):
-        assert isinstance(ctx, URIRef), ctx
-        if not ctx.startswith(self.topUri):
-            raise ValueError("don't know what filename to use for %s" % ctx)
-        return ctx[len(self.topUri):] + ".n3"
-
         
 class Db(object):
     """
     the master graph, all the connected clients, all the files we're watching
     """
-    def __init__(self, topDirsToWatch):
+    def __init__(self, dirUriMap):
       
         self.clients = []
         self.graph = ConjunctiveGraph()
 
-        self.watchedFiles = WatchedFiles(topDirsToWatch,
+        self.watchedFiles = WatchedFiles(dirUriMap,
                                          self.patch, self.getSubgraph)
         
         self.summarizeToLog()
@@ -444,7 +418,8 @@ if __name__ == "__main__":
 
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
-    db = Db(topDirsToWatch=[os.environ['LIGHT9_SHOW']])
+    db = Db(dirUriMap={os.environ['LIGHT9_SHOW'].rstrip('/') + '/':
+                       URIRef('http://light9.bigasterisk.com/show/dance2014/')})
 
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)
