@@ -1,4 +1,4 @@
-from rdflib import Namespace, RDF
+from rdflib import Namespace, RDF, RDFS
 
 L9 = Namespace("http://light9.bigasterisk.com/")
 MUS = Namespace("http://light9.bigasterisk.com/music/")

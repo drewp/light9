@@ -4,7 +4,8 @@ from bisect import bisect_left,bisect
 import louie as dispatcher
 from rdflib import Literal
 from light9 import showconfig
-from light9.namespaces import L9
+from light9.namespaces import L9, RDF, RDFS
+from light9.rdfdb.patch import Patch
 
 from bcf2000 import BCF2000
 
@@ -15,7 +16,9 @@ postPad = 4
 
 class Curve(object):
     """curve does not know its name. see Curveset"""
-    def __init__(self):
+    def __init__(self, uri, pointsStorage='graph'):
+        self.uri = uri
+        self.pointsStorage = pointsStorage
         self.points = [] # x-sorted list of (x,y)
         self._muted = False
 
@@ -179,7 +182,7 @@ class Curveset(object):
             self.sliderIgnoreInputUntil = {}
         else:
             self.sliders = None
-        self.markers = Markers()
+        self.markers = Markers(uri=None, pointsStorage='file')
 
         graph.addHandler(self.loadCurvesForSong)
 
@@ -195,23 +198,20 @@ class Curveset(object):
         self.curveName.clear()
         self.sliderCurve.clear()
         self.sliderNum.clear()
-        self.markers = Markers()
+        self.markers = Markers(uri=None, pointsStorage='file')
         
         self.currentSong = self.graph.value(self.session, L9['currentSong'])
         if self.currentSong is None:
             return
 
         for uri in self.graph.objects(self.currentSong, L9['curve']):
-            c = Curve()
-            c.uri = uri
             pts = self.graph.value(uri, L9['points'])
+            c = Curve(uri, pointsStorage='file' if pts is None else 'graph')
             if pts is not None:
                 c.set_from_string(pts)
-                c.pointsStorage = 'graph'
             else:
                 diskPts = self.graph.value(uri, L9['pointsFile'])
                 c.load(os.path.join(showconfig.curvesDir(), diskPts))
-                c.pointsStorage = 'file'
 
             curvename = self.graph.label(uri)
             if not curvename:
@@ -298,11 +298,17 @@ class Curveset(object):
         while name in self.curves:
            name=name+"-1"
 
-        c = Curve()
-        # missing some new attrs here, uri pointsStorage
-        s,e = self.get_time_range()
-        c.points.extend([(s,0), (e,0)])
-        self.add_curve(name,c)
+        uri = self.currentSong + ('/curve/c-%f' % time.time())
+        c = Curve(uri)
+        s, e = self.get_time_range()
+        c.points.extend([(s, 0), (e, 0)])
+        ctx = self.currentSong
+        self.graph.patch(Patch(addQuads=[
+            (self.currentSong, L9['curve'], uri, ctx),
+            (uri, RDF.type, L9['Curve'], ctx),
+            (uri, RDFS.label, Literal(name), ctx),
+            (uri, L9['points'], Literal(c.points_as_string()), ctx),
+            ]))
 
     def hw_slider_in(self, num, value):
         try:
