@@ -169,5 +169,10 @@ class GraphFile(object):
         f.close()
         self.lastWriteTimestamp = os.path.getmtime(tmpOut)
         os.rename(tmpOut, self.path)
-        iolog.info("%s rewrote in %.1f ms", self.path, serializeTime * 1000)
+        iolog.info("%s rewrote in %.1f ms",
+                   self.path, serializeTime * 1000)
+        
+    def __repr__(self):
+        return "%s(path=%r, uri=%r, ...)" % (
+            self.__class__.__name__, self.path, self.uri)
         
