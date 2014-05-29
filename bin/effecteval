@@ -4,13 +4,13 @@ from twisted.internet import reactor, task
 from twisted.internet.defer import inlineCallbacks
 import cyclone.web, cyclone.websocket, cyclone.httpclient
 import sys, optparse, logging, subprocess, json, re, time, traceback
-from rdflib import URIRef, RDF, Literal
+from rdflib import URIRef, Literal
 
 sys.path.append(".")
 from light9 import networking, showconfig, Submaster, dmxclient
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.curvecalc.curve import Curve
-from light9.namespaces import L9, DCTERMS, RDF
+from light9.namespaces import L9, DCTERMS, RDF, RDFS
 from light9.rdfdb.patch import Patch
 
 sys.path.append("/my/proj/homeauto/lib")
@@ -29,13 +29,20 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
         now = time.time()
         effect = song + "/effect/e-%f" % now
         curve = song + "/curve/c-%f" % now
+
+        with self.settings.graph.currentState(
+                tripleFilter=(drop, RDFS.label, None)) as g:
+            dropSubLabel = g.label(drop)
+        
         self.settings.graph.patch(Patch(addQuads=[
+            (song, L9['curve'], curve, ctx),
             (song, L9['effect'], effect, ctx),
             (effect, RDF.type, L9['Effect'], ctx),
             (effect, L9['code'],
              Literal('out = sub(%s, intensity=%s)' % (drop.n3(), curve.n3())),
              ctx),
             (curve, RDF.type, L9['Curve'], ctx),
+            (curve, RDFS.label, Literal('sub %s' % dropSubLabel), ctx),
             (curve, L9['points'], Literal('0 0'), ctx),
             ]))
         
@@ -92,10 +99,13 @@ def uriFromCode(s):
 class EffectNode(object):
     def __init__(self, graph, uri):
         self.graph, self.uri = graph, uri
+        # this is not expiring at the right time, when an effect goes away
         self.graph.addHandler(self.prepare)
 
     def prepare(self):
         self.code = self.graph.value(self.uri, L9['code'])
+        if self.code is None:
+            raise ValueError("effect %s has no code" % self.uri)
         m = re.match(r'^out = sub\((.*?), intensity=(.*?)\)', self.code)
         if not m:
             raise NotImplementedError
@@ -104,7 +114,7 @@ class EffectNode(object):
         self.sub = subs.get_sub_by_uri(subUri)
         
         intensityCurve = uriFromCode(m.group(2))
-        self.curve = Curve()
+        self.curve = Curve(uri=intensityCurve)
 
         # read from disk ok? how do we know to reread? start with
         # mtime. the mtime check could be done occasionally so on
@@ -192,7 +202,7 @@ class App(object):
         self.graph.initiallySynced.addCallback(self.launch)
 
     def launch(self, *args):
-        task.LoopingCall(effectLoop, self.graph).start(1)    
+        task.LoopingCall(effectLoop, self.graph).start(.3)    
         SFH = cyclone.web.StaticFileHandler
         self.cycloneApp = cyclone.web.Application(handlers=[
             (r'/()', SFH,
