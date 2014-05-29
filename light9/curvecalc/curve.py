@@ -1,8 +1,10 @@
 from __future__ import division
-import glob, time, logging, ast
+import glob, time, logging, ast, os
 from bisect import bisect_left,bisect
 import louie as dispatcher
 from rdflib import Literal
+from light9 import showconfig
+from light9.namespaces import L9
 
 from bcf2000 import BCF2000
 
@@ -49,8 +51,12 @@ class Curve(object):
             self.points.append((float(x), ast.literal_eval(y)))
         self.points.sort()
         dispatcher.send("points changed",sender=self)
+
+    def points_as_string(self):
+        return ' '.join("%s %r" % p for p in self.points)
         
     def save(self,filename):
+        # this is just around for markers, now
         if filename.endswith('-music') or filename.endswith('_music'):
             print "not saving music track"
             return
@@ -152,12 +158,15 @@ class Sliders(BCF2000):
 
         
 class Curveset(object):
-    
     curves = None # curvename : curve
-    def __init__(self, sliders=False):
+    def __init__(self, graph, session, sliders=False):
         """sliders=True means support the hardware sliders"""
+        self.graph, self.session = graph, session
+
+        self.currentSong = None
         self.curves = {} # name (str) : Curve
         self.curveName = {} # reverse
+        
         self.sliderCurve = {} # slider number (1 based) : curve name
         self.sliderNum = {} # reverse
         if sliders:
@@ -172,16 +181,15 @@ class Curveset(object):
             self.sliders = None
         self.markers = Markers()
 
-    def sorter(self, name):
-        return (not name in ['music', 'smooth_music'], name)
+        graph.addHandler(self.loadCurvesForSong)
 
-    def load(self,basename, skipMusic=False):
-        """find all files that look like basename-curvename and add
-        curves with their contents
-
+    def loadCurvesForSong(self):
+        """
+        current curves will track song's curves.
+        
         This fires 'add_curve' dispatcher events to announce the new curves.
         """
-        log.info("Curveset.load %s", basename)
+        log.info('loadCurvesForSong')
         dispatcher.send("clear_curves")
         self.curves.clear()
         self.curveName.clear()
@@ -189,31 +197,70 @@ class Curveset(object):
         self.sliderNum.clear()
         self.markers = Markers()
         
-        for filename in sorted(glob.glob("%s-*"%basename), key=self.sorter):
-            curvename = filename[filename.rfind('-')+1:]
-            if skipMusic and curvename in ['music', 'smooth_music']:
-                continue
-            c=Curve()
-            c.load(filename)
-            curvename = curvename.replace('-','_')
-            self.add_curve(curvename,c)
+        self.currentSong = self.graph.value(self.session, L9['currentSong'])
+        if self.currentSong is None:
+            return
 
+        for uri in self.graph.objects(self.currentSong, L9['curve']):
+            c = Curve()
+            c.uri = uri
+            pts = self.graph.value(uri, L9['points'])
+            if pts is not None:
+                c.set_from_string(pts)
+                c.pointsStorage = 'graph'
+            else:
+                diskPts = self.graph.value(uri, L9['pointsFile'])
+                c.load(os.path.join(showconfig.curvesDir(), diskPts))
+                c.pointsStorage = 'file'
+
+            curvename = self.graph.label(uri)
+            if not curvename:
+                raise ValueError("curve %r has no label" % uri)
+            self.add_curve(curvename, c)
+
+        basename = os.path.join(
+            showconfig.curvesDir(),
+            showconfig.songFilenameFromURI(self.currentSong))
         try:
             self.markers.load("%s.markers" % basename)
         except IOError:
             print "no marker file found"
             
-    def save(self,basename):
+    def save(self):
         """writes a file for each curve with a name
-        like basename-curvename"""
-        for name,cur in self.curves.items():
-            cur.save("%s-%s" % (basename,name))
-        self.markers.save("%s.markers" % basename)
+        like basename-curvename, or saves them to the rdf graph"""
+        basename=os.path.join(
+            showconfig.curvesDir(),
+            showconfig.songFilenameFromURI(self.currentSong))
 
+        patches = []
+        for label, curve in self.curves.items():
+            if curve.pointsStorage == 'file':
+                log.warn("not saving file curves anymore- skipping %s" % label)
+                #cur.save("%s-%s" % (basename,name))
+            elif curve.pointsStorage == 'graph':
+                ctx = self.currentSong
+                patches.append(self.graph.getObjectPatch(
+                    ctx,
+                    subject=curve.uri,
+                    predicate=L9['points'],
+                    newObject=Literal(curve.points_as_string())))
+            else:
+                raise NotImplementedError(curve.pointsStorage)
+
+        self.markers.save("%s.markers" % basename)
+        # this will cause reloads that will clear our curve list
+        for p in patches:
+            self.graph.patch(p)
+
+    def sorter(self, name):
+        return (not name in ['music', 'smooth_music'], name)
+        
     def curveNamesInOrder(self):
         return sorted(self.curves.keys(), key=self.sorter)
             
-    def add_curve(self,name,curve):
+    def add_curve(self, name, curve):
+        # should be indexing by uri
         if isinstance(name, Literal):
             name = str(name) 
         if name in self.curves:
@@ -252,6 +299,7 @@ class Curveset(object):
            name=name+"-1"
 
         c = Curve()
+        # missing some new attrs here, uri pointsStorage
         s,e = self.get_time_range()
         c.points.extend([(s,0), (e,0)])
         self.add_curve(name,c)

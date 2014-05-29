@@ -344,14 +344,9 @@ class Main(object):
 
     def onSave(self, *args):
         # only doing curves still. I hope to eliminate all this.
-        with self.graph.currentState() as g:
-            song = g.value(self.session, L9['currentSong'])
-
-            log.info("saving curves for %r", song)
-            self.curveset.save(basename=os.path.join(
-                showconfig.curvesDir(),
-                showconfig.songFilenameFromURI(song)))
-            log.info("saved")
+        log.info("saving curves")
+        self.curveset.save()
+        log.info("saved")
 
     def makeStatusLines(self, master):
         """various labels that listen for dispatcher signals"""
@@ -452,18 +447,7 @@ def launch(args, graph, session, opts, startTime, music):
     except IndexError:
         pass
 
-    curveset = Curveset(sliders=opts.sliders)
-
-    def curvesetReload():
-        # not sure if this clears right or not yet
-        song = graph.value(session, L9['currentSong'])
-        if song is None:
-            return
-        curveset.load(basename=os.path.join(
-            showconfig.curvesDir(),
-            showconfig.songFilenameFromURI(song)),
-                      skipMusic=opts.skip_music)
-    graph.addHandler(curvesetReload)
+    curveset = Curveset(graph=graph, session=session, sliders=opts.sliders)
         
     log.debug("startup: output %s", time.time() - startTime)
 
@@ -504,8 +488,6 @@ def main():
     parser.set_usage("%prog [opts] [songURI]")
     parser.add_option("--sliders", action='store_true',
                       help='use hardware sliders')
-    parser.add_option("--skip-music", action='store_true',
-                      help="ignore music and smooth_music curve files")
     parser.add_option("--debug", action="store_true",
                       help="log at DEBUG")
     parser.add_option("--reload", action="store_true",
