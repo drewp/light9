@@ -11,7 +11,7 @@ class GraphEditApi(object):
     mixin for SyncedGraph, separated here because these methods work together
     """
 
-    def patchObject(self, context, subject, predicate, newObject):
+    def getObjectPatch(self, context, subject, predicate, newObject):
         """send a patch which removes existing values for (s,p,*,c)
         and adds (s,p,newObject,c). Values in other graphs are not affected.
 
@@ -23,13 +23,16 @@ class GraphEditApi(object):
                                      context=context):
             existing.append(spo+(context,))
         # what layer is supposed to cull out no-op changes?
-        p = Patch(
+        return Patch(
             delQuads=existing,
             addQuads=([(subject, predicate, newObject, context)]
                       if newObject is not None else []))
+
+    def patchObject(self, context, subject, predicate, newObject):
+        p = self.getObjectPatch(context, subject, predicate, newObject)
         log.info("patchObject %r" % p.jsonRepr)
         self.patch(p)
-
+        
     def patchMapping(self, context, subject, predicate, nodeClass, keyPred, valuePred, newKey, newValue):
         """
         creates/updates a structure like this:
