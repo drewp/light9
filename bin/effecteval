@@ -3,15 +3,15 @@ from run_local import log
 from twisted.internet import reactor, task
 from twisted.internet.defer import inlineCallbacks
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-import sys, optparse, logging, subprocess, json, re, time, traceback
+import sys, optparse, logging, subprocess, json, time, traceback
 from rdflib import URIRef, Literal
 
 sys.path.append(".")
 from light9 import networking, showconfig, Submaster, dmxclient
 from light9.rdfdb.syncedgraph import SyncedGraph
-from light9.curvecalc.curve import Curve
-from light9.namespaces import L9, DCTERMS, RDF, RDFS
+from light9.namespaces import L9, RDF, RDFS
 from light9.rdfdb.patch import Patch
+from light9.effecteval.effect import EffectNode
 
 sys.path.append("/my/proj/homeauto/lib")
 sys.path.append("/home/drewp/projects/homeauto/lib")
@@ -85,54 +85,7 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
     def messageReceived(self, message):
         log.info("got message %s" % message)
         # write a patch back to the graph
-
-def uriFromCode(s):
-    # i thought this was something a graph could do with its namespace manager
-    if s.startswith('sub:'):
-        return URIRef('http://light9.bigasterisk.com/show/dance2014/sub/' + s[4:])
-    if s.startswith('song1:'):
-        return URIRef('http://ex/effect/song1/' + s[6:])
-    if (s[0], s[-1]) == ('<', '>'):
-        return URIRef(s[1:-1])
-    raise NotImplementedError
         
-class EffectNode(object):
-    def __init__(self, graph, uri):
-        self.graph, self.uri = graph, uri
-        # this is not expiring at the right time, when an effect goes away
-        self.graph.addHandler(self.prepare)
-
-    def prepare(self):
-        self.code = self.graph.value(self.uri, L9['code'])
-        if self.code is None:
-            raise ValueError("effect %s has no code" % self.uri)
-        m = re.match(r'^out = sub\((.*?), intensity=(.*?)\)', self.code)
-        if not m:
-            raise NotImplementedError
-        subUri = uriFromCode(m.group(1))
-        subs = Submaster.get_global_submasters(self.graph)
-        self.sub = subs.get_sub_by_uri(subUri)
-        
-        intensityCurve = uriFromCode(m.group(2))
-        self.curve = Curve(uri=intensityCurve)
-
-        # read from disk ok? how do we know to reread? start with
-        # mtime. the mtime check could be done occasionally so on
-        # average we read at most one curve's mtime per effectLoop.       
-
-        pts = self.graph.value(intensityCurve, L9['points'])
-        if pts is None:
-            log.info("curve %r has no points" % intensityCurve)
-        else:
-            self.curve.set_from_string(pts)
-
-        
-    def eval(self, songTime):
-        # consider http://waxeye.org/ for a parser that can be used in py and js
-        level = self.curve.eval(songTime)
-        scaledSubs = self.sub * level
-        return scaledSubs
-
         
 class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
     @inlineCallbacks
