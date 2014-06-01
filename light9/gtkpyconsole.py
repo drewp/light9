@@ -1,5 +1,7 @@
 from lib.ipython_view import IPythonView
-import pango, gtk
+import gi
+from gi.repository import Gtk
+from gi.repository import Pango
 
 def togglePyConsole(self, item, user_ns):
     """
@@ -13,12 +15,12 @@ def togglePyConsole(self, item, user_ns):
     """
     if item.get_active():
         if not hasattr(self, 'pythonWindow'):
-            self.pythonWindow = gtk.Window()
-            S = gtk.ScrolledWindow()
-            S.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+            self.pythonWindow = Gtk.Window()
+            S = Gtk.ScrolledWindow()
+            S.set_policy(Gtk.PolicyType.AUTOMATIC, Gtk.PolicyType.AUTOMATIC)
             V = IPythonView(user_ns=user_ns)
-            V.modify_font(pango.FontDescription("luxi mono 8"))
-            V.set_wrap_mode(gtk.WRAP_CHAR)
+            V.modify_font(Pango.FontDescription("luxi mono 8"))
+            V.set_wrap_mode(Gtk.WrapMode.CHAR)
             S.add(V)
             self.pythonWindow.add(S)
             self.pythonWindow.show_all()

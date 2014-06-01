@@ -1,7 +1,10 @@
 from __future__ import division
-import gtk, goocanvas
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import GooCanvas
 import louie as dispatcher
 from light9.curvecalc import cursors 
+from lib.goocanvas_compat import Points, polyline_new_line
 
 class ZoomControl(object):
     """
@@ -52,7 +55,7 @@ class ZoomControl(object):
     offset = property(**offset())
 
     def __init__(self, **kw):
-        self.widget = goocanvas.Canvas(bounds_padding=5)
+        self.widget = GooCanvas.Canvas(bounds_padding=5)
         self.widget.set_property("background-color", "gray60")
         self.widget.set_size_request(-1, 30)
         self.widget.props.x2 = 2000
@@ -67,16 +70,17 @@ class ZoomControl(object):
         self.end = 250
 
         self.root = self.widget.get_root_item()
-        self.leftbrack = goocanvas.Polyline(parent=self.root,
+        self.leftbrack = polyline_new_line(parent=self.root,
                                             line_width=5, stroke_color='black')
-        self.rightbrack = goocanvas.Polyline(parent=self.root,
+        self.rightbrack = polyline_new_line(parent=self.root,
                                              line_width=5, stroke_color='black')
-        self.shade = goocanvas.Rect(parent=self.root,
+        self.shade = GooCanvas.CanvasRect(parent=self.root,
                                     fill_color='gray70',
                                     line_width=.5)
-        self.time = goocanvas.Polyline(parent=self.root,
+        self.time = polyline_new_line(parent=self.root,
                                        line_width=2,
                                        stroke_color='red')
+
         self.redrawzoom()
         self.widget.connect("size-allocate", self.redrawzoom)
 
@@ -146,8 +150,7 @@ class ZoomControl(object):
         except ZeroDivisionError:
             x = -100
         self.time.set_property("points",
-                               goocanvas.Points([(x, 0),
-                                                 (x, self.size.height)]))
+                               Points([(x, 0), (x, self.size.height)]))
         
     def press(self,ev,attr):
         self.adjustingattr = attr
@@ -177,7 +180,7 @@ class ZoomControl(object):
     def t_for_can(self,x):
         a, b = self.mintime, self.maxtime
         return (x - 20) / (self.size.width - 30) * (b - a) + a
-
+        
     def redrawzoom(self,*args):
         """redraw pieces based on start/end"""
         self.size = self.widget.get_allocation()
@@ -193,12 +196,12 @@ class ZoomControl(object):
             # todo: set the zoom to some clear null state
             return
 
-        self.leftbrack.set_property("points", goocanvas.Points([
+        self.leftbrack.set_property("points", Points([
             (scan + lip, y1),
             (scan, y1),
             (scan, y2),
             (scan + lip, y2)]))
-        self.rightbrack.set_property("points", goocanvas.Points([
+        self.rightbrack.set_property("points", Points([
             (ecan - lip, y1),
             (ecan, y1),
             (ecan, y2),
@@ -214,7 +217,7 @@ class ZoomControl(object):
     def redrawTics(self):
         if hasattr(self, 'ticsGroup'):
             self.ticsGroup.remove()
-        self.ticsGroup = goocanvas.Group(parent=self.root)
+        self.ticsGroup = GooCanvas.CanvasGroup(parent=self.root)
 
         lastx =- 1000
 
@@ -224,13 +227,13 @@ class ZoomControl(object):
                 txt = str(t)
                 if lastx == -1000:
                     txt = txt + "sec"
-                goocanvas.Polyline(parent=self.ticsGroup,
-                                   points=goocanvas.Points([(x, 0), (x, 15)]),
+                GooCanvas.CanvasPolyline(parent=self.ticsGroup,
+                                   points=Points([(x, 0), (x, 15)]),
                                    line_width=.8,
                                    stroke_color='black')
-                goocanvas.Text(parent=self.ticsGroup,
+                GooCanvas.CanvasText(parent=self.ticsGroup,
                                x=x, y=self.size.height-1,
-                               anchor=gtk.ANCHOR_SOUTH,
+                               anchor=GooCanvas.CanvasAnchorType.SOUTH,
                                text=txt,
                                font='ubuntu 7')
                 lastx = x

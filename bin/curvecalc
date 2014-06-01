@@ -13,11 +13,16 @@ from __future__ import division
 
 import sys
 sys.path.append('/usr/lib/python2.7/dist-packages') # For gtk
-from twisted.internet import gtk2reactor
-gtk2reactor.install()
+from twisted.internet import gtk3reactor
+gtk3reactor.install()
 from twisted.internet import reactor
 
-import time, textwrap, os, optparse, gtk, linecache, signal, traceback, json
+import time, textwrap, os, optparse, linecache, signal, traceback, json
+import gi
+from gi.repository import Gtk
+from gi.repository import GObject
+from gi.repository import Gdk
+
 from urlparse import parse_qsl
 import louie as dispatcher 
 from rdflib import URIRef, Literal, RDF, RDFS
@@ -37,7 +42,7 @@ from light9.curvecalc.output import Output
 from light9.gtkpyconsole import togglePyConsole
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.rdfdb.patch import Patch
-from light9.editchoicegtk import EditChoice
+from light9.editchoicegtk import EditChoice, Local
 from light9.observable import Observable
 
 class SubtermExists(ValueError):
@@ -50,14 +55,14 @@ class Main(object):
         self.lastSeenInputTime = 0
         self.currentSubterms = [] # Subterm objects that are synced to the graph
 
-        wtree = self.wtree = gtk.Builder()
+        wtree = self.wtree = Gtk.Builder()
         wtree.add_from_file("light9/curvecalc/curvecalc.glade")
         mainwin = wtree.get_object("MainWindow")
         
         mainwin.connect("destroy", self.onQuit)
         wtree.connect_signals(self)
-        gtk.rc_parse("theme/marble-ice/gtk-2.0/gtkrc")
-        gtk.rc_parse_string("""style "default" {font_name = "sans 9"}""")
+        Gtk.rc_parse("theme/marble-ice/gtk-2.0/gtkrc")
+        Gtk.rc_parse_string("""style "default" {font_name = "sans 9"}""")
         if self.opts.reload:
             self.refreshTheme()
         mainwin.show_all()
@@ -82,6 +87,8 @@ class Main(object):
         graph.addHandler(setSong)
         # next here, watch songChoice and patch the graph
         def songToGraph(newSong):
+            if newSong is Local:
+                raise NotImplementedError('what do i patch')
             graph.patchObject(context=session, subject=session,
                               predicate=L9['currentSong'], newObject=newSong)
         songChoice.subscribe(songToGraph)
@@ -100,14 +107,13 @@ class Main(object):
                 
         self.current_player_song = current_player_song
         dispatcher.connect(current_player_song, "current_player_song")
-        
+
         ec = EditChoice(graph, songChoice, label="Editing song:")
         wtree.get_object("currentSongEditChoice").add(ec)
         ec.show()
         
         wtree.get_object("subterms").connect("add", self.onSubtermChildAdded)
         
-
         self.refreshCurveView()       
         
         self.makeStatusLines(wtree.get_object("status"))
@@ -119,15 +125,15 @@ class Main(object):
 
     def setupNewSubZone(self):
         self.wtree.get_object("newSubZone").drag_dest_set(
-            flags=gtk.DEST_DEFAULT_ALL,
-            targets=[('text/uri-list', 0, 0)],
-            actions=gtk.gdk.ACTION_COPY)
+            flags=Gtk.DestDefaults.ALL,
+            targets=[Gtk.TargetEntry('text/uri-list', 0, 0)],
+            actions=Gdk.DragAction.COPY)
         
     def acceptDragsOnCurveViews(self):
         w = self.wtree.get_object("curves")
-        w.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
-                        targets=[('text/uri-list', 0, 0)],
-                        actions=gtk.gdk.ACTION_COPY)
+        w.drag_dest_set(flags=Gtk.DestDefaults.ALL,
+                        targets=[Gtk.TargetEntry('text/uri-list', 0, 0)],
+                        actions=Gdk.DragAction.COPY)
         def recv(widget, context, x, y, selection,
                        targetType, time):
             subUri = URIRef(selection.data.strip())
@@ -295,7 +301,7 @@ class Main(object):
         log.debug("%s table children showing" % len(master.get_children()))
         
     def refreshTheme(self):
-        gtk.rc_reparse_all()
+        Gtk.rc_reparse_all()
         reactor.callLater(1, self.refreshTheme)
 
     def onSubtermChildAdded(self, subtermsTable, *args):
@@ -360,8 +366,8 @@ class Main(object):
             ('update period', lambda t: "%.1fms"%(t*1000)),
             ('update status', lambda x: str(x)),
             ]):
-            key = gtk.Label("%s:" % signame)
-            value = gtk.Label("")
+            key = Gtk.Label("%s:" % signame)
+            value = Gtk.Label("")
             master.resize(row + 1, 2)
             master.attach(key, 0, 1, row, row + 1)
             master.attach(value, 1, 2, row, row + 1)
@@ -456,6 +462,7 @@ def launch(args, graph, session, opts, startTime, music):
 
     start = Main(graph, opts, session, curveset, music)
     out = Output(graph, session, music, curveset, start.currentSubterms)
+
 
     dispatcher.send("show all")
         

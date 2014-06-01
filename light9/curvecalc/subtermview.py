@@ -1,4 +1,5 @@
-import gtk, logging
+import logging
+from gi.repository import Gtk
 from louie import dispatcher
 from rdflib import Literal, URIRef
 from light9.namespaces import L9
@@ -14,11 +15,11 @@ class Subexprview(object):
         self.saveContext = saveContext
         self.curveset = curveset
 
-        self.box = gtk.HBox()
+        self.box = Gtk.HBox()
 
-        self.entryBuffer = gtk.EntryBuffer("", -1)
-        self.entry = gtk.Entry()
-        self.error = gtk.Label("")
+        self.entryBuffer = Gtk.EntryBuffer("", -1)
+        self.entry = Gtk.Entry()
+        self.error = Gtk.Label("")
 
         self.box.pack_start(self.entry, expand=True)
         self.box.pack_start(self.error, expand=False)
@@ -67,12 +68,12 @@ class Subtermview(object):
         self.subterm = st
         self.graph = st.graph
 
-        self.label = gtk.Label("sub")
+        self.label = Gtk.Label("sub")
         self.graph.addHandler(self.setName)
 
-        self.label.drag_dest_set(flags=gtk.DEST_DEFAULT_ALL,
+        self.label.drag_dest_set(flags=Gtk.DEST_DEFAULT_ALL,
                             targets=[('text/uri-list', 0, 0)],
-                            actions=gtk.gdk.ACTION_COPY)
+                            actions=Gtk.gdk.ACTION_COPY)
         self.label.connect("drag-data-received", self.onDataReceivedOnLabel)
         
         sev = Subexprview(self.graph, self.subterm.uri, self.subterm.saveContext, curveset)
