@@ -31,21 +31,21 @@ class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
         self.settings.graph.patch(Patch(delQuads=[
             (song, L9['effect'], uri, ctx),
             ]))
-
+        
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
         song = URIRef(self.get_argument('uri'))
         drop = URIRef(self.get_argument('drop'))
         ctx = song
-        now = time.time()
-        effect = song + "/effect/e-%f" % now
-        curve = song + "/curve/c-%f" % now
+        graph = self.settings.graph
+        effect = graph.sequentialUri(song + "/effect/e-")
+        curve = graph.sequentialUri(song + "/curve/c-")
 
-        with self.settings.graph.currentState(
+        with graph.currentState(
                 tripleFilter=(drop, RDFS.label, None)) as g:
             dropSubLabel = g.label(drop)
         
-        self.settings.graph.patch(Patch(addQuads=[
+        graph.patch(Patch(addQuads=[
             (song, L9['curve'], curve, ctx),
             (song, L9['effect'], effect, ctx),
             (effect, RDF.type, L9['Effect'], ctx),

@@ -1,4 +1,4 @@
-import logging, traceback, time
+import logging, traceback, time, itertools
 from rdflib import ConjunctiveGraph
 from light9.rdfdb.rdflibpatch import contextsForStatement as rp_contextsForStatement
 log = logging.getLogger("currentstate")
@@ -48,6 +48,18 @@ class CurrentStateGraphApi(object):
 
         return Mgr()
 
+    def sequentialUri(self, prefix):
+        """
+        Prefix URIRef like http://example.com/r- will return
+        http://example.com/r-1 if that uri is not a subject in the graph,
+        or else http://example.com/r-2, etc
+        """
+        for i in itertools.count(1):
+            newUri = prefix + str(i)
+            if not list(self._grap.triples((newUri, None, None))):
+                return newUri
+
+        
 def contextsForStatementNoWildcards(g, triple):
     if None in triple:
         raise NotImplementedError("no wildcards")
