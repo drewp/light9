@@ -14,7 +14,9 @@
         <a class="song" data-bind="attr: {href: uri}">Song <span data-bind="text: label"></span></a>
         <ul>
           <!-- ko foreach: effects -->
-          <li><a class="effect" data-bind="attr: {href: 'effect?'+jQuery.param({uri: $data})}, text: $data"></a></li>
+          <li>
+            <a class="effect" data-bind="attr: {href: 'effect?'+jQuery.param({uri: uri})}, text: uri"></a> <button data-bind="click: deleteEffect">Delete</button>
+          </li>
           <!-- /ko -->
           <li class="dropTarget" data-bind="event: {dragover: $root.dragover, dragenter: $root.dragover, drop: function(data, event) { $root.drop(uri, event); }}">Add another (drop a sub or effect class)</li>
         </ul>

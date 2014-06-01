@@ -20,9 +20,17 @@ sys.path.append("/my/proj/homeauto/lib")
 sys.path.append("/home/drewp/projects/homeauto/lib")
 from cycloneerr import PrettyErrorHandler
 
-class EffectEdit(cyclone.web.RequestHandler):
+class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
         self.write(open("light9/effecteval/effect.html").read())
+    def delete(self):
+        graph = self.settings.graph
+        uri = URIRef(self.get_argument('uri'))
+        with graph.currentState(tripleFilter=(None, L9['effect'], uri)) as g:
+            song = ctx = list(g.subjects(L9['effect'], uri))[0]
+        self.settings.graph.patch(Patch(delQuads=[
+            (song, L9['effect'], uri, ctx),
+            ]))
 
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
@@ -61,7 +69,7 @@ class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
         out = []
         for s in songs:
             out.append({'uri': s, 'label': self.graph.label(s)})
-            out[-1]['effects'] = sorted(self.graph.objects(s, L9['effect']))
+            out[-1]['effects'] = [{'uri': uri} for uri in sorted(self.graph.objects(s, L9['effect']))]
         self.sendMessage({'songs': out})
         
         

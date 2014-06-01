@@ -12,8 +12,18 @@ model.drop = (uri, event) ->
 dropped = (songTargetUri, dropUri) ->
   $.post('songEffects', {uri: songTargetUri, drop: dropUri})
 
+deleteEffect = (uri) ->
+  $.ajax
+    type: 'DELETE'
+    url: 'effect?' + $.param({uri: uri})
+  console.log("del", uri)
+  
 reconnectingWebSocket "ws://localhost:8070/songEffectsUpdates", (msg) ->
-  console.log(msg.songs)
+  for s in msg.songs
+    for e in s.effects
+      do (e) ->
+        e.deleteEffect = -> deleteEffect(e.uri)
+
   model.songs(msg.songs)
   
 ko.applyBindings(model)
