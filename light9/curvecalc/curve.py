@@ -100,9 +100,9 @@ class Curve(object):
         # missing a check that this isn't the same X as the neighbor point
         return i
 
-    def live_input_point(self, new_pt):
+    def live_input_point(self, new_pt, clear_ahead_secs=.01):
         x, y = new_pt
-        exist = self.points_between(x, x + .01)
+        exist = self.points_between(x, x + clear_ahead_secs)
         for pt in exist:
             self.remove_point(pt)
         self.insert_pt(new_pt)

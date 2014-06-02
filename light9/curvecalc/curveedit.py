@@ -44,5 +44,5 @@ class CurveEdit(object):
         
     def liveInputPoint(self, curveUri, value):
         curve = self.curveset.curveFromUri(curveUri)
-        curve.live_input_point((self.currentTime, value))
+        curve.live_input_point((self.currentTime, value), clear_ahead_secs=.5)
         

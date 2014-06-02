@@ -1,0 +1,65 @@
+#!bin/python
+"""
+read Quneo midi events, write to curvecalc and maybe to effects
+"""
+from __future__ import division
+from run_local import log
+import cyclone.web, cyclone.httpclient
+from rdflib import URIRef
+from twisted.internet import reactor, task
+from light9.curvecalc.client import sendLiveInputPoint
+
+import sys
+sys.path.append('/usr/lib/python2.7/dist-packages') # For pygame
+import pygame.midi
+
+curves = {
+    23: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-2'),
+    24: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-3'),
+    25: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-4'),
+    6:URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-5'),
+    18: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-6'),
+}
+
+class WatchMidi(object):
+    def __init__(self):
+        pygame.midi.init()
+
+        dev = self.findQuneo()
+        self.inp = pygame.midi.Input(dev)
+        task.LoopingCall(self.step).start(.05)
+
+        self.noteOn = {}
+        
+    def findQuneo(self):
+        for dev in range(pygame.midi.get_count()):
+            interf, name, isInput, isOutput, opened = pygame.midi.get_device_info(dev)
+            if 'QUNEO' in name and isInput:
+                return dev
+        raise ValueError("didn't find quneo input device")
+        
+    def step(self):
+        if not self.inp.poll():
+            return
+        for ev in self.inp.read(999):
+            (status, d1, d2, _), _ = ev
+            print status, d1, d2
+
+            for group in [(23,24,25), (6, 18)]:
+                if d1 in group:
+                    if not self.noteOn.get(group):
+                        print "start zero"
+                        for d in group:
+                            sendLiveInputPoint(curves[d], 0)
+                        self.noteOn[group] = True
+                    else: # miss first update
+                        sendLiveInputPoint(curves[d1], d2 / 127)
+                    
+                if status == 128: #noteoff
+                    for d in group:
+                        sendLiveInputPoint(curves[d], 0)
+                    self.noteOn[group] = False
+
+
+wm = WatchMidi()
+reactor.run()

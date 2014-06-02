@@ -735,14 +735,12 @@ class Curveview(object):
                                  "gray20" if self.curve.muted else "black")
 
         self.update_time_bar(self._time)
-        if self.canvas.props.y2 < 40:
-            self._draw_line(visible_points, area=True)
-        else:
+        self._draw_line(visible_points, area=True)
+        self._draw_markers(
+            self.markers.points[i] for i in
+            self.markers.indices_between(visible_x[0], visible_x[1]))
+        if self.canvas.props.y2 > 80:
             self._draw_time_tics(visible_x)
-            self._draw_line(visible_points)
-            self._draw_markers(
-                self.markers.points[i] for i in
-                self.markers.indices_between(visible_x[0], visible_x[1]))
 
             self.dots = {} # idx : canvas rectangle
 
@@ -1071,7 +1069,7 @@ class CurveRow(object):
         self.box.add(self.cols)
         
         controls = Gtk.Frame()
-        controls.set_size_request(115, -1)
+        controls.set_size_request(160, -1)
         controls.set_shadow_type(Gtk.ShadowType.OUT)
         self.cols.pack_start(controls, expand=False, fill=True, padding=0)
         self.setupControls(controls, name, curve, slider)
@@ -1104,6 +1102,8 @@ class CurveRow(object):
 
     def setHeight(self, h):
         self.curveView.widget.set_size_request(-1, h)
+        # the event watcher wasn't catching these
+        reactor.callLater(.5, self.curveView.update_curve)
         
     def setupControls(self, controls, name, curve, slider):
         box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
