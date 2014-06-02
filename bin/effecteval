@@ -192,7 +192,7 @@ class EffectLoop(object):
                 elapsed = time.time() - t1
                 dt = max(0, self.period - elapsed)
         except Exception:
-            self.stats.errors.mark()
+            self.stats.errors += 1
             traceback.print_exc()
             dt = 1
 
