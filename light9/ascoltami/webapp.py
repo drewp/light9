@@ -7,13 +7,7 @@ from rdflib import URIRef
 from web.contrib.template import render_genshi
 render = render_genshi([sibpath(__file__, ".")], auto_reload=True)
 
-try:
-    import sys
-    sys.path.append("../homeauto/lib")
-    from cycloneerr import PrettyErrorHandler
-except ImportError:
-    class PrettyErrorHandler(object):
-        pass
+from lib.cycloneerr import PrettyErrorHandler
 
 _songUris = {} # locationUri : song
 def songLocation(graph, songUri):

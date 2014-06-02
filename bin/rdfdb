@@ -127,13 +127,7 @@ from twisted.internet.inotify import INotify
 from run_local import log
 log.setLevel(logging.DEBUG)
 
-try:
-    import sys
-    sys.path.append("../homeauto/lib")
-    from cycloneerr import PrettyErrorHandler
-except ImportError:
-    class PrettyErrorHandler(object):
-        pass
+from lib.cycloneerr import PrettyErrorHandler
 
 class Client(object):
     """

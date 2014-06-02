@@ -15,13 +15,7 @@ from light9.rdfdb.patch import Patch
 from light9.namespaces import L9, DCTERMS
 from light9 import networking, showconfig
 
-try:
-    sys.path.append("../homeauto/lib")
-    sys.path.append("/home/drewp/projects/homeauto/lib")
-    from cycloneerr import PrettyErrorHandler
-except ImportError:
-    class PrettyErrorHandler(object):
-        pass
+from lib.cycloneerr import PrettyErrorHandler
         
 liveClients = set()
 def sendToLiveClients(d=None, asJson=None):

@@ -16,9 +16,7 @@ from light9.effecteval.effect import EffectNode
 from light9.greplin_cyclone import StatsForCyclone
 from greplin import scales
 
-sys.path.append("/my/proj/homeauto/lib")
-sys.path.append("/home/drewp/projects/homeauto/lib")
-from cycloneerr import PrettyErrorHandler
+from lib.cycloneerr import PrettyErrorHandler
 
 class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
