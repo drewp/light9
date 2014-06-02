@@ -1,11 +1,11 @@
 from __future__ import division
-import math, time, logging
+import math, logging
 from gi.repository import Gtk
-from gi.repository import GObject
 from gi.repository import Gdk
 from gi.repository import GooCanvas
 import louie as dispatcher
 from rdflib import Literal
+from twisted.internet import reactor
 from light9.curvecalc.zoomcontrol import RegionZoom
 from light9.curvecalc import cursors
 from light9.curvecalc.curve import introPad, postPad
@@ -81,13 +81,14 @@ class SelectManip(object):
     draws itself on the canvas and edits the points when you drag
     various parts
     """
-    def __init__(self, parent, getSelectedIndices, getWorldPoint, getScreenPoint,
-                 getCanvasSize, setPoints, getWorldTime, getWorldValue, getDragRange):
+    def __init__(self, parent, getSelectedIndices, getWorldPoint,
+                 getScreenPoint, getCanvasHeight, setPoints,
+                 getWorldTime, getWorldValue, getDragRange):
         """parent goocanvas group"""
         self.getSelectedIndices = getSelectedIndices
         self.getWorldPoint = getWorldPoint
         self.getScreenPoint = getScreenPoint
-        self.getCanvasSize = getCanvasSize
+        self.getCanvasHeight = getCanvasHeight
         self.setPoints = setPoints
         self.getWorldTime = getWorldTime
         self.getDragRange = getDragRange
@@ -226,7 +227,7 @@ class SelectManip(object):
         margin = 10 if len(pts) > 1 else 0
         b.width = max(p[0] for p in pts) - b.x + margin
         b.height = min(max(p[1] for p in pts) - b.y + margin,
-                       self.getCanvasSize().height - b.y - 1)
+                       self.getCanvasHeight() - b.y - 1)
 
         multi = (GooCanvas.CanvasItemVisibility.VISIBLE if len(pts) > 1 else
                  GooCanvas.CanvasItemVisibility.INVISIBLE)
@@ -241,8 +242,8 @@ class SelectManip(object):
 
         centerX = b.x + b.width / 2
 
-        midY = self.getCanvasSize().height * .5
-        loY = self.getCanvasSize().height * .8
+        midY = self.getCanvasHeight() * .5
+        loY = self.getCanvasHeight() * .8
 
         self.leftScale.props.points = Points([
             (b.x, b.y), (b.x, b.y + b.height)])
@@ -293,23 +294,37 @@ class SelectManip(object):
 class Curveview(object):
     """
     graphical curve widget only. Please pack .widget
+
+    <caller's parent>
+     -> self.widget <caller packs this>
+       -> EventBox
+         -> Box vertical, for border
+           -> self.canvas GooCanvas
+             -> root CanvasItem
+               ..various groups and items..
+
+    The canvas x1/x2/y1/y2 coords are updated to match self.widget.
+    
     """
     def __init__(self, curve, markers, knobEnabled=False, isMusic=False,
                  zoomControl=None):
         """knobEnabled=True highlights the previous key and ties it to a
         hardware knob"""
-        self.redrawsEnabled = False
-
-        self.rebuild()
-        
         self.curve = curve
         self.markers = markers
         self.knobEnabled = knobEnabled
         self._isMusic = isMusic
         self.zoomControl = zoomControl
+        
+        self.redrawsEnabled = False
+
+        box = self.createOuterWidgets()
+        self.canvas = self.createCanvasWidget(box)
+        self.trackWidgetSize()
+        self.update_curve()
+        
         self._time = -999
         self.last_mouse_world = None
-        self.culled = False # have we been putting off updates?
         self.entered = False # is the mouse currently over this widget
         self.selected_points=[] # idx of points being dragged
         self.dots = {}
@@ -348,18 +363,8 @@ class Curveview(object):
         if butNot is self:
             return
         self.unselect()
-        
-    def rebuild(self):
-        """
-        sometimes after windows get resized, canvas gets stuck with a
-        weird offset. I can't find where it is, so for now we support
-        rebuilding the canvas widget
-        """
-        if hasattr(self, 'widget'):
-            self.widget.destroy()
-            self._time = -999
-            print "rebuilding canvas, destroyed old widget"
 
+    def createOuterWidgets(self):
         self.timelineLine = self.curveGroup = self.selectManip = None
         self.widget = Gtk.EventBox()
         self.widget.set_can_focus(True)
@@ -367,37 +372,58 @@ class Curveview(object):
                                Gdk.EventMask.FOCUS_CHANGE_MASK)
         self.onFocusOut()
 
-        box = Gtk.VBox()
+        box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
         box.set_border_width(1)
         self.widget.add(box)
         box.show()
+        return box
+
+    def trackWidgetSize(self):
+        """
+        Also tried:
+            visibility-notify-event (Gdk.EventMask.VISIBILITY_NOTIFY_MASK)
+            fires on some resizes but not all.
+
+            configure-event seems to never fire.
+        """
+        def sizeEvent(w, alloc):
+            p = self.canvas.props
+            if (alloc.width, alloc.height) != (p.x2, p.y2):
+                p.x1, p.x2 = 0, alloc.width
+                p.y1, p.y2 = 0, alloc.height
+                # calling update_curve in this event usually doesn't work
+                reactor.callLater(0, self.update_curve)
+            return False
+            
+        self.widget.connect('size-allocate', sizeEvent)
         
-        self.canvas = GooCanvas.Canvas()
-        box.pack_start(self.canvas, expand=True, fill=True, padding=0)
-        self.canvas.show()
+    def createCanvasWidget(self, parent):
+        # this is only separate from createOuterWidgets because in the
+        # past, i worked around display bugs by recreating the whole
+        # canvas widget. If that's not necessary, this could be more
+        # clearly combined with createOuterWidgets since there's no
+        # time you'd want that one but not this one.
+        canvas = GooCanvas.Canvas()
+        parent.pack_start(canvas, expand=True, fill=True, padding=0)
+        canvas.show()
 
-        p = self.canvas.props
+        p = canvas.props
         p.background_color = 'black'
-        p.x2 = 2000
+        root = canvas.get_root_item()
 
-        self.size = self.canvas.get_allocation()
-        self.root = self.canvas.get_root_item()
-
-        self.canvas.connect("size-allocate", self.update_curve)
-        self.canvas.connect("draw", self.onExpose)
-
-        self.canvas.connect("leave-notify-event", self.onLeave)
-        self.canvas.connect("enter-notify-event", self.onEnter)
-        self.canvas.connect("motion-notify-event", self.onMotion)
-        self.canvas.connect("scroll-event", self.onScroll)
-        self.canvas.connect("button-release-event", self.onRelease)
-        self.root.connect("button-press-event", self.onCanvasPress)
+        canvas.connect("leave-notify-event", self.onLeave)
+        canvas.connect("enter-notify-event", self.onEnter)
+        canvas.connect("motion-notify-event", self.onMotion)
+        canvas.connect("scroll-event", self.onScroll)
+        canvas.connect("button-release-event", self.onRelease)
+        root.connect("button-press-event", self.onCanvasPress)
 
         self.widget.connect("key-press-event", self.onKeyPress)
 
         self.widget.connect("focus-in-event", self.onFocusIn)
         self.widget.connect("focus-out-event", self.onFocusOut)
-        self.widget.connect("event", self.onAny)
+        #self.widget.connect("event", self.onAny)
+        return canvas
 
     def onAny(self, w, event):
         print "   %s on %s" % (event, w)
@@ -421,11 +447,6 @@ class Curveview(object):
             self.add_point((self.current_time(), (x - 1) / 4.0))
         if event.string in list('qwerty'):
             self.add_marker((self.current_time(), event.string))
-
-    def onExpose(self, *args):
-        print "onExpose for %s, culled=%s" % (self, self.culled)
-        if self.culled:
-            self.update_curve()
 
     def onDelete(self):
         if self.selected_points:
@@ -517,13 +538,13 @@ class Curveview(object):
         self.highlight_selected_dots()
         if self.selected_points and not self.selectManip:
             self.selectManip = SelectManip(
-                self.root,
+                self.canvas.get_root_item(),
                 getSelectedIndices=lambda: sorted(self.selected_points),
                 getWorldPoint=lambda i: self.curve.points[i],
                 getScreenPoint=lambda i: self.screen_from_world(self.curve.points[i]),
                 getWorldTime=lambda x: self.world_from_screen(x, 0)[0],
                 getWorldValue=lambda y: self.world_from_screen(0, y)[1],
-                getCanvasSize=lambda: self.size,
+                getCanvasHeight=lambda: self.canvas.props.y2,
                 setPoints=self.setPoints,
                 getDragRange=self.getDragRange,
                 )
@@ -612,19 +633,19 @@ class Curveview(object):
 
     def _coords(self):
         z = self.zoomControl
-        ht = self.size.height
+        ht = self.canvas.props.y2
         marginBottom = 3 if ht > 40 else 0
         marginTop = marginBottom
         return z, ht, marginBottom, marginTop
         
     def screen_from_world(self,p):
         z, ht, marginBottom, marginTop = self._coords()
-        return ((p[0] - z.start) / (z.end - z.start) * self.size.width,
+        return ((p[0] - z.start) / (z.end - z.start) * self.canvas.props.x2,
                 (ht - marginBottom) - p[1] * (ht - (marginBottom + marginTop)))
 
     def world_from_screen(self,x,y):
         z, ht, marginBottom, marginTop = self._coords()
-        return (x / self.size.width * (z.end - z.start) + z.start,
+        return (x / self.canvas.props.x2 * (z.end - z.start) + z.start,
                 ((ht - marginBottom) - y) / (ht - (marginBottom + marginTop)))
 
     def input_time(self, val, forceUpdate=False):
@@ -635,7 +656,8 @@ class Curveview(object):
     def update_time_bar(self, t):
 
         if not getattr(self, 'timelineLine', None):
-            self.timelineGroup = GooCanvas.CanvasGroup(parent=self.root)
+            self.timelineGroup = GooCanvas.CanvasGroup(
+                parent=self.canvas.get_root_item())
             self.timelineLine = polyline_new_line(
                 parent=self.timelineGroup,
                 points=Points([(0,0), (0,0)]),
@@ -659,61 +681,28 @@ class Curveview(object):
                                  outline='#800000',
                                  tags=('knob',))
                 dispatcher.send("knob out", value=prevKey[1], curve=self.curve)
-
-    def canvasIsVisible(self):
-        print "test canvasIsVisible"
-        if not hasattr(self, "scrollWin"):
-            self.scrollWin = self.canvas
-            while not isinstance(self.scrollWin, Gtk.ScrolledWindow):
-                self.scrollWin = self.scrollWin.get_parent()
-
-        sw = self.scrollWin
-        top = sw.get_toplevel()
-        visy1 = sw.translate_coordinates(top, 0, 0)[1]
-        visy2 = visy1 + sw.get_allocation().height
-
-        coords = self.canvas.translate_coordinates(top, 0, 0)
-        if not coords: # probably broken after a reload()
-            print "  canvas coords failed"
-            return False
-        cany1 = coords[1]
-        cany2 = cany1 + self.canvas.get_allocation().height
-        ret = not (cany2 < visy1 or cany1 > visy2)
-        print "  return %s" % ret
-        return ret
-        
+       
     def update_curve(self, *args):
         if not self.redrawsEnabled:
-            print "update_curve skipping1"
+            print "no redrawsEnabled, skipping", self
             return
 
-        if not self.canvasIsVisible():
-            self.culled = True
-            print "update_curve skipping2"
-            return
-        self.culled = False
-        
-        self.size = self.canvas.get_allocation()
- 
         visible_x = (self.world_from_screen(0,0)[0],
-                     self.world_from_screen(self.size.width, 0)[0])
+                     self.world_from_screen(self.canvas.props.x2, 0)[0])
 
         visible_idxs = self.curve.indices_between(visible_x[0], visible_x[1],
                                                   beyond=1)
         visible_points = [self.curve.points[i] for i in visible_idxs]
-
+        
         if getattr(self, 'curveGroup', None):
-            print "rm old curveGroup"
             self.curveGroup.remove()
-        self.curveGroup = GooCanvas.CanvasGroup(parent=self.root)
+        self.curveGroup = GooCanvas.CanvasGroup(parent=self.canvas.get_root_item())
 
-        # this makes gtk quietly stop working. Getting called too early?
-        #self.canvas.set_property("background-color",
-        #                         "gray20" if self.curve.muted else "black")
+        self.canvas.set_property("background-color",
+                                 "gray20" if self.curve.muted else "black")
 
         self.update_time_bar(self._time)
-        print "drawing! height=%s" % self.size.height
-        if self.size.height < 40:
+        if self.canvas.props.y2 < 40:
             self._draw_line(visible_points, area=True)
         else:
             self._draw_time_tics(visible_x)
@@ -746,7 +735,7 @@ class Curveview(object):
         for t, name in pts:
             x = int(self.screen_from_world((t,0))[0]) + .5
             polyline_new_line(self.curveGroup,
-                              x, 0, x, self.size.height,
+                              x, 0, x, self.canvas.props.y2,
                               line_width=.4 if name in 'rty' else .8,
                               stroke_color=colorMap.get(name, 'gray'))
 
@@ -769,13 +758,13 @@ class Curveview(object):
     def _draw_one_tic(self,t,label):
         try:
             x = self.screen_from_world((t,0))[0]
-            if not 0 <= x < self.size.width:
+            if not 0 <= x < self.canvas.props.x2:
                 return
             x = max(5, x) # cheat left-edge stuff onscreen
         except ZeroDivisionError:
             x = -100
             
-        ht = self.size.height
+        ht = self.canvas.props.y2
         polyline_new_line(self.curveGroup,
                                     x, ht,
                                     x, ht - 20,
@@ -792,7 +781,7 @@ class Curveview(object):
         linepts=[]
         step=1
         linewidth = 1.5
-        maxPointsToDraw = self.size.width / 2
+        maxPointsToDraw = self.canvas.props.x2 / 2
         if len(visible_points) > maxPointsToDraw:
             step = int(len(visible_points) / maxPointsToDraw)
             linewidth = .8
@@ -1031,12 +1020,13 @@ class CurveRow(object):
 
     please pack self.box
     """
-    def __init__(self, name, curve, markers, slider, knobEnabled, zoomControl):
+    def __init__(self, graph, name, curve, markers, slider, knobEnabled, zoomControl):
+        self.graph = graph
         self.name = name
-        self.box = Gtk.VBox()
+        self.box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
         self.box.set_border_width(1)
 
-        self.cols = Gtk.HBox()
+        self.cols = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         self.box.add(self.cols)
         
         controls = Gtk.Frame()
@@ -1052,11 +1042,8 @@ class CurveRow(object):
         self.initCurveView()
         dispatcher.connect(self.rebuild, "all curves rebuild")
 
-        # incomplete: this makes the row start with a small size
-        # request, but doesn't update the row widgets
-        self.collapsed.props.active = True
-
     def rebuild(self):
+        raise NotImplementedError('obsolete, if curves are drawing right')
         self.curveView.rebuild()
         self.initCurveView()
         self.update_ui_to_collapsed_state()
@@ -1072,24 +1059,19 @@ class CurveRow(object):
         self.cols.pack_start(self.curveView.widget, expand=True, fill=True, padding=0)       
         
     def setupControls(self, controls, name, curve, slider):
-        box = Gtk.VBox()
+        box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         controls.add(box)
-        
-        txt = "curve '%s'" % name
-        if len(name) > 7:
-            txt = name
-        curve_name_label = Gtk.Label(txt)
-        box.pack_start(curve_name_label, expand=True, fill=True, padding=0)
 
-        bools = Gtk.HBox()
-        box.pack_start(bools, expand=True, fill=True, padding=0)
-        self.collapsed = Gtk.CheckButton("C")
-        bools.pack_start(self.collapsed, expand=True, fill=True, padding=0)
-        self.collapsed.connect("toggled", self.update_ui_to_collapsed_state)
-        self.hideWhenCollapsed = [bools]
-        self.muted = Gtk.CheckButton("M")
+        curve_name_label = Gtk.LinkButton()
+        def update_label():
+            # todo: abort if we don't still exist...
+            p = curve_name_label.props
+            p.uri = curve.uri
+            p.label = self.graph.label(curve.uri)
+        self.graph.addHandler(update_label)
         
-        bools.pack_start(self.muted, expand=True, fill=True, padding=0)
+
+        self.muted = Gtk.CheckButton("M")
         self.muted.connect("toggled", self.sync_mute_to_curve)
         dispatcher.connect(self.mute_changed, 'mute changed', sender=curve)
 
@@ -1100,11 +1082,8 @@ class CurveRow(object):
             self.sliderLabel = Gtk.Label("Slider %s" % slider)
             box.pack_start(self.sliderLabel, expand=True, fill=True, padding=0)
 
-        # widgets that need recoloring when we tint the row:
-        #self.widgets = [leftside, self.collapsed, self.muted,
-        #                curve_name_label, self]
-        #if self.sliderLabel:
-        #    self.widgets.append(self.sliderLabel)
+        box.pack_start(curve_name_label, expand=True, fill=True, padding=0)
+        box.pack_start(self.muted, expand=True, fill=True, padding=0)
 
     def onDelete(self):
         self.curveView.onDelete()
@@ -1144,17 +1123,16 @@ class Curvesetview(object):
     """
     
     """
-    def __init__(self, curvesVBox, zoomControlBox, curveset):
+    def __init__(self, graph, curvesVBox, zoomControlBox, curveset):
+        self.graph = graph
         self.live = True
         self.curvesVBox = curvesVBox
         self.curveset = curveset
         self.allCurveRows = set()
 
-        import light9.curvecalc.zoomcontrol
-        reload(light9.curvecalc.zoomcontrol)
-        self.zoomControl = light9.curvecalc.zoomcontrol.ZoomControl()
-        zoomControlBox.add(self.zoomControl.widget)
-        self.zoomControl.widget.show_all()
+        self.zoomControl = self.initZoomControl(zoomControlBox)
+        self.zoomControl.redrawzoom()
+        
         for c in curveset.curveNamesInOrder():
             self.add_curve(c) 
 
@@ -1172,6 +1150,14 @@ class Curvesetview(object):
     def __del__(self):
         print "del curvesetview", id(self) 
 
+    def initZoomControl(self, zoomControlBox):
+        import light9.curvecalc.zoomcontrol
+        reload(light9.curvecalc.zoomcontrol)
+        zoomControl = light9.curvecalc.zoomcontrol.ZoomControl()
+        zoomControlBox.add(zoomControl.widget)
+        zoomControl.widget.show_all()
+        return zoomControl
+        
     def clear_curves(self):
         """curveset is about to re-add all new curves"""
         while self.allCurveRows:
@@ -1227,7 +1213,7 @@ class Curvesetview(object):
         if isinstance(name, Literal):
             name = str(name)
         curve = self.curveset.curves[name]
-        f = CurveRow(name, curve, self.curveset.markers,
+        f = CurveRow(self.graph, name, curve, self.curveset.markers,
                      slider, knobEnabled, self.zoomControl)
         self.curvesVBox.pack_start(f.box, expand=True, fill=True, padding=0)
         f.box.show_all()

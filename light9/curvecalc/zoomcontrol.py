@@ -5,6 +5,7 @@ from gi.repository import GooCanvas
 import louie as dispatcher
 from light9.curvecalc import cursors 
 from lib.goocanvas_compat import Points, polyline_new_line
+from twisted.internet import reactor
 
 class ZoomControl(object):
     """
@@ -182,6 +183,10 @@ class ZoomControl(object):
         return (x - 20) / (self.size.width - 30) * (b - a) + a
         
     def redrawzoom(self,*args):
+        # often, this was clearing the zoom widget and not repainting right
+        reactor.callLater(0, self._redrawzoom)
+        
+    def _redrawzoom(self):
         """redraw pieces based on start/end"""
         self.size = self.widget.get_allocation()
         dispatcher.send("zoom changed")

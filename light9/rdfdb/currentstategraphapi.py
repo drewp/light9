@@ -56,7 +56,7 @@ class CurrentStateGraphApi(object):
         """
         for i in itertools.count(1):
             newUri = prefix + str(i)
-            if not list(self._grap.triples((newUri, None, None))):
+            if not list(self._graph.triples((newUri, None, None))):
                 return newUri
 
         
