@@ -730,6 +730,7 @@ class Curveview(object):
         if getattr(self, 'curveGroup', None):
             self.curveGroup.remove()
         self.curveGroup = GooCanvas.CanvasGroup(parent=self.canvas.get_root_item())
+        self.curveGroup.lower(None)
 
         self.canvas.set_property("background-color",
                                  "gray20" if self.curve.muted else "black")
@@ -839,14 +840,17 @@ class Curveview(object):
                 areapts.insert(0, (0, areapts[0][1]))
                 areapts.append((self.canvas.props.x2, areapts[-1][1]))
             polyline_new_line(parent=self.curveGroup,
-                               points=Points(
-                                   [(areapts[0][0], base)] +
-                                   areapts +
-                                   [(areapts[-1][0], base)]),
-                               close_path=True,
-                               line_width=0,
-                               fill_color="green",
-                               )
+                              points=Points(
+                                  [(areapts[0][0], base)] +
+                                  areapts +
+                                  [(areapts[-1][0], base)]),
+                              close_path=True,
+                              line_width=0,
+                              # transparent as a workaround for
+                              # covering some selectmanips (which
+                              # become unclickable)
+                              fill_color_rgba=0x00800080,
+            )
 
         self.pl = polyline_new_line(parent=self.curveGroup,
                                      points=Points(linepts),
