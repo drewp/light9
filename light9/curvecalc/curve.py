@@ -100,6 +100,14 @@ class Curve(object):
         # missing a check that this isn't the same X as the neighbor point
         return i
 
+    def live_input_point(self, new_pt):
+        x, y = new_pt
+        exist = self.points_between(x, x + .01)
+        for pt in exist:
+            self.remove_point(pt)
+        self.insert_pt(new_pt)
+        # now simplify to the left
+        
     def set_points(self, updates):
         for i, pt in updates:
             self.points[i] = pt
@@ -123,6 +131,7 @@ class Curve(object):
         return range(leftidx, rightidx)
         
     def points_between(self, x1, x2):
+        """returns (x,y) points"""
         return [self.points[i] for i in self.indices_between(x1,x2)]
 
     def point_before(self, x):
@@ -190,6 +199,13 @@ class Curveset(object):
         self.markers = Markers(uri=None, pointsStorage='file')
 
         graph.addHandler(self.loadCurvesForSong)
+
+    def curveFromUri(self, uri):
+        # self.curves should be indexed by this
+        for c in self.curves.values():
+            if c.uri == uri:
+                return c
+        raise KeyError("no curve %s" % uri)
 
     def loadCurvesForSong(self):
         """
