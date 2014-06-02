@@ -5,7 +5,7 @@ from twisted.internet import gtk3reactor
 gtk3reactor.install()
 from twisted.internet import reactor
 from rdflib import URIRef
-import optparse, logging, urllib
+import optparse, logging, urllib, time
 from gi.repository import Gtk
 from run_local import log
 from light9 import showconfig, networking
@@ -16,7 +16,7 @@ import cyclone.httpclient
 class App(object):
     def __init__(self):
         parser = optparse.OptionParser()
-        parser.set_usage("%prog [opts]")
+        parser.set_usage("%prog [opts] [curve uri]")
         parser.add_option("--debug", action="store_true",
                           help="log at DEBUG")
         clientsession.add_option(parser)
@@ -29,7 +29,7 @@ class App(object):
 
         self.graph.initiallySynced.addCallback(lambda _: self.launch())
 
-        self.curve = URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-1401259747.675542')
+        self.curve = args[0] if args else URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-1401259747.675542')
         print "sending points on curve %s" % self.curve
         
         reactor.run()
@@ -52,12 +52,15 @@ class App(object):
         f = cyclone.httpclient.fetch(
             networking.curveCalc.path('liveInputPoint'),
             method='POST', timeout=1,
-            postdata=urllib.urlencode({'curve': self.curve,
-                                       'value': str(scale.get_value())}))
+            postdata=urllib.urlencode({
+                'curve': self.curve,
+                'value': str(scale.get_value()),
+            }))
         @f.addCallback
         def cb(result):
             if result.code // 100 != 2:
                 log.error("curveCalc said %s: %s", result.code, result.body)
+            print "posted in %.1f ms" % (1000 * (time.time() - t1))
         @f.addErrback
         def eb(err):
             print "err", err
