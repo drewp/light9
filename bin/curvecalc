@@ -471,16 +471,17 @@ def launch(args, graph, session, opts, startTime, music):
         log.debug("quitting now because of --startup-only")
         return
 
-    def hoverTimeResponse(request):
+    def hoverTimeResponse(requestHandler):
         results = dispatcher.send("onPlayPause")
         times = [t for listener, t in results if t is not None]
         if not times:
-            request.setResponseCode(404)
-            return "not hovering over any time"
+            requestHandler.set_status(404)
+            requestHandler.write("not hovering over any time")
+            return
         with graph.currentState(
                 tripleFilter=(session, L9['currentSong'], None)) as g:
             song = g.value(session, L9['currentSong'])
-            return json.dumps({"song": song, "hoverTime" : times[0]})
+            json.dump({"song": song, "hoverTime" : times[0]}, requestHandler)
         
     serveCurveEdit(networking.curveCalc.port, hoverTimeResponse)
 
