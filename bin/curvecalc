@@ -497,6 +497,7 @@ def main():
                       help="live reload of themes and code")
     parser.add_option("--startup-only", action='store_true',
                       help="quit after loading everything (for timing tests)")
+    parser.add_option("--profile", action='store_true', help='profile')
     clientsession.add_option(parser)
     opts, args = parser.parse_args()
 
@@ -512,8 +513,8 @@ def main():
 
     graph.initiallySynced.addCallback(
         lambda _: launch(args, graph, session, opts, startTime, music))
-
-    reactor.run()
+    from light9 import prof
+    prof.run(reactor.run, profile=opts.profile)
 
 main()
 
