@@ -1,0 +1,65 @@
+#!bin/python
+import sys
+sys.path.append('/usr/lib/python2.7/dist-packages') # For gtk
+from twisted.internet import gtk3reactor
+gtk3reactor.install()
+from twisted.internet import reactor
+from rdflib import URIRef
+import optparse, logging, urllib
+from gi.repository import Gtk
+from run_local import log
+from light9 import showconfig, networking
+from light9.rdfdb import clientsession
+from light9.rdfdb.syncedgraph import SyncedGraph
+import cyclone.httpclient
+
+class App(object):
+    def __init__(self):
+        parser = optparse.OptionParser()
+        parser.set_usage("%prog [opts]")
+        parser.add_option("--debug", action="store_true",
+                          help="log at DEBUG")
+        clientsession.add_option(parser)
+        opts, args = parser.parse_args()
+
+        log.setLevel(logging.DEBUG if opts.debug else logging.INFO)
+
+        self.session = clientsession.getUri('inputdemo', opts)
+        self.graph = SyncedGraph("inputdemo")
+
+        self.graph.initiallySynced.addCallback(lambda _: self.launch())
+
+        self.curve = URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-1401259747.675542')
+        print "sending points on curve %s" % self.curve
+        
+        reactor.run()
+
+    def launch(self):
+        win = Gtk.Window()
+
+        slider = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL,
+                                          min=0, max=1, step=.001)
+        slider.props.inverted = True
+        slider.connect('value-changed', self.onChanged)
+
+        win.add(slider)
+        win.parse_geometry('50x250')
+        win.connect("delete-event", lambda *a: reactor.crash())
+        win.connect("destroy", lambda *a: reactor.crash())
+        win.show_all()
+
+    def onChanged(self, scale):
+        f = cyclone.httpclient.fetch(
+            networking.curveCalc.path('liveInputPoint'),
+            method='POST', timeout=1,
+            postdata=urllib.urlencode({'curve': self.curve,
+                                       'value': str(scale.get_value())}))
+        @f.addCallback
+        def cb(result):
+            if result.code // 100 != 2:
+                log.error("curveCalc said %s: %s", result.code, result.body)
+        @f.addErrback
+        def eb(err):
+            print "err", err
+
+App()
