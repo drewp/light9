@@ -106,6 +106,7 @@ class Curve(object):
         for pt in exist:
             self.remove_point(pt)
         self.insert_pt(new_pt)
+        dispatcher.send("points changed", sender=self)
         # now simplify to the left
         
     def set_points(self, updates):
@@ -275,7 +276,7 @@ class Curveset(object):
             self.graph.patch(p)
 
     def sorter(self, name):
-        return (not name in ['music', 'smooth_music'], name)
+        return self.curves[name].uri
         
     def curveNamesInOrder(self):
         return sorted(self.curves.keys(), key=self.sorter)

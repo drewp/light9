@@ -1,7 +1,7 @@
 """
 this may be split out from curvecalc someday, since it doesn't
 need to be tied to a gui """
-import cgi
+import cgi, time
 from twisted.internet import reactor
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 from rdflib import URIRef

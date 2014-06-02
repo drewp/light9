@@ -1,5 +1,5 @@
 from __future__ import division
-import math, logging
+import math, logging, traceback
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GooCanvas
@@ -381,10 +381,16 @@ class Curveview(object):
     def trackWidgetSize(self):
         """
         Also tried:
-            visibility-notify-event (Gdk.EventMask.VISIBILITY_NOTIFY_MASK)
-            fires on some resizes but not all.
 
+            visibility-notify-event
+            (Gdk.EventMask.VISIBILITY_NOTIFY_MASK) fires on some
+            resizes but maybe not all. Could be doing the right thing,
+            though
+        
             configure-event seems to never fire.
+
+            size-allocate seems right but i get into infinite bounces
+            between two sizes
         """
         def sizeEvent(w, alloc):
             p = self.canvas.props
@@ -395,7 +401,19 @@ class Curveview(object):
                 reactor.callLater(0, self.update_curve)
             return False
             
-        self.widget.connect('size-allocate', sizeEvent)
+        #self.widget.connect('size-allocate', sizeEvent) # see docstring
+
+        def visEvent(w, alloc):
+            p = self.canvas.props
+            w = self.widget.get_allocated_width()
+            h = self.widget.get_allocated_height()
+            if (w, h) != (p.x2, p.y2):
+                p.x1, p.x2 = 0, w
+                p.y1, p.y2 = 0, h
+                self.update_curve()
+            return False
+        self.widget.add_events(Gdk.EventMask.VISIBILITY_NOTIFY_MASK)
+        self.widget.connect('visibility-notify-event', visEvent)
         
     def createCanvasWidget(self, parent):
         # this is only separate from createOuterWidgets because in the
@@ -429,11 +447,13 @@ class Curveview(object):
         print "   %s on %s" % (event, w)
         
     def onFocusIn(self, *args):
+        dispatcher.send('curve row focus change')     
         dispatcher.send("all curves lose selection", butNot=self)
 
         self.widget.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("red"))
 
     def onFocusOut(self, widget=None, event=None):
+        dispatcher.send('curve row focus change')                  
         self.widget.modify_bg(Gtk.StateFlags.NORMAL, Gdk.color_parse("gray30"))
 
         # you'd think i'm unselecting when we lose focus, but we also
@@ -681,8 +701,21 @@ class Curveview(object):
                                  outline='#800000',
                                  tags=('knob',))
                 dispatcher.send("knob out", value=prevKey[1], curve=self.curve)
-       
+
     def update_curve(self, *args):
+        if not getattr(self, '_pending_update', False):
+            self._pending_update = True
+            reactor.callLater(.01, self._update_curve)
+        
+    def _update_curve(self):
+        if not getattr(self, '_pending_update', False):
+            return
+        self._pending_update = False
+        if not self.canvas.is_visible():
+            # this avoids an occasional crash in something like
+            # goocanvas_add_item when we write objects to a canvas
+            # that's gone
+            return
         if not self.redrawsEnabled:
             print "no redrawsEnabled, skipping", self
             return
@@ -803,11 +836,15 @@ class Curveview(object):
             except ZeroDivisionError:
                 base = -100
             base = base + linewidth / 2
+            areapts = linepts[:]
+            if len(areapts) >= 1:
+                areapts.insert(0, (0, areapts[0][1]))
+                areapts.append((self.canvas.props.x2, areapts[-1][1]))
             polyline_new_line(parent=self.curveGroup,
                                points=Points(
-                                   [(linepts[0][0], base)] +
-                                   linepts +
-                                   [(linepts[-1][0], base)]),
+                                   [(areapts[0][0], base)] +
+                                   areapts +
+                                   [(areapts[-1][0], base)]),
                                close_path=True,
                                line_width=0,
                                fill_color="green",
@@ -997,6 +1034,10 @@ class Curveview(object):
         t = self.world_from_screen(event.x, 0)[0]
         self.zoomControl.zoom_about_mouse(
             t, factor=1.5 if event.direction == Gdk.ScrollDirection.DOWN else 1/1.5)
+        # Don't actually scroll the canvas! (it shouldn't have room to
+        # scroll anyway, but it does because of some coordinate errors
+        # and borders and stuff)
+        return True 
         
     def onRelease(self, widget, event):
         self.print_state("dotrelease")
@@ -1042,6 +1083,9 @@ class CurveRow(object):
         self.initCurveView()
         dispatcher.connect(self.rebuild, "all curves rebuild")
 
+    def isFocus(self):
+        return self.curveView.widget.is_focus()
+        
     def rebuild(self):
         raise NotImplementedError('obsolete, if curves are drawing right')
         self.curveView.rebuild()
@@ -1055,8 +1099,11 @@ class CurveRow(object):
         
     def initCurveView(self):
         self.curveView.widget.show()
-        self.curveView.widget.set_size_request(-1, 100)
+        self.setHeight(100)
         self.cols.pack_start(self.curveView.widget, expand=True, fill=True, padding=0)       
+
+    def setHeight(self, h):
+        self.curveView.widget.set_size_request(-1, h)
         
     def setupControls(self, controls, name, curve, slider):
         box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
@@ -1129,6 +1176,7 @@ class Curvesetview(object):
         self.curvesVBox = curvesVBox
         self.curveset = curveset
         self.allCurveRows = set()
+        self.visibleHeight = 1000
 
         self.zoomControl = self.initZoomControl(zoomControlBox)
         self.zoomControl.redrawzoom()
@@ -1146,6 +1194,8 @@ class Curvesetview(object):
         eventBox = self.curvesVBox.get_parent()
         eventBox.connect("key-press-event", self.onKeyPress)
         eventBox.connect("button-press-event", self.takeFocus)
+
+        self.watchCurveAreaHeight()
 
     def __del__(self):
         print "del curvesetview", id(self) 
@@ -1218,8 +1268,37 @@ class Curvesetview(object):
         self.curvesVBox.pack_start(f.box, expand=True, fill=True, padding=0)
         f.box.show_all()
         self.allCurveRows.add(f)
+        self.setRowHeights()
         f.curveView.goLive()
 
+    def watchCurveAreaHeight(self):
+        def sizeEvent(w, size):
+            # this is firing really often
+            if self.visibleHeight == size.height:
+                return
+            print "size.height is new", size.height
+            self.visibleHeight = size.height
+            self.setRowHeights()
+
+        visibleArea = self.curvesVBox.get_parent().get_parent()
+        visibleArea.connect('size-allocate', sizeEvent)
+
+        dispatcher.connect(self.setRowHeights, "curve row focus change")
+        
+    def setRowHeights(self):
+        focusHeight = 100
+        nRows = len(self.allCurveRows)
+        if not nRows:
+            return
+        anyFocus = any(r.isFocus() for r in self.allCurveRows)
+
+        if anyFocus:
+            h = max(14, (self.visibleHeight - focusHeight) // (nRows - 1)) - 3
+        else:
+            h = max(14, self.visibleHeight // nRows) - 3
+        for row in self.allCurveRows:
+            row.setHeight(100 if row.isFocus() else h)
+            
     def row(self, name):
         if isinstance(name, Literal):
             name = str(name)
