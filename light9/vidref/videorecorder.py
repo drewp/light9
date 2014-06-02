@@ -2,7 +2,7 @@ import pygst
 pygst.require("0.10")
 import gst, gobject, time, logging, os, traceback
 import gtk
-import Image
+from PIL import Image
 from threading import Thread
 from twisted.internet import defer
 from Queue import Queue, Empty

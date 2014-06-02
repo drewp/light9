@@ -16,3 +16,4 @@ pyjade==2.2.0
 python-dateutil==2.2
 txosc==0.2.0
 service_identity==0.2
+Pillow==2.4.0

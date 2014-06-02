@@ -27,8 +27,6 @@ link_to_sys_packages:
 	ln -sf $(DP)/pygst.pth $(SP)/
 	ln -sf $(DP)/pygst.py $(SP)/
 	ln -sf $(DP)/gst-0.10 $(SP)/
-	ln -sf $(DP)/PIL $(SP)/
-	ln -sf $(DP)/PIL.pth $(SP)/
 	ln -sf $(DP)/goocanvasmodule.so $(SP)/
 
 PYTHON=/usr/bin/pypy
