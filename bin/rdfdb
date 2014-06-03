@@ -288,6 +288,12 @@ class Db(object):
             self.watchedFiles.aboutToPatch(ctx)
         
         patchQuads(self.graph, p.delQuads, p.addQuads, perfect=True)
+        self._sendPatch(p)
+        if not dueToFileChange:
+            self.watchedFiles.dirtyFiles([ctx])
+        sendToLiveClients(asJson=p.jsonRepr)
+
+    def _sendPatch(self, p):
         senderUpdateUri = getattr(p, 'senderUpdateUri', None)
 
         for c in self.clients:
@@ -296,10 +302,7 @@ class Db(object):
                 continue
             d = c.sendPatch(p)
             d.addErrback(self.clientErrored, c)
-        if not dueToFileChange:
-            self.watchedFiles.dirtyFiles([ctx])
-        sendToLiveClients(asJson=p.jsonRepr)
-
+        
     def clientErrored(self, err, c):
         err.trap(twisted.internet.error.ConnectError)
         log.info("connection error- dropping client %r" % c)
