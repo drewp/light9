@@ -182,7 +182,10 @@ class EffectLoop(object):
 
                 outSubs = []
                 for e in self.currentEffects:
-                    outSubs.append(e.eval(songTime))
+                    try:
+                        outSubs.append(e.eval(songTime))
+                    except Exception as exc:
+                        log.error("effect %s: %s" % (e.uri, exc))
                 out = Submaster.sub_maxes(*outSubs)
 
                 self.logLevels(t1, out)
