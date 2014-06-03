@@ -331,7 +331,7 @@ class Curveset(object):
         while name in self.curves:
            name=name+"-1"
 
-        uri = self.graph.sequentialUri(self.currentSong + '/curve/c-')
+        uri = self.graph.sequentialUri(self.currentSong + '/curve-')
         c = Curve(uri)
         s, e = self.get_time_range()
         c.points.extend([(s, 0), (e, 0)])

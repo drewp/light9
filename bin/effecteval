@@ -33,26 +33,28 @@ class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
         song = URIRef(self.get_argument('uri'))
-        drop = URIRef(self.get_argument('drop'))
+        dropped = URIRef(self.get_argument('drop'))
         ctx = song
         graph = self.settings.graph
-        effect = graph.sequentialUri(song + "/effect/e-")
-        curve = graph.sequentialUri(song + "/curve/c-")
+        effect = graph.sequentialUri(song + "/effect-")
+        curve = graph.sequentialUri(song + "/curve-")
 
         with graph.currentState(
-                tripleFilter=(drop, RDFS.label, None)) as g:
-            dropSubLabel = g.label(drop)
+                tripleFilter=(dropped, RDFS.label, None)) as g:
+            droppedSubLabel = g.label(dropped)
         
         graph.patch(Patch(addQuads=[
             (song, L9['curve'], curve, ctx),
             (song, L9['effect'], effect, ctx),
             (effect, RDF.type, L9['Effect'], ctx),
             (effect, L9['code'],
-             Literal('out = sub(%s, intensity=%s)' % (drop.n3(), curve.n3())),
+             Literal('out = sub(%s, intensity=%s)' % (dropped.n3(), curve.n3())),
              ctx),
             (curve, RDF.type, L9['Curve'], ctx),
-            (curve, RDFS.label, Literal('sub %s' % dropSubLabel), ctx),
-            (curve, L9['points'], Literal('0 0'), ctx),
+            (curve, RDFS.label, Literal('sub %s' % droppedSubLabel), ctx),
+            ]))
+        graph.patch(Patch(addQuads=[
+            (curve, L9['points'], Literal('0 0'), Curve(uri=curve).curvePointsContext()),
             ]))
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
@@ -127,6 +129,8 @@ class EffectLoop(object):
         self.graph, self.stats = graph, stats
         self.currentSong = None
         self.currentEffects = []
+        self.lastLogTime = 0
+        self.lastLogMsg = ""
         self.graph.addHandler(self.setEffects)
         self.period = 1 / 30
         self.coastSecs = .3 # main reason to keep this low is to notice play/pause
@@ -181,11 +185,8 @@ class EffectLoop(object):
                     outSubs.append(e.eval(songTime))
                 out = Submaster.sub_maxes(*outSubs)
 
+                self.logLevels(t1, out)
                 dmx = out.get_dmx_list()
-
-                if log.isEnabledFor(logging.DEBUG):
-                    log.debug("send dmx: %r", out.get_levels())
-
                 with self.stats.writeDmx.time():
                     yield dmxclient.outputlevels(dmx, twisted=True)
 
@@ -197,7 +198,24 @@ class EffectLoop(object):
             dt = 1
 
         reactor.callLater(dt, self.sendLevels)
-    
+        
+    def logLevels(self, now, out):
+        # this would look nice on the top of the effecteval web pages too
+        if log.isEnabledFor(logging.DEBUG):
+            log.debug(self.logMessage(out))
+        else:
+            if now > self.lastLogTime + 5:
+                msg = self.logMessage(out)
+                if msg != self.lastLogMsg:
+                    log.info(msg)
+                    self.lastLogMsg = msg
+                self.lastLogTime = now
+                
+    def logMessage(self, out):
+        return ("send dmx: {%s}" %
+                ", ".join("%r: %.3g" % (str(k), v)
+                          for k,v in out.get_levels().items()))
+        
 class App(object):
     def __init__(self, show):
         self.show = show

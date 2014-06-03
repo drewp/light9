@@ -35,10 +35,6 @@ class EffectNode(object):
         intensityCurve = uriFromCode(m.group(2))
         self.curve = Curve(uri=intensityCurve)
 
-        # read from disk ok? how do we know to reread? start with
-        # mtime. the mtime check could be done occasionally so on
-        # average we read at most one curve's mtime per effectLoop.       
-
         pts = self.graph.value(intensityCurve, L9['points'])
         if pts is None:
             log.info("curve %r has no points" % intensityCurve)
