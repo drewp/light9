@@ -38,9 +38,6 @@ class Curve(object):
     def toggleMute(self):
         self.muted = not self.muted
 
-    def curvePointsContext(self):
-        return self.uri
-
     def load(self,filename):
         self.points[:]=[]
         for line in file(filename):
@@ -151,11 +148,66 @@ class Curve(object):
             return None
         return leftidx
 
+class CurveResource(object):
+    """
+    holds a Curve, deals with graphs
+    """
+    def __init__(self, graph, uri):
+        self.graph, self.uri = graph, uri
+
+    def curvePointsContext(self):
+        return self.uri
+
+    def newCurve(self, ctx, label):
+        """
+        Save type/label for a new :Curve resource.
+        Pass the ctx where the main curve data (not the points) will go.
+        """
+        self.graph.patch(Patch(addQuads=[
+            (self.uri, RDF.type, L9['Curve'], ctx),
+            (self.uri, RDFS.label, label, ctx),
+            ]))
+        self.curve = Curve(self.uri)
+        self.curve.points.extend([(0, 0)])
+        self.saveCurve()
+        
+    def loadCurve(self):
+        pts = self.graph.value(self.uri, L9['points'])
+        self.curve = Curve(self.uri,
+                           pointsStorage='file' if pts is None else 'graph')
+        if pts is not None:
+            self.curve.set_from_string(pts)
+        else:
+            diskPts = self.graph.value(self.uri, L9['pointsFile'])
+            if diskPts is not None:
+                self.curve.load(os.path.join(showconfig.curvesDir(), diskPts))
+            else:
+                log.warn("curve %s has no points", self.uri)
+
+    def saveCurve(self):
+        for p in self.getSavePatches():
+            self.graph.patch(p)
+
+    def getSavePatches(self):
+        if self.curve.pointsStorage == 'file':
+            log.warn("not saving file curves anymore- skipping %s" % self.uri)
+            #cur.save("%s-%s" % (basename,name))
+            return []
+        elif self.curve.pointsStorage == 'graph':
+            return [self.graph.getObjectPatch(
+                self.curvePointsContext(),
+                subject=self.uri,
+                predicate=L9['points'],
+                newObject=Literal(self.curve.points_as_string()))]
+        else:
+            raise NotImplementedError(self.curve.pointsStorage)
+
+        
 class Markers(Curve):
     """Marker is like a point but the y value is a string"""
     def eval(self):
         raise NotImplementedError()
-    
+
 
 def slope(p1,p2):
     if p2[0] == p1[0]:
@@ -231,7 +283,14 @@ class Curveset(object):
 
         for uri in sorted(self.graph.objects(self.currentSong, L9['curve'])):
             try:
-                self.loadCurve(uri)
+                cr = CurveResource(self.graph, uri)
+                cr.loadCurve()
+
+                curvename = self.graph.label(uri)
+                if not curvename:
+                    raise ValueError("curve %r has no label" % uri)
+                self.add_curve(curvename, cr.curve)
+
             except Exception as e:
                 log.error("loading %s failed: %s", uri, e)
                 
@@ -243,23 +302,6 @@ class Curveset(object):
         except IOError:
             print "no marker file found"
 
-    def loadCurve(self, uri):
-        pts = self.graph.value(uri, L9['points'])
-        c = Curve(uri, pointsStorage='file' if pts is None else 'graph')
-        if pts is not None:
-            c.set_from_string(pts)
-        else:
-            diskPts = self.graph.value(uri, L9['pointsFile'])
-            if diskPts is not None:
-                c.load(os.path.join(showconfig.curvesDir(), diskPts))
-            else:
-                log.warn("curve %s has no points", c.uri)
-
-        curvename = self.graph.label(uri)
-        if not curvename:
-            raise ValueError("curve %r has no label" % uri)
-        self.add_curve(curvename, c)
-            
     def save(self):
         """writes a file for each curve with a name
         like basename-curvename, or saves them to the rdf graph"""
@@ -269,17 +311,9 @@ class Curveset(object):
 
         patches = []
         for label, curve in self.curves.items():
-            if curve.pointsStorage == 'file':
-                log.warn("not saving file curves anymore- skipping %s" % label)
-                #cur.save("%s-%s" % (basename,name))
-            elif curve.pointsStorage == 'graph':
-                patches.append(self.graph.getObjectPatch(
-                    curve.curvePointsContext(),
-                    subject=curve.uri,
-                    predicate=L9['points'],
-                    newObject=Literal(curve.points_as_string())))
-            else:
-                raise NotImplementedError(curve.pointsStorage)
+            cr = CurveResource(self.graph, curve.uri)
+            cr.curve = curve
+            patches.extend(cr.getSavePatches())
 
         self.markers.save("%s.markers" % basename)
         # this will cause reloads that will clear our curve list
@@ -332,20 +366,17 @@ class Curveset(object):
            name=name+"-1"
 
         uri = self.graph.sequentialUri(self.currentSong + '/curve-')
-        c = Curve(uri)
+
+        cr = CurveResource(self.graph, uri)
+        cr.newCurve(ctx=self.currentSong, label=Literal(name))
         s, e = self.get_time_range()
-        c.points.extend([(s, 0), (e, 0)])
+        cr.curve.points.extend([(s, 0), (e, 0)])
+
         ctx = self.currentSong
         self.graph.patch(Patch(addQuads=[
             (self.currentSong, L9['curve'], uri, ctx),
-            (uri, RDF.type, L9['Curve'], ctx),
-            (uri, RDFS.label, Literal(name), ctx),
             ]))
-        print "pts to", c.curvePointsContext()
-        self.graph.patch(Patch(addQuads=[
-            (uri, L9['points'], Literal(c.points_as_string()),
-             c.curvePointsContext()),
-            ]))
+        cr.saveCurve()
 
     def hw_slider_in(self, num, value):
         try:

@@ -9,11 +9,12 @@ from rdflib import URIRef, Literal
 
 sys.path.append(".")
 from light9 import networking, showconfig, Submaster, dmxclient
-from light9.rdfdb.syncedgraph import SyncedGraph
-from light9.namespaces import L9, RDF, RDFS
-from light9.rdfdb.patch import Patch
+from light9.curvecalc.curve import CurveResource
 from light9.effecteval.effect import EffectNode
 from light9.greplin_cyclone import StatsForCyclone
+from light9.namespaces import L9, RDF, RDFS
+from light9.rdfdb.patch import Patch
+from light9.rdfdb.syncedgraph import SyncedGraph
 from greplin import scales
 
 from lib.cycloneerr import PrettyErrorHandler
@@ -42,7 +43,10 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
         with graph.currentState(
                 tripleFilter=(dropped, RDFS.label, None)) as g:
             droppedSubLabel = g.label(dropped)
-        
+            
+        cr = CurveResource(graph, curve)
+        cr.newCurve(ctx, label=Literal('sub %s' % droppedSubLabel))
+        cr.saveCurve()
         graph.patch(Patch(addQuads=[
             (song, L9['curve'], curve, ctx),
             (song, L9['effect'], effect, ctx),
@@ -50,12 +54,8 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             (effect, L9['code'],
              Literal('out = sub(%s, intensity=%s)' % (dropped.n3(), curve.n3())),
              ctx),
-            (curve, RDF.type, L9['Curve'], ctx),
-            (curve, RDFS.label, Literal('sub %s' % droppedSubLabel), ctx),
             ]))
-        graph.patch(Patch(addQuads=[
-            (curve, L9['points'], Literal('0 0'), Curve(uri=curve).curvePointsContext()),
-            ]))
+        
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
     def connectionMade(self, *args, **kwargs):
