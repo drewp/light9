@@ -16,7 +16,8 @@ def rce(self, exc, val, tb):
         Failure(val, exc, tb).printDetailedTraceback()
 Tkinter.Tk.report_callback_exception = rce
 
-import coloredlogs, logging, time
+import coloredlogs, logging, time, faulthandler
+faulthandler.enable()
 log = logging.getLogger()
 
 class CSH(coloredlogs.ColoredStreamHandler):
