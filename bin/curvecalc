@@ -74,11 +74,6 @@ class Main(object):
                               graph.label(
                                   graph.value(session, L9['currentSong'])))
         graph.addHandler(updateTitle)
-        mainwin.parse_geometry("1x1-0+0")
-
-        # this is the only one i found that would set the size right,
-        # but it's a minimum size, which i don't really want
-        mainwin.set_size_request(1678, 922)
 
         songChoice = Observable(None) # to be connected with the session song
 
