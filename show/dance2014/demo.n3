@@ -31,7 +31,3 @@
   # an output?
   :dep <http://ex/effect/song1/opening>, <http://light9.bigasterisk.com/show/dance2014/sub/s2>
   .
-
-<http://light9.bigasterisk.com/show/dance2014/song1>
-  :effect   <http://ex/effect/song1/openingLook>
-  .

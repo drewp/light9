@@ -6,9 +6,14 @@
 
 <http://light9.bigasterisk.com/show/dance2014/sub/s2> a ns1:Submaster ;
     rdfs:label "s2" ;
-    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1401175515.38/map/105963414> .
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2014/sub/s2/map/526557250>,
+        <http://light9.bigasterisk.com/sub/local/1401175515.38/map/105963414> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/s2/map/526557250> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/front9-l> ;
+    ns1:level 0 .
 
 <http://light9.bigasterisk.com/sub/local/1401175515.38/map/105963414> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/upleft> ;
-    ns1:level 6.4e-01 .
+    ns1:level 0.8 .
 
