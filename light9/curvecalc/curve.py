@@ -38,6 +38,9 @@ class Curve(object):
     def toggleMute(self):
         self.muted = not self.muted
 
+    def curvePointsContext(self):
+        return self.uri
+
     def load(self,filename):
         self.points[:]=[]
         for line in file(filename):
@@ -227,19 +230,11 @@ class Curveset(object):
             return
 
         for uri in sorted(self.graph.objects(self.currentSong, L9['curve'])):
-            pts = self.graph.value(uri, L9['points'])
-            c = Curve(uri, pointsStorage='file' if pts is None else 'graph')
-            if pts is not None:
-                c.set_from_string(pts)
-            else:
-                diskPts = self.graph.value(uri, L9['pointsFile'])
-                c.load(os.path.join(showconfig.curvesDir(), diskPts))
-
-            curvename = self.graph.label(uri)
-            if not curvename:
-                raise ValueError("curve %r has no label" % uri)
-            self.add_curve(curvename, c)
-
+            try:
+                self.loadCurve(uri)
+            except Exception as e:
+                log.error("loading %s failed: %s", uri, e)
+                
         basename = os.path.join(
             showconfig.curvesDir(),
             showconfig.songFilenameFromURI(self.currentSong))
@@ -247,6 +242,23 @@ class Curveset(object):
             self.markers.load("%s.markers" % basename)
         except IOError:
             print "no marker file found"
+
+    def loadCurve(self, uri):
+        pts = self.graph.value(uri, L9['points'])
+        c = Curve(uri, pointsStorage='file' if pts is None else 'graph')
+        if pts is not None:
+            c.set_from_string(pts)
+        else:
+            diskPts = self.graph.value(uri, L9['pointsFile'])
+            if diskPts is not None:
+                c.load(os.path.join(showconfig.curvesDir(), diskPts))
+            else:
+                log.warn("curve %s has no points", c.uri)
+
+        curvename = self.graph.label(uri)
+        if not curvename:
+            raise ValueError("curve %r has no label" % uri)
+        self.add_curve(curvename, c)
             
     def save(self):
         """writes a file for each curve with a name
@@ -261,9 +273,8 @@ class Curveset(object):
                 log.warn("not saving file curves anymore- skipping %s" % label)
                 #cur.save("%s-%s" % (basename,name))
             elif curve.pointsStorage == 'graph':
-                ctx = self.currentSong
                 patches.append(self.graph.getObjectPatch(
-                    ctx,
+                    curve.curvePointsContext(),
                     subject=curve.uri,
                     predicate=L9['points'],
                     newObject=Literal(curve.points_as_string())))
@@ -274,7 +285,7 @@ class Curveset(object):
         # this will cause reloads that will clear our curve list
         for p in patches:
             self.graph.patch(p)
-
+            
     def sorter(self, name):
         return self.curves[name].uri
         
@@ -320,7 +331,7 @@ class Curveset(object):
         while name in self.curves:
            name=name+"-1"
 
-        uri = self.currentSong + ('/curve/c-%f' % time.time())
+        uri = self.graph.sequentialUri(self.currentSong + '/curve/c-')
         c = Curve(uri)
         s, e = self.get_time_range()
         c.points.extend([(s, 0), (e, 0)])
@@ -329,7 +340,11 @@ class Curveset(object):
             (self.currentSong, L9['curve'], uri, ctx),
             (uri, RDF.type, L9['Curve'], ctx),
             (uri, RDFS.label, Literal(name), ctx),
-            (uri, L9['points'], Literal(c.points_as_string()), ctx),
+            ]))
+        print "pts to", c.curvePointsContext()
+        self.graph.patch(Patch(addQuads=[
+            (uri, L9['points'], Literal(c.points_as_string()),
+             c.curvePointsContext()),
             ]))
 
     def hw_slider_in(self, num, value):

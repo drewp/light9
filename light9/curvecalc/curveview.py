@@ -672,9 +672,18 @@ class Curveview(object):
         if self._time == val:
             return
         self.update_time_bar(val)
+
+    def alive(self):
+        # Some handlers still run after a view is destroyed, which
+        # leads to crashes in somewhere like
+        # goocanvas_add_item. Workaround is to disable certain methods
+        # when the widget is gone. Correct solution would be to stop
+        # and free those handlers when the widget is gone.
+        return self.canvas.is_visible()
         
     def update_time_bar(self, t):
-
+        if not self.alive():
+            return
         if not getattr(self, 'timelineLine', None):
             self.timelineGroup = GooCanvas.CanvasGroup(
                 parent=self.canvas.get_root_item())
@@ -708,13 +717,17 @@ class Curveview(object):
             reactor.callLater(.01, self._update_curve)
         
     def _update_curve(self):
+        try:
+            self._update_curve2()
+        except Exception:
+            log.error("in update_curve on %s", self.curve.uri)
+            raise
+
+    def _update_curve2(self):
         if not getattr(self, '_pending_update', False):
             return
         self._pending_update = False
-        if not self.canvas.is_visible():
-            # this avoids an occasional crash in something like
-            # goocanvas_add_item when we write objects to a canvas
-            # that's gone
+        if not self.alive():
             return
         if not self.redrawsEnabled:
             print "no redrawsEnabled, skipping", self
@@ -810,6 +823,8 @@ class Curveview(object):
                        text=label)
 
     def _draw_line(self, visible_points, area=False):
+        if not visible_points:
+            return
         linepts=[]
         step=1
         linewidth = 1.5
@@ -1290,18 +1305,22 @@ class Curvesetview(object):
         dispatcher.connect(self.setRowHeights, "curve row focus change")
         
     def setRowHeights(self):
-        focusHeight = 100
         nRows = len(self.allCurveRows)
         if not nRows:
             return
         anyFocus = any(r.isFocus() for r in self.allCurveRows)
 
+        evenHeight = max(14, self.visibleHeight // nRows) - 3
         if anyFocus:
-            h = max(14, (self.visibleHeight - focusHeight) // (nRows - 1)) - 3
+            focusHeight = max(100, evenHeight)
+            if nRows > 1:
+                otherHeight = max(14,
+                                  (self.visibleHeight - focusHeight) //
+                                  (nRows - 1)) - 3
         else:
-            h = max(14, self.visibleHeight // nRows) - 3
+            otherHeight = evenHeight
         for row in self.allCurveRows:
-            row.setHeight(100 if row.isFocus() else h)
+            row.setHeight(focusHeight if row.isFocus() else otherHeight)
             
     def row(self, name):
         if isinstance(name, Literal):
