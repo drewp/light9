@@ -384,8 +384,9 @@ class Curveview(object):
 
             visibility-notify-event
             (Gdk.EventMask.VISIBILITY_NOTIFY_MASK) fires on some
-            resizes but maybe not all. Could be doing the right thing,
-            though
+            resizes but definitely not all. During window resizes,
+            sometimes I have to 'shake' the window size to get all
+            curves to update.
         
             configure-event seems to never fire.
 
@@ -1154,14 +1155,6 @@ class CurveRow(object):
     def onDelete(self):
         self.curveView.onDelete()
         
-    def update_ui_to_collapsed_state(self, *args):
-        if self.collapsed.get_active():
-            self.curveView.widget.set_size_request(-1, 25)
-            [w.hide() for w in self.hideWhenCollapsed]
-        else:
-            self.curveView.widget.set_size_request(-1, 100)
-            [w.show() for w in self.hideWhenCollapsed]
-
     def sync_mute_to_curve(self, *args):
         """send value from CheckButton to the master attribute inside Curve"""
         new_mute = self.muted.get_active()
@@ -1257,17 +1250,16 @@ class Curvesetview(object):
         if not self.live: # workaround for old instances living past reload()
             return
 
-        if event.string == 'c':
-            r = self.row_under_mouse()
-            # calling toggled() had no effect; don't know why
-            r.collapsed.set_active(not r.collapsed.get_active())
+        r = self.row_under_mouse()
+        key = event.string
+        pass # no handlers right now
  
     def row_under_mouse(self):
         x, y = self.curvesVBox.get_pointer()
         for r in self.allCurveRows:
             inRowX, inRowY = self.curvesVBox.translate_coordinates(r.box, x, y)
-            _, _, w, h = r.box.get_allocation()
-            if 0 <= inRowX < w and 0 <= inRowY < h:
+            alloc = r.box.get_allocation()
+            if 0 <= inRowX < alloc.width and 0 <= inRowY < alloc.height:
                 return r
         raise ValueError("no curveRow is under the mouse")
 
@@ -1295,7 +1287,7 @@ class Curvesetview(object):
             # this is firing really often
             if self.visibleHeight == size.height:
                 return
-            print "size.height is new", size.height
+            log.debug("size.height is new: %s", size.height)
             self.visibleHeight = size.height
             self.setRowHeights()
 
@@ -1342,12 +1334,5 @@ class Curvesetview(object):
         for r in self.allCurveRows:
             r.onDelete()
 
-    def collapseAll(self):
-        for r in self.allCurveRows:
-            r.collapsed.set_active(True)
-
-    def collapseNone(self):
-        for r in self.allCurveRows:
-            r.collapsed.set_active(False)
 
         

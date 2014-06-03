@@ -10,9 +10,12 @@
   </object>
   <object class="GtkTextBuffer" id="help">
     <property name="text">Mousewheel zoom; C-p play/pause music at mouse
-Drag sub into curve area for new curve+subterm
-Keys in a selected curve: C to collapse; R to rebuild broken canvas widget; 1..5 add point at time cursor; q,w,e,r,t,y set marker at time cursor
+Keys in a selected curve: 1..5 add point at time cursor
+Keys in any curve: q,w,e,r,t,y set marker at time cursor
 Curve point bindings: B1 drag point; C-B1 curve add point; S-B1 sketch points; B1 drag select points
+
+Old subterm system may still work:
+Drag sub into curve area for new curve+subterm
 Available in functions: nsin/ncos period=amp=1; within(a,b) bef(x) aft(x) compare to time; smoove(x) cubic smoothstep; chan(name); curvename(t) eval curve</property>
   </object>
   <object class="GtkWindow" id="MainWindow">
@@ -435,34 +438,10 @@ Available in functions: nsin/ncos period=amp=1; within(a,b) bef(x) aft(x) compar
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkButton" id="button7">
-                            <property name="label" translatable="yes">Collapse all</property>
-                            <property name="use_action_appearance">False</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <signal name="clicked" handler="onCollapseAll" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <child>
-                          <object class="GtkButton" id="button6">
-                            <property name="label" translatable="yes">Collapse none	</property>
-                            <property name="use_action_appearance">False</property>
-                            <property name="visible">True</property>
-                            <property name="can_focus">True</property>
-                            <property name="receives_default">True</property>
-                            <signal name="clicked" handler="onCollapseNone" swapped="no"/>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">2</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <child>
                           <placeholder/>
@@ -617,6 +596,12 @@ Available in functions: nsin/ncos period=amp=1; within(a,b) bef(x) aft(x) compar
                                 <child>
                                   <placeholder/>
                                 </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
                               </object>
                             </child>
                           </object>
@@ -712,6 +697,12 @@ Available in functions: nsin/ncos period=amp=1; within(a,b) bef(x) aft(x) compar
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="n_columns">2</property>
+                    <child>
+                      <placeholder/>
+                    </child>
+                    <child>
+                      <placeholder/>
+                    </child>
                     <child>
                       <placeholder/>
                     </child>
