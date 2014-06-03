@@ -37,6 +37,7 @@
 <node CREATED="1308035440009" ID="ID_779574958" MODIFIED="1308035482364" TEXT="the code parts of this ought to be pulled out so they&apos;re not in the show dirs at all"/>
 </node>
 <node CREATED="1308036115080" ID="ID_96013633" MODIFIED="1308036120978" TEXT="make a file URI with the show&apos;s uri"/>
+<node CREATED="1401778373943" ID="ID_1188394623" MODIFIED="1401778425886" TEXT="have a much nicer time in the shell by making $TOP/cur a symlink to $TOP/show/dance2xxx (this cur shortcut is not used in any files)"/>
 <node COLOR="#cc6600" CREATED="1308035427896" ID="ID_417435636" MODIFIED="1308035437068" TEXT="mkdir {curves,subs,subterms}"/>
 <node CREATED="1308113577178" ID="ID_565870104" MODIFIED="1308113586124" TEXT="bin/wavecurve -a"/>
 <node CREATED="1308113587154" ID="ID_150041665" MODIFIED="1308113601383" TEXT="make music curves out of the audio data"/>
