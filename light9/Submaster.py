@@ -298,7 +298,7 @@ class Submasters(object):
         for s in self.graph.subjects(RDF.type, L9['Submaster']):
             if self.graph.contains((s, RDF.type, L9['LocalSubmaster'])):
                 continue
-            log.info("found sub %s", s)
+            log.debug("found sub %s", s)
             if s not in self.submasters:
                 sub = self.submasters[s] = PersistentSubmaster(self.graph, s)
                 dispatcher.send("new submaster", sub=sub)
