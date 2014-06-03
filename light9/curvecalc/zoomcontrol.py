@@ -128,8 +128,10 @@ class ZoomControl(object):
         if t is None:
             t = self.lastTime
         vis_seconds = self.end - self.start
-        margin = vis_seconds * .1
-        if t < self.start or t > (self.end - vis_seconds * .3):
+        # note that setting self.offset positions the time in the
+        # *middle*.
+        margin = vis_seconds * -.4
+        if t < self.start or t > (self.end - vis_seconds * .6):
             self.offset = t - margin
 
         self.redrawzoom()
