@@ -1,0 +1,74 @@
+doctype html
+html
+  head
+    title light9
+    meta(charset='utf8')
+    link(rel='Stylesheet', href='style.css')
+    link(href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css", rel="stylesheet")
+
+  body
+    h1 Light9 theater lighting control system
+  section
+    h2 About
+    p
+      | Light9 is a suite of tools for playing music and controlling DMX theater lighting.
+      img(src='overview.svg', style="background: rgba(255, 255, 255, 0.69)")
+
+    p
+      | <a href="old/FrontPage.html">Old wiki page (2005)</a>. <a href="old/lightsim/">lightsim</a>.
+      
+  section
+    h2 Code
+    p
+      | Main repo is in
+      |  
+      a(href="https://bigasterisk.com/darcs/?r=light9;a=summary")
+        img(src="//bigasterisk.com/darcs/darcs.png", style="width: 17px; vertical-align: middle;")
+        |  darcs
+      
+      | . There is a mirror at
+      |  
+      a(href="https://github.com/drewp/light9")
+        i.fa.fa-github
+        |  github
+      | .
+
+  section
+    h2 Changelog
+    section
+      h3 2014
+      p New effect system: <a href="https://www.youtube.com/watch?v=GzPvwzg5scM">demo video 1</a>
+      p <a href="2014-design-notes.txt">Notes for the next redesign</a>, which is mostly for accepting more controller input at once (<a href="http://www.keithmcmillen.com/QuNeo/">QuNeo</a> and <a href="http://www.behringer.com/EN/Products/BCF2000.aspx">BCF2000</a>) and making it faster to create and edit effects.
+      p A <a href="mockup/curveedit.html">test of the new curve editor</a>, which needs to display 50+ curves at once and zoom them smoothly. Click in the body to start a zooming animation test.
+      p <a href="mockup/effectpreview.html">Test of effect preview</a> (from this <a href="mockup/effectmockup.svg">UI sketch</a>) showing expressions with their inputs and outputs represented as curve and color timelines. Drag a constant to change it.
+    section
+      h3 2013
+      p RDF patches are passed between all components for live updates. <a href="http://knockoutjs.com/">Knockoutjs</a>-style auto dependency tracking arranges for GUI updates to happen whenever data changes.
+    section
+      h3 2012
+    section
+      h3 2011
+    section
+      h3 2010
+    section
+      h3 2009
+    section
+      h3 2008
+    section
+      h3 2007
+      p Use RDF for config.
+    section
+      h3 2006
+    section
+      h3 2005
+    section
+      h3 2004
+    section
+      h3 2003
+    section
+      h3 2002
+      p CVS versioning started here
+  section.project
+    h2 Project
+    p Written by <a href="https://bigasterisk.com/">Drew Perttula</a> and David McClosky. 
+
