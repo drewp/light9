@@ -1,0 +1,71 @@
+#!env_pi/bin/python
+from __future__ import division
+from run_local import log
+import sys;sys.path.append('/usr/lib/python2.7/dist-packages/')
+import io, logging, traceback
+import cyclone.web
+from twisted.internet import reactor
+from light9 import prof
+
+try:
+    import picamera
+    cameraCls = picamera.PiCamera
+except ImportError:
+    class cameraCls(object):
+        def __enter__(self): return self
+        def __exit__(self): pass
+        def capture(self, out, *a, **kw):
+            out.write(open('yuv.demo').read())
+
+@prof.logTime
+def getFrame(c, arg):
+    res = int(arg('res', 480))
+    c.resolution = {
+        480: (640, 480),
+        1080: (1920, 1080),
+        1944: (2592, 1944),
+    }[res]
+    c.shutter_speed = int(arg('shutter', 50000))
+    c.exposure_mode = arg('exposure_mode', 'fixedfps')
+    c.awb_mode = arg('awb_mode', 'off')
+    c.brightness = int(arg('brightness', 50))
+    
+    c.awb_gains = (float(arg('redgain', 1)), float(arg('bluegain', 1)))
+    c.crop = (float(arg('x', 0)), float(arg('y', 0)),
+              float(arg('w', 1)), float(arg('h', 1)))
+    rw = rh = int(arg('resize', 100))
+    # width 1920, showing w=.3 of image, resize=100 -> scale is 100/.3*1920
+    # scl is [ output px / camera px ]
+    scl1 = rw / (c.crop[2] * c.resolution[0])
+    scl2 = rh / (c.crop[3] * c.resolution[1])
+    if scl1 < scl2:
+        # width is the constraint; reduce height to the same scale
+        rh = int(scl1 * c.crop[3] * c.resolution[1])
+    else:
+        # height is the constraint
+        rw = int(scl2 * c.crop[2] * c.resolution[0])
+    c.ISO = int(arg('iso', 250))
+    out = io.BytesIO('w')
+    prof.logTime(c.capture)(out, 'jpeg', use_video_port=True, resize=(rw, rh))
+    return out.getvalue()
+
+class Pic(cyclone.web.RequestHandler):
+    def get(self):
+        try:
+            self.set_header('Content-Type', 'image/jpeg')
+            self.write(getFrame(self.settings.camera, self.get_argument))
+        except Exception:
+            traceback.print_exc()
+        
+log.setLevel(logging.INFO)
+
+with cameraCls() as camera:
+    port = 8001
+    reactor.listenTCP(port, cyclone.web.Application(handlers=[
+        (r'/pic', Pic),
+        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
+        (r'/(|gui.js)', cyclone.web.StaticFileHandler, {'path': 'light9/vidref/',
+                                                 'default_filename': 'index.html'}),
+        ], debug=True, camera=camera))
+    log.info("serving on %s" % port)
+    reactor.run()

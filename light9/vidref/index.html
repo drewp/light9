@@ -1,0 +1,37 @@
+<!doctype html>
+<html>
+  <head>
+    <title>picamserve</title>
+    <meta charset="utf-8" />
+    <style>
+      .tile {
+        display: inline-block;
+       border: 1px solid gray;
+       margin: 3px;
+       padding: 2px;
+       }
+     .tile img {
+       }
+     
+    </style>
+  </head>
+  <body>
+    <section>
+      Whole view
+      <div class="tile">
+        <img src="pic?resize=500&awb_mode=auto&exposure_mode=auto&shutter=100000">
+      </div>
+    </section>
+  <section>
+    Shutters
+      <div data-bind="foreach: shutters">
+        <div class="tile">
+          <div><img data-bind="attr: {src: 'pic?res=480&resize=200&x=.5&y=.3&w=.5&h=.2&awb_mode=auto&exposure_mode=auto&shutter='+$data}"></div>
+          <span data-bind="text: ($data / 1000) + ' ms'"></span> 
+        </div>
+      </div>
+    </section>
+    <script src="static/knockout-3.1.0.js"></script>
+    <script src="gui.js"></script>
+  </body>
+</html>

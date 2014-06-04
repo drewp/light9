@@ -51,3 +51,11 @@ gst_packages:
 
 packages:
 	sudo aptitude install coffeescript freemind normalize-audio audacity python-pygoocanvas python-pygame
+
+raspberry_pi_virtualenv:
+	mkdir -p env_pi
+	virtualenv --system-site-packages env_pi
+
+raspberry_pi_packages:
+	sudo apt-get install python-picamera python-twisted 
+	env_pi/bin/pip install cyclone coloredlogs
