@@ -10,4 +10,5 @@ sh:netHome
   :oscDmxServer     <udp://dash:9050/>;
   :curveCalc        <http://dash:8060/>;
   :keyboardComposer <http://dash:8050/>;
+  :picamserve       <http://10.1.0.125:8001/>;
   :vidref           <http://dash:8053/> .

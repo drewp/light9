@@ -9,6 +9,7 @@ gst-launch dv1394src ! dvdemux name=d ! dvdec ! ffmpegcolorspace ! hqdn3d ! xvim
 import gobject, logging, traceback
 import gtk
 from twisted.python.util import sibpath
+from light9 import networking
 from light9.vidref.replay import ReplayViews, framerate
 from light9.vidref.musictime import MusicTime
 from light9.vidref.videorecorder import Pipeline
@@ -50,7 +51,7 @@ class Gui(object):
                 liveVideo=vid3,
                 musicTime=self.musicTime,
                 recordingTo=self.recordingTo,
-                picsUrl='http://10.1.0.125:8001/pics?res=1080&resize=450&x=0&y=.3&w=1&h=.5&awb_mode=auto&exposure_mode=auto')
+                picsUrl=networking.picamserve.path('pics?res=1080&resize=450&x=0&y=.3&w=1&h=.5&awb_mode=auto&exposure_mode=auto'))
 
         vid3.props.width_request = 360
         vid3.props.height_request = 220

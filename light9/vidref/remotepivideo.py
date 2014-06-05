@@ -5,6 +5,7 @@ import os, time, logging
 import gtk
 import numpy
 import treq
+from twisted.internet import defer
 from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
 from light9 import prof
 from PIL import Image
@@ -20,6 +21,8 @@ class Pipeline(object):
         
         self._startRequest(picsUrl)
         self._buffer = ''
+
+        self._snapshotRequests = []
 
     def _replaceLiveVideoWidget(self, liveVideo):
         aspectFrame = liveVideo.get_parent()
@@ -55,7 +58,9 @@ class Pipeline(object):
         we saved the image.
         """
         filename = "%s/%s.jpg" % (snapshotDir(), time.time())
-        return
+        d = defer.Deferred()
+        self._snapshotRequests.append((d, filename))
+        return d
 
     def setInput(self, name):
         pass
@@ -64,7 +69,20 @@ class Pipeline(object):
         print "setLiveVideo", on
 
     def onFrame(self, jpg, frameTime):
+        # We could pass frameTime here to try to compensate for lag,
+        # but it ended up looking worse in a test. One suspect is the
+        # rpi clock drift might be worse than the lag. The value of
+        # (now - frameTime) stutters regularly between 40ms, 140ms,
+        # and 200ms.
         position = self.musicTime.getLatest()
+
+        for d, filename in self._snapshotRequests:
+            with open(filename, 'w') as out:
+                out.write(jpg)
+            d.callback(filename)
+        self._snapshotRequests[:] = []
+            
+        
         if not position['song']:
             self.updateLiveFromTemp(jpg)
             return 

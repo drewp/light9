@@ -38,8 +38,8 @@ a.resource {
     background: rgb(44, 44, 44);
 }
 .sub img {
-    width: 180px;
-    height: 90px;
+    width: 196px;
+    min-height: 40px;
     margin: 6px;
     background: -webkit-gradient(linear,right top,left bottom,color-stop(0,rgb(121, 120, 120)),color-stop(1,rgb(54, 54, 54)));
 }

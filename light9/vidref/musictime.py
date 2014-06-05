@@ -31,17 +31,21 @@ class MusicTime(object):
         self.pollMusicTime()
         self.pollCurvecalcTime()
 
-    def getLatest(self):
+    def getLatest(self, frameTime=None):
         """
         dict with 't' and 'song', etc.
+
+        frameTime is the timestamp from the camera, which will be used
+        instead of now.
 
         Note that this may be called in a gst camera capture thread. Very often.
         """
         if not hasattr(self, 'position'):
             return {'t' : 0, 'song' : None}
         pos = self.position.copy()
+        now = frameTime or time.time()
         if pos.get('playing'):
-            pos['t'] = pos['t'] + (time.time() - self.positionFetchTime)
+            pos['t'] = pos['t'] + (now - self.positionFetchTime)
         else:
             if self.lastHoverTime is not None:
                 pos['hoverTime'] = self.lastHoverTime
