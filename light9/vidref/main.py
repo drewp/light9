@@ -12,6 +12,7 @@ from twisted.python.util import sibpath
 from light9.vidref.replay import ReplayViews, framerate
 from light9.vidref.musictime import MusicTime
 from light9.vidref.videorecorder import Pipeline
+from light9.vidref import remotepivideo
 log = logging.getLogger()
 
 class Gui(object):
@@ -39,8 +40,17 @@ class Gui(object):
         mainwin.show_all()
         vid3 = wtree.get_object("vid3")
 
-        self.pipeline = Pipeline(vid3.window.xid, self.musicTime,
-                                 self.recordingTo)
+        if 0:
+            self.pipeline = Pipeline(
+                liveVideoXid=vid3.window.xid,
+                musicTime=self.musicTime,
+                recordingTo=self.recordingTo)
+        else:
+            self.pipeline = remotepivideo.Pipeline(
+                liveVideo=vid3,
+                musicTime=self.musicTime,
+                recordingTo=self.recordingTo,
+                picsUrl='http://10.1.0.125:8001/pics?res=1080&resize=450&x=0&y=.3&w=1&h=.5&awb_mode=auto&exposure_mode=auto')
 
         vid3.props.width_request = 360
         vid3.props.height_request = 220

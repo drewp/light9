@@ -3,28 +3,34 @@
   <requires lib="gtk+" version="2.16"/>
   <!-- interface-naming-policy project-wide -->
   <object class="GtkWindow" id="MainWindow">
+    <property name="can_focus">False</property>
     <property name="title" translatable="yes">vidref</property>
     <property name="default_width">690</property>
     <property name="default_height">500</property>
     <child>
       <object class="GtkVBox" id="vbox1">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <child>
           <object class="GtkHBox" id="hbox3">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <child>
               <object class="GtkVBox" id="vbox3">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <child>
                   <object class="GtkFrame" id="frame1">
-                    <property name="width_request">336</property>
+                    <property name="width_request">450</property>
                     <property name="height_request">277</property>
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="label_xalign">0</property>
                     <property name="shadow_type">out</property>
                     <child>
                       <object class="GtkAspectFrame" id="aspectframe2">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <property name="ratio">1.3300000429153442</property>
@@ -33,6 +39,7 @@
                             <property name="width_request">320</property>
                             <property name="height_request">240</property>
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                           </object>
                         </child>
                       </object>
@@ -40,6 +47,7 @@
                     <child type="label">
                       <object class="GtkLabel" id="label2">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="label" translatable="yes">&lt;b&gt;Live view&lt;/b&gt;</property>
                         <property name="use_markup">True</property>
                       </object>
@@ -47,12 +55,14 @@
                   </object>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="fill">True</property>
                     <property name="position">0</property>
                   </packing>
                 </child>
                 <child>
                   <object class="GtkVBox" id="vbox4">
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <child>
                       <object class="GtkToggleButton" id="liveVideoEnabled">
                         <property name="label" translatable="yes">Enabled</property>
@@ -61,26 +71,31 @@
                         <property name="visible">True</property>
                         <property name="can_focus">True</property>
                         <property name="receives_default">True</property>
+                        <property name="use_action_appearance">False</property>
                         <property name="active">True</property>
-                        <signal name="toggled" handler="on_liveVideoEnabled_toggled"/>
+                        <signal name="toggled" handler="on_liveVideoEnabled_toggled" swapped="no"/>
                       </object>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">True</property>
                         <property name="position">0</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkHBox" id="hbox4">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel" id="label1">
                             <property name="width_request">75</property>
                             <property name="height_request">20</property>
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Frame rate:</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
                         </child>
@@ -91,30 +106,40 @@
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="invisible_char">●</property>
+                            <property name="primary_icon_activatable">False</property>
+                            <property name="secondary_icon_activatable">False</property>
+                            <property name="primary_icon_sensitive">True</property>
+                            <property name="secondary_icon_sensitive">True</property>
                             <property name="numeric">True</property>
                           </object>
                           <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">True</property>
                         <property name="position">1</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkHBox" id="hbox5">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel" id="label4">
                             <property name="width_request">85</property>
                             <property name="height_request">20</property>
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Input source:</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>
+                            <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
                         </child>
@@ -122,27 +147,35 @@
                           <object class="GtkComboBox" id="videoSource">
                             <property name="width_request">100</property>
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                           </object>
                           <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
                       <packing>
                         <property name="expand">False</property>
+                        <property name="fill">True</property>
                         <property name="position">2</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkHBox" id="hbox1">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <child>
                           <object class="GtkLabel" id="label6">
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                             <property name="label" translatable="yes">Recording
 to:</property>
                           </object>
                           <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
                             <property name="position">0</property>
                           </packing>
                         </child>
@@ -155,17 +188,22 @@ to:</property>
                             <property name="buffer">recordingTo</property>
                           </object>
                           <packing>
+                            <property name="expand">True</property>
+                            <property name="fill">True</property>
                             <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
                       <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
                         <property name="position">3</property>
                       </packing>
                     </child>
                     <child>
                       <object class="GtkFrame" id="frame2">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="label_xalign">0</property>
                         <property name="shadow_type">none</property>
                         <child>
@@ -179,24 +217,29 @@ to:</property>
                         <child type="label">
                           <object class="GtkLabel" id="label8">
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;Last log&lt;/b&gt;</property>
                             <property name="use_markup">True</property>
                           </object>
                         </child>
                       </object>
                       <packing>
+                        <property name="expand">True</property>
+                        <property name="fill">True</property>
                         <property name="position">4</property>
                       </packing>
                     </child>
                   </object>
                   <packing>
                     <property name="expand">False</property>
+                    <property name="fill">True</property>
                     <property name="position">1</property>
                   </packing>
                 </child>
               </object>
               <packing>
                 <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -205,6 +248,7 @@ to:</property>
                 <property name="width_request">336</property>
                 <property name="height_request">259</property>
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="label_xalign">0</property>
                 <property name="shadow_type">out</property>
                 <child>
@@ -219,10 +263,12 @@ to:</property>
                     <child>
                       <object class="GtkViewport" id="replayScroll">
                         <property name="visible">True</property>
+                        <property name="can_focus">False</property>
                         <property name="resize_mode">queue</property>
                         <child>
                           <object class="GtkVBox" id="replayVbox">
                             <property name="visible">True</property>
+                            <property name="can_focus">False</property>
                             <child>
                               <placeholder/>
                             </child>
@@ -241,28 +287,35 @@ to:</property>
                 <child type="label">
                   <object class="GtkLabel" id="label3">
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="label" translatable="yes">&lt;b&gt;Playback 1&lt;/b&gt;</property>
                     <property name="use_markup">True</property>
                   </object>
                 </child>
               </object>
               <packing>
+                <property name="expand">True</property>
+                <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
           </object>
           <packing>
+            <property name="expand">True</property>
+            <property name="fill">True</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
           <object class="GtkFrame" id="musicPosition">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="label_xalign">0</property>
             <property name="shadow_type">none</property>
             <child>
               <object class="GtkAlignment" id="alignment1">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="left_padding">12</property>
                 <child>
                   <object class="GtkHScale" id="musicScale">
@@ -276,6 +329,7 @@ to:</property>
             <child type="label">
               <object class="GtkLabel" id="label7">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="label" translatable="yes">&lt;b&gt;Music position&lt;/b&gt;</property>
                 <property name="use_markup">True</property>
               </object>
@@ -283,21 +337,34 @@ to:</property>
           </object>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
         </child>
       </object>
     </child>
   </object>
+  <object class="GtkImage" id="image2">
+    <property name="visible">True</property>
+    <property name="can_focus">False</property>
+    <property name="stock">gtk-delete</property>
+  </object>
+  <object class="GtkTextBuffer" id="lastLog"/>
+  <object class="GtkTextBuffer" id="recordingTo">
+    <property name="text" translatable="yes">/home/drewp/light9-vidref/play-light9.bigasterisk.com_show_dance2010_song6/1276582699</property>
+  </object>
   <object class="GtkWindow" id="replayPanel">
+    <property name="can_focus">False</property>
     <child>
       <object class="GtkHBox" id="replayPanel2">
         <property name="visible">True</property>
+        <property name="can_focus">False</property>
         <child>
           <object class="GtkAspectFrame" id="aspectframe1">
             <property name="width_request">320</property>
             <property name="height_request">240</property>
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <property name="label_xalign">0</property>
             <property name="shadow_type">out</property>
             <property name="ratio">1.3300000429153442</property>
@@ -306,24 +373,29 @@ to:</property>
                 <property name="width_request">320</property>
                 <property name="height_request">240</property>
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <property name="stock">gtk-missing-image</property>
               </object>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">True</property>
             <property name="position">0</property>
           </packing>
         </child>
         <child>
           <object class="GtkVBox" id="vbox2">
             <property name="visible">True</property>
+            <property name="can_focus">False</property>
             <child>
               <object class="GtkHBox" id="hbox2">
                 <property name="visible">True</property>
+                <property name="can_focus">False</property>
                 <child>
                   <object class="GtkLabel" id="label5">
                     <property name="visible">True</property>
+                    <property name="can_focus">False</property>
                     <property name="label" translatable="yes">Started:</property>
                   </object>
                   <packing>
@@ -340,6 +412,10 @@ to:</property>
                     <property name="invisible_char">●</property>
                     <property name="width_chars">12</property>
                     <property name="text" translatable="yes">Sat 14:22:25</property>
+                    <property name="primary_icon_activatable">False</property>
+                    <property name="secondary_icon_activatable">False</property>
+                    <property name="primary_icon_sensitive">True</property>
+                    <property name="secondary_icon_sensitive">True</property>
                   </object>
                   <packing>
                     <property name="expand">False</property>
@@ -350,6 +426,7 @@ to:</property>
               </object>
               <packing>
                 <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">0</property>
               </packing>
             </child>
@@ -359,9 +436,11 @@ to:</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
               </object>
               <packing>
                 <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">1</property>
               </packing>
             </child>
@@ -371,10 +450,12 @@ to:</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">True</property>
+                <property name="use_action_appearance">False</property>
                 <property name="image">image2</property>
               </object>
               <packing>
                 <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">2</property>
               </packing>
             </child>
@@ -384,28 +465,23 @@ to:</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="receives_default">False</property>
+                <property name="use_action_appearance">False</property>
                 <property name="draw_indicator">True</property>
               </object>
               <packing>
                 <property name="expand">False</property>
+                <property name="fill">True</property>
                 <property name="position">3</property>
               </packing>
             </child>
           </object>
           <packing>
             <property name="expand">False</property>
+            <property name="fill">True</property>
             <property name="position">1</property>
           </packing>
         </child>
       </object>
     </child>
   </object>
-  <object class="GtkImage" id="image2">
-    <property name="visible">True</property>
-    <property name="stock">gtk-delete</property>
-  </object>
-  <object class="GtkTextBuffer" id="recordingTo">
-    <property name="text" translatable="yes">/home/drewp/light9-vidref/play-light9.bigasterisk.com_show_dance2010_song6/1276582699</property>
-  </object>
-  <object class="GtkTextBuffer" id="lastLog"/>
 </interface>

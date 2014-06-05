@@ -40,7 +40,7 @@ class MusicTime(object):
         if not hasattr(self, 'position'):
             return {'t' : 0, 'song' : None}
         pos = self.position.copy()
-        if pos['playing']:
+        if pos.get('playing'):
             pos['t'] = pos['t'] + (time.time() - self.positionFetchTime)
         else:
             if self.lastHoverTime is not None:

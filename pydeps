@@ -18,3 +18,4 @@ txosc==0.2.0
 service_identity==0.2
 Pillow==2.4.0
 faulthandler==2.3
+treq==0.2.1

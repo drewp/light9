@@ -20,7 +20,7 @@ except ImportError:
         def capture_continuous(self, *a, **kw):
             for i in range(1000):
                 time.sleep(1)
-                yield i
+                yield str(i)
 
 def setCameraParams(c, arg):
     res = int(arg('res', 480))
