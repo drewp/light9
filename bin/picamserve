@@ -145,7 +145,10 @@ class Pics(cyclone.web.RequestHandler):
                 self.flush()
 
                 fpsReport.frame()
-
+            # another camera request coming in at the same time breaks
+            # the server. it would be nice if this request could
+            # let-go-and-reopen when it knows about another request
+            # coming in
             yield captureContinuousAsync(c, resize, onFrame)
         except Exception:
             traceback.print_exc()
