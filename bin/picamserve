@@ -33,7 +33,7 @@ def setCameraParams(c, arg):
     c.exposure_mode = arg('exposure_mode', 'fixedfps')
     c.awb_mode = arg('awb_mode', 'off')
     c.brightness = int(arg('brightness', 50))
-    
+    c.exposure_compensation= int(arg('exposure_compensation', 0))
     c.awb_gains = (float(arg('redgain', 1)), float(arg('bluegain', 1)))
     c.ISO = int(arg('iso', 250))
 

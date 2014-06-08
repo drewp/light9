@@ -9,11 +9,11 @@ import gobject
 gobject.threads_init()
 import gtk
 import sys, logging, optparse, json
-sys.path.append(".")
-from light9 import networking
+import cyclone.web, cyclone.httpclient, cyclone.websocket
+from light9 import networking, showconfig
 from light9.vidref.main import Gui
 from light9.vidref.replay import snapshotDir
-import cyclone.web, cyclone.httpclient, cyclone.websocket
+from light9.rdfdb.syncedgraph import SyncedGraph
 
  # find replay dirs correctly. show multiple
  # replays. trash. reorder/pin. dump takes that are too short; they're
@@ -50,11 +50,15 @@ class Snapshot(cyclone.web.RequestHandler):
 class SnapshotPic(cyclone.web.StaticFileHandler):
     pass
 
-        
-gui = Gui()
+graph = SyncedGraph("vidref")
+
+gui = Gui(graph)
 
 port = networking.vidref.port
 reactor.listenTCP(port, cyclone.web.Application(handlers=[
+    (r'/()', cyclone.web.StaticFileHandler,
+     {'path': 'light9/vidref', 'default_filename': 'vidref.html'}),
+    (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
     (r'/snapshot', Snapshot),
     (r'/snapshot/(.*)', SnapshotPic, {"path": snapshotDir()}),
     ], debug=True, gui=gui))

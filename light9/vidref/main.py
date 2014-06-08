@@ -17,7 +17,7 @@ from light9.vidref import remotepivideo
 log = logging.getLogger()
 
 class Gui(object):
-    def __init__(self):
+    def __init__(self, graph):
         wtree = gtk.Builder()
         wtree.add_from_file(sibpath(__file__, "vidref.glade"))
         mainwin = wtree.get_object("MainWindow")
@@ -51,7 +51,7 @@ class Gui(object):
                 liveVideo=vid3,
                 musicTime=self.musicTime,
                 recordingTo=self.recordingTo,
-                picsUrl=networking.picamserve.path('pics?res=1080&resize=450&x=0&y=.3&w=1&h=.5&awb_mode=auto&exposure_mode=auto'))
+                graph=graph)
 
         vid3.props.width_request = 360
         vid3.props.height_request = 220

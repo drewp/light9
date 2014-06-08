@@ -7,23 +7,34 @@ import numpy
 import treq
 from twisted.internet import defer
 from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
-from light9 import prof
+from light9 import prof, showconfig
+from light9.namespaces import L9
 from PIL import Image
 from StringIO import StringIO
 log = logging.getLogger('remotepi')
 
 class Pipeline(object):
-    def __init__(self, liveVideo, musicTime, recordingTo, picsUrl):
+    def __init__(self, liveVideo, musicTime, recordingTo, graph):
         self.musicTime = musicTime
         self.recordingTo = recordingTo
 
         self.liveVideo = self._replaceLiveVideoWidget(liveVideo)
         
-        self._startRequest(picsUrl)
-        self._buffer = ''
-
         self._snapshotRequests = []
+        self.graph = graph
+        self.graph.addHandler(self.updateCamUrl)
 
+    def updateCamUrl(self):
+        show = showconfig.showUri()
+        self.picsUrl = self.graph.value(show, L9['vidrefCamRequest'])
+        log.info("picsUrl now %r", self.picsUrl)
+        if not self.picsUrl:
+            return
+        
+        # this cannot yet survive being called a second time
+        self._startRequest(str(self.picsUrl.replace('/pic', '/pics')) +
+                           '&res=1080&resize=450')
+        
     def _replaceLiveVideoWidget(self, liveVideo):
         aspectFrame = liveVideo.get_parent()
         liveVideo.destroy()
@@ -34,6 +45,7 @@ class Pipeline(object):
         return img
         
     def _startRequest(self, url):
+        self._buffer = ''
         d = treq.get(url)
         d.addCallback(treq.collect, self._dataReceived)
         # not sure how to stop this

@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+  <head>
+    <title>vidref</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="static/tapmodo-Jcrop-1902fbc/css/jquery.Jcrop.min.css" type="text/css">
+    <style>
+     body {
+       background: black;
+       color: rgb(170, 170, 170);
+       font-family: sans-serif; 
+     }
+     a {
+       color: rgb(163, 163, 255);
+     }
+     input[type=range] { width: 400px; }
+     .smallUrl { font-size: 60%; }
+
+     .jcrop-holder {
+       position: absolute !important;
+       top: 0 !important;
+       background-color: initial !important;
+     }
+    </style>
+  </head>
+  <body>
+    <h1>video setup</h1>
+    
+    <div>Camera view</div>
+    <div>
+      <div style="position: relative; display: inline-block">
+        <img id="cam" src="pic?resize=500&awb_mode=auto&exposure_mode=auto&shutter=100000">
+        <div id="cover" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0;"></div>
+      </div>
+    </div>
+   
+    <fieldset>
+      <legend>set these</legend>
+      <div><label>shutter <input type="range" min="1" max="100000" data-bind="value: params.shutter, valueUpdate: 'input'"></label></div>
+      <div><label>brightness <span data-bind="text: params.brightness"></span> <input type="range" min="0" max="100" step="1" data-bind="value: params.brightness, valueUpdate: 'input'"></label></div>
+      <div><label>exposure_mode
+        <select data-bind="value: params.exposure_mode">
+          <option>auto</option>
+          <option>fireworks</option>
+          <option>verylong</option>
+          <option>fixedfps</option>
+          <option>backlight</option>
+          <option>antishake</option>
+          <option>snow</option>
+          <option>sports</option>
+          <option>nightpreview</option>
+          <option>night</option>
+          <option>beach</option>
+          <option>spotlight</option>
+        </select>           
+      </label></div>
+      <div><label>exposure_compensation <span data-bind="text: params.exposure_compensation"></span> <input type="range" min="-25" max="25" step="1" data-bind="value: params.exposure_compensation, valueUpdate: 'input'"></label></div>
+      <div><label>awb_mode
+        <select data-bind="value: params.awb_mode">
+          <option>horizon</option>
+          <option>off</option>
+          <option>cloudy</option>
+          <option>shade</option>
+          <option>fluorescent</option>
+          <option>tungsten</option>
+          <option>auto</option>
+          <option>flash</option>
+          <option>sunlight</option>
+          <option>incandescent</option>
+        </select>
+      </label></div>
+      <div><label>redgain <input type="range" min="0" max="8" step=".1" data-bind="value: params.redgain, valueUpdate: 'input'"></label></div>
+      <div><label>bluegain <input type="range" min="0" max="8" step=".1" data-bind="value: params.bluegain, valueUpdate: 'input'"></label></div>
+      <div><label>iso <input type="range" min="100" max="800" step="20" list="isos" data-bind="value: params.iso, valueUpdate: 'input'"></label></div>
+      <datalist id="isos">
+        <option>100</option>
+        <option>200</option>
+        <option>320</option>
+        <option>400</option>
+        <option>500</option>
+        <option>640</option>
+        <option>800</option>
+      </datalist>
+      <div>See <a href="http://picamera.readthedocs.org/en/release-1.4/api.html#picamera.PiCamera.ISO">picamera attribute docs</a></div>
+    </fieldset>
+
+    <div>Resulting url: <a class="smallUrl" data-bind="attr: {href: currentUrl}, text: currentUrl"></a></div>
+
+    <div>Resulting crop image:</div>
+    <div><img id="cropped"></div>
+
+    
+    <script src="static/knockout-3.1.0.js"></script>
+    <script src="static/jquery-2.1.1.min.js"></script>
+    <script src="static/underscore-min.js"></script>
+    <script src="static/tapmodo-Jcrop-1902fbc/js/jquery.Jcrop.js"></script>
+    <script>
+     jQuery(function () {
+       var model = {
+         baseUrl: ko.observable(),
+         crop: ko.observable({x: 0, y: 0, w: 1, h: 1}),
+         params: {
+           shutter: ko.observable(50000),
+           exposure_mode: ko.observable('auto'),
+           awb_mode: ko.observable('auto'),
+           brightness: ko.observable(50),
+           redgain: ko.observable(1),
+           bluegain: ko.observable(1),
+           iso: ko.observable(250),
+           exposure_compensation: ko.observable(0),
+         }
+       };
+       model.currentUrl = ko.computed(assembleCamUrlWithCrop);
+
+       function getBaseUrl() {
+         $.ajax({
+           url: 'picUrl',
+           success: model.baseUrl
+         });
+       }
+       
+       function imageUpdatesForever(model, img, onFirstLoad) {
+         var everLoaded = false;
+         function onLoad(ev) {
+           if (ev.type == 'load' && !everLoaded) {
+             everLoaded = true;
+             onFirstLoad();
+           }
+           
+           var src = assembleCamUrl() + '&t=' + (+new Date());
+           img.src = src;
+
+           $("#cropped").attr({src: assembleCamUrlWithCrop()});
+         }
+         img.addEventListener('load', onLoad);
+         img.addEventListener('error', onLoad);
+         
+         onLoad({type: '<startup>'})
+       }
+       
+       function assembleCamUrl() {
+         if (!model.baseUrl()) {
+           return '#';
+         }
+         return model.baseUrl() + '?resize=500&' + $.param(ko.toJS(model.params));
+       }
+       
+       function assembleCamUrlWithCrop() {
+         return assembleCamUrl() + '&' + $.param(model.crop());
+       }
+       
+       getBaseUrl();
+       
+       imageUpdatesForever(model, document.getElementById('cam'), function onFirstLoad() {
+         var crop = $('#cover').Jcrop({onChange: function (c) {
+           var size = this.getBounds();
+           model.crop({x: c.x / size[0], y: c.y / size[1], w: c.w / size[0], h: c.h / size[1]});
+         }}, function() {
+           this.setSelect([50, 50, 100, 100]);
+         });
+       });
+
+       var putVidrefCamRequest = _.debounce(
+           function(uri) {
+             $.ajax({
+               type: 'PUT',
+               url: 'vidrefCamRequest',
+               data: {uri: uri}
+             });
+           }, 1000);
+       ko.computed(function saver() {
+         var uri = assembleCamUrlWithCrop();
+         putVidrefCamRequest(uri);
+       });
+
+       ko.applyBindings(model);
+     });
+    </script>
+  </body>
+</html>
