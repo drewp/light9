@@ -37,9 +37,29 @@ class Live(cyclone.websocket.WebSocketHandler):
         log.info("got message %s" % message)
         self.sendMessage(message)
         
+class EffectsUpdates(cyclone.websocket.WebSocketHandler):
+    def connectionMade(self, *args, **kwargs):
+        self.connected = True
+        self.settings.graph.addHandler(self.onGraphChange)
+        
+    def connectionLost(self, reason):
+        self.connected = False
+        
+    def onGraphChange(self):
+        if not self.connected:
+            return
+        graph = self.settings.graph
+        classes = []
+        for e in graph.subjects(RDF.type, L9['EffectClass']):
+            classes.append({'uri': e,
+                            'label': graph.label(e),
+                            'code': graph.value(e, L9['code'])})
+        print "sendMessage", classes
+        self.sendMessage({'classes': classes})
+
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
     def get(self, path, *args, **kw):
-        if path in ['', 'chases']:
+        if path in ['', 'effects']:
             return self.respondStaticJade("light9/subserver/%s.jade" %
                                           (path or 'index'))
             
@@ -129,6 +149,7 @@ if __name__ == "__main__":
     port = 8052
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
         (r'/live', Live),
+        (r'/effectsUpdates', EffectsUpdates),
         (r'/snapshot', Snapshot),
         (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
         (r'/(.*)', Static,

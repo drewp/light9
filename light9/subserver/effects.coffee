@@ -25,14 +25,14 @@ class Model
 
 model = new Model()
 
-# this sort of works to stop clicks in <input> from following the
-# submaster hyperlink, but it may make certain clicks act wrong
-$('a').live('click', (ev) ->
-  return false if ev.target.tagName == 'INPUT'
-)
 
-reconnectingWebSocket "ws://localhost:8052/live", (msg) ->
+reconnectingWebSocket "ws://localhost:8052/effectsUpdates", (msg) ->
   model.chases(msg.chases) if msg.chases?
 
+# this sort of works to stop clicks in <input> from following the
+# submaster hyperlink, but it may make certain clicks act wrong
+$(document).on('click', 'a', (ev) ->
+  return false if ev.target.tagName == 'INPUT'
+)
 
 ko.applyBindings(model)
