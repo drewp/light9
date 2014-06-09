@@ -3,6 +3,9 @@ body {
     background: rgb(0, 0, 0);
     color: rgb(163, 163, 163);
 }
+h1 {
+    margin: 0;
+}
 h2 {
     margin: 0;
     padding: 0;
@@ -22,8 +25,8 @@ a.resource {
 .resource {
     border: 1px solid gray;
     border-radius: 5px;
-    padding: 5px;
-    margin: 5px;
+    padding: 1px;
+    margin: 2px;
     background: rgb(66, 66, 66);
     display: block;
 }
@@ -40,7 +43,7 @@ a.resource {
 .sub img {
     width: 196px;
     min-height: 40px;
-    margin: 6px;
+    margin: 0 6px;
     background: -webkit-gradient(linear,right top,left bottom,color-stop(0,rgb(121, 120, 120)),color-stop(1,rgb(54, 54, 54)));
 }
 
@@ -56,4 +59,8 @@ input[type=text] {
 }
 .chase {
     background: rgb(75, 57, 72);
+}
+
+a button {
+    font-size: 60%;
 }

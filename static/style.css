@@ -3,7 +3,9 @@ body {
     color: white;
     font-family: sans-serif;
 }
-
+h1 {
+    margin: 0;
+}
 
 a {
 color: rgb(97, 97, 255);
