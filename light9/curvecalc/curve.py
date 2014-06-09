@@ -2,12 +2,11 @@ from __future__ import division
 import glob, time, logging, ast, os
 from bisect import bisect_left,bisect
 import louie as dispatcher
+from twisted.internet import reactor
 from rdflib import Literal
 from light9 import showconfig
 from light9.namespaces import L9, RDF, RDFS
 from light9.rdfdb.patch import Patch
-
-from bcf2000 import BCF2000
 
 log = logging.getLogger()
 # todo: move to config, consolidate with ascoltami, musicPad, etc
@@ -98,6 +97,7 @@ class Curve(object):
         i = bisect(self.points, (new_pt[0],None))
         self.points.insert(i,new_pt)
         # missing a check that this isn't the same X as the neighbor point
+        dispatcher.send("points changed", sender=self)
         return i
 
     def live_input_point(self, new_pt, clear_ahead_secs=.01):
@@ -112,7 +112,11 @@ class Curve(object):
     def set_points(self, updates):
         for i, pt in updates:
             self.points[i] = pt
+
+        #self.checkOverlap()
+        dispatcher.send("points changed", sender=self)
             
+    def checkOverlap(self):
         x = None
         for p in self.points:
             if p[0] <= x:
@@ -120,10 +124,13 @@ class Curve(object):
             x = p[0]
 
     def pop_point(self, i):
-        return self.points.pop(i)
+        p = self.points.pop(i)
+        dispatcher.send("points changed", sender=self)
+        return p
             
     def remove_point(self, pt):
         self.points.remove(pt)
+        dispatcher.send("points changed", sender=self)
             
     def indices_between(self, x1, x2, beyond=0):
         leftidx = max(0, bisect(self.points, (x1,None)) - beyond)
@@ -153,6 +160,7 @@ class CurveResource(object):
     holds a Curve, deals with graphs
     """
     def __init__(self, graph, uri):
+        # probably newCurve and loadCurve should be the constructors instead.
         self.graph, self.uri = graph, uri
 
     def curvePointsContext(self):
@@ -163,6 +171,9 @@ class CurveResource(object):
         Save type/label for a new :Curve resource.
         Pass the ctx where the main curve data (not the points) will go.
         """
+        if hasattr(self, 'curve'):
+            raise ValueError('CurveResource already has a curve %r' %
+                             self.curve)
         self.graph.patch(Patch(addQuads=[
             (self.uri, RDF.type, L9['Curve'], ctx),
             (self.uri, RDFS.label, label, ctx),
@@ -170,11 +181,19 @@ class CurveResource(object):
         self.curve = Curve(self.uri)
         self.curve.points.extend([(0, 0)])
         self.saveCurve()
+        self.watchChanges()
         
     def loadCurve(self):
-        pts = self.graph.value(self.uri, L9['points'])
+        if hasattr(self, 'curve'):
+            raise ValueError('CurveResource already has a curve %r' %
+                             self.curve)
+        pointsFile = self.graph.value(self.uri, L9['pointsFile'])
         self.curve = Curve(self.uri,
-                           pointsStorage='file' if pts is None else 'graph')
+                           pointsStorage='file' if pointsFile else 'graph')
+        self.graph.addHandler(self.pointsFromGraph)
+        
+    def pointsFromGraph(self):
+        pts = self.graph.value(self.uri, L9['points'])
         if pts is not None:
             self.curve.set_from_string(pts)
         else:
@@ -183,8 +202,10 @@ class CurveResource(object):
                 self.curve.load(os.path.join(showconfig.curvesDir(), diskPts))
             else:
                 log.warn("curve %s has no points", self.uri)
+        self.watchCurvePointChanges()
 
     def saveCurve(self):
+        self.pendingSave = None
         for p in self.getSavePatches():
             self.graph.patch(p)
 
@@ -202,6 +223,24 @@ class CurveResource(object):
         else:
             raise NotImplementedError(self.curve.pointsStorage)
 
+    def watchCurvePointChanges(self):
+        """start watching and saving changes to the graph"""
+        dispatcher.connect(self.onChange, 'points changed', sender=self.curve)
+        
+    def onChange(self):
+
+        # Don't write a patch for the edited curve points until they've been
+        # stable for this long. This can be very short, since it's just to
+        # stop a 100-point edit from sending many updates. If it's too long,
+        # you won't see output lights change while you drag a point.  Todo:
+        # this is just the wrong timing algorithm- it should be a max rate,
+        # not a max-hold-still-time.
+        HOLD_POINTS_GRAPH_COMMIT_SECS = .1
+        
+        if getattr(self, 'pendingSave', None):
+            self.pendingSave.cancel()
+        self.pendingSave = reactor.callLater(HOLD_POINTS_GRAPH_COMMIT_SECS,
+                                             self.saveCurve)
         
 class Markers(Curve):
     """Marker is like a point but the y value is a string"""
@@ -214,54 +253,20 @@ def slope(p1,p2):
         return 0
     return (p2[1] - p1[1]) / (p2[0] - p1[0])
 
-
-class Sliders(BCF2000):
-    def __init__(self, cb, knobCallback, knobButtonCallback):
-        BCF2000.__init__(self)
-        self.cb = cb
-        self.knobCallback = knobCallback
-        self.knobButtonCallback = knobButtonCallback
-    def valueIn(self, name, value):
-        if name.startswith("slider"):
-            self.cb(int(name[6:]), value / 127)
-        if name.startswith("knob"):
-            self.knobCallback(int(name[4:]), value / 127)
-        if name.startswith("button-knob"):
-            self.knobButtonCallback(int(name[11:]))
-
-        
+       
 class Curveset(object):
-    curves = None # curvename : curve
-    def __init__(self, graph, session, sliders=False):
-        """sliders=True means support the hardware sliders"""
+    def __init__(self, graph, session):
         self.graph, self.session = graph, session
 
         self.currentSong = None
-        self.curves = {} # name (str) : Curve
-        self.curveName = {} # reverse
+        self.curveResources = {} # uri : CurveResource
         
-        self.sliderCurve = {} # slider number (1 based) : curve name
-        self.sliderNum = {} # reverse
-        if sliders:
-            self.sliders = Sliders(self.hw_slider_in, self.hw_knob_in, 
-                                   self.hw_knob_button)
-            dispatcher.connect(self.curvesToSliders, "curves to sliders")
-            dispatcher.connect(self.knobOut, "knob out")
-            self.lastSliderTime = {} # num : time
-            self.sliderSuppressOutputUntil = {} # num : time
-            self.sliderIgnoreInputUntil = {}
-        else:
-            self.sliders = None
         self.markers = Markers(uri=None, pointsStorage='file')
 
         graph.addHandler(self.loadCurvesForSong)
 
     def curveFromUri(self, uri):
-        # self.curves should be indexed by this
-        for c in self.curves.values():
-            if c.uri == uri:
-                return c
-        raise KeyError("no curve %s" % uri)
+        return self.curveResources[uri].curve
 
     def loadCurvesForSong(self):
         """
@@ -271,10 +276,7 @@ class Curveset(object):
         """
         log.info('loadCurvesForSong')
         dispatcher.send("clear_curves")
-        self.curves.clear()
-        self.curveName.clear()
-        self.sliderCurve.clear()
-        self.sliderNum.clear()
+        self.curveResources.clear()
         self.markers = Markers(uri=None, pointsStorage='file')
         
         self.currentSong = self.graph.value(self.session, L9['currentSong'])
@@ -283,14 +285,14 @@ class Curveset(object):
 
         for uri in sorted(self.graph.objects(self.currentSong, L9['curve'])):
             try:
-                cr = CurveResource(self.graph, uri)
+                cr = self.curveResources[uri] = CurveResource(self.graph, uri)
                 cr.loadCurve()
 
                 curvename = self.graph.label(uri)
                 if not curvename:
                     raise ValueError("curve %r has no label" % uri)
-                self.add_curve(curvename, cr.curve)
-
+                dispatcher.send("add_curve", sender=self,
+                                uri=uri, label=curvename, curve=cr.curve)
             except Exception as e:
                 log.error("loading %s failed: %s", uri, e)
                 
@@ -310,46 +312,29 @@ class Curveset(object):
             showconfig.songFilenameFromURI(self.currentSong))
 
         patches = []
-        for label, curve in self.curves.items():
-            cr = CurveResource(self.graph, curve.uri)
-            cr.curve = curve
+        for cr in self.curveResources.values():
             patches.extend(cr.getSavePatches())
 
         self.markers.save("%s.markers" % basename)
-        # this will cause reloads that will clear our curve list
+        # this will cause reloads that will rebuild our curve list
         for p in patches:
             self.graph.patch(p)
             
     def sorter(self, name):
         return self.curves[name].uri
         
-    def curveNamesInOrder(self):
-        return sorted(self.curves.keys(), key=self.sorter)
-            
-    def add_curve(self, name, curve):
-        # should be indexing by uri
-        if isinstance(name, Literal):
-            name = str(name) 
-        if name in self.curves:
-            raise ValueError("can't add a second curve named %r" % name)
-        self.curves[name] = curve
-        self.curveName[curve] = name
+    def curveUrisInOrder(self):
+        return sorted(self.curveResources.keys())
 
-        if self.sliders and name not in ['smooth_music', 'music']:
-            num = len(self.sliderCurve) + 1
-            if num <= 8:
-                self.sliderCurve[num] = name
-                self.sliderNum[name] = num
-            else:
-                num = None
-        else:
-            num = None
-            
-        dispatcher.send("add_curve", slider=num, knobEnabled=num is not None,
-                        sender=self, name=name)
-
+    def currentCurves(self):
+        # deprecated
+        for uri, cr in sorted(self.curveResources.items()):
+            with self.graph.currentState(
+                    tripleFilter=(uri, RDFS['label'], None)) as g:
+                yield uri, g.label(uri), cr.curve
+        
     def globalsdict(self):
-        return self.curves.copy()
+        raise NotImplementedError('subterm used to get a dict of name:curve')
     
     def get_time_range(self):
         return 0, dispatcher.send("get max time")[0][1]
@@ -367,7 +352,7 @@ class Curveset(object):
 
         uri = self.graph.sequentialUri(self.currentSong + '/curve-')
 
-        cr = CurveResource(self.graph, uri)
+        cr = self.curveResources[uri] = CurveResource(self.graph, uri)
         cr.newCurve(ctx=self.currentSong, label=Literal(name))
         s, e = self.get_time_range()
         cr.curve.points.extend([(s, 0), (e, 0)])
@@ -378,55 +363,3 @@ class Curveset(object):
             ]))
         cr.saveCurve()
 
-    def hw_slider_in(self, num, value):
-        try:
-            curve = self.curves[self.sliderCurve[num]]
-        except KeyError:
-            return
-
-        now = time.time()
-        if now < self.sliderIgnoreInputUntil.get(num):
-            return
-        # don't make points too fast. This is the minimum spacing
-        # between slider-generated points.
-        self.sliderIgnoreInputUntil[num] = now + .1
-        
-        # don't push back on the slider for a little while, since the
-        # user might be trying to slowly move it. This should be
-        # bigger than the ignore time above.
-        self.sliderSuppressOutputUntil[num] = now + .2
-        
-        dispatcher.send("set key", curve=curve, value=value)
-
-    def hw_knob_in(self, num, value):
-        try:
-            curve = self.curves[self.sliderCurve[num]]
-        except KeyError:
-            return
-        dispatcher.send("knob in", curve=curve, value=value)
-
-    def hw_knob_button(self, num):
-        try:
-            curve = self.curves[self.sliderCurve[num]]
-        except KeyError:
-            return
-
-        dispatcher.send("set key", curve=curve)
-        
-
-    def curvesToSliders(self, t):
-        now = time.time()
-        for num, name in self.sliderCurve.items():
-            if now < self.sliderSuppressOutputUntil.get(num):
-                continue
-#            self.lastSliderTime[num] = now
-            
-            value = self.curves[name].eval(t)
-            self.sliders.valueOut("slider%s" % num, value * 127)
-
-    def knobOut(self, curve, value):
-        try:
-            num = self.sliderNum[self.curveName[curve]]
-        except KeyError:
-            return
-        self.sliders.valueOut("knob%s" % num, value * 127)

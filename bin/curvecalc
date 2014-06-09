@@ -449,7 +449,7 @@ def launch(args, graph, session, opts, startTime, music):
     except IndexError:
         pass
 
-    curveset = Curveset(graph=graph, session=session, sliders=opts.sliders)
+    curveset = Curveset(graph=graph, session=session)
         
     log.debug("startup: output %s", time.time() - startTime)
 
@@ -484,8 +484,6 @@ def main():
     startTime = time.time()
     parser = optparse.OptionParser()
     parser.set_usage("%prog [opts] [songURI]")
-    parser.add_option("--sliders", action='store_true',
-                      help='use hardware sliders')
     parser.add_option("--debug", action="store_true",
                       help="log at DEBUG")
     parser.add_option("--reload", action="store_true",

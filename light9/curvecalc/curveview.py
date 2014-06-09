@@ -526,7 +526,6 @@ class Curveview(object):
         if idx is not None:
             pos = self.curve.points[idx]
             self.curve.set_points([(idx, (pos[0], value))])
-            self.update_curve()
 
     def slider_in(self, curve, value=None):
         """user pushed on a slider. make a new key.  if value is None,
@@ -538,7 +537,6 @@ class Curveview(object):
             value = self.curve.eval(self.current_time())
 
         self.curve.insert_pt((self.current_time(), value))
-        self.update_curve()
 
     def print_state(self, msg=""):
         if 0:
@@ -599,7 +597,6 @@ class Curveview(object):
 
     def setPoints(self, updates):
         self.curve.set_points(updates)
-        self.update_curve()
         
     def selectionChanged(self):
         if self.selectManip:
@@ -930,7 +927,6 @@ class Curveview(object):
 
     def add_points(self, pts):
         idxs = [self.curve.insert_pt(p) for p in pts]
-        self.update_curve()
         self.select_indices(idxs)
         
     def add_point(self, p):
@@ -938,7 +934,6 @@ class Curveview(object):
 
     def add_marker(self, p):
         self.markers.insert_pt(p)
-        self.update_curve()
         
     def remove_point_idx(self, *idxs):
         idxs = list(idxs)
@@ -963,8 +958,6 @@ class Curveview(object):
             self.select_indices(newsel)
             idxs[:] = newidxs
             
-        self.update_curve()
-
     def highlight_selected_dots(self):
         if not self.redrawsEnabled:
             return
@@ -1020,10 +1013,8 @@ class Curveview(object):
             delta = 0,0
         self.last_mouse_world = cur
 
-        moved = self.translate_points(delta)
+        self.translate_points(delta)
         
-        if moved:
-            self.update_curve()
 
     def translate_points(self, delta):
         moved = False
@@ -1079,7 +1070,7 @@ class CurveRow(object):
 
     please pack self.box
     """
-    def __init__(self, graph, name, curve, markers, slider, knobEnabled, zoomControl):
+    def __init__(self, graph, name, curve, markers, zoomControl):
         self.graph = graph
         self.name = name
         self.box = Gtk.Box.new(Gtk.Orientation.VERTICAL, 0)
@@ -1092,9 +1083,9 @@ class CurveRow(object):
         controls.set_size_request(160, -1)
         controls.set_shadow_type(Gtk.ShadowType.OUT)
         self.cols.pack_start(controls, expand=False, fill=True, padding=0)
-        self.setupControls(controls, name, curve, slider)
+        self.setupControls(controls, name, curve)
 
-        self.curveView = Curveview(curve, markers, knobEnabled=knobEnabled,
+        self.curveView = Curveview(curve, markers,
                                    isMusic=name in ['music', 'smooth_music'],
                                    zoomControl=zoomControl)
         
@@ -1125,7 +1116,7 @@ class CurveRow(object):
         # the event watcher wasn't catching these
         reactor.callLater(.5, self.curveView.update_curve)
         
-    def setupControls(self, controls, name, curve, slider):
+    def setupControls(self, controls, name, curve):
         box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
         controls.add(box)
 
@@ -1141,13 +1132,6 @@ class CurveRow(object):
         self.muted = Gtk.CheckButton("M")
         self.muted.connect("toggled", self.sync_mute_to_curve)
         dispatcher.connect(self.mute_changed, 'mute changed', sender=curve)
-
-        self.sliderLabel = None
-        if slider is not None:
-            # slider should have a checkbutton, defaults to off for
-            # music tracks
-            self.sliderLabel = Gtk.Label("Slider %s" % slider)
-            box.pack_start(self.sliderLabel, expand=True, fill=True, padding=0)
 
         box.pack_start(curve_name_label, expand=True, fill=True, padding=0)
         box.pack_start(self.muted, expand=True, fill=True, padding=0)
@@ -1192,9 +1176,9 @@ class Curvesetview(object):
 
         self.zoomControl = self.initZoomControl(zoomControlBox)
         self.zoomControl.redrawzoom()
-        
-        for c in curveset.curveNamesInOrder():
-            self.add_curve(c) 
+
+        for uri, label, curve in curveset.currentCurves():
+            self.add_curve(uri, label, curve) 
 
         dispatcher.connect(self.clear_curves, "clear_curves")
         dispatcher.connect(self.add_curve, "add_curve", sender=self.curveset)
@@ -1270,12 +1254,12 @@ class Curvesetview(object):
         self.curveset.new_curve(self.newcurvename.get())
         self.newcurvename.set('')
         
-    def add_curve(self, name, slider=None, knobEnabled=False):
-        if isinstance(name, Literal):
-            name = str(name)
-        curve = self.curveset.curves[name]
-        f = CurveRow(self.graph, name, curve, self.curveset.markers,
-                     slider, knobEnabled, self.zoomControl)
+    def add_curve(self, uri, label, curve):
+        if isinstance(label, Literal):
+            label = str(label)
+
+        f = CurveRow(self.graph, label, curve, self.curveset.markers,
+                     self.zoomControl)
         self.curvesVBox.pack_start(f.box, expand=True, fill=True, padding=0)
         f.box.show_all()
         self.allCurveRows.add(f)
