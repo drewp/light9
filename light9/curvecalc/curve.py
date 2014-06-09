@@ -113,6 +113,8 @@ class Curve(object):
         for i, pt in updates:
             self.points[i] = pt
 
+        # this should be on, but live_input_point made it fail a
+        # lot. need a new solution.
         #self.checkOverlap()
         dispatcher.send("points changed", sender=self)
             
