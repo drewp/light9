@@ -53,7 +53,7 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             (song, L9['effect'], effect, ctx),
             (effect, RDF.type, L9['Effect'], ctx),
             (effect, L9['code'],
-             Literal('out = sub(%s, intensity=%s)' % (dropped.n3(), curve.n3())),
+             Literal('out = %s * %s' % (dropped.n3(), curve.n3())),
              ctx),
             ]))
         
@@ -102,13 +102,15 @@ class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
     def put(self):
         effect = URIRef(self.get_argument('uri'))
         code = Literal(self.get_argument('code'))
-        with self.settings.graph.currentState(tripleFilter=(None, L9['effect'], effect)) as g:
+        with self.settings.graph.currentState(
+                tripleFilter=(None, L9['effect'], effect)) as g:
             song = g.subjects(L9['effect'], effect).next()
         self.settings.graph.patchObject(
             context=song,
             subject=effect,
             predicate=L9['code'],
             newObject=code)
+        # right here we could tell if the code has a python error and return it
         self.send_error(202)
         
 class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):

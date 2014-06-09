@@ -22,7 +22,8 @@ class Curve(object):
         self._muted = False
 
     def __repr__(self):
-        return "<%s (%s points)>" % (self.__class__.__name__, len(self.points))
+        return "<%s %s (%s points)>" % (self.__class__.__name__, self.uri,
+                                        len(self.points))
 
     def muted():
         doc = "Whether to currently send levels (boolean, obviously)"
@@ -183,7 +184,7 @@ class CurveResource(object):
         self.curve = Curve(self.uri)
         self.curve.points.extend([(0, 0)])
         self.saveCurve()
-        self.watchChanges()
+        self.watchCurvePointChanges()
         
     def loadCurve(self):
         if hasattr(self, 'curve'):
@@ -192,7 +193,11 @@ class CurveResource(object):
         pointsFile = self.graph.value(self.uri, L9['pointsFile'])
         self.curve = Curve(self.uri,
                            pointsStorage='file' if pointsFile else 'graph')
-        self.graph.addHandler(self.pointsFromGraph)
+        if hasattr(self.graph, 'addHandler'):
+            self.graph.addHandler(self.pointsFromGraph)
+        else:
+            # given a currentState graph
+            self.pointsFromGraph()
         
     def pointsFromGraph(self):
         pts = self.graph.value(self.uri, L9['points'])

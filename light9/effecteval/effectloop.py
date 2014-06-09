@@ -1,3 +1,4 @@
+from __future__ import division
 import time, json, logging, traceback
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -19,6 +20,7 @@ class EffectLoop(object):
         self.currentEffects = []
         self.lastLogTime = 0
         self.lastLogMsg = ""
+        self.lastErrorLog = 0
         self.graph.addHandler(self.setEffects)
         self.period = 1 / 30
         self.coastSecs = .3 # main reason to keep this low is to notice play/pause
@@ -73,7 +75,12 @@ class EffectLoop(object):
                     try:
                         outSubs.append(e.eval(songTime))
                     except Exception as exc:
-                        log.error("effect %s: %s" % (e.uri, exc))
+                        now = time.time()
+                        if now > self.lastErrorLog + 5:
+                            log.error("effect %s: %s" % (e.uri, exc))
+                            log.error("  expr: %s", e.code.expr)
+                            log.error("  resources: %r", e.resourcesAsPython())
+                            self.lastErrorLog = now
                 out = Submaster.sub_maxes(*outSubs)
 
                 self.logLevels(t1, out)

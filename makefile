@@ -1,10 +1,10 @@
-NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch"
+NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect"
 
 tests:
 	eval env/bin/nosetests -x $(NOSEARGS)
 
 tests_watch:
-	eval env/bin/nosetests --with-watch $(NOSEARGS)
+	eval env/bin/nosetests --with-watcher $(NOSEARGS)
 
 
 # needed packages: python-gtk2 python-imaging

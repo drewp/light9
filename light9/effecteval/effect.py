@@ -1,9 +1,9 @@
-from run_local import log
-import re
+import re, logging
 from rdflib import URIRef
-from light9.namespaces import L9
-from light9.curvecalc.curve import Curve
+from light9.namespaces import L9, RDF
+from light9.curvecalc.curve import CurveResource
 from light9 import Submaster
+log = logging.getLogger('effect')
 
 def uriFromCode(s):
     # i thought this was something a graph could do with its namespace manager
@@ -15,6 +15,46 @@ def uriFromCode(s):
         return URIRef(s[1:-1])
     raise NotImplementedError
 
+# consider http://waxeye.org/ for a parser that can be used in py and js
+
+class CodeLine(object):
+    """code string is immutable"""
+    def __init__(self, graph, code):
+        self.graph, self.code = graph, code
+
+        self.outName, self.expr, self.resources = self._asPython()
+
+    def _asPython(self):
+        """
+        out = sub(<uri1>, intensity=<curveuri2>)
+        becomes
+          'out',
+          'sub(_u1, intensity=curve(_u2, t))',
+          {'_u1': URIRef('uri1'), '_u2': URIRef('uri2')}
+        """
+        lname, expr = [s.strip() for s in self.code.split('=', 1)]
+        self.uriCounter = 0
+        resources = {}
+
+        def alreadyInCurveFunc(s, i):
+            prefix = 'curve('
+            return i >= len(prefix) and s[i-len(prefix):i] == prefix
+
+        def repl(m):
+            v = '_res%s' % self.uriCounter
+            self.uriCounter += 1
+            r = resources[v] = URIRef(m.group(1))
+            if self._uriIsCurve(r):
+                if not alreadyInCurveFunc(m.string, m.start()):
+                    return 'curve(%s, t)' % v
+            return v
+        outExpr = re.sub(r'<(http\S*?)>', repl, expr)
+        return lname, outExpr, resources
+
+    def _uriIsCurve(self, uri):
+        # this result could vary with graph changes (rare)
+        return self.graph.contains((uri, RDF.type, L9['Curve']))
+        
 class EffectNode(object):
     def __init__(self, graph, uri):
         self.graph, self.uri = graph, uri
@@ -22,28 +62,51 @@ class EffectNode(object):
         self.graph.addHandler(self.prepare)
 
     def prepare(self):
-        self.code = self.graph.value(self.uri, L9['code'])
-        if self.code is None:
+        log.info("prepare effect %s", self.uri)
+        # maybe there can be multiple lines of code as multiple
+        # objects here, and we sort them by dependencies
+        codeStr = self.graph.value(self.uri, L9['code'])
+        if codeStr is None:
             raise ValueError("effect %s has no code" % self.uri)
-        m = re.match(r'^out = sub\((.*?), intensity=(.*?)\)', self.code)
-        if not m:
-            raise NotImplementedError
-        subUri = uriFromCode(m.group(1))
-        subs = Submaster.get_global_submasters(self.graph)
-        self.sub = subs.get_sub_by_uri(subUri)
+
+        self.code = CodeLine(self.graph, codeStr)
+
+        self.resourceMap = self.resourcesAsPython()
         
-        intensityCurve = uriFromCode(m.group(2))
-        self.curve = Curve(uri=intensityCurve)
+    def resourcesAsPython(self):
+        """
+        mapping of the local names for uris in the code to high-level
+        objects (Submaster, Curve)
+        """
+        out = {}
+        subs = Submaster.get_global_submasters(self.graph)
+        for localVar, uri in self.code.resources.items():
+            for rdfClass in self.graph.objects(uri, RDF.type):
+                if rdfClass == L9['Curve']:
+                    cr = CurveResource(self.graph, uri)
+                    cr.loadCurve()
+                    out[localVar] = cr.curve
+                elif rdfClass == L9['Submaster']:
+                    out[localVar] = subs.get_sub_by_uri(uri)
+                else:
+                    out[localVar] = uri
 
-        pts = self.graph.value(intensityCurve, L9['points'])
-        if pts is None:
-            log.info("curve %r has no points" % intensityCurve)
-        else:
-            self.curve.set_from_string(pts)
-
+        return out
         
     def eval(self, songTime):
-        # consider http://waxeye.org/ for a parser that can be used in py and js
-        level = self.curve.eval(songTime)
-        scaledSubs = self.sub * level
-        return scaledSubs
+        ns = {'t': songTime}
+
+        ns.update(dict(
+            curve=lambda c, t: c.eval(t),
+            ))
+        # loop over lines in order, merging in outputs 
+        # merge in named outputs from previous lines
+        
+        ns.update(self.resourceMap)
+        return eval(self.code.expr, ns)
+
+
+class GraphAwareFunction(object):
+    def __init__(self, graph):
+        self.graph = graph
+
