@@ -36,7 +36,7 @@ log.addHandler(CSH(show_hostname=False, show_name=True))
 
 
 def setTerminalTitle(s):
-    if os.environ.get('TERM', '') in ['xterm']:
+    if os.environ.get('TERM', '') in ['xterm', 'rxvt']:
         print "\033]0;%s\007" % s # not escaped/protected correctly
 
 if 'listsongs' not in sys.argv[0]:
