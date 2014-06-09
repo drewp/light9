@@ -97,7 +97,19 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
     def messageReceived(self, message):
         log.info("got message %s" % message)
         # write a patch back to the graph
-        
+
+class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def put(self):
+        effect = URIRef(self.get_argument('uri'))
+        code = Literal(self.get_argument('code'))
+        with self.settings.graph.currentState(tripleFilter=(None, L9['effect'], effect)) as g:
+            song = g.subjects(L9['effect'], effect).next()
+        self.settings.graph.patchObject(
+            context=song,
+            subject=effect,
+            predicate=L9['code'],
+            newObject=code)
+        self.send_error(202)
         
 class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
     @inlineCallbacks
@@ -148,6 +160,7 @@ class App(object):
             (r'/effect\.js', StaticCoffee, {'src': 'light9/effecteval/effect.coffee'}),
             (r'/index\.js', StaticCoffee, {'src': 'light9/effecteval/index.coffee'}),
             (r'/effectUpdates', EffectUpdates),
+            (r'/code', Code),
             (r'/songEffectsUpdates', SongEffectsUpdates),
             (r'/static/(.*)', SFH, {'path': 'static/'}),
             (r'/effect/eval', EffectEval),
