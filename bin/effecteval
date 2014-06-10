@@ -104,8 +104,12 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
     def updateClient(self):
         # todo: if client has dropped, abort and don't get any more
         # graph updates
-        self.sendMessage({'codeLines':
-                          list(self.graph.objects(self.uri, L9['code']))})
+
+        # EffectNode knows how to put them in order. Somehow this is
+        # not triggering an update when the order changes.
+        en = EffectNode(self.graph, self.uri)
+        codeLines = [c.code for c in en.codes]
+        self.sendMessage({'codeLines': codeLines})
         
     def connectionLost(self, reason):
         log.info("websocket closed")

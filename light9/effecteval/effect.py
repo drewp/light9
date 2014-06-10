@@ -1,4 +1,5 @@
 import re, logging
+import toposort
 from rdflib import URIRef
 from light9.namespaces import L9, RDF
 from light9.curvecalc.curve import CurveResource
@@ -22,8 +23,9 @@ class CodeLine(object):
     def __init__(self, graph, code):
         self.graph, self.code = graph, code
 
-        self.outName, self.expr, self.resources = self._asPython()
+        self.outName, self.inExpr, self.expr, self.resources = self._asPython()
         self.pyResources = self._resourcesAsPython(self.resources)
+        self.possibleVars = self.findVars(self.inExpr)
 
     def _asPython(self):
         """
@@ -50,8 +52,15 @@ class CodeLine(object):
                     return 'curve(%s, t)' % v
             return v
         outExpr = re.sub(r'<(http\S*?)>', repl, expr)
-        return lname, outExpr, resources
+        return lname, expr, outExpr, resources
 
+    def findVars(self, expr):
+        """may return some more strings than just the vars"""
+        withoutUris = re.sub(r'<(http\S*?)>', 'None', expr)
+        tokens = set(re.findall(r'\b([a-zA-Z_]\w*)\b', withoutUris))
+        tokens.discard('None')
+        return tokens
+        
     def _uriIsCurve(self, uri):
         # this result could vary with graph changes (rare)
         return self.graph.contains((uri, RDF.type, L9['Curve']))
@@ -92,8 +101,21 @@ class EffectNode(object):
 
         self.codes = [CodeLine(self.graph, s) for s in codeStrs]
 
+        self.sortCodes()
+        
         self.otherFuncs = Effects.configExprGlobals()
-                
+
+    def sortCodes(self):
+        """put self.codes in a working evaluation order"""
+        codeFromOutput = dict((c.outName, c) for c in self.codes)
+        deps = {}
+        for c in self.codes:
+            outName = c.outName
+            inNames = c.possibleVars.intersection(codeFromOutput.keys())
+            inNames.discard(outName)
+            deps[outName] = inNames
+        self.codes = [codeFromOutput[n] for n in toposort.toposort_flatten(deps)]
+        
     def eval(self, songTime):
         ns = {'t': songTime}
         ns.update(self.otherFuncs)
@@ -101,13 +123,13 @@ class EffectNode(object):
         ns.update(dict(
             curve=lambda c, t: c.eval(t),
             ))
-        # loop over lines in order, merging in outputs 
-        # merge in named outputs from previous lines
 
         for c in self.codes:
             codeNs = ns.copy()
             codeNs.update(c.pyResources)
-            if c.outName == 'out':
-                out = eval(c.expr, codeNs)
-        return out
+            lineOut = eval(c.expr, codeNs)
+            ns[c.outName] = lineOut
+        if 'out' not in ns:
+            log.error("ran code for %s, didn't make an 'out' value", self.uri)
+        return ns['out']
 

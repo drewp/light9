@@ -21,3 +21,5 @@ Pillow==2.4.0
 faulthandler==2.3
 treq==0.2.1
 mock==1.0.1
+toposort==1.0
+
