@@ -81,6 +81,14 @@
         <option>640</option>
         <option>800</option>
       </datalist>
+      <div><label>rotation
+        <select data-bind="value: params.rotation">
+          <option>0</option>
+          <option>90</option>
+          <option>180</option>
+          <option>270</option>
+        </select>
+      </label></div>
       <div>See <a href="http://picamera.readthedocs.org/en/release-1.4/api.html#picamera.PiCamera.ISO">picamera attribute docs</a></div>
     </fieldset>
 
@@ -108,6 +116,7 @@
            bluegain: ko.observable(1),
            iso: ko.observable(250),
            exposure_compensation: ko.observable(0),
+           rotation: ko.observable(0),
          }
        };
        model.currentUrl = ko.computed(assembleCamUrlWithCrop);

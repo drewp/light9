@@ -36,6 +36,7 @@ def setCameraParams(c, arg):
     c.exposure_compensation= int(arg('exposure_compensation', 0))
     c.awb_gains = (float(arg('redgain', 1)), float(arg('bluegain', 1)))
     c.ISO = int(arg('iso', 250))
+    c.rotation = int(arg('rotation', '0'))
 
 def setupCrop(c, arg):
     c.crop = (float(arg('x', 0)), float(arg('y', 0)),
