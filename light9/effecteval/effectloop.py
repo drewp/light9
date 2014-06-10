@@ -79,7 +79,8 @@ class EffectLoop(object):
                         if now > self.lastErrorLog + 5:
                             log.error("effect %s: %s" % (e.uri, exc))
                             log.error("  expr: %s", e.code.expr)
-                            log.error("  resources: %r", e.resourcesAsPython())
+                            log.error("  resources: %r",
+                                      getattr(e, 'resourceMap', '?'))
                             self.lastErrorLog = now
                 out = Submaster.sub_maxes(*outSubs)
 

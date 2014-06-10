@@ -4,7 +4,7 @@ from run_local import log
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-import sys, optparse, logging, subprocess, json, time, traceback
+import sys, optparse, logging, subprocess, json, time, traceback, itertools
 from rdflib import URIRef, Literal
 
 sys.path.append(".")
@@ -39,24 +39,39 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
         ctx = song
         graph = self.settings.graph
         effect = graph.sequentialUri(song + "/effect-")
-        curve = graph.sequentialUri(song + "/curve-")
-
-        with graph.currentState(
-                tripleFilter=(dropped, RDFS.label, None)) as g:
-            droppedSubLabel = g.label(dropped)
-            
-        cr = CurveResource(graph, curve)
-        cr.newCurve(ctx, label=Literal('sub %s' % droppedSubLabel))
-        cr.saveCurve()
-        graph.patch(Patch(addQuads=[
-            (song, L9['curve'], curve, ctx),
+        quads = [
             (song, L9['effect'], effect, ctx),
             (effect, RDF.type, L9['Effect'], ctx),
-            (effect, L9['code'],
-             Literal('out = %s * %s' % (dropped.n3(), curve.n3())),
-             ctx),
-            ]))
-        
+        ]
+
+        with graph.currentState(
+                tripleFilter=(dropped, None, None)) as g:
+            droppedTypes = g.objects(dropped, RDF.type)
+            droppedLabel = g.label(dropped)
+            droppedCodes = g.objects(dropped, L9['code'])
+
+        if L9['EffectClass'] in droppedTypes:
+            quads.extend([
+                (effect, RDFS.label, droppedLabel, ctx),
+                (effect, RDF.type, dropped, ctx),
+                ] + [(effect, L9['code'], c, ctx) for c in droppedCodes])
+        elif L9['Curve'] in droppedTypes:
+            curve = graph.sequentialUri(song + "/curve-")
+            cr = CurveResource(graph, curve)
+            cr.newCurve(ctx, label=Literal('sub %s' % droppedLabel))
+            cr.saveCurve()
+            quads.extend([
+                (song, L9['curve'], curve, ctx),                
+                (effect, L9['code'],
+                 Literal('out = %s * %s' % (dropped.n3(), curve.n3())),
+                 ctx),
+                ])
+        else:
+            raise NotImplementedError(
+                "don't know how to add an effect from %r (types=%r)" %
+                (dropped, droppedTypes))
+            
+        graph.patch(Patch(addQuads=quads))
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
     def connectionMade(self, *args, **kwargs):
@@ -89,7 +104,8 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
     def updateClient(self):
         # todo: if client has dropped, abort and don't get any more
         # graph updates
-        self.sendMessage({'code': self.graph.value(self.uri, L9['code'])})
+        self.sendMessage({'codeLines':
+                          list(self.graph.objects(self.uri, L9['code']))})
         
     def connectionLost(self, reason):
         log.info("websocket closed")
@@ -98,18 +114,41 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
         log.info("got message %s" % message)
         # write a patch back to the graph
 
+def replaceObjects(graph, c, s, p, newObjs):
+    patch = graph.getObjectPatch(
+        context=c,
+        subject=s,
+        predicate=p,
+        newObject=newObjs[0])
+
+    moreAdds = []
+    for line in newObjs[1:]:
+        moreAdds.append((s, p, line, c))
+    fullPatch = Patch(delQuads=patch.delQuads,
+                      addQuads=patch.addQuads + moreAdds)
+    graph.patch(fullPatch)
+
+        
 class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
     def put(self):
         effect = URIRef(self.get_argument('uri'))
-        code = Literal(self.get_argument('code'))
+        codeLines = []
+        for i in itertools.count(0):
+            k = 'codeLines[%s][text]' % i
+            v = self.get_argument(k, None)
+            if v is not None:
+                codeLines.append(Literal(v))
+            else:
+                break
+        if not codeLines:
+            log.info("no codelines recevied on PUT /code")
+            return
         with self.settings.graph.currentState(
                 tripleFilter=(None, L9['effect'], effect)) as g:
             song = g.subjects(L9['effect'], effect).next()
-        self.settings.graph.patchObject(
-            context=song,
-            subject=effect,
-            predicate=L9['code'],
-            newObject=code)
+            
+        replaceObjects(self.settings.graph, song, effect, L9['code'], codeLines)
+            
         # right here we could tell if the code has a python error and return it
         self.send_error(202)
         

@@ -19,6 +19,16 @@ html
         ul(data-bind="foreach: $parent.subtermExprs($data)")
           li: a.resource(data-bind="attr: {href: $root.subtermLink($parent.label, $data)}, text: $data")
 
+
+    div(data-bind="foreach: classes")
+      div.resource.effectClass
+        h2
+          | Effect class
+          | 
+          a(data-bind="attr: {href: uri}, text: label")
+        div
+          code(data-bind="text: code")
+        
     #status
       
     script(src="static/jquery-2.1.1.min.js")

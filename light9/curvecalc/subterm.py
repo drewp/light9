@@ -13,7 +13,6 @@ class Expr(object):
     e.g. chases"""
     def __init__(self):
         self.effectGlobals = light9.Effects.configExprGlobals()
-        self._smooth_random_items = [random.random() for x in range(100)]
     
     def exprGlobals(self, startDict, t):
         """globals dict for use by expressions"""
@@ -23,50 +22,27 @@ class Expr(object):
         # add in functions from Effects
         glo.update(self.effectGlobals)
 
-        glo['nsin'] = lambda x: (math.sin(x * (2 * math.pi)) + 1) / 2
-        glo['ncos'] = lambda x: (math.cos(x * (2 * math.pi)) + 1) / 2
-        glo['within'] = lambda a, b: a < t < b
-        glo['bef'] = lambda x: t < x
-
-
-        def smoove(x):
-            return -2 * (x ** 3) + 3 * (x ** 2)
-        glo['smoove'] = smoove
-
-        def aft(t, x, smooth=0):
-            left = x - smooth / 2
-            right = x + smooth / 2
-            if left < t < right:
-                return smoove((t - left) / (right - left))
-            return t > x
-        glo['aft'] = lambda x, smooth=0: aft(t, x, smooth)
-
         def chan(name):
             return Submaster.Submaster(
                 name=name,
                 levels={get_dmx_channel(name) : 1.0})
         glo['chan'] = chan
+        glo['within'] = lambda a, b: a < t < b
+        glo['bef'] = lambda x: t < x
 
-        def smooth_random(speed=1):
-            """1 = new stuff each second, <1 is slower, fade-ier"""
-            x = (t * speed) % len(self._smooth_random_items)
-            x1 = int(x)
-            x2 = (int(x) + 1) % len(self._smooth_random_items)
-            y1 = self._smooth_random_items[x1]
-            y2 = self._smooth_random_items[x2]
-            return y1 + (y2 - y1) * ((x - x1))
+        def aft(t, x, smooth=0):
+            left = x - smooth / 2
+            right = x + smooth / 2
+            if left < t < right:
+                return light9.Effects.smoove((t - left) / (right - left))
+            return t > x
+        glo['aft'] = lambda x, smooth=0: aft(t, x, smooth)
 
-        def notch_random(speed=1):
-            """1 = new stuff each second, <1 is slower, notch-ier"""
-            x = (t * speed) % len(self._smooth_random_items)
-            x1 = int(x)
-            y1 = self._smooth_random_items[x1]
-            return y1
-            
-        glo['noise'] = smooth_random
-        glo['notch'] = notch_random
-
+        glo['smooth_random'] = lambda speed=1: glo['smooth_random2'](t, speed)
+        glo['notch_random'] = lambda speed=1: glo['notch_random2'](t, speed)
         
+        glo['noise'] = glo['smooth_random']
+        glo['notch'] = glo['notch_random']
 
         return glo
 

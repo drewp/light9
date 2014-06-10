@@ -2,7 +2,7 @@ import re, logging
 from rdflib import URIRef
 from light9.namespaces import L9, RDF
 from light9.curvecalc.curve import CurveResource
-from light9 import Submaster
+from light9 import Submaster, Effects
 log = logging.getLogger('effect')
 
 def uriFromCode(s):
@@ -23,6 +23,7 @@ class CodeLine(object):
         self.graph, self.code = graph, code
 
         self.outName, self.expr, self.resources = self._asPython()
+        self.pyResources = self._resourcesAsPython(self.resources)
 
     def _asPython(self):
         """
@@ -55,32 +56,14 @@ class CodeLine(object):
         # this result could vary with graph changes (rare)
         return self.graph.contains((uri, RDF.type, L9['Curve']))
         
-class EffectNode(object):
-    def __init__(self, graph, uri):
-        self.graph, self.uri = graph, uri
-        # this is not expiring at the right time, when an effect goes away
-        self.graph.addHandler(self.prepare)
-
-    def prepare(self):
-        log.info("prepare effect %s", self.uri)
-        # maybe there can be multiple lines of code as multiple
-        # objects here, and we sort them by dependencies
-        codeStr = self.graph.value(self.uri, L9['code'])
-        if codeStr is None:
-            raise ValueError("effect %s has no code" % self.uri)
-
-        self.code = CodeLine(self.graph, codeStr)
-
-        self.resourceMap = self.resourcesAsPython()
-        
-    def resourcesAsPython(self):
+    def _resourcesAsPython(self, resources):
         """
         mapping of the local names for uris in the code to high-level
         objects (Submaster, Curve)
         """
         out = {}
         subs = Submaster.get_global_submasters(self.graph)
-        for localVar, uri in self.code.resources.items():
+        for localVar, uri in resources.items():
             for rdfClass in self.graph.objects(uri, RDF.type):
                 if rdfClass == L9['Curve']:
                     cr = CurveResource(self.graph, uri)
@@ -92,21 +75,39 @@ class EffectNode(object):
                     out[localVar] = uri
 
         return out
-        
+
+class EffectNode(object):
+    def __init__(self, graph, uri):
+        self.graph, self.uri = graph, uri
+        # this is not expiring at the right time, when an effect goes away
+        self.graph.addHandler(self.prepare)
+
+    def prepare(self):
+        log.info("prepare effect %s", self.uri)
+        # maybe there can be multiple lines of code as multiple
+        # objects here, and we sort them by dependencies
+        codeStrs = list(self.graph.objects(self.uri, L9['code']))
+        if not codeStrs:
+            raise ValueError("effect %s has no code" % self.uri)
+
+        self.codes = [CodeLine(self.graph, s) for s in codeStrs]
+
+        self.otherFuncs = Effects.configExprGlobals()
+                
     def eval(self, songTime):
         ns = {'t': songTime}
+        ns.update(self.otherFuncs)
 
         ns.update(dict(
             curve=lambda c, t: c.eval(t),
             ))
         # loop over lines in order, merging in outputs 
         # merge in named outputs from previous lines
-        
-        ns.update(self.resourceMap)
-        return eval(self.code.expr, ns)
 
-
-class GraphAwareFunction(object):
-    def __init__(self, graph):
-        self.graph = graph
+        for c in self.codes:
+            codeNs = ns.copy()
+            codeNs.update(c.pyResources)
+            if c.outName == 'out':
+                out = eval(c.expr, codeNs)
+        return out
 

@@ -1,5 +1,7 @@
 class Model
   constructor: ->
+    @classes = ko.observable([])
+    
     @chases = ko.observable([])
     @moreExprs = [
       {label: "rainbow", expr: "hsv(t*1,1,1)"},
@@ -22,12 +24,11 @@ class Model
     ]
   
 
-
 model = new Model()
-
 
 reconnectingWebSocket "ws://localhost:8052/effectsUpdates", (msg) ->
   model.chases(msg.chases) if msg.chases?
+  model.classes(msg.classes) if msg.classes?
 
 # this sort of works to stop clicks in <input> from following the
 # submaster hyperlink, but it may make certain clicks act wrong

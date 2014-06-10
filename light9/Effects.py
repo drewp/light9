@@ -1,5 +1,6 @@
 from __future__ import division
-from random import Random
+import random as random_mod
+import math
 import logging, colorsys
 import light9.Submaster as Submaster
 from chase import chase as chase_logic
@@ -9,12 +10,18 @@ from light9 import Patch
 from light9.namespaces import L9
 log = logging.getLogger()
 
+registered = []
+def register(f):
+    registered.append(f)
+    return f
+
+@register
 def chase(t, ontime=0.5, offset=0.2, onval=1.0, 
           offval=0.0, names=None, combiner=max, random=False):
     """names is list of URIs. returns a submaster that chases through
     the inputs"""
     if random:
-        r = Random(random)
+        r = random_mod.Random(random)
         names = names[:]
         r.shuffle(names)
 
@@ -31,6 +38,7 @@ def chase(t, ontime=0.5, offset=0.2, onval=1.0,
 
     return Submaster.Submaster(name="chase" ,levels=lev)
 
+@register
 def hsv(h, s, v, light='all', centerScale=.5):
     r,g,b = colorsys.hsv_to_rgb(h % 1.0, s, v)
     lev = {}
@@ -41,7 +49,8 @@ def hsv(h, s, v, light='all', centerScale=.5):
     if light in ['center', 'all']:
         lev[88], lev[89], lev[90] = r*centerScale,g*centerScale,b*centerScale
     return Submaster.Submaster(name='hsv', levels=lev)
-    
+
+@register
 def stack(t, names=None, fade=0):
     """names is list of URIs. returns a submaster that stacks the the inputs
 
@@ -65,6 +74,10 @@ def stack(t, names=None, fade=0):
     
     return Submaster.Submaster(name="stack", levels=lev)
 
+@register
+def smoove(x):
+    return -2 * (x ** 3) + 3 * (x ** 2)
+    
 def configExprGlobals():
     graph = showconfig.getGraph()
     ret = {}
@@ -75,7 +88,35 @@ def configExprGlobals():
         ret[shortName] = list(graph.items(chans))
         print "%r is a chase" % shortName
 
-    ret['chase'] = chase
-    ret['stack'] = stack
-    ret['hsv'] = hsv
+    for f in registered:
+        ret[f.__name__] = f
+
+    ret['nsin'] = lambda x: (math.sin(x * (2 * math.pi)) + 1) / 2
+    ret['ncos'] = lambda x: (math.cos(x * (2 * math.pi)) + 1) / 2
+
+    _smooth_random_items = [random_mod.random() for x in range(100)]
+
+    # suffix '2' to keep backcompat with the versions that magically knew time
+    def smooth_random2(t, speed=1):
+        """1 = new stuff each second, <1 is slower, fade-ier"""
+        x = (t * speed) % len(_smooth_random_items)
+        x1 = int(x)
+        x2 = (int(x) + 1) % len(_smooth_random_items)
+        y1 = _smooth_random_items[x1]
+        y2 = _smooth_random_items[x2]
+        return y1 + (y2 - y1) * ((x - x1))
+
+    def notch_random2(t, speed=1):
+        """1 = new stuff each second, <1 is slower, notch-ier"""
+        x = (t * speed) % len(_smooth_random_items)
+        x1 = int(x)
+        y1 = _smooth_random_items[x1]
+        return y1
+
+    ret['noise2'] = smooth_random2
+    ret['notch2'] = notch_random2
+
+
+
+    
     return ret
