@@ -233,7 +233,7 @@ class Main(object):
         """
         assert isinstance(newname, Literal), repr(newname)
         if withCurve:
-            self.curveset.new_curve(newname, renameIfExisting=False)
+            self.curveset.new_curve(newname)
         if newname in self.all_subterm_labels():
             raise SubtermExists("have a subterm who sub is named %r" % newname)
         with self.graph.currentState() as current:

@@ -346,16 +346,9 @@ class Curveset(object):
     def get_time_range(self):
         return 0, dispatcher.send("get max time")[0][1]
 
-    def new_curve(self, name, renameIfExisting=True):
+    def new_curve(self, name):
         if isinstance(name, Literal):
             name = str(name)
-        if name=="":
-            print "no name given"
-            return
-        if not renameIfExisting and name in self.curves:
-            return
-        while name in self.curves:
-           name=name+"-1"
 
         uri = self.graph.sequentialUri(self.currentSong + '/curve-')
 
