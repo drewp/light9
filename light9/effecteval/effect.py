@@ -6,16 +6,6 @@ from light9.curvecalc.curve import CurveResource
 from light9 import Submaster, Effects
 log = logging.getLogger('effect')
 
-def uriFromCode(s):
-    # i thought this was something a graph could do with its namespace manager
-    if s.startswith('sub:'):
-        return URIRef('http://light9.bigasterisk.com/show/dance2014/sub/' + s[4:])
-    if s.startswith('song1:'):
-        return URIRef('http://ex/effect/song1/' + s[6:])
-    if (s[0], s[-1]) == ('<', '>'):
-        return URIRef(s[1:-1])
-    raise NotImplementedError
-
 # consider http://waxeye.org/ for a parser that can be used in py and js
 
 class CodeLine(object):
