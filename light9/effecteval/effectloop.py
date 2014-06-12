@@ -70,22 +70,11 @@ class EffectLoop(object):
                 if song is None:
                     return
 
-                outSubs = []
-                for e in self.currentEffects:
-                    try:
-                        outSubs.append(e.eval(songTime))
-                    except Exception as exc:
-                        now = time.time()
-                        if now > self.lastErrorLog + 5:
-                            log.error("effect %s: %s" % (e.uri, exc))
-                            self.lastErrorLog = now
-                out = Submaster.sub_maxes(*outSubs)
-
-                self.logLevels(t1, out)
-                dmx = out.get_dmx_list()
-                with self.stats.writeDmx.time():
-                    yield dmxclient.outputlevels(dmx, twisted=True)
-
+                outputs = self.allEffectOutputs(songTime)
+                combined = self.combineOutputs(outputs)
+                self.logLevels(t1, combined)
+                self.sendOutput(combined)
+                
                 elapsed = time.time() - t1
                 dt = max(0, self.period - elapsed)
         except Exception:
@@ -94,6 +83,31 @@ class EffectLoop(object):
             dt = 1
 
         reactor.callLater(dt, self.sendLevels)
+
+    def combineOutputs(self, outputs):
+        """pick usable effect outputs and reduce them into one for sendOutput"""
+        outputs = [x for x in outputs if isinstance(x, Submaster.Submaster)]
+        out = Submaster.sub_maxes(*outputs)
+
+        return out
+        
+    @inlineCallbacks
+    def sendOutput(self, combined):
+        dmx = combined.get_dmx_list()
+        with self.stats.writeDmx.time():
+            yield dmxclient.outputlevels(dmx, twisted=True)
+        
+    def allEffectOutputs(self, songTime):
+        outputs = []
+        for e in self.currentEffects:
+            try:
+                outputs.append(e.eval(songTime))
+            except Exception as exc:
+                now = time.time()
+                if now > self.lastErrorLog + 5:
+                    log.error("effect %s: %s" % (e.uri, exc))
+                    self.lastErrorLog = now
+        return outputs
         
     def logLevels(self, now, out):
         # this would look nice on the top of the effecteval web pages too

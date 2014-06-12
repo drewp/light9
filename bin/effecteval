@@ -145,7 +145,7 @@ class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
             else:
                 break
         if not codeLines:
-            log.info("no codelines recevied on PUT /code")
+            log.info("no codelines received on PUT /code")
             return
         with self.settings.graph.currentState(
                 tripleFilter=(None, L9['effect'], effect)) as g:
