@@ -22,5 +22,6 @@ faulthandler==2.3
 treq==0.2.1
 mock==1.0.1
 toposort==1.0
+pyserial==2.7
 
 scales==1.0.6
