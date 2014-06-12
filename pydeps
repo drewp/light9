@@ -23,3 +23,4 @@ treq==0.2.1
 mock==1.0.1
 toposort==1.0
 
+scales==1.0.6
