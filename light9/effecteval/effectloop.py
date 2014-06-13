@@ -155,7 +155,7 @@ class LedLoop(EffectLoop):
         for out in outputs:
             if isinstance(out, Effects.Blacklight):
                 combined['blacklight'] = max(combined['blacklight'], int(out * 255))
-            elif isinstance(out, Effects.ColorStrip):
+            elif isinstance(out, Effects.Strip):
                 pixels = numpy.array(out.pixels, dtype=numpy.float16)
                 px255 = (numpy.clip(pixels, 0, 1) * 255).astype(numpy.uint8)
                 combined[out.which] = numpy.maximum(combined[out.which], px255)
