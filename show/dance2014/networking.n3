@@ -3,7 +3,8 @@
 @prefix sh: <http://light9.bigasterisk.com/show/dance2014/> .
 
 show:dance2014 :networking sh:netHome .
-sh:netHome  
+sh:netHome
+  :rdfdb            <http://localhost:8051/>;
   :effectEval       <http://dash:8070/>;
   :musicPlayer      <http://dash:8040/>;
   :dmxServer        <http://dash:8030/>;

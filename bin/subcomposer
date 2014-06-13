@@ -273,7 +273,7 @@ if __name__ == "__main__":
 
     initTkdnd(root.tk, 'tkdnd/trunk/')
 
-    graph = SyncedGraph("subcomposer")
+    graph = SyncedGraph(networking.rdfdb.url, "subcomposer")
     session = clientsession.getUri('subcomposer', opts)
 
     graph.initiallySynced.addCallback(lambda _: launch(opts, args, root, graph, session))

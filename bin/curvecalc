@@ -502,7 +502,7 @@ def main():
     session = clientsession.getUri('curvecalc', opts)
 
     music = Music()
-    graph = SyncedGraph("curvecalc")
+    graph = SyncedGraph(networking.rdfdb.url, "curvecalc")
 
     graph.initiallySynced.addCallback(
         lambda _: launch(args, graph, session, opts, startTime, music))

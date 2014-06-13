@@ -52,7 +52,7 @@ def main():
     (options, args) = parser.parse_args()
 
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
-    graph = SyncedGraph("vidrefsetup")
+    graph = SyncedGraph(networking.rdfdb.url, "vidrefsetup")
 
     # deliberately conflict with vidref since they can't talk at once to cam
     port = networking.vidref.port 

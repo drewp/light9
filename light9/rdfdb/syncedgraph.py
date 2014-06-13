@@ -51,17 +51,18 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
     pending local changes) and get the data again from the
     server.
     """
-    def __init__(self, label):
+    def __init__(self, rdfdbRoot, label):
         """
         label is a string that the server will display in association
         with your connection
         """
+        self.rdfdbRoot = rdfdbRoot
         self.initiallySynced = defer.Deferred()
         self._graph = ConjunctiveGraph()
 
         self._receiver = PatchReceiver(label, self._onPatch)
         
-        self._sender = PatchSender('http://localhost:8051/patches',
+        self._sender = PatchSender(self.rdfdbRoot + 'patches',
                                    self._receiver.updateResource)
         AutoDepGraphApi.__init__(self)
         # this needs more state to track if we're doing a resync (and
@@ -84,7 +85,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         self._sender.cancelAll()
         # this should be locked so only one resync goes on at once
         return cyclone.httpclient.fetch(
-            url="http://localhost:8051/graph",
+            url=self.rdfdbRoot + "graph",
             method="GET",
             headers={'Accept':['x-trig']},
             ).addCallback(self._resyncGraph)

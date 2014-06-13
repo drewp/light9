@@ -26,7 +26,7 @@ class App(object):
         log.setLevel(logging.DEBUG if opts.debug else logging.INFO)
 
         self.session = clientsession.getUri('inputdemo', opts)
-        self.graph = SyncedGraph("inputdemo")
+        self.graph = SyncedGraph(networking.rdfdb.url, "inputdemo")
 
         self.graph.initiallySynced.addCallback(lambda _: self.launch())
 

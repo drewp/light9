@@ -50,7 +50,7 @@ class Snapshot(cyclone.web.RequestHandler):
 class SnapshotPic(cyclone.web.StaticFileHandler):
     pass
 
-graph = SyncedGraph("vidref")
+graph = SyncedGraph(networking.rdfdb.url, "vidref")
 
 gui = Gui(graph)
 

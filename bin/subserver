@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
-    graph = SyncedGraph("subserver")
+    graph = SyncedGraph(networking.rdfdb.url, "subserver")
 
     d = {}
     def updateSubs():

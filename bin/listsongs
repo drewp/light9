@@ -11,10 +11,11 @@ compdef _songs curvecalc
 from run_local import log
 from twisted.internet import reactor
 from rdflib import RDF
+from light9 import networking
 from light9.namespaces import L9
 from light9.rdfdb.syncedgraph import SyncedGraph
 
-graph = SyncedGraph("listsongs")
+graph = SyncedGraph(networking.rdfdb.url, "listsongs")
 
 @graph.initiallySynced.addCallback
 def printSongs(result):

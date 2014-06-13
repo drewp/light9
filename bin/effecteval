@@ -181,9 +181,10 @@ class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
         # return dmx dict for all effects in the song, already combined
 
 class App(object):
-    def __init__(self, show):
+    def __init__(self, show, outputWhere):
         self.show = show
-        self.graph = SyncedGraph("effectEval")
+        self.outputWhere = outputWhere
+        self.graph = SyncedGraph(networking.rdfdb.url, "effectEval")
         self.graph.initiallySynced.addCallback(self.launch)
 
         self.stats = scales.collection('/',

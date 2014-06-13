@@ -603,7 +603,7 @@ if __name__ == "__main__":
 
     log.setLevel(logging.INFO if opts.v else logging.WARN)
 
-    graph = SyncedGraph("keyboardcomposer")
+    graph = SyncedGraph(networking.rdfdb.url, "keyboardcomposer")
 
     # i think this also needs delayed start (like subcomposer has), to have a valid graph
     # before setting any stuff from the ui
