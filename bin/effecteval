@@ -7,6 +7,7 @@ import cyclone.web, cyclone.websocket, cyclone.httpclient
 import sys, optparse, logging, subprocess, json, time, traceback, itertools
 from rdflib import URIRef, Literal
 
+sys.path.append('/usr/lib/pymodules/python2.7/') # for numpy, on rpi
 sys.path.append('/usr/lib/python2.7/dist-packages') # For numpy
 from light9 import networking, showconfig, Submaster, dmxclient
 from light9.curvecalc.curve import CurveResource
