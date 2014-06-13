@@ -7,11 +7,11 @@ import cyclone.web, cyclone.websocket, cyclone.httpclient
 import sys, optparse, logging, subprocess, json, time, traceback, itertools
 from rdflib import URIRef, Literal
 
-sys.path.append(".")
+sys.path.append('/usr/lib/python2.7/dist-packages') # For numpy
 from light9 import networking, showconfig, Submaster, dmxclient
 from light9.curvecalc.curve import CurveResource
 from light9.effecteval.effect import EffectNode
-from light9.effecteval.effectloop import EffectLoop
+from light9.effecteval.effectloop import makeEffectLoop
 from light9.greplin_cyclone import StatsForCyclone
 from light9.namespaces import L9, RDF, RDFS
 from light9.rdfdb.patch import Patch
@@ -195,7 +195,8 @@ class App(object):
                                        )
 
     def launch(self, *args):
-        self.loop = EffectLoop(self.graph, self.stats)
+        self.loop = makeEffectLoop(self.graph, self.stats, self.outputWhere)
+        self.loop.startLoop()
         
         SFH = cyclone.web.StaticFileHandler
         self.cycloneApp = cyclone.web.Application(handlers=[
@@ -236,14 +237,14 @@ if __name__ == "__main__":
                       help="logging.DEBUG")
     parser.add_option("--twistedlog", action="store_true",
                       help="twisted logging")
+    parser.add_option("--output", metavar="WHERE", help="dmx or leds")
     (options, args) = parser.parse_args()
-
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
     if not options.show:
         raise ValueError("missing --show http://...")
             
-    app = App(URIRef(options.show))
+    app = App(URIRef(options.show), options.output)
     if options.twistedlog:
         from twisted.python import log as twlog
         twlog.startLogging(sys.stderr)

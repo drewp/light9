@@ -15,6 +15,15 @@ def register(f):
     registered.append(f)
     return f
 
+class ColorStrip(object):
+    """list of r,g,b tuples for sending to an LED strip"""
+    which = 'L'
+    pixels = []
+    
+class Blacklight(float):
+    """a level for the blacklight PWM output"""
+
+    
 @register
 def chase(t, ontime=0.5, offset=0.2, onval=1.0, 
           offval=0.0, names=None, combiner=max, random=False):
@@ -50,6 +59,13 @@ def hsv(h, s, v, light='all', centerScale=.5):
         lev[88], lev[89], lev[90] = r*centerScale,g*centerScale,b*centerScale
     return Submaster.Submaster(name='hsv', levels=lev)
 
+@register
+def colorDemo():
+    s = ColorStrip()
+    s.which = 'L'
+    s.pixels = [(0,0,1)] * 50
+    return s
+    
 @register
 def stack(t, names=None, fade=0):
     """names is list of URIs. returns a submaster that stacks the the inputs

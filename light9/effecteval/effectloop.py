@@ -1,11 +1,14 @@
 from __future__ import division
 import time, json, logging, traceback
+import numpy
+import serial
 from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks, returnValue
+from twisted.internet.defer import inlineCallbacks, returnValue, succeed
 from rdflib import URIRef, Literal
 import cyclone.httpclient
 from light9.namespaces import L9, RDF, RDFS
 from light9.effecteval.effect import EffectNode
+from light9 import Effects
 from light9 import networking
 from light9 import Submaster
 from light9 import dmxclient
@@ -27,6 +30,13 @@ class EffectLoop(object):
 
         self.songTimeFromRequest = 0
         self.requestTime = 0 # unix sec for when we fetched songTime
+        self.initOutput()
+
+    def initOutput(self):
+        pass
+
+    def startLoop(self):
+        log.info("startLoop")
         reactor.callLater(self.period, self.sendLevels)
 
     def setEffects(self):
@@ -73,7 +83,7 @@ class EffectLoop(object):
                 outputs = self.allEffectOutputs(songTime)
                 combined = self.combineOutputs(outputs)
                 self.logLevels(t1, combined)
-                self.sendOutput(combined)
+                yield self.sendOutput(combined)
                 
                 elapsed = time.time() - t1
                 dt = max(0, self.period - elapsed)
@@ -87,6 +97,7 @@ class EffectLoop(object):
     def combineOutputs(self, outputs):
         """pick usable effect outputs and reduce them into one for sendOutput"""
         outputs = [x for x in outputs if isinstance(x, Submaster.Submaster)]
+        log.info('outputs %r', outputs)
         out = Submaster.sub_maxes(*outputs)
 
         return out
@@ -125,4 +136,45 @@ class EffectLoop(object):
         return ("send dmx: {%s}" %
                 ", ".join("%r: %.3g" % (str(k), v)
                           for k,v in out.get_levels().items()))
+
+class LedLoop(EffectLoop):
+    def initOutput(self):
+        kw = dict(baudrate=115200)
+        self.boards = {
+            'L': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0', **kw),
+            'R': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027JI6-if00-port0', **kw),
+        }
+        
+    def combineOutputs(self, outputs):
+        combined = []
+        for out in outputs:
+            if isinstance(out, (Effects.ColorStrip, Effects.Blacklight)):
+                # todo: take the max of all matching outputs, not just the last one
+                pixels = numpy.array(out.pixels, dtype=numpy.float16)
+                px255 = (numpy.clip(pixels, 0, 1) * 255).astype(numpy.uint8)
+                combined.append((out.which, px255))
+                
+        return combined
+                
+    @inlineCallbacks
+    def sendOutput(self, combined):
+        for which, px255 in combined:
+            board = self.boards[which]
+            msg = '\x60\x00' + px255.reshape((-1,)).tostring()
+            board.write(msg)
+            board.flush()
+            
+        yield succeed(None)
+        
+    def logMessage(self, out):
+        return str([(w, p.tolist()) for w,p in out])
+
+def makeEffectLoop(graph, stats, outputWhere):
+    if outputWhere == 'dmx':
+        return EffectLoop(graph, stats)
+    elif outputWhere == 'leds':
+        return LedLoop(graph, stats)
+    else:
+        raise NotImplementedError
+
         
