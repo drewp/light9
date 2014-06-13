@@ -172,12 +172,14 @@ class LedLoop(EffectLoop):
         for which, px255 in combined.items():
             if which == 'blacklight':
                 if px255 != self.lastSentBacklight:
-                    yield threads.deferToThread(self.serialWrite, self.boards['L'], '\x60\x01' + chr(px255))
+                    yield succeed(self.serialWrite(self.boards['L'], '\x60\x01' + chr(px255))
                     self.lastSentBacklight = px255
             else:
                 board = self.boards[which]
                 msg = '\x60\x00' + px255.reshape((-1,)).tostring()
-                yield threads.deferToThread(self.serialWrite, board, msg)
+                # may be stuttering more, and not smoother
+                #yield threads.deferToThread(self.serialWrite, board, msg)
+                yield succeed(self.serialWrite(board, msg))
 
     def serialWrite(self, serial, msg):
         serial.write(msg)
