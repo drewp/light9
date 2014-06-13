@@ -137,6 +137,8 @@ class EffectLoop(object):
                 ", ".join("%r: %.3g" % (str(k), v)
                           for k,v in out.get_levels().items()))
 
+Z = numpy.zeros((50, 3), dtype=numpy.uint8)
+
 class LedLoop(EffectLoop):
     def initOutput(self):
         kw = dict(baudrate=115200)
@@ -146,28 +148,33 @@ class LedLoop(EffectLoop):
         }
         
     def combineOutputs(self, outputs):
-        combined = []
+        combined = {'L': Z, 'R': Z, 'blacklight': 0}
+        
         for out in outputs:
-            if isinstance(out, (Effects.ColorStrip, Effects.Blacklight)):
-                # todo: take the max of all matching outputs, not just the last one
+            if isinstance(out, Effects.Blacklight):
+                combined['blacklight'] = max(combined['blacklight'], int(out * 255))
+            elif isinstance(out, Effects.ColorStrip):
                 pixels = numpy.array(out.pixels, dtype=numpy.float16)
                 px255 = (numpy.clip(pixels, 0, 1) * 255).astype(numpy.uint8)
-                combined.append((out.which, px255))
+                combined[out.which] = numpy.maximum(combined[out.which], px255)
                 
         return combined
                 
-    @inlineCallbacks
     def sendOutput(self, combined):
-        for which, px255 in combined:
-            board = self.boards[which]
-            msg = '\x60\x00' + px255.reshape((-1,)).tostring()
-            board.write(msg)
-            board.flush()
-            
-        yield succeed(None)
+        for which, px255 in combined.items():
+            if which == 'blacklight':
+                self.boards['L'].write('\x60\x01' + chr(px255))
+                self.boards['L'].flush()
+            else:
+                board = self.boards[which]
+                msg = '\x60\x00' + px255.reshape((-1,)).tostring()
+                board.write(msg)
+                board.flush()
+                
+        return succeed(None)
         
     def logMessage(self, out):
-        return str([(w, p.tolist()) for w,p in out])
+        return str([(w, p.tolist() if isinstance(p, numpy.ndarray) else p) for w,p in out.items()])
 
 def makeEffectLoop(graph, stats, outputWhere):
     if outputWhere == 'dmx':

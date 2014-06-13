@@ -70,7 +70,7 @@ def colorDemo():
 def colorSolid(which='L', color=[1,1,1]):
     s = ColorStrip()
     s.which = which
-    s.pixels = tuple(color) * 50
+    s.pixels = [tuple(color)] * 50
     return s
     
 @register
