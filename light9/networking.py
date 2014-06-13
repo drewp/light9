@@ -30,7 +30,8 @@ class ServiceAddress(object):
     @property
     def url(self):
         return self._url()
-
+    value = url
+    
     def path(self, more):
         return self.url + str(more)
 
@@ -43,3 +44,5 @@ vidref = ServiceAddress(L9['vidref'])
 effectEval = ServiceAddress(L9['effectEval'])
 picamserve = ServiceAddress(L9['picamserve'])
 rdfdb = ServiceAddress(L9['rdfdb'])
+
+patchReceiverUpdateHost = ServiceAddress(L9['patchReceiverUpdateHost'])

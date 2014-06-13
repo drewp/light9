@@ -60,7 +60,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         self.initiallySynced = defer.Deferred()
         self._graph = ConjunctiveGraph()
 
-        self._receiver = PatchReceiver(label, self._onPatch)
+        self._receiver = PatchReceiver(self.rdfdbRoot, label, self._onPatch)
         
         self._sender = PatchSender(self.rdfdbRoot + 'patches',
                                    self._receiver.updateResource)

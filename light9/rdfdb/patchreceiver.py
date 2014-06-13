@@ -1,6 +1,6 @@
 import logging, cyclone.httpclient, traceback, urllib
 from twisted.internet import reactor
-from light9.rdfdb.rdflibpatch import patchQuads
+from light9 import networking
 from light9.rdfdb.patch import Patch
 log = logging.getLogger('syncedgraph')
 
@@ -10,24 +10,27 @@ class PatchReceiver(object):
     master. See onPatch for what happens when the rdfdb master sends
     us a patch
     """
-    def __init__(self, label, onPatch):
+    def __init__(self, rdfdbRoot, label, onPatch):
         """
         label is what we'll call ourselves to the rdfdb server
 
         onPatch is what we call back when the server sends a patch
         """
+        self.rdfdbRoot = rdfdbRoot
         listen = reactor.listenTCP(0, cyclone.web.Application(handlers=[
             (r'/update', makePatchEndpoint(onPatch)),
         ]))
         port = listen._realPortNumber  # what's the right call for this?
-        self.updateResource = 'http://localhost:%s/update' % port
+        
+        self.updateResource = 'http://%s:%s/update' % (
+            networking.patchReceiverUpdateHost.value, port)
         log.info("listening on %s" % port)
         self._register(label)
 
     def _register(self, label):
 
         cyclone.httpclient.fetch(
-            url='http://localhost:8051/graphClients',
+            url=self.rdfdbRoot + 'graphClients',
             method='POST',
             headers={'Content-Type': ['application/x-www-form-urlencoded']},
             postdata=urllib.urlencode([('clientUpdate', self.updateResource),

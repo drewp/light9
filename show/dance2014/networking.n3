@@ -4,6 +4,7 @@
 
 show:dance2014 :networking sh:netHome .
 sh:netHome
+  :patchReceiverUpdateHost "localhost";
   :rdfdb            <http://localhost:8051/>;
   :effectEval       <http://dash:8070/>;
   :musicPlayer      <http://dash:8040/>;
