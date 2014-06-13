@@ -51,13 +51,13 @@ class EffectLoop(object):
     @inlineCallbacks
     def getSongTime(self):
         now = time.time()
-
-        if now - self.requestTime > self.coastSecs:
+        old = now - self.requestTime
+        if old > self.coastSecs:
             try:
                 response = json.loads((yield cyclone.httpclient.fetch(
                     networking.musicPlayer.path('time'), timeout=.5)).body)
-            except TimeoutError as e:
-                log.warning("%r, using stale time", e)
+            except TimeoutError:
+                log.warning("TimeoutError: using stale time from %.1f ago", old)
             else:
                 self.requestTime = now
                 self.currentPlaying = response['playing']
