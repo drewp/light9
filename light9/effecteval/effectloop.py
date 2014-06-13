@@ -3,7 +3,8 @@ import time, json, logging, traceback
 import numpy
 import serial
 from twisted.internet import reactor, threads
-from twisted.internet.defer import inlineCallbacks, returnValue, succeed, TimeoutError
+from twisted.internet.defer import inlineCallbacks, returnValue, succeed
+from twisted.internet.error import TimeoutError
 from rdflib import URIRef, Literal
 import cyclone.httpclient
 from light9.namespaces import L9, RDF, RDFS
