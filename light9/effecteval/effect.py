@@ -3,7 +3,8 @@ import toposort
 from rdflib import URIRef
 from light9.namespaces import L9, RDF
 from light9.curvecalc.curve import CurveResource
-from light9 import Submaster, Effects
+from light9 import Submaster
+from light9 import Effects # gets reload() later
 log = logging.getLogger('effect')
 
 # consider http://waxeye.org/ for a parser that can be used in py and js
@@ -92,7 +93,8 @@ class EffectNode(object):
         self.codes = [CodeLine(self.graph, s) for s in codeStrs]
 
         self.sortCodes()
-        
+
+        reload(Effects)
         self.otherFuncs = Effects.configExprGlobals()
 
     def sortCodes(self):

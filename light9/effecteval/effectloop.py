@@ -99,7 +99,6 @@ class EffectLoop(object):
     def combineOutputs(self, outputs):
         """pick usable effect outputs and reduce them into one for sendOutput"""
         outputs = [x for x in outputs if isinstance(x, Submaster.Submaster)]
-        log.info('outputs %r', outputs)
         out = Submaster.sub_maxes(*outputs)
 
         return out
