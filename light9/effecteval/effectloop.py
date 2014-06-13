@@ -80,10 +80,12 @@ class EffectLoop(object):
                 if song is None:
                     return
 
-                outputs = self.allEffectOutputs(songTime)
+                with self.stats.evals.time():
+                    outputs = self.allEffectOutputs(songTime)
                 combined = self.combineOutputs(outputs)
                 self.logLevels(t1, combined)
-                yield self.sendOutput(combined)
+                with self.stats.sendOutput.time():
+                    yield self.sendOutput(combined)
                 
                 elapsed = time.time() - t1
                 dt = max(0, self.period - elapsed)
@@ -105,8 +107,7 @@ class EffectLoop(object):
     @inlineCallbacks
     def sendOutput(self, combined):
         dmx = combined.get_dmx_list()
-        with self.stats.writeDmx.time():
-            yield dmxclient.outputlevels(dmx, twisted=True)
+        yield dmxclient.outputlevels(dmx, twisted=True)
         
     def allEffectOutputs(self, songTime):
         outputs = []

@@ -191,7 +191,8 @@ class App(object):
         self.stats = scales.collection('/',
                                        scales.PmfStat('sendLevels'),
                                        scales.PmfStat('getMusic'),
-                                       scales.PmfStat('writeDmx'),
+                                       scales.PmfStat('evals'),
+                                       scales.PmfStat('sendOutupt'),
                                        scales.IntStat('errors'),
                                        )
 
