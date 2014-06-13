@@ -3,7 +3,7 @@ import time, json, logging, traceback
 import numpy
 import serial
 from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks, returnValue, succeed
+from twisted.internet.defer import inlineCallbacks, returnValue, succeed, TimeoutError
 from rdflib import URIRef, Literal
 import cyclone.httpclient
 from light9.namespaces import L9, RDF, RDFS
@@ -50,19 +50,25 @@ class EffectLoop(object):
     @inlineCallbacks
     def getSongTime(self):
         now = time.time()
-        if now - self.requestTime < self.coastSecs:
-            estimated = self.songTimeFromRequest
-            if self.currentSong is not None and self.currentPlaying:
-                estimated += now - self.requestTime
-            returnValue((estimated, self.currentSong))
-        else:
-            response = json.loads((yield cyclone.httpclient.fetch(
-                networking.musicPlayer.path('time'))).body)
-            self.requestTime = now
-            self.currentPlaying = response['playing']
-            self.songTimeFromRequest = response['t']
-            returnValue(
-                (response['t'], (response['song'] and URIRef(response['song']))))
+
+        if now - self.requestTime > self.coastSecs:
+            try:
+                response = json.loads((yield cyclone.httpclient.fetch(
+                    networking.musicPlayer.path('time'), timeout=.5)).body)
+            except TimeoutError as e:
+                log.warning("%r, using stale time", e)
+            else:
+                self.requestTime = now
+                self.currentPlaying = response['playing']
+                self.songTimeFromRequest = response['t']
+                returnValue(
+                    (response['t'], (response['song'] and URIRef(response['song']))))
+
+        estimated = self.songTimeFromRequest
+        if self.currentSong is not None and self.currentPlaying:
+            estimated += now - self.requestTime
+        returnValue((estimated, self.currentSong))
+
             
     @inlineCallbacks
     def sendLevels(self):
@@ -92,7 +98,7 @@ class EffectLoop(object):
         except Exception:
             self.stats.errors += 1
             traceback.print_exc()
-            dt = 1
+            dt = .5
 
         reactor.callLater(dt, self.sendLevels)
 
