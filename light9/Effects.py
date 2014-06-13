@@ -23,6 +23,9 @@ class ColorStrip(object):
 class Blacklight(float):
     """a level for the blacklight PWM output"""
 
+@register
+def blacklight(v):
+    return Blacklight(v)
     
 @register
 def chase(t, ontime=0.5, offset=0.2, onval=1.0, 

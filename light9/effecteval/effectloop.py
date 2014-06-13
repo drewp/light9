@@ -143,9 +143,10 @@ class LedLoop(EffectLoop):
     def initOutput(self):
         kw = dict(baudrate=115200)
         self.boards = {
-            'L': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0', **kw),
-            'R': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027JI6-if00-port0', **kw),
+            'L': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027JI6-if00-port0', **kw),
+            'R': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0', **kw),
         }
+        self.lastSentBacklight = None
         
     def combineOutputs(self, outputs):
         combined = {'L': Z, 'R': Z, 'blacklight': 0}
@@ -163,8 +164,10 @@ class LedLoop(EffectLoop):
     def sendOutput(self, combined):
         for which, px255 in combined.items():
             if which == 'blacklight':
-                self.boards['L'].write('\x60\x01' + chr(px255))
-                self.boards['L'].flush()
+                if px255 != self.lastSentBacklight:
+                    self.boards['L'].write('\x60\x01' + chr(px255))
+                    self.boards['L'].flush()
+                    self.lastSentBacklight = px255
             else:
                 board = self.boards[which]
                 msg = '\x60\x00' + px255.reshape((-1,)).tostring()
