@@ -2,7 +2,7 @@ from __future__ import division
 import time, json, logging, traceback
 import numpy
 import serial
-from twisted.internet import reactor
+from twisted.internet import reactor, threads
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed, TimeoutError
 from rdflib import URIRef, Literal
 import cyclone.httpclient
@@ -166,21 +166,22 @@ class LedLoop(EffectLoop):
                 combined[out.which] = numpy.maximum(combined[out.which], px255)
                 
         return combined
-                
+
+    @inlineCallbacks
     def sendOutput(self, combined):
         for which, px255 in combined.items():
             if which == 'blacklight':
                 if px255 != self.lastSentBacklight:
-                    self.boards['L'].write('\x60\x01' + chr(px255))
-                    self.boards['L'].flush()
+                    yield threads.deferToThread(self.serialWrite, self.boards['L'], '\x60\x01' + chr(px255))
                     self.lastSentBacklight = px255
             else:
                 board = self.boards[which]
                 msg = '\x60\x00' + px255.reshape((-1,)).tostring()
-                board.write(msg)
-                board.flush()
-                
-        return succeed(None)
+                yield threads.deferToThread(self.serialWrite, board, msg)
+
+    def serialWrite(self, serial, msg):
+        serial.write(msg)
+        serial.flush()
         
     def logMessage(self, out):
         return str([(w, p.tolist() if isinstance(p, numpy.ndarray) else p) for w,p in out.items()])
