@@ -65,6 +65,13 @@ def colorDemo():
     s.which = 'L'
     s.pixels = [(0,0,1)] * 50
     return s
+
+@register
+def colorSolid(which='L', color=[1,1,1]):
+    s = ColorStrip()
+    s.which = which
+    s.pixels = tuple(color) * 50
+    return s
     
 @register
 def stack(t, names=None, fade=0):
