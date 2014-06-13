@@ -172,7 +172,7 @@ class LedLoop(EffectLoop):
         for which, px255 in combined.items():
             if which == 'blacklight':
                 if px255 != self.lastSentBacklight:
-                    yield succeed(self.serialWrite(self.boards['L'], '\x60\x01' + chr(px255))
+                    yield succeed(self.serialWrite(self.boards['L'], '\x60\x01' + chr(px255)))
                     self.lastSentBacklight = px255
             else:
                 board = self.boards[which]
