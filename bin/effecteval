@@ -86,7 +86,7 @@ class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
         out = []
         for s in songs:
             out.append({'uri': s, 'label': self.graph.label(s)})
-            out[-1]['effects'] = [{'uri': uri} for uri in sorted(self.graph.objects(s, L9['effect']))]
+            out[-1]['effects'] = [{'uri': uri, 'label': self.graph.label(uri)} for uri in sorted(self.graph.objects(s, L9['effect']))]
         self.sendMessage({'songs': out})
         
         
