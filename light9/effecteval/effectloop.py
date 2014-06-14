@@ -29,7 +29,7 @@ class EffectLoop(object):
         self.graph.addHandler(self.setEffects)
         self.period = 1 / 30
         self.coastSecs = .3 # main reason to keep this low is to notice play/pause
-
+        self.songTimeFetch = 0
         self.songTimeFromRequest = 0
         self.requestTime = 0 # unix sec for when we fetched songTime
         self.initOutput()
@@ -78,7 +78,8 @@ class EffectLoop(object):
     def updateTimeFromMusic(self):
         t1 = time.time()
         with self.stats.getMusic.time():
-            songTime, song = yield self.getSongTime()
+            self.songTime, song = yield self.getSongTime()
+            self.songTimeFetch = time.time()
 
         if song != self.currentSong:
             self.currentSong = song
@@ -89,7 +90,8 @@ class EffectLoop(object):
         reactor.callLater(max(0, self.period - elapsed), self.updateTimeFromMusic)
 
     def estimatedSongTime(self):
-        return self.songTime
+        now = time.time()
+        return self.songTime + max(0, now - self.songTimeFetch)
         
     @inlineCallbacks
     def sendLevels(self):
