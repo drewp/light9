@@ -1,0 +1,8 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/song1/curve/c-1401723840.932466> ns1:points "0 0 25.77 0.1942 27.47 0.3426 28.92 0.4631 29.69 0.5588 30.96 0.63 33.78 0.2942 36.28 0.4781 37.1 0.6226 38.19 0.7906 42.25 0.5545 42.78 0.6192 43.42 0.7144 45.43 0.1418 46.9 0.3179 48.08 0.4577 51.81 0.7408 52.83 0.561 53.7 0.1937 198.2 0" .
+

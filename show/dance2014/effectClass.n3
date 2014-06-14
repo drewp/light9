@@ -8,4 +8,14 @@
 effect:cycFlash a :EffectClass;
   rdfs:label "cycFlash";
   :code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * nsin(t*2)" .
+
+effect:blacklight a :EffectClass;
+  rdfs:label "blacklight";
+  :code 
+  "env = <http://light9.bigasterisk.com/show/dance2014/song1/curve-1>",
+  "p1 = env * <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .5",
+  "p2 = Strip.solid('R', (0,0,.3)) * env",
+  "p3 = Strip.solid('L', (0,0,.3)) * env, Blacklight(1) * env",
+    "out = [p1, p2, p3]"
+  .
   
