@@ -28,7 +28,8 @@ from run_local import log
 log.setLevel(logging.DEBUG)
 
 from light9.dmxchanedit import Levelbox
-from light9 import dmxclient, Submaster, prof, showconfig
+from light9 import dmxclient, Submaster, prof, showconfig, networking
+
 from light9.Patch import get_channel_name
 from light9.uihelpers import toplevelat
 from light9.rdfdb.syncedgraph import SyncedGraph
