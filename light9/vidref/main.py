@@ -9,7 +9,6 @@ gst-launch dv1394src ! dvdemux name=d ! dvdec ! ffmpegcolorspace ! hqdn3d ! xvim
 import gobject, logging, traceback
 import gtk
 from twisted.python.util import sibpath
-from light9 import networking
 from light9.vidref.replay import ReplayViews, framerate
 from light9.vidref.musictime import MusicTime
 from light9.vidref.videorecorder import Pipeline
@@ -23,7 +22,6 @@ class Gui(object):
         mainwin = wtree.get_object("MainWindow")
         mainwin.connect("destroy", gtk.main_quit)
         wtree.connect_signals(self)
-        mainwin.set_size_request(920, 815)
         gtk.rc_parse("theme/marble-ice/gtk-2.0/gtkrc")
 
         self.recordingTo = wtree.get_object('recordingTo')
