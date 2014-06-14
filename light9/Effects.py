@@ -18,7 +18,7 @@ def register(f):
 @register
 class Strip(object):
     """list of r,g,b tuples for sending to an LED strip"""
-    which = 'L'
+    which = 'L' # LR means both
     pixels = []
     @classmethod
     def solid(cls, which='L', color=(1,1,1)):
