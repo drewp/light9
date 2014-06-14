@@ -62,7 +62,8 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             cr.newCurve(ctx, label=Literal('sub %s' % droppedLabel))
             cr.saveCurve()
             quads.extend([
-                (song, L9['curve'], curve, ctx),                
+                (song, L9['curve'], curve, ctx),
+                (effect, RDFS.label, Literal('sub %s' % droppedLabel), ctx),
                 (effect, L9['code'],
                  Literal('out = %s * %s' % (dropped.n3(), curve.n3())),
                  ctx),
