@@ -2,7 +2,7 @@
 
 # this should be turned off when the programs are installed
 
-import sys,os
+import sys, os, socket
 sys.path.insert(0,os.path.join(os.path.dirname(sys.argv[0]),".."))
 
 from twisted.python.failure import Failure
@@ -40,7 +40,7 @@ def setTerminalTitle(s):
         print "\033]0;%s\007" % s # not escaped/protected correctly
 
 if 'listsongs' not in sys.argv[0]:
-    setTerminalTitle(' '.join(sys.argv))
+    setTerminalTitle('[%s] %s' % (socket.gethostname(), ' '.join(sys.argv)))
 
 # see http://www.youtube.com/watch?v=3cIOT9kM--g for commands that make
 # profiles and set background images
