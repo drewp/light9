@@ -47,6 +47,10 @@ $(function () {
 
     $("#nav").text(navigator.userAgent);
     var updateFreq = (navigator.userAgent.indexOf("Linux") != -1) ? 10 : 2;
+    if (navigator.userAgent.match(/Windows NT/)) {
+      // helper laptop
+      updateFreq = 10;
+    }
     $("#updateReq").text(updateFreq);
 
     var times = { // need to get these from server
