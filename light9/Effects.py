@@ -41,6 +41,9 @@ class Strip(object):
 @register
 class Blacklight(float):
     """a level for the blacklight PWM output"""
+    def __mul__(self, f):
+        return Blacklight(self * f)
+    __rmul__ = __mul__
     
 @register
 def chase(t, ontime=0.5, offset=0.2, onval=1.0, 
