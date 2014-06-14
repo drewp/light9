@@ -47,16 +47,16 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
 
         with graph.currentState(
                 tripleFilter=(dropped, None, None)) as g:
-            droppedTypes = g.objects(dropped, RDF.type)
+            droppedTypes = list(g.objects(dropped, RDF.type))
             droppedLabel = g.label(dropped)
-            droppedCodes = g.objects(dropped, L9['code'])
+            droppedCodes = list(g.objects(dropped, L9['code']))
 
         if L9['EffectClass'] in droppedTypes:
             quads.extend([
                 (effect, RDFS.label, droppedLabel, ctx),
                 (effect, RDF.type, dropped, ctx),
                 ] + [(effect, L9['code'], c, ctx) for c in droppedCodes])
-        elif L9['Curve'] in droppedTypes:
+        elif L9['Submaster'] in droppedTypes:
             curve = graph.sequentialUri(song + "/curve-")
             cr = CurveResource(graph, curve)
             cr.newCurve(ctx, label=Literal('sub %s' % droppedLabel))
