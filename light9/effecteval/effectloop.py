@@ -13,6 +13,7 @@ from light9 import Effects
 from light9 import networking
 from light9 import Submaster
 from light9 import dmxclient
+from light9 import prof
 log = logging.getLogger('effectloop')
 
 class EffectLoop(object):
@@ -38,7 +39,9 @@ class EffectLoop(object):
 
     def startLoop(self):
         log.info("startLoop")
+        self.lastSendLevelsTime = 0
         reactor.callLater(self.period, self.sendLevels)
+        reactor.callLater(self.period, self.updateTimeFromMusic)
 
     def setEffects(self):
         self.currentEffects = []
@@ -70,29 +73,38 @@ class EffectLoop(object):
             estimated += now - self.requestTime
         returnValue((estimated, self.currentSong))
 
-            
+
+    @inlineCallbacks
+    def updateTimeFromMusic(self):
+        t1 = time.time()
+        with self.stats.getMusic.time():
+            songTime, song = yield self.getSongTime()
+
+        if song != self.currentSong:
+            self.currentSong = song
+            # this may be piling on the handlers
+            self.graph.addHandler(self.setEffects)
+        self.songTime = songTime
+        elapsed = time.time() - t1
+        reactor.callLater(max(0, self.period - elapsed), self.updateTimeFromMusic)
+
+    def estimatedSongTime(self):
+        return self.songTime
+        
     @inlineCallbacks
     def sendLevels(self):
         t1 = time.time()
+        log.debug("time since last call: %.1f ms" % (1000 * (t1 - self.lastSendLevelsTime)))
+        self.lastSendLevelsTime = t1
         try:
             with self.stats.sendLevels.time():
-                with self.stats.getMusic.time():
-                    songTime, song = yield self.getSongTime()
-
-                if song != self.currentSong:
-                    self.currentSong = song
-                    # this may be piling on the handlers
-                    self.graph.addHandler(self.setEffects)
-
-                if song is None:
-                    return
-
-                with self.stats.evals.time():
-                    outputs = self.allEffectOutputs(songTime)
-                combined = self.combineOutputs(outputs)
-                self.logLevels(t1, combined)
-                with self.stats.sendOutput.time():
-                    yield self.sendOutput(combined)
+                if self.currentSong is not None:
+                    with self.stats.evals.time():
+                        outputs = self.allEffectOutputs(self.estimatedSongTime())
+                    combined = self.combineOutputs(outputs)
+                    self.logLevels(t1, combined)
+                    with self.stats.sendOutput.time():
+                        yield self.sendOutput(combined)
                 
                 elapsed = time.time() - t1
                 dt = max(0, self.period - elapsed)
