@@ -15,12 +15,23 @@
     <div class="songs"/>
 
     <div class="dimStalled">
-      <div>Song: <span id="currentSong"/></div>
-      <div>Time: <span id="currentTime"/></div>
-      <div>Left: <span id="leftTime"/></div>
-      <div>Until autostop: <span id="leftAutoStopTime"/></div>
-      <div>Update freq: requested <span id="updateReq"/>, actual <span id="updateActual"/></div>
-      <div>States: <span id="states"/></div>
+      <table>
+        <tr><td colspan="3">Song: <span id="currentSong"/></td></tr>
+        <tr>
+          <td>Time: <span id="currentTime"/></td>
+          <td>Left: <span id="leftTime"/></td>
+          <td>Until autostop: <span id="leftAutoStopTime"/></td>
+        </tr>
+        <tr>
+
+          <td colspan="3">
+            Update freq: requested <span id="updateReq"/>, actual <span id="updateActual"/>
+            States: <span id="states"/>
+          </td>
+          
+        </tr>
+      </table>
+      
       <div class="timeRow">
         <div id="timeSlider"/>
       </div>
