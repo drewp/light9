@@ -1,0 +1,26 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/song16> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song16/curve-1> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2014/song16/effect-1> .
+
+<http://light9.bigasterisk.com/show/dance2014/song16/effect-2> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/cycFlash> ;
+    rdfs:label "cycFlash" ;
+    ns1:code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * nsin(t*2)" .
+
+<http://light9.bigasterisk.com/show/dance2014/song16/curve-1> a ns1:Curve ;
+    rdfs:label "blacklight" .
+
+<http://light9.bigasterisk.com/show/dance2014/song16/effect-1> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/blacklight> ;
+    rdfs:label "blacklight" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song16/curve-1>",
+        "out = [env * p1, env * p2, env * p4]",
+        "p1 = env * <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .5",
+        "p2 = Strip.solid('LR', (curve(<http://light9.bigasterisk.com/show/dance2014/song16smooth_music>,t+.2),curve(<http://light9.bigasterisk.com/show/dance2014/song16smooth_music>,t+.1),curve(<http://light9.bigasterisk.com/show/dance2014/song16smooth_music>,t)*3))",
+        "p4 = Blacklight(min(255,<http://light9.bigasterisk.com/show/dance2014/song16smooth_music>*3))" .
+

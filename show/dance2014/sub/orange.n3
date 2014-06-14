@@ -1,0 +1,59 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange> a ns1:Submaster ;
+    rdfs:label "orange" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/14739305>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/213885522>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/275036431>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/350701590>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/420545514>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/575014434>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/74622266>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/796239863>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/867137124>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/913119622> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/14739305> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/oran1> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/213885522> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-r> ;
+    ns1:level 2.9e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/275036431> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-r> ;
+    ns1:level 5e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/350701590> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/oran3> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/420545514> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-g> ;
+    ns1:level 2.95e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/575014434> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-r> ;
+    ns1:level 5e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/74622266> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-g> ;
+    ns1:level 1.55e-01 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/796239863> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/oran4> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/867137124> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/oran2> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/913119622> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-g> ;
+    ns1:level 2.85e-01 .
+
