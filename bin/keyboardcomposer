@@ -257,6 +257,7 @@ class KeyboardComposer(Frame, SubClient):
         if hw_sliders:
             try:
                 self.sliders = Sliders(self)
+                log.info("connected to sliders")
             except IOError:
                 log.info("no hardware sliders")
                 self.sliders = DummySliders()
