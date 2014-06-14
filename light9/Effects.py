@@ -27,6 +27,17 @@ class Strip(object):
         x.pixels = [tuple(color)] * 50
         return x
 
+    def __mul__(self, f):
+        if not isinstance(f, (int, float)):
+            raise TypeError
+            
+        s = Strip()
+        s.which = self.which
+        s.pixels = [(r*f, g*f, b*f) for r,g,b in self.pixels]
+        return s
+
+    __rmul__ = __mul__
+
 @register
 class Blacklight(float):
     """a level for the blacklight PWM output"""

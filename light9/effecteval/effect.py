@@ -9,6 +9,9 @@ log = logging.getLogger('effect')
 
 # consider http://waxeye.org/ for a parser that can be used in py and js
 
+class CouldNotConvert(TypeError):
+    pass
+
 class CodeLine(object):
     """code string is immutable"""
     def __init__(self, graph, code):
@@ -64,18 +67,24 @@ class CodeLine(object):
         out = {}
         subs = Submaster.get_global_submasters(self.graph)
         for localVar, uri in resources.items():
+            
             for rdfClass in self.graph.objects(uri, RDF.type):
                 if rdfClass == L9['Curve']:
                     cr = CurveResource(self.graph, uri)
                     cr.loadCurve()
                     out[localVar] = cr.curve
+                    break
                 elif rdfClass == L9['Submaster']:
                     out[localVar] = subs.get_sub_by_uri(uri)
+                    break
                 else:
-                    out[localVar] = uri
+                    out[localVar] = CouldNotConvert(uri)
+                    break
+            else:
+                out[localVar] = CouldNotConvert(uri)
 
         return out
-
+        
 class EffectNode(object):
     def __init__(self, graph, uri):
         self.graph, self.uri = graph, uri
