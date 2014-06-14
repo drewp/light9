@@ -1,0 +1,8 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014> ns1:vidrefCamRequest <http://10.2.0.3:8001/pic?resize=500&shutter=15296&exposure_mode=auto&awb_mode=auto&brightness=50&redgain=1&bluegain=1&iso=250&exposure_compensation=0&rotation=180&x=0&y=0.47&w=0.804&h=0.5> .
+
