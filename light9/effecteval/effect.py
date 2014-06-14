@@ -22,6 +22,7 @@ class CodeLine(object):
         self.pyResources = self._resourcesAsPython(self.resources)
         self.possibleVars = self.findVars(self.inExpr)
 
+    @prof.logTime
     def _asPython(self):
         """
         out = sub(<uri1>, intensity=<curveuri2>)
@@ -60,19 +61,21 @@ class CodeLine(object):
         # this result could vary with graph changes (rare)
         return self.graph.contains((uri, RDF.type, L9['Curve']))
         
+    @prof.logTime
     def _resourcesAsPython(self, resources):
         """
         mapping of the local names for uris in the code to high-level
         objects (Submaster, Curve)
         """
         out = {}
-        subs = Submaster.get_global_submasters(self.graph)
+        subs = prof.logTime(Submaster.get_global_submasters)(self.graph)
         for localVar, uri in resources.items():
             
             for rdfClass in self.graph.objects(uri, RDF.type):
                 if rdfClass == L9['Curve']:
                     cr = CurveResource(self.graph, uri)
-                    cr.loadCurve()
+                    # this is slow- pool these curves somewhere, maybe just with curveset
+                    prof.logTime(cr.loadCurve)()
                     out[localVar] = cr.curve
                     break
                 elif rdfClass == L9['Submaster']:
