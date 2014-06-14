@@ -119,7 +119,11 @@ class EffectLoop(object):
         outputs = []
         for e in self.currentEffects:
             try:
-                outputs.append(e.eval(songTime))
+                out = e.eval(songTime)
+                if isinstance(out, (list, tuple)):
+                    outputs.extend(out)
+                else:
+                    outputs.append(out)
             except Exception as exc:
                 now = time.time()
                 if now > self.lastErrorLog + 5:
