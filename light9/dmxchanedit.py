@@ -19,10 +19,10 @@ proposal for new attribute system:
 from __future__ import nested_scopes,division
 import Tkinter as tk
 from rdflib import RDF, Literal
-import math
+import math, logging
 from decimal import Decimal
 from light9.namespaces import L9
-
+log = logging.getLogger('dmxchanedit')
 stdfont = ('Arial', 9)
 
 def gradient(lev, low=(80,80,180), high=(255,55,50)):
@@ -192,12 +192,20 @@ class Levelbox(tk.Frame):
         remaining = set(self.levelFromUri.keys())
         for ll in self.graph.objects(sub, L9['lightLevel']):
             chan = self.graph.value(ll, L9['channel'])
-            lev = self.graph.value(ll, L9['level']).toPython()
+            try:
+                 lev = self.graph.value(ll, L9['level']).toPython()
+            except AttributeError as e:
+                 log.error('on lightlevel %r:', ll)
+                 log.exception(e)
+                 continue
             if isinstance(lev, Decimal):
                  lev = float(lev)
             assert isinstance(lev, (int, long, float)), repr(lev)
-            self.levelFromUri[chan].setTo(lev)
-            remaining.remove(chan)
+            try:
+                 self.levelFromUri[chan].setTo(lev)
+                 remaining.remove(chan)
+            except KeyError as e:
+                 log.exception(e)
         for channel in remaining:
             self.levelFromUri[channel].setTo(0)
 
