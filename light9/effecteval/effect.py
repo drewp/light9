@@ -3,6 +3,7 @@ import toposort
 from rdflib import URIRef
 from light9.namespaces import L9, RDF
 from light9.curvecalc.curve import CurveResource
+from light9 import prof
 from light9 import Submaster
 from light9 import Effects # gets reload() later
 log = logging.getLogger('effect')
@@ -91,6 +92,7 @@ class EffectNode(object):
         # this is not expiring at the right time, when an effect goes away
         self.graph.addHandler(self.prepare)
 
+    @prof.logTime
     def prepare(self):
         log.info("prepare effect %s", self.uri)
         # maybe there can be multiple lines of code as multiple
@@ -103,8 +105,8 @@ class EffectNode(object):
 
         self.sortCodes()
 
-        reload(Effects)
-        self.otherFuncs = Effects.configExprGlobals()
+        #reload(Effects)
+        self.otherFuncs = prof.logTime(Effects.configExprGlobals)()
 
     def sortCodes(self):
         """put self.codes in a working evaluation order"""
