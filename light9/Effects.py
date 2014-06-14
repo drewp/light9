@@ -42,7 +42,7 @@ class Strip(object):
 class Blacklight(float):
     """a level for the blacklight PWM output"""
     def __mul__(self, f):
-        return Blacklight(self * f)
+        return Blacklight(float(self) * f)
     __rmul__ = __mul__
     
 @register
