@@ -133,7 +133,11 @@ class EffectNode(object):
         for c in self.codes:
             codeNs = ns.copy()
             codeNs.update(c.pyResources)
-            lineOut = eval(c.expr, codeNs)
+            try:
+                lineOut = eval(c.expr, codeNs)
+            except Exception as e:
+                e.expr = c.expr
+                raise e
             ns[c.outName] = lineOut
         if 'out' not in ns:
             log.error("ran code for %s, didn't make an 'out' value", self.uri)

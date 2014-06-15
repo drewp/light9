@@ -147,6 +147,8 @@ class EffectLoop(object):
             except Exception as exc:
                 now = time.time()
                 if now > self.lastErrorLog + 5:
+                    if hasattr(exc, 'expr'):
+                        log.error('in expression %r', exc.expr)
                     log.error("effect %s: %s" % (e.uri, exc))
                     self.lastErrorLog = now
         log.debug('eval %s effects, got %s outputs', len(self.currentEffects), len(outputs))

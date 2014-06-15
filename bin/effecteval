@@ -53,6 +53,7 @@ def newEnvelopeCurve(graph, ctx, uri, label):
 
 @inlineCallbacks
 def insertEnvelopePoints(curve):
+    # wrong: we might not be adding to the currently-playing song.
     musicStatus = yield getMusicStatus()
     songTime=musicStatus['t']
     songDuration=musicStatus['duration']
