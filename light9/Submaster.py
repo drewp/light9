@@ -168,16 +168,20 @@ class PersistentSubmaster(Submaster):
             log.debug(" lightLevel %s %s", self.uri, lev)
             chan = self.graph.value(lev, L9['channel'])
 
+            val = self.graph.value(lev, L9['level'])
+            if val is None:
+                # broken lightLevel link- may be from someone deleting channels
+                log.warn("sub %r has lightLevel %r with channel %r "
+                         "and level %r" % (self.uri, lev, chan, val))
+                continue
+            log.debug("   new val %r", val)
+            if val == 0:
+                continue
             name = self.graph.label(chan)
             if not name:
                 log.error("sub %r has channel %r with no name- "
                           "leaving out that channel" % (self.name, chan))
                 continue
-            val = self.graph.value(lev, L9['level'])
-            if val is None:
-                raise ValueError("sub %r has lightLevel %r with channel %r "
-                                 "and level %r" % (self.uri, lev, chan, val))
-            log.debug("   new val %r", val)
             try:
                 self.levels[name] = float(val)
             except:
