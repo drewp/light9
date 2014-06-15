@@ -4,13 +4,22 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2014/song12> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song12/curve-1> ;
-    ns1:effect <http://light9.bigasterisk.com/show/dance2014/song12/effect-1> .
+<http://light9.bigasterisk.com/show/dance2014/song12> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song12/curve-1>,
+        <http://light9.bigasterisk.com/show/dance2014/song12/curve-2> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2014/song12/effect-1>,
+        <http://light9.bigasterisk.com/show/dance2014/song12/effect-2> .
 
 <http://light9.bigasterisk.com/show/dance2014/song12/curve-1> a ns1:Curve ;
     rdfs:label "sub song12" .
 
+<http://light9.bigasterisk.com/show/dance2014/song12/curve-2> a ns1:Curve ;
+    rdfs:label "sub full" .
+
 <http://light9.bigasterisk.com/show/dance2014/song12/effect-1> a ns1:Effect ;
     rdfs:label "sub song12" ;
     ns1:code "out = <http://light9.bigasterisk.com/show/dance2014/sub/song12> * <http://light9.bigasterisk.com/show/dance2014/song12/curve-1>" .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/effect-2> a ns1:Effect ;
+    rdfs:label "sub full" ;
+    ns1:code "out = <http://light9.bigasterisk.com/show/dance2014/sub/full> * <http://light9.bigasterisk.com/show/dance2014/song12/curve-2>" .
 
