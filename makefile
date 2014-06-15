@@ -59,3 +59,7 @@ raspberry_pi_virtualenv:
 raspberry_pi_packages:
 	sudo apt-get install python-picamera python-twisted 
 	env_pi/bin/pip install cyclone coloredlogs
+
+darcs_show_checkpoint:
+	darcs add --quiet --recursive ${LIGHT9_SHOW} 
+	darcs rec -a -m "checkpoint show data" ${LIGHT9_SHOW}
