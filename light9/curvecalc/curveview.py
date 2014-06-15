@@ -874,7 +874,7 @@ class Curveview(object):
             
     def _draw_handle_points(self,visible_idxs,visible_points):
         for i,p in zip(visible_idxs,visible_points):
-            rad=3
+            rad=6
             worldp = p
             try:
                 p = self.screen_from_world(p)
