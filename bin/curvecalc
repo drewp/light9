@@ -490,7 +490,7 @@ def main():
                       help="live reload of themes and code")
     parser.add_option("--startup-only", action='store_true',
                       help="quit after loading everything (for timing tests)")
-    parser.add_option("--profile", action='store_true', help='profile')
+    parser.add_option("--profile", help='"hotshot" or "stat"')
     clientsession.add_option(parser)
     opts, args = parser.parse_args()
 

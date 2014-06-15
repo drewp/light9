@@ -1,16 +1,25 @@
 import sys, traceback, time, logging
 log = logging.getLogger()
 
-def run(main, profile=False):
+def run(main, profile=None):
     if not profile:
         main()
         return
-    
-    import hotshot, hotshot.stats
-    p = hotshot.Profile("/tmp/pro")
-    p.runcall(main)
-    p.close()
-    hotshot.stats.load("/tmp/pro").sort_stats('cumulative').print_stats()
+
+    if profile == 'hotshot':
+        import hotshot, hotshot.stats
+        p = hotshot.Profile("/tmp/pro")
+        p.runcall(main)
+        p.close()
+        hotshot.stats.load("/tmp/pro").sort_stats('cumulative').print_stats()
+    elif profile == 'stat':
+        import statprof
+        statprof.start()
+        try:
+            main()
+        finally:
+            statprof.stop()
+            statprof.display()
     
 def watchPoint(filename, lineno, event="call"):
     """whenever we hit this line, print a stack trace. event='call'
