@@ -10,6 +10,7 @@ from rdflib import URIRef, Literal
 sys.path.append('/usr/lib/pymodules/python2.7/') # for numpy, on rpi
 sys.path.append('/usr/lib/python2.7/dist-packages') # For numpy
 from light9 import networking, showconfig, Submaster, dmxclient
+from light9.curvecalc import musicaccess
 from light9.curvecalc.curve import CurveResource
 from light9.effecteval.effect import EffectNode
 from light9.effecteval.effectloop import makeEffectLoop
@@ -33,45 +34,90 @@ class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
             (song, L9['effect'], uri, ctx),
             ]))
         
+def clamp(x, lo, hi):
+    return max(lo, min(hi, x))
+    
+@inlineCallbacks
+def newEnvelopeCurve(graph, ctx, uri, label):
+    """this does its own patch to the graph"""
+    
+    musicStatus = json.loads((yield cyclone.httpclient.fetch(
+        networking.musicPlayer.path('time'), timeout=.5)).body)
+    songTime=musicStatus['t']
+    songDuration=musicStatus['duration']
+    
+    cr = CurveResource(graph, uri)
+    cr.newCurve(ctx, label=Literal(label))
+    fade = 2
+    t1 = clamp(songTime - fade, .1, songDuration - .1 * 2) + fade
+    t2 = clamp(songTime + 20, t1 + .1, songDuration)
+    print vars()
+    
+    cr.curve.insert_pt((t1 - fade, 0))
+    cr.curve.insert_pt((t1, 1))
+    cr.curve.insert_pt((t2, 1))
+    cr.curve.insert_pt((t2 + fade, 0))
+    cr.saveCurve()
+
+def newEffect(graph, song, ctx):
+    effect = graph.sequentialUri(song + "/effect-")
+    quads = [
+        (song, L9['effect'], effect, ctx),
+        (effect, RDF.type, L9['Effect'], ctx),
+    ]
+    return effect, quads
+    
+def musicCurveForSong(uri):
+    return URIRef(uri + 'music')
+    
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
+    @inlineCallbacks
     def post(self):
         song = URIRef(self.get_argument('uri'))
         dropped = URIRef(self.get_argument('drop'))
         ctx = song
         graph = self.settings.graph
-        effect = graph.sequentialUri(song + "/effect-")
-        quads = [
-            (song, L9['effect'], effect, ctx),
-            (effect, RDF.type, L9['Effect'], ctx),
-        ]
-
+        
         with graph.currentState(
                 tripleFilter=(dropped, None, None)) as g:
             droppedTypes = list(g.objects(dropped, RDF.type))
             droppedLabel = g.label(dropped)
             droppedCodes = list(g.objects(dropped, L9['code']))
 
+        quads = []
+            
+        effect, q = newEffect(graph, song, ctx)
+        quads.extend(q)
+
+        curve = graph.sequentialUri(song + "/curve-")
+        yield newEnvelopeCurve(graph, ctx, curve, droppedLabel)
+        quads.extend([
+            (song, L9['curve'], curve, ctx),
+            (effect, RDFS.label, droppedLabel, ctx),
+            (effect, L9['code'], Literal('env = %s' % curve.n3()), ctx),
+            ])
+        
         if L9['EffectClass'] in droppedTypes:
             quads.extend([
-                (effect, RDFS.label, droppedLabel, ctx),
                 (effect, RDF.type, dropped, ctx),
                 ] + [(effect, L9['code'], c, ctx) for c in droppedCodes])
         elif L9['Submaster'] in droppedTypes:
-            curve = graph.sequentialUri(song + "/curve-")
-            cr = CurveResource(graph, curve)
-            cr.newCurve(ctx, label=Literal('sub %s' % droppedLabel))
-            cr.saveCurve()
             quads.extend([
-                (song, L9['curve'], curve, ctx),
-                (effect, RDFS.label, Literal('sub %s' % droppedLabel), ctx),
-                (effect, L9['code'],
-                 Literal('out = %s * %s' % (dropped.n3(), curve.n3())),
+                (effect, L9['code'], Literal('out = %s * env' % dropped.n3()),
                  ctx),
                 ])
         else:
             raise NotImplementedError(
                 "don't know how to add an effect from %r (types=%r)" %
                 (dropped, droppedTypes))
+
+        for spoc in quads:
+            if 'music' in spoc[2]:
+                quads.extend([
+                    (effect, L9['code'],
+                     Literal('music = %s' % musicCurveForSong(song).n3()), ctx)
+                    ])
+                break
             
         graph.patch(Patch(addQuads=quads))
         
@@ -217,7 +263,10 @@ class App(object):
             (r'/songEffects', SongEffects),
             (r'/songEffects/eval', SongEffectsEval),
             (r'/stats', StatsForCyclone),
-        ], debug=True, graph=self.graph, stats=self.stats)
+        ],
+                                                  debug=True,
+                                                  graph=self.graph,
+                                                  stats=self.stats)
         reactor.listenTCP(networking.effectEval.port, self.cycloneApp)
         log.info("listening on %s" % networking.effectEval.port)
         

@@ -5,9 +5,19 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+
+# when these are inserted, a curve called 'env' will be added to this
+# code, so multiply by that. Also if you mention 'music' anywhere, an
+# output 'music' will be set to the current song.
+
+
 effect:cycFlash a :EffectClass;
   rdfs:label "cycFlash";
   :code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * nsin(t*2)" .
+
+  
+effect:cycToMusic a :EffectClass; rdfs:label "cyc to music";
+:code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * music * env" .
 
 effect:blacklight a :EffectClass;
   rdfs:label "blacklight";
