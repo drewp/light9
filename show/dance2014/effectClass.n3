@@ -15,14 +15,20 @@ effect:cycFlash a :EffectClass;
   rdfs:label "cycFlash";
   :code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * nsin(t*2)" .
 
+# Notes for quneo pads:
+# 48 49 50 51
+# 44 45 46 47
+# 40 41 42 43
+# 36 37 38 39
+  
   
 effect:cycToMusic a :EffectClass; rdfs:label "cyc to music";
-:quneoNote 26;
+:quneoNote 36;
 :code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * music * env" .
 
 effect:blacklight a :EffectClass;
   rdfs:label "blacklight";
-  :quneoNote 23;
+  :quneoNote 37;
   :code 
     "env = <http://light9.bigasterisk.com/show/dance2014/song1/curve-1>",
     "out = [env * p1, env * p2, env * p3, env * p4]",
