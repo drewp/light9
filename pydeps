@@ -25,3 +25,4 @@ toposort==1.0
 pyserial==2.7
 
 scales==1.0.6
+statprof==0.1.2
