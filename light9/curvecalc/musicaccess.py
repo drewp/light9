@@ -1,4 +1,3 @@
-import restkit
 import json
 from louie import dispatcher
 from rdflib import URIRef
@@ -76,11 +75,3 @@ class Music:
             self.player.request("POST",
                                 networking.musicPlayer.path("seekPlayOrPause"),
                                 bodyProducer=StringProducer(json.dumps({"t" : t})))
-
-def currentlyPlayingSong():
-    """ask the music player what song it's on"""
-    player = restkit.Resource(networking.musicPlayer.url)
-    t = json.loads(player.get("time").body_string())
-    if t['song'] is None:
-        raise ValueError("music player is not playing any song")
-    return URIRef(t['song'])
