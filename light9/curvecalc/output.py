@@ -51,8 +51,11 @@ class Output(object):
         
     def send_dmx(self, t):
         dispatcher.send("curves to sliders", t=t)
-        scaledsubs=[]
 
+        if not self.currentSubterms:
+            return
+            
+        scaledsubs=[]
         for st in self.currentSubterms:
             scl = st.scaled(t)
             scaledsubs.append(scl)
