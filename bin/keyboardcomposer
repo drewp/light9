@@ -221,13 +221,16 @@ class KeyboardComposer(Frame, SubClient):
         # there are unlikely to be any subs at startup because we
         # probably haven't been called back with the graph data yet
 
-        withgroups = sorted((self.graph.value(sub.uri, L9['group']),
-                             self.graph.value(sub.uri, L9['order']),
-                             sub)
+        withgroups = sorted(
+            (self.graph.value(sub.uri, L9['group']),
+             self.graph.value(sub.uri, L9['order']),
+             self.graph.label(sub), # todo: split numbers into ints so they sort right
+             sub.uri, 
+             sub)
             for sub in self.submasters.get_all_subs())
         log.info("withgroups %s", withgroups)
 
-        for group, order, sub in withgroups:
+        for group, order, _sortLabel, _sortUri, sub in withgroups:
             group = self.graph.value(sub.uri, L9['group'])
 
             if col == 0 or group != last_group:
