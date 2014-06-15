@@ -5,15 +5,48 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://light9.bigasterisk.com/show/dance2014/song12> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song12/curve-1>,
-        <http://light9.bigasterisk.com/show/dance2014/song12/curve-2> ;
+        <http://light9.bigasterisk.com/show/dance2014/song12/curve-2>,
+        <http://light9.bigasterisk.com/show/dance2014/song12/curve-3>,
+        <http://light9.bigasterisk.com/show/dance2014/song12/curve-4>,
+        <http://light9.bigasterisk.com/show/dance2014/song12/curve-5> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2014/song12/effect-1>,
         <http://light9.bigasterisk.com/show/dance2014/song12/effect-2> .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/effect-3> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/cycToMusic> ;
+    rdfs:label "cyc to music" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song12/curve-3>",
+        "music = <http://light9.bigasterisk.com/show/dance2014/song12music>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * music * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/effect-4> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/cycToMusic> ;
+    rdfs:label "cyc to music" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song12/curve-4>",
+        "music = <http://light9.bigasterisk.com/show/dance2014/song12music>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * music * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/effect-5> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/cycToMusic> ;
+    rdfs:label "cyc to music" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song12/curve-5>",
+        "music = <http://light9.bigasterisk.com/show/dance2014/song12music>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * music * env" .
 
 <http://light9.bigasterisk.com/show/dance2014/song12/curve-1> a ns1:Curve ;
     rdfs:label "sub song12" .
 
 <http://light9.bigasterisk.com/show/dance2014/song12/curve-2> a ns1:Curve ;
     rdfs:label "sub full" .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/curve-3> a ns1:Curve ;
+    rdfs:label "cyc to music" .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/curve-4> a ns1:Curve ;
+    rdfs:label "cyc to music" .
+
+<http://light9.bigasterisk.com/show/dance2014/song12/curve-5> a ns1:Curve ;
+    rdfs:label "cyc to music" .
 
 <http://light9.bigasterisk.com/show/dance2014/song12/effect-1> a ns1:Effect ;
     rdfs:label "sub song12" ;

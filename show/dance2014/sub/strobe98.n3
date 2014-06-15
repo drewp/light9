@@ -1,0 +1,44 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/strobe98> a ns1:Submaster ;
+    rdfs:label "strobe98" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1402849859.13/map/110212461>,
+        <http://light9.bigasterisk.com/sub/local/1402849859.13/map/300352937>,
+        <http://light9.bigasterisk.com/sub/local/1402849859.13/map/320877914>,
+        <http://light9.bigasterisk.com/sub/local/1402849859.13/map/469072802>,
+        <http://light9.bigasterisk.com/sub/local/1402849859.13/map/619529524>,
+        <http://light9.bigasterisk.com/sub/local/1402849859.13/map/662840261>,
+        <http://light9.bigasterisk.com/sub/local/1402849859.13/map/847912455> .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/110212461> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b23-up> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/300352937> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b24-up> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/320877914> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b21-edge> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/469072802> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b14-yel> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/619529524> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b32-red> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/662840261> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/strobebright> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1402849859.13/map/847912455> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/strobespeed> ;
+    ns1:level 9.8e-01 .
+
