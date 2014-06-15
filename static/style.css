@@ -61,10 +61,13 @@ button a {
 }
 
 .dropTarget {
-    padding: 5px;
+    padding: 10px 5px;
     border: 2px dashed gray;
     font-style: italic;
     color: rgb(78, 90, 107);
+}
+.dropTarget:hover {
+    background: #1F1F0D;
 }
 .twoColList {
     -webkit-column-width: 24em;

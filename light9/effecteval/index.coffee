@@ -9,6 +9,9 @@ model.drop = (uri, event) ->
   event.preventDefault()
   dropped(uri, event.originalEvent.dataTransfer.getData('text/uri-list'))
 
+model.focusSong = (song) ->
+  window.location.search = '?song=' + song.uri
+
 dropped = (songTargetUri, dropUri) ->
   $.post('songEffects', {uri: songTargetUri, drop: dropUri})
 
@@ -24,7 +27,12 @@ reconnectingWebSocket "ws://localhost:8070/songEffectsUpdates", (msg) ->
       do (e) ->
         e.deleteEffect = -> deleteEffect(e.uri)
 
-  model.songs(msg.songs)
+
+  m = window.location.search.match(/song=(http[^&]+)/)
+  if m
+    model.songs((s for s in msg.songs when s.uri == m[1]))
+  else
+    model.songs(msg.songs)
   
 ko.applyBindings(model)
 

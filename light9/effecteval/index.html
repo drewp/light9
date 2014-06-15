@@ -7,11 +7,12 @@
   </head>
   <body>
     <div><a href="stats">/stats</a></div>
-    <h1>All effect instances</h1>
+    <h1>Effect instances</h1>
+    <div><a href=".">View all songs</a></div>
     <!-- subscribe to a query of all effects and their songs -->
-    <ul data-bind="foreach: songs" class="twoColList">
+    <ul data-bind="foreach: songs">
       <li>
-        <a class="song" data-bind="attr: {href: uri}">Song <span data-bind="text: label"></span></a>
+        <a class="song" data-bind="attr: {href: uri}, click: $root.focusSong">Song <span data-bind="text: label"></span></a>
         <ul>
           <!-- ko foreach: effects -->
           <li>
