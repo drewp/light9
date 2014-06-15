@@ -26,6 +26,13 @@ class Model
 
 model = new Model()
 
+model.addToCurrentSong = (e) ->
+  $.ajax({
+    type: 'POST'
+    url: '//localhost:8070/songEffects'
+    data: {drop: e.uri}
+  })
+
 reconnectingWebSocket "ws://localhost:8052/effectsUpdates", (msg) ->
   model.chases(msg.chases) if msg.chases?
   model.classes(msg.classes) if msg.classes?

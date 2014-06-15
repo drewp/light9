@@ -36,13 +36,17 @@ class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
         
 def clamp(x, lo, hi):
     return max(lo, min(hi, x))
+
+@inlineCallbacks
+def getMusicStatus():
+    returnValue(json.loads((yield cyclone.httpclient.fetch(
+        networking.musicPlayer.path('time'), timeout=.5)).body))
     
 @inlineCallbacks
 def newEnvelopeCurve(graph, ctx, uri, label):
     """this does its own patch to the graph"""
     
-    musicStatus = json.loads((yield cyclone.httpclient.fetch(
-        networking.musicPlayer.path('time'), timeout=.5)).body)
+    musicStatus = yield getMusicStatus()
     songTime=musicStatus['t']
     songDuration=musicStatus['duration']
     
@@ -69,12 +73,37 @@ def newEffect(graph, song, ctx):
     
 def musicCurveForSong(uri):
     return URIRef(uri + 'music')
+
+@inlineCallbacks
+def currentSong():
+    s = (yield getMusicStatus())['song']
+    if s is None:
+        raise ValueError("no current song")
+    returnValue(URIRef(s))
     
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def wideOpenCors(self):
+        self.set_header('Access-Control-Allow-Origin', '*')
+        self.set_header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
+        self.set_header('Access-Control-Max-Age', '1000')
+        self.set_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
+    
+    def options(self):
+        self.wideOpenCors()
+        self.write('')
+
     @inlineCallbacks
     def post(self):
-        song = URIRef(self.get_argument('uri'))
+        self.wideOpenCors()
         dropped = URIRef(self.get_argument('drop'))
+
+        try:
+            song = URIRef(self.get_argument('uri'))
+        except Exception: # which?
+            song = yield currentSong()
+            
+        log.info("adding to %s", song)
+
         ctx = song
         graph = self.settings.graph
         
