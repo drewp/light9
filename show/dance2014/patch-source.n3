@@ -49,18 +49,18 @@
 
 [ :name "c40"; :output dmx:c40 ] .
 
-[ :name "c1"; :output dmx:c1 ] .
-[ :name "c2"; :output dmx:c2 ] .
-[ :name "c3"; :output dmx:c3 ] .
-[ :name "front4-r"; :output dmx:c4 ] .
-[ :name "front5-l"; :output dmx:c5 ] .
-[ :name "sharlyn"; :output dmx:c6 ] .
-[ :name "pool"; :output dmx:c7 ] .
-[ :name "front8-r"; :output dmx:c8 ] .
-[ :name "front9-l"; :output dmx:c9 ] .
-[ :name "front10-r2"; :output dmx:c10 ] .
-[ :name "c11"; :output dmx:c11 ] .
-[ :name "c12"; :output dmx:c12 ] .
+[ :name "f1-blue";   :output dmx:c1 ] .
+[ :name "f2";        :output dmx:c2 ] .
+[ :name "f3";        :output dmx:c3 ] .
+[ :name "f4-pool-l"; :output dmx:c4 ] .
+[ :name "f5-fill";   :output dmx:c5 ] .
+[ :name "sharlyn";   :output dmx:c6 ] .
+[ :name "f7";        :output dmx:c7 ] .
+[ :name "f8-fill";   :output dmx:c8 ] .
+[ :name "f9-pool-r"; :output dmx:c9 ] .
+[ :name "f10";       :output dmx:c10 ] .
+[ :name "f11-blue";  :output dmx:c11 ] .
+[ :name "f12-purp";  :output dmx:c12 ] .
 
 [ :name ""; :output dmx:c13 ] .
 [ :name "blacklight"; :output dmx:c14 ] .

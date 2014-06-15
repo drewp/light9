@@ -7,5 +7,9 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/blue> ns2:image <http://plus:8053/snapshot/1402724825.77.jpg> .
 
+<http://light9.bigasterisk.com/show/dance2014/sub/backs> ns2:image <http://plus:8053/snapshot/1402792923.84.jpg> .
+
 <http://plus:8053/snapshot/1402724825.77.jpg> ns1:created "2014-06-13T22:47:05.828915-07:00"^^xsd:dateTime .
+
+<http://plus:8053/snapshot/1402792923.84.jpg> ns1:created "2014-06-14T17:42:03.929240-07:00"^^xsd:dateTime .
 

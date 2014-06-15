@@ -12,5 +12,6 @@ sh:netHome
   :oscDmxServer     <udp://plus:9050/>;
   :curveCalc        <http://plus:8060/>;
   :keyboardComposer <http://plus:8050/>;
+  :subComposer <http://plus:8054/>;
   :picamserve       <http://10.2.0.3:8001/>;
   :vidref           <http://plus:8053/> .
