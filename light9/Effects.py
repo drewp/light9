@@ -21,7 +21,10 @@ class Strip(object):
     which = 'L' # LR means both
     pixels = []
     @classmethod
-    def solid(cls, which='L', color=(1,1,1)):
+    def solid(cls, which='L', color=(1,1,1), hsv=None):
+        """hsv overrides color"""
+        if hsv is not None:
+            color = colorsys.hsv_to_rgb(hsv[0] % 1.0, hsv[1], hsv[2])
         x = cls()
         x.which = which
         x.pixels = [tuple(color)] * 50
@@ -123,6 +126,9 @@ def configExprGlobals():
 
     ret['nsin'] = lambda x: (math.sin(x * (2 * math.pi)) + 1) / 2
     ret['ncos'] = lambda x: (math.cos(x * (2 * math.pi)) + 1) / 2
+    def nsquare(t, on=.5):
+        return (t % 1.0) < on
+    ret['nsquare'] = nsquare
 
     _smooth_random_items = [random_mod.random() for x in range(100)]
 
