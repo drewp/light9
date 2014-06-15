@@ -53,7 +53,11 @@ def inGraph(spoc, graph):
     c is just a URIRef.
     Workaround for https://github.com/RDFLib/rdflib/issues/398
     """
-    return (spoc[:3] + (Graph(identifier=spoc[3]),)) in graph.quads()
+    spoi = spoc[:3] + (Graph(identifier=spoc[3]),)
+    if spoi not in graph:
+        # this is a huge speedup, avoid many whole-graph scans
+        return False
+    return spoi in graph.quads()
 
 
 def graphFromQuads(q):
