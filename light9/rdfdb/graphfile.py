@@ -93,7 +93,7 @@ class GraphFile(object):
 
                 return
 
-            log.info("%s needs reread because of %s event", filepath, maskNames)
+            log.info("reread %s because of %s event", filepath, maskNames)
 
             self.reread()
         except Exception:
@@ -142,6 +142,8 @@ class GraphFile(object):
         if p:
             log.debug("%s applying patch for changes in file", self.path)
             self.patch(p, dueToFileChange=True)
+        else:
+            log.debug("old == new after reread of %s", self.path)
 
     def dirty(self, graph):
         """
