@@ -47,14 +47,16 @@ class EditChoice(Gtk.HBox):
          
     def makeDropTarget(self):
         def ddr(widget, drag_context, x, y, selection_data, info, timestamp):
-            if selection_data.get_data_type().name() != 'text/uri-list':
-                raise ValueError("unknown DnD selection type %r" %
-                                 selection_data.get_data_type())
+            dtype = selection_data.get_data_type()
+            if dtype.name() not in ['text/uri-list', 'TEXT']:
+                raise ValueError("unknown DnD selection type %r" % dtype)
             self.resourceObservable(URIRef(selection_data.get_data().strip()))
         
         self.currentLink.drag_dest_set(
             flags=Gtk.DestDefaults.ALL,
-            targets=[Gtk.TargetEntry.new('text/uri-list', 0, 0)],
+            targets=[Gtk.TargetEntry.new('text/uri-list', 0, 0),
+                     Gtk.TargetEntry.new('TEXT', 0, 0), # getting this from chrome :(
+                 ],
             actions=Gdk.DragAction.LINK  | Gdk.DragAction.COPY)
         self.currentLink.connect("drag_data_received", ddr)
                 
