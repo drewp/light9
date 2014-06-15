@@ -46,33 +46,52 @@ def getMusicStatus():
 def newEnvelopeCurve(graph, ctx, uri, label):
     """this does its own patch to the graph"""
     
+    cr = CurveResource(graph, uri)
+    cr.newCurve(ctx, label=Literal(label))
+    yield insertEnvelopePoints(cr.curve)
+    cr.saveCurve()
+
+@inlineCallbacks
+def insertEnvelopePoints(curve):
     musicStatus = yield getMusicStatus()
     songTime=musicStatus['t']
     songDuration=musicStatus['duration']
     
-    cr = CurveResource(graph, uri)
-    cr.newCurve(ctx, label=Literal(label))
     fade = 2
     t1 = clamp(songTime - fade, .1, songDuration - .1 * 2) + fade
     t2 = clamp(songTime + 20, t1 + .1, songDuration)
-    print vars()
     
-    cr.curve.insert_pt((t1 - fade, 0))
-    cr.curve.insert_pt((t1, 1))
-    cr.curve.insert_pt((t2, 1))
-    cr.curve.insert_pt((t2 + fade, 0))
-    cr.saveCurve()
-
+    curve.insert_pt((t1 - fade, 0))
+    curve.insert_pt((t1, 1))
+    curve.insert_pt((t2, 1))
+    curve.insert_pt((t2 + fade, 0))
+    
+    
 def newEffect(graph, song, ctx):
     effect = graph.sequentialUri(song + "/effect-")
     quads = [
         (song, L9['effect'], effect, ctx),
         (effect, RDF.type, L9['Effect'], ctx),
     ]
+    print "newEffect", effect, quads
     return effect, quads
     
 def musicCurveForSong(uri):
     return URIRef(uri + 'music')
+
+def maybeAddMusicLine(quads, effect, song, ctx):
+    """
+    add a line getting the current music into 'music' if any code might
+    be mentioning that var
+    """
+    
+    for spoc in quads:
+        if spoc[1] == L9['code'] and 'music' in spoc[2]:
+            quads.extend([
+                (effect, L9['code'],
+                 Literal('music = %s' % musicCurveForSong(song).n3()), ctx)
+                ])
+            break
 
 @inlineCallbacks
 def currentSong():
@@ -80,6 +99,11 @@ def currentSong():
     if s is None:
         raise ValueError("no current song")
     returnValue(URIRef(s))
+
+def songHasEffect(graph, song, uri):
+    """does this song have an effect of class uri or a sub curve for sub
+    uri? this should be simpler to look up."""
+    return False # todo
     
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
     def wideOpenCors(self):
@@ -114,40 +138,41 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             droppedCodes = list(g.objects(dropped, L9['code']))
 
         quads = []
-            
-        effect, q = newEffect(graph, song, ctx)
-        quads.extend(q)
 
-        curve = graph.sequentialUri(song + "/curve-")
-        yield newEnvelopeCurve(graph, ctx, curve, droppedLabel)
-        quads.extend([
-            (song, L9['curve'], curve, ctx),
-            (effect, RDFS.label, droppedLabel, ctx),
-            (effect, L9['code'], Literal('env = %s' % curve.n3()), ctx),
-            ])
-        
-        if L9['EffectClass'] in droppedTypes:
-            quads.extend([
-                (effect, RDF.type, dropped, ctx),
-                ] + [(effect, L9['code'], c, ctx) for c in droppedCodes])
-        elif L9['Submaster'] in droppedTypes:
-            quads.extend([
-                (effect, L9['code'], Literal('out = %s * env' % dropped.n3()),
-                 ctx),
-                ])
+        if songHasEffect(graph, song, dropped):
+            # bump the existing curve
+            pass
         else:
-            raise NotImplementedError(
-                "don't know how to add an effect from %r (types=%r)" %
-                (dropped, droppedTypes))
+            effect, q = newEffect(graph, song, ctx)
+            quads.extend(q)
 
-        for spoc in quads:
-            if 'music' in spoc[2]:
+            curve = graph.sequentialUri(song + "/curve-")
+            yield newEnvelopeCurve(graph, ctx, curve, droppedLabel)
+            quads.extend([
+                (song, L9['curve'], curve, ctx),
+                (effect, RDFS.label, droppedLabel, ctx),
+                (effect, L9['code'], Literal('env = %s' % curve.n3()), ctx),
+                ])
+
+            if L9['EffectClass'] in droppedTypes:
                 quads.extend([
-                    (effect, L9['code'],
-                     Literal('music = %s' % musicCurveForSong(song).n3()), ctx)
+                    (effect, RDF.type, dropped, ctx),
+                    ] + [(effect, L9['code'], c, ctx) for c in droppedCodes])
+            elif L9['Submaster'] in droppedTypes:
+                quads.extend([
+                    (effect, L9['code'], Literal('out = %s * env' % dropped.n3()),
+                     ctx),
                     ])
-                break
-            
+            else:
+                raise NotImplementedError(
+                    "don't know how to add an effect from %r (types=%r)" %
+                    (dropped, droppedTypes))
+
+            maybeAddMusicLine(quads, effect, song, ctx)
+
+        print "adding"
+        for qq in quads:
+            print qq
         graph.patch(Patch(addQuads=quads))
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
