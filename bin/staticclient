@@ -1,0 +1,34 @@
+#!bin/python
+"""
+push a dmx level forever
+"""
+from __future__ import division, nested_scopes
+import time, logging
+from optparse import OptionParser
+import logging, urllib
+from twisted.internet import reactor, tksupport, task
+from rdflib import URIRef, RDF, RDFS, Literal
+
+from run_local import log
+log.setLevel(logging.DEBUG)
+
+from light9 import dmxclient, showconfig, networking
+
+if __name__ == "__main__":
+    parser = OptionParser(usage="%prog")
+    parser.add_option('--chan', help='channel number, starts at 1', type=int) #todo: or name or uri
+    parser.add_option('--level', help='0..1', type=float)
+    parser.add_option('-v', action='store_true', help="log debug level")
+
+    opts, args = parser.parse_args()
+
+    log.setLevel(logging.DEBUG if opts.v else logging.INFO)
+
+    levels = [0] * (opts.chan - 1) + [opts.level]
+    log.info('staticclient will write this forever: %r', levels)
+    def write():
+        log.debug('writing %r', levels)
+        dmxclient.outputlevels(levels, twisted=1)
+    log.info('looping...')
+    task.LoopingCall(write).start(1)
+    reactor.run()
