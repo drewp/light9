@@ -1,0 +1,74 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur> a ns1:Submaster ;
+    rdfs:label "song16blur" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/153192661>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/160849936>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/252983525>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/281562461>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/350058594>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/442435468>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/472766050>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/518545388>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/632041120>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/658505764>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/738859953>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/802490738>,
+        <http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/930999835> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/153192661> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/upright> ;
+    ns1:level 4.65e-02 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/160849936> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-mode> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/252983525> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house2> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/281562461> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house1> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/350058594> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house4> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/442435468> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-right> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/472766050> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/upleft> ;
+    ns1:level 1.5e-01 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/518545388> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/down-c-P> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/632041120> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-mid> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/658505764> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-left> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/738859953> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house-side> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/802490738> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house3> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/song16blur/map/930999835> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-g> ;
+    ns1:level 0e+00 .
+

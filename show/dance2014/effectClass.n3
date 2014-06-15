@@ -31,7 +31,7 @@ effect:cycToMusic a :EffectClass; rdfs:label "cyc to music";
 
 effect:fullToMusic a :EffectClass; rdfs:label "full to music";
 :quneoNote 38;
-:code "out = <http://light9.bigasterisk.com/show/dance2013/sub/full> * music * env" .
+:code "out = <http://light9.bigasterisk.com/show/dance2014/sub/full> * music * env" .
 
 
 
