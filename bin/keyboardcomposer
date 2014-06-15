@@ -72,14 +72,14 @@ class SubmasterBox(Frame):
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
         darkBg = webcolors.rgb_to_hex(tuple([x * 255 for x in colorsys.hsv_to_rgb(
-            hsv[0], hsv[1], .3)]))
+            hsv[0], hsv[1], .2)]))
         Frame.__init__(self, master, bd=1, relief='raised', bg=bg)
         self.name = sub.name
         self.slider_var = DoubleVar()
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
 
-        self.namelabel = Label(self, font="Arial 7", bg=darkBg,
+        self.namelabel = Label(self, font="Arial 9", bg=darkBg,
             fg='white', pady=0)
         self.sub.graph.addHandler(self.updateName)
 
