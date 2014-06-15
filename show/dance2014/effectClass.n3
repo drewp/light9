@@ -37,11 +37,9 @@ effect:blacklight a :EffectClass;
   rdfs:label "blacklight";
   :quneoNote 37;
   :code 
-    "env = <http://light9.bigasterisk.com/show/dance2014/song1/curve-1>",
-    "out = [env * p1, env * p2, env * p3, env * p4]",
-    "p1 = env * <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .5",
-    "p2 = Strip.solid('R', (0,0,1))",
-    "p3 = Strip.solid('L', (0,0,1))",
+    "out = [env * p1, env * p2, env * p4]",
+    "p1 = env * <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .3",
+    "p2 = Strip.solid('LR', (0,0,1))",
     "p4 = Blacklight(1)" 
     .
 
@@ -49,5 +47,17 @@ effect:blacklight a :EffectClass;
 effect:whiteLed a :EffectClass;
   rdfs:label "whiteLed";
   :code "out = Strip.solid('LR', (1,1,1))" .
+
+    
+effect:slowColor a :EffectClass;
+  rdfs:label "slow color chase";
+  :quneoNote 37;
+  :code
+    "period = 5",
+    "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
+    "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)",
+    "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period)",
+    "out = [r*env,y*env,b*env]"
+    .
 
     

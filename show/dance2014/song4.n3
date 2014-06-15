@@ -1,0 +1,67 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/song4> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song4/curve-1>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/curve-2>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/curve-3>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/curve-4>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/curve-5> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2014/song4/effect-1>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/effect-2>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/effect-3>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/effect-4>,
+        <http://light9.bigasterisk.com/show/dance2014/song4/effect-5> .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/curve-1> a ns1:Curve ;
+    rdfs:label "song4" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/curve-2> a ns1:Curve ;
+    rdfs:label "full" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/curve-3> a ns1:Curve ;
+    rdfs:label "blacklight" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/curve-4> a ns1:Curve ;
+    rdfs:label "blue" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/curve-5> a ns1:Curve ;
+    rdfs:label "slow color chase" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/effect-1> a ns1:Effect ;
+    rdfs:label "song4" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song4/curve-1>",
+        "out = <http://light9.bigasterisk.com/show/dance2014/sub/song4> * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/effect-2> a ns1:Effect ;
+    rdfs:label "full" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song4/curve-2>",
+        "out = <http://light9.bigasterisk.com/show/dance2014/sub/full> * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/effect-3> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/blacklight> ;
+    rdfs:label "blacklight" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song4/curve-3>",
+        "out = [env * p1, env * p2, env * p4]",
+        "p1 = env * <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .3",
+        "p2 = Strip.solid('LR', (0,0,1))",
+        "p4 = Blacklight(1)" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/effect-4> a ns1:Effect ;
+    rdfs:label "blue" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song4/curve-4>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song4/effect-5> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/slowColor> ;
+    rdfs:label "slow color chase" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song4/curve-5>",
+        "period = 5",
+    "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
+    "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)",
+    "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period)",
+    "out = [r,y,b]" .
+
+
