@@ -4,7 +4,7 @@ read Quneo midi events, write to curvecalc and maybe to effects
 """
 from __future__ import division
 from run_local import log
-import logging
+import logging, urllib
 import cyclone.web, cyclone.httpclient
 from rdflib import URIRef
 from twisted.internet import reactor, task
@@ -34,7 +34,7 @@ class WatchMidi(object):
         self.inp = pygame.midi.Input(dev)
         task.LoopingCall(self.step).start(.05)
 
-        self.noteOn = {}
+        self.noteIsOn = {}
 
         self.effectMap = {} # note: effect class uri
         self.graph.addHandler(self.setupNotes)
@@ -56,29 +56,48 @@ class WatchMidi(object):
     def step(self):
         if not self.inp.poll():
             return
+        NOTEON, NOTEOFF = 144, 128
         for ev in self.inp.read(999):
             (status, d1, d2, _), _ = ev
-            print status, d1, d2
+            if status in [NOTEON, NOTEOFF]:
+                print status, d1, d2
 
 
-            # if noteOn and it's in effectMap,
-            # POST http://localhost:8070/songEffects drop=<effect>
-            
-            for group in [(23,24,25), (6, 18)]:
-                if d1 in group:
-                    if not self.noteOn.get(group):
-                        print "start zero"
+            if status == NOTEON:
+                if not self.noteIsOn.get(d1):
+                    self.noteIsOn[d1] = True
+                    try:
+                        e = self.effectMap[d1]
+                        cyclone.httpclient.fetch(
+                            url=networking.effectEval.path('songEffects'),
+                            method='POST',
+                            headers={'Content-Type': ['application/x-www-form-urlencoded']},
+                            postdata=urllib.urlencode([('drop', e)]),
+                        )
+                    except KeyError:
+                        pass
 
+            if status == NOTEOFF:
+                self.noteIsOn[d1] = False
+
+
+            if 0:
+                # curve editing mode, not done yet
+                for group in [(23,24,25), (6, 18)]:
+                    if d1 in group:
+                        if not self.noteIsOn.get(group):
+                            print "start zero"
+
+                            for d in group:
+                                sendLiveInputPoint(curves[d], 0)
+                            self.noteIsOn[group] = True
+                        else: # miss first update
+                            sendLiveInputPoint(curves[d1], d2 / 127)
+
+                    if status == 128: #noteoff
                         for d in group:
                             sendLiveInputPoint(curves[d], 0)
-                        self.noteOn[group] = True
-                    else: # miss first update
-                        sendLiveInputPoint(curves[d1], d2 / 127)
-                    
-                if status == 128: #noteoff
-                    for d in group:
-                        sendLiveInputPoint(curves[d], 0)
-                    self.noteOn[group] = False
+                        self.noteIsOn[group] = False
 
 def main():
     log.setLevel(logging.DEBUG)
