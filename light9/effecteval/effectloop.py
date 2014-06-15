@@ -224,6 +224,6 @@ def makeEffectLoop(graph, stats, outputWhere):
     elif outputWhere == 'leds':
         return LedLoop(graph, stats)
     else:
-        raise NotImplementedError
+        raise NotImplementedError("unknown output system %r" % outputWhere)
 
         

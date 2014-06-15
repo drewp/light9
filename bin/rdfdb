@@ -435,4 +435,4 @@ if __name__ == "__main__":
 
         ], debug=True, db=db))
     log.info("serving on %s" % port)
-    prof.run(reactor.run, profile=False)
+    prof.run(reactor.run, profile=None)
