@@ -4,10 +4,14 @@ read Quneo midi events, write to curvecalc and maybe to effects
 """
 from __future__ import division
 from run_local import log
+import logging
 import cyclone.web, cyclone.httpclient
 from rdflib import URIRef
 from twisted.internet import reactor, task
 from light9.curvecalc.client import sendLiveInputPoint
+from light9.namespaces import L9, RDF, RDFS
+from light9.rdfdb.syncedgraph import SyncedGraph
+from light9 import networking
 
 import sys
 sys.path.append('/usr/lib/python2.7/dist-packages') # For pygame
@@ -22,7 +26,8 @@ curves = {
 }
 
 class WatchMidi(object):
-    def __init__(self):
+    def __init__(self, graph):
+        self.graph = graph
         pygame.midi.init()
 
         dev = self.findQuneo()
@@ -30,6 +35,16 @@ class WatchMidi(object):
         task.LoopingCall(self.step).start(.05)
 
         self.noteOn = {}
+
+        self.effectMap = {} # note: effect class uri
+        self.graph.addHandler(self.setupNotes)
+
+    def setupNotes(self):
+        for e in self.graph.subjects(RDF.type, L9['EffectClass']):
+            qn = self.graph.value(e, L9['quneoNote'])
+            if qn:
+                self.effectMap[int(qn)] = e
+        log.info("setup with %s effects", len(self.effectMap))
         
     def findQuneo(self):
         for dev in range(pygame.midi.get_count()):
@@ -45,10 +60,15 @@ class WatchMidi(object):
             (status, d1, d2, _), _ = ev
             print status, d1, d2
 
+
+            # if noteOn and it's in effectMap,
+            # POST http://localhost:8070/songEffects drop=<effect>
+            
             for group in [(23,24,25), (6, 18)]:
                 if d1 in group:
                     if not self.noteOn.get(group):
                         print "start zero"
+
                         for d in group:
                             sendLiveInputPoint(curves[d], 0)
                         self.noteOn[group] = True
@@ -60,6 +80,10 @@ class WatchMidi(object):
                         sendLiveInputPoint(curves[d], 0)
                     self.noteOn[group] = False
 
+def main():
+    log.setLevel(logging.DEBUG)
+    graph = SyncedGraph(networking.rdfdb.url, "inputQuneo")
+    wm = WatchMidi(graph)
+    reactor.run()
 
-wm = WatchMidi()
-reactor.run()
+main()
