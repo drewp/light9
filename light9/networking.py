@@ -44,5 +44,6 @@ vidref = ServiceAddress(L9['vidref'])
 effectEval = ServiceAddress(L9['effectEval'])
 picamserve = ServiceAddress(L9['picamserve'])
 rdfdb = ServiceAddress(L9['rdfdb'])
+subComposer = ServiceAddress(L9['subComposer'])
 
 patchReceiverUpdateHost = ServiceAddress(L9['patchReceiverUpdateHost'])

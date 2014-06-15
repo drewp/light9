@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+  <head>
+    <title>subcomposer</title>
+    <meta charset="utf-8" />
+    <style>
+     button {
+       min-width: 200px;
+       min-height: 50px;
+       display: block;
+     }
+    </style>
+  </head>
+  <body>
+    <div>Toggle channel in current sub</div>
+
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f1-blue">f1-blue</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f2">f2</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f3">f3</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f4-pool-l">f4-pool-l</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f5-fill">f5-fill</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/sharlyn">sharlyn</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f7">f7</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f8-fill">f8-fill</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f9-pool-r">f9-pool-r</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f10">f10</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f11-blue">f11-blue</button>
+    <button data-chan="http://light9.bigasterisk.com/theater/piedmont/channel/f12-purp">f12-purp</button>
+
+    <script src="static/jquery-2.1.1.min.js"></script>
+    <script>
+      $(document).on("click", "button", function (ev) {
+          var chan = ev.target.getAttribute('data-chan');
+          $.ajax({
+              type: 'POST',
+              url: 'toggle',
+              data: {chan: chan}
+          });
+      });
+    </script>
+  </body>
+</html>

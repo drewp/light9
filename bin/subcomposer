@@ -39,6 +39,7 @@ from light9.namespaces import L9
 from light9.rdfdb.patch import Patch
 from light9.observable import Observable
 from light9.editchoice import EditChoice, Local
+from light9.subcomposer import subcomposerweb
 
 
 class Subcomposer(tk.Frame):
@@ -235,8 +236,11 @@ def launch(opts, args, root, graph, session):
     if not opts.no_geometry:
         toplevelat("subcomposer - %s" % opts.session, root, graph, session)
 
+        
     sc = Subcomposer(root, graph, session)
     sc.pack()
+    
+    subcomposerweb.init(graph, session, sc.currentSub)
 
     tk.Label(root,text="Bindings: B1 adjust level; B2 set full; B3 instant bump",
              font="Helvetica -12 italic",anchor='w').pack(side='top',fill='x')
