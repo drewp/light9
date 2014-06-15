@@ -5,6 +5,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://light9.bigasterisk.com/show/dance2013/sub/houseside> a ns1:Submaster ;
+    ns1:color "#400020";
     rdfs:label "houseside" ;
     ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371346683.43/map/579807785> .
 

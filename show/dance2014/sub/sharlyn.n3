@@ -6,6 +6,7 @@
 
 <http://light9.bigasterisk.com/show/dance2014/sub/sharlyn> a ns1:Submaster ;
     rdfs:label "sharlyn" ;
+        ns1:group "showsliders";
     ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1402799573.25/map/214022026> .
 
 <http://light9.bigasterisk.com/sub/local/1402799573.25/map/214022026> a ns1:ChannelSetting ;

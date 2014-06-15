@@ -6,6 +6,7 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/patio> a ns1:Submaster ;
     rdfs:label "patio" ;
+    ns1:color "#505050";
     ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371320332.68/map/916981013>,
         <http://light9.bigasterisk.com/sub/local/1371320332.68/map/953892364> .
 

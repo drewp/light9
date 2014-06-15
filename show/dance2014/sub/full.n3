@@ -6,6 +6,8 @@
 
 <http://light9.bigasterisk.com/show/dance2014/sub/full> a ns1:Submaster ;
     rdfs:label "full" ;
+    ns1:color "#ffffff";        ns1:group "showsliders";
+
     ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1402806936.17/map/106134968>,
         <http://light9.bigasterisk.com/sub/local/1402806936.17/map/158229254>,
         <http://light9.bigasterisk.com/sub/local/1402806936.17/map/237088061>,

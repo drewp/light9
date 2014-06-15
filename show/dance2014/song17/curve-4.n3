@@ -4,5 +4,5 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2014/song17/curve-1> ns1:points "0 0" .
+<http://light9.bigasterisk.com/show/dance2014/song17/curve-4> ns1:points "0 0 83.34 0 101.1 1 126.4 1 128.4 0" .
 

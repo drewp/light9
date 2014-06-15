@@ -6,8 +6,18 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/edge> a ns1:Submaster ;
     rdfs:label "edge" ;
-    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371343692.45/map/14077781>,
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/edge/map/689308994>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/edge/map/807383782>,
+        <http://light9.bigasterisk.com/sub/local/1371343692.45/map/14077781>,
         <http://light9.bigasterisk.com/sub/local/1371343692.45/map/401610583> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/edge/map/689308994> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b21-edge> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/edge/map/807383782> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b26-edge> ;
+    ns1:level 1e+00 .
 
 <http://light9.bigasterisk.com/sub/local/1371343692.45/map/14077781> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b31-edge-r> ;

@@ -6,6 +6,7 @@
 
 <http://light9.bigasterisk.com/show/dance2014/sub/cycwhite> a ns1:Submaster ;
     rdfs:label "cycwhite" ;
+        ns1:color "#80ffff";
     ns1:lightLevel <http://light9.bigasterisk.com/show/dance2014/sub/cycwhite/map/448597126>,
         <http://light9.bigasterisk.com/sub/local/1402800502.66/map/248847820> .
 

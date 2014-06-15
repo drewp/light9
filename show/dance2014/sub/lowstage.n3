@@ -6,6 +6,7 @@
 
 <http://light9.bigasterisk.com/show/dance2014/sub/lowstage> a ns1:Submaster ;
     rdfs:label "lowstage" ;
+    ns1:color "#808080";
     ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1402851873.33/map/395840206>,
         <http://light9.bigasterisk.com/sub/local/1402851873.33/map/780090194> .
 

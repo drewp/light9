@@ -6,6 +6,7 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/cyc> a ns1:Submaster ;
     rdfs:label "cyc" ;
+        ns1:color "#00ffff";
     ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371318911.67/map/41358376>,
         <http://light9.bigasterisk.com/sub/local/1371318911.67/map/440671256>,
         <http://light9.bigasterisk.com/sub/local/1371318911.67/map/54019112>,

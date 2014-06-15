@@ -6,6 +6,9 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/green> a ns1:Submaster ;
     rdfs:label "green" ;
+    ns1:color "#00ff00";
+        ns1:group "color";
+
     ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/green/map/120183201>,
         <http://light9.bigasterisk.com/show/dance2013/sub/green/map/352731801>,
         <http://light9.bigasterisk.com/show/dance2013/sub/green/map/523896698>,
