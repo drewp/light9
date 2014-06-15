@@ -46,11 +46,13 @@ class EffectLoop(object):
 
     def setEffects(self):
         self.currentEffects = []
+        log.info('setEffects currentSong=%s', self.currentSong)
         if self.currentSong is None:
             return
         
         for effectUri in self.graph.objects(self.currentSong, L9['effect']):
             self.currentEffects.append(EffectNode(self.graph, effectUri))
+        log.info('now we have %s effects', len(self.currentEffects))
         
     @inlineCallbacks
     def getSongTime(self):
@@ -147,6 +149,8 @@ class EffectLoop(object):
                 if now > self.lastErrorLog + 5:
                     log.error("effect %s: %s" % (e.uri, exc))
                     self.lastErrorLog = now
+        log.debug('eval %s effects, got %s outputs', len(self.currentEffects), len(outputs))
+                    
         return outputs
         
     def logLevels(self, now, out):

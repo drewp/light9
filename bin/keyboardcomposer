@@ -551,6 +551,7 @@ class Sliders(BCF2000):
                 break
 
         self.kc = kc
+        log.info('found sliders on %s', dev)
     def valueIn(self, name, value):
         kc = self.kc
         if name.startswith("slider"):
@@ -633,4 +634,4 @@ if __name__ == "__main__":
 
 #    prof.watchPoint("/usr/lib/python2.4/site-packages/rdflib-2.3.3-py2.4-linux-i686.egg/rdflib/Graph.py", 615)
 
-    prof.run(reactor.run, profile=False)
+    prof.run(reactor.run, profile=None)
