@@ -4,11 +4,11 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2014/song10> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song10/curve-1> ;
-    ns1:effect <http://light9.bigasterisk.com/show/dance2014/song10/effect-1> .
-
-<http://light9.bigasterisk.com/show/dance2014/song10/curve-1> a ns1:Curve ;
-    rdfs:label "black" .
+<http://light9.bigasterisk.com/show/dance2014/song10> ns1:curve <http://light9.bigasterisk.com/show/dance2014/song10/curve-1>,
+        <http://light9.bigasterisk.com/show/dance2014/song10/curve-2>,
+        <http://light9.bigasterisk.com/show/dance2014/song10/curve-3> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2014/song10/effect-2>,
+        <http://light9.bigasterisk.com/show/dance2014/song10/effect-3> .
 
 <http://light9.bigasterisk.com/show/dance2014/song10/effect-1> a ns1:Effect,
         <http://light9.bigasterisk.com/effect/blacklight> ;
@@ -19,4 +19,23 @@
         "p2 = Strip.solid('R', (0,0,1))",
         "p3 = Strip.solid('L', (0,0,1))",
         "p4 = Blacklight(1)" .
+
+<http://light9.bigasterisk.com/show/dance2014/song10/curve-1> a ns1:Curve ;
+    rdfs:label "black" .
+
+<http://light9.bigasterisk.com/show/dance2014/song10/curve-2> a ns1:Curve ;
+    rdfs:label "song10" .
+
+<http://light9.bigasterisk.com/show/dance2014/song10/curve-3> a ns1:Curve ;
+    rdfs:label "full" .
+
+<http://light9.bigasterisk.com/show/dance2014/song10/effect-2> a ns1:Effect ;
+    rdfs:label "song10" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song10/curve-2>",
+        "out = <http://light9.bigasterisk.com/show/dance2014/sub/song10> * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song10/effect-3> a ns1:Effect ;
+    rdfs:label "full" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song10/curve-3>",
+        "out = <http://light9.bigasterisk.com/show/dance2014/sub/full> * env" .
 
