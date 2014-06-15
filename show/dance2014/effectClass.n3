@@ -19,5 +19,10 @@ effect:blacklight a :EffectClass;
     "p3 = Strip.solid('L', (0,0,1))",
     "p4 = Blacklight(1)" 
     .
+
     
+effect:whiteLed a :EffectClass;
+  rdfs:label "whiteLed";
+  :code "out = Strip.solid('LR', (1,1,1))" .
+
     

@@ -1,0 +1,11 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/song8/effect-1> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/whiteLed> ;
+    rdfs:label "whiteLed" ;
+    ns1:code "out = Strip.solid('LR', (1,1,1))" .
+
