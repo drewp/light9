@@ -1,0 +1,19 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/cycwhite> a ns1:Submaster ;
+    rdfs:label "cycwhite" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2014/sub/cycwhite/map/448597126>,
+        <http://light9.bigasterisk.com/sub/local/1402800502.66/map/248847820> .
+
+<http://light9.bigasterisk.com/show/dance2014/sub/cycwhite/map/448597126> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/upright> ;
+    ns1:level 3.1e-01 .
+
+<http://light9.bigasterisk.com/sub/local/1402800502.66/map/248847820> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/upleft> ;
+    ns1:level 1e+00 .
+
