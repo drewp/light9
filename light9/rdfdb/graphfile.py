@@ -44,6 +44,11 @@ class GraphFile(object):
         self.flushDelay = 2 # seconds until we have to call flush() when dirty
         self.writeCall = None # or DelayedCall
 
+        self.notifier = notifier
+        self.addWatch()
+        
+    def addWatch(self):
+
         # emacs save comes in as IN_MOVE_SELF, maybe
         
         # I was hoping not to watch IN_CHANGED and get lots of
@@ -55,8 +60,9 @@ class GraphFile(object):
 
         from twisted.internet.inotify import IN_CLOSE_WRITE, IN_MOVED_FROM, IN_MODIFY, IN_DELETE, IN_DELETE_SELF, IN_CHANGED
 
-        notifier.watch(FilePath(path), callbacks=[self.notify])
-      
+        log.info("add watch on %s", self.path)
+        self.notifier.watch(FilePath(self.path), callbacks=[self.notify])
+        
     def notify(self, notifier, filepath, mask):
         try:
             maskNames = humanReadableMask(mask)
@@ -82,6 +88,9 @@ class GraphFile(object):
                     return
             except OSError as e:
                 log.error("%s: %r" % (filepath, e))
+                # getting OSError no such file, followed by no future reads
+                reactor.callLater(.5, self.addWatch) # ?
+
                 return
 
             log.info("%s needs reread because of %s event", filepath, maskNames)
