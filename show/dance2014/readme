@@ -1,0 +1,18 @@
+notes in https://checkvist.com/checklists/452948
+
+after song3, lights stayed on.
+
+song4 has colors before start because effect-5 missing env. fixed this during the song in the show!
+
+clicking different parts of a song button doesn't work.
+
+realized at showtime that i made the mic fader and light slider 6' apart. very hard.
+
+because of rdfdb stalls, cyc got left on a little at the start of a song. i had turned it to 0, but that last step didn't get distributed, i think.
+
+song15 had a spare env +1.0 for testing or something, which made colors between songs. fixed it just before the song started.
+
+song17 had a 2013 sub instead of 2014, not sure how. fixed when i saw errors between songs. no visual impact.
+
+but then the cyc got stuck on again.
+
