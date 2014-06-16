@@ -405,17 +405,20 @@ class Curveview(object):
         #self.widget.connect('size-allocate', sizeEvent) # see docstring
 
         def visEvent(w, alloc):
-            p = self.canvas.props
-            w = self.widget.get_allocated_width()
-            h = self.widget.get_allocated_height()
-            if (w, h) != (p.x2, p.y2):
-                p.x1, p.x2 = 0, w
-                p.y1, p.y2 = 0, h
-                self.update_curve()
+            self.setCanvasToWidgetSize()
             return False
         self.widget.add_events(Gdk.EventMask.VISIBILITY_NOTIFY_MASK)
         self.widget.connect('visibility-notify-event', visEvent)
-        
+
+    def setCanvasToWidgetSize(self):
+        p = self.canvas.props
+        w = self.widget.get_allocated_width()
+        h = self.widget.get_allocated_height()
+        if (w, h) != (p.x2, p.y2):
+            p.x1, p.x2 = 0, w
+            p.y1, p.y2 = 0, h
+            self.update_curve()
+
     def createCanvasWidget(self, parent):
         # this is only separate from createOuterWidgets because in the
         # past, i worked around display bugs by recreating the whole
@@ -1113,8 +1116,10 @@ class CurveRow(object):
 
     def setHeight(self, h):
         self.curveView.widget.set_size_request(-1, h)
-        # the event watcher wasn't catching these
-        reactor.callLater(.5, self.curveView.update_curve)
+
+        # this should have been automatic when the size changed, but
+        # the signals for that are wrong somehow.
+        reactor.callLater(0, self.curveView.setCanvasToWidgetSize) 
         
     def setupControls(self, controls, name, curve):
         box = Gtk.Box.new(Gtk.Orientation.HORIZONTAL, 0)
