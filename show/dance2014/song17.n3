@@ -9,12 +9,14 @@
         <http://light9.bigasterisk.com/show/dance2014/song17/curve-3>,
         <http://light9.bigasterisk.com/show/dance2014/song17/curve-4>,
         <http://light9.bigasterisk.com/show/dance2014/song17/curve-5>,
-        <http://light9.bigasterisk.com/show/dance2014/song17/curve-6> ;
+        <http://light9.bigasterisk.com/show/dance2014/song17/curve-6>,
+        <http://light9.bigasterisk.com/show/dance2014/song17/curve-7> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2014/song17/effect-2>,
         <http://light9.bigasterisk.com/show/dance2014/song17/effect-3>,
         <http://light9.bigasterisk.com/show/dance2014/song17/effect-4>,
         <http://light9.bigasterisk.com/show/dance2014/song17/effect-5>,
-        <http://light9.bigasterisk.com/show/dance2014/song17/effect-6> .
+        <http://light9.bigasterisk.com/show/dance2014/song17/effect-6>,
+        <http://light9.bigasterisk.com/show/dance2014/song17/effect-7> .
 
 <http://light9.bigasterisk.com/show/dance2014/song17/effect-1> a ns1:Effect ;
     rdfs:label "sub patio" ;
@@ -37,6 +39,9 @@
 
 <http://light9.bigasterisk.com/show/dance2014/song17/curve-6> a ns1:Curve ;
     rdfs:label "full to music" .
+
+<http://light9.bigasterisk.com/show/dance2014/song17/curve-7> a ns1:Curve ;
+    rdfs:label "patio" .
 
 <http://light9.bigasterisk.com/show/dance2014/song17/effect-2> a ns1:Effect ;
     rdfs:label "patio" ;
@@ -66,4 +71,9 @@
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song17/curve-6>",
         "music = <http://light9.bigasterisk.com/show/dance2014/song17music> * 2",
         "out = <http://light9.bigasterisk.com/show/dance2013/sub/full> * music  * env" .
+
+<http://light9.bigasterisk.com/show/dance2014/song17/effect-7> a ns1:Effect ;
+    rdfs:label "patio" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song17/curve-7>",
+        "out = <http://light9.bigasterisk.com/show/dance2014/sub/patio> * env" .
 

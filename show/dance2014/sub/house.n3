@@ -7,7 +7,7 @@
 <http://light9.bigasterisk.com/show/dance2013/sub/house> a ns1:Submaster ;
     ns1:color "#400040";
     rdfs:label "house" ;
-        ns1:group "showsliders";
+        ns1:group "showsliders"; ns1:order "3";
 
     ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/house/map/129986475>,
         <http://light9.bigasterisk.com/show/dance2013/sub/house/map/276467481>,
