@@ -70,7 +70,7 @@
     rdfs:label "full to music" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song17/curve-6>",
         "music = <http://light9.bigasterisk.com/show/dance2014/song17music> * 2",
-        "out = <http://light9.bigasterisk.com/show/dance2013/sub/full> * music  * env" .
+        "out = <http://light9.bigasterisk.com/show/dance2014/sub/full> * music  * env" .
 
 <http://light9.bigasterisk.com/show/dance2014/song17/effect-7> a ns1:Effect ;
     rdfs:label "patio" ;

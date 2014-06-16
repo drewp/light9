@@ -67,7 +67,7 @@
 <http://light9.bigasterisk.com/show/dance2014/song15/effect-2> a ns1:Effect,
         <http://light9.bigasterisk.com/effect/blacklight> ;
     rdfs:label "blacklight" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song1/curve-1> +1.0",
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song1/curve-1> ",
         "out = [env * p1, env * p2, env * p3, env * p4]",
         "p1 = env * <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .5",
         "p2 = Strip.solid('R', (0,0,1))",

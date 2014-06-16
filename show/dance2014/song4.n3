@@ -59,9 +59,9 @@
     rdfs:label "slow color chase" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2014/song4/curve-5>",
         "period = 5",
-    "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
-    "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)",
-    "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period)",
+    "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period) * env",
+    "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period) * env",
+    "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period) * env",
     "out = [r,y,b]" .
 
 
