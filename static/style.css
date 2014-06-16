@@ -57,7 +57,8 @@ button a {
 .num {
     font-size: 27px;
     color: rgb(233, 122, 122);
-    display: inline-block; 
+    display: inline-block;
+    padding: 10px
 }
 
 .dropTarget {
