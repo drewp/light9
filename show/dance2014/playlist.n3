@@ -22,7 +22,7 @@ sh:song6 a :Song; rdfs:label  "06 'twenty-two'";                  :songFilename 
 sh:song7 a :Song; rdfs:label  "07 chorus line 'one'";             :songFilename "07-mix.wav" .
 sh:song8 a :Song; rdfs:label  "08 rock around the clock";         :songFilename "08-mix.wav" .
 sh:song9 a :Song; rdfs:label  "09 tea for two";                   :songFilename "09-teafor2-trim.wav" .
-sh:song10 a :Song; rdfs:label "10 fourty-second st";              :songFilename "10-42ndst-wav.wav" .
+sh:song10 a :Song; rdfs:label "10 forty-second st";              :songFilename "10-42ndst-wav.wav" .
 sh:song11 a :Song; rdfs:label "11 sixteen going on seventeen";    :songFilename "11-mix.wav" .
 sh:song12 a :Song; rdfs:label "12 specialty tap";                 :songFilename "12-5678-trim.wav" .
 sh:song13 a :Song; rdfs:label "13 ABC";                           :songFilename "13-abc-trim.wav" .
