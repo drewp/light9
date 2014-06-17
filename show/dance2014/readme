@@ -16,3 +16,22 @@ song17 had a 2013 sub instead of 2014, not sure how. fixed when i saw errors bet
 
 but then the cyc got stuck on again.
 
+---
+monday:
+
+after song4 there was a bogus curve spike after the song range which
+caused a flicker of UV leds after the curtain closed. mostly looked
+like someone with an odd camera flash.
+
+next year look at RGB strips (without individual led control), of
+which we could buy a lot and cover the stage above and below.
+
+blacklight leds (with blues to help) are ok. at least 2x would be good.
+
+LED strips didn't get used a lot because they were too hard to
+incorporate and especially to test. need the 'every channel is an effect' changes for that, so strips can be tested like everrthing else.
+
+lack of overhead and backlight instruments lost a lot of looks that we've had before. leds might work for those.
+
+
+
