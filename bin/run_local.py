@@ -22,7 +22,9 @@ try:
     faulthandler.enable()
 except ImportError:
     pass
-log = logging.getLogger()
+
+progName = sys.argv[0].split('/')[-1]
+log = logging.getLogger(progName)
 
 class CSH(coloredlogs.ColoredStreamHandler):
     def render_timestamp(self, created):
