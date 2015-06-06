@@ -10,7 +10,7 @@ tests_watch:
 # needed packages: python-gtk2 python-imaging
 
 install_python_deps: link_to_sys_packages
-	env/bin/pip install -r pydeps
+	env/bin/pip install -U -r pydeps
 
 DP=/usr/lib/python2.7/dist-packages
 SP=env/lib/python2.7/site-packages
@@ -35,6 +35,7 @@ PYTHON=/usr/bin/python
 create_virtualenv:
 	mkdir -p env
 	virtualenv -p $(PYTHON) env
+	env/bin/pip install -U pip
 	ln -sf ../env/bin/python bin/python
 
 tkdnd_build:
