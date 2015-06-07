@@ -428,7 +428,6 @@ if __name__ == "__main__":
         (r'/patches', Patches),
         (r'/graphClients', GraphClients),
 
-        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
         (r'/(.*)', NoExts,
          {"path" : "light9/rdfdb/web",
           "default_filename" : "index.xhtml"}),

@@ -1,0 +1,36 @@
+#!/bin/zsh
+
+CONF=/tmp/light9_nginx.conf
+ROOT=`dirname $0`/..
+ROOT=${ROOT:a}
+
+cat > $CONF <<EOF
+worker_processes 1;
+
+daemon off;
+error_log /tmp/light9_homepage.err;
+pid /dev/null;
+
+events {
+  worker_connections 1024;
+}
+
+http {
+ include $ROOT/light9/web/mime.types;
+ 
+ server {
+  listen 8052;
+  access_log /tmp/light9_homepage_access.log;
+
+  location /rdfdb { proxy_pass http://localhost:8051/; }
+  location /ascoltami { proxy_pass http://localhost:8040/; rewrite /ascoltami(.*) $1 break; }
+
+  location / {
+    root $ROOT/light9/web;
+  }
+
+ }
+}
+EOF
+
+exec nginx -c $CONF

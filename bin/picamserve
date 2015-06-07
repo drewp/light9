@@ -165,7 +165,7 @@ with cameraCls() as camera:
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
         (r'/pic', Pic),
         (r'/pics', Pics),
-        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
+        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'light9/web/'}),
         (r'/(|gui.js)', cyclone.web.StaticFileHandler, {'path': 'light9/vidref/',
                                                  'default_filename': 'index.html'}),
         ], debug=True, camera=camera))

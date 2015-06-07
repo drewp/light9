@@ -61,7 +61,6 @@ def main():
         (r'/pic', RedirToCamera),
         (r'/picUrl', UrlToCamera),
         (r'/vidrefCamRequest', VidrefCamRequest),
-        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
         (r'/()', cyclone.web.StaticFileHandler, {'path': 'light9/vidref/', 'default_filename': 'vidref.html'}),
         ], debug=True, graph=graph))
     log.info("serving on %s" % port)

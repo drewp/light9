@@ -313,7 +313,6 @@ class App(object):
             (r'/effectUpdates', EffectUpdates),
             (r'/code', Code),
             (r'/songEffectsUpdates', SongEffectsUpdates),
-            (r'/static/(.*)', SFH, {'path': 'static/'}),
             (r'/effect/eval', EffectEval),
             (r'/songEffects', SongEffects),
             (r'/songEffects/eval', SongEffectsEval),

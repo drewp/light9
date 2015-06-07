@@ -58,7 +58,6 @@ port = networking.vidref.port
 reactor.listenTCP(port, cyclone.web.Application(handlers=[
     (r'/()', cyclone.web.StaticFileHandler,
      {'path': 'light9/vidref', 'default_filename': 'vidref.html'}),
-    (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
     (r'/snapshot', Snapshot),
     (r'/snapshot/(.*)', SnapshotPic, {"path": snapshotDir()}),
     ], debug=True, gui=gui))

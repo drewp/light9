@@ -117,12 +117,6 @@ class goButton(PrettyErrorHandler, cyclone.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.write("ok")
 
-class static(PrettyErrorHandler, cyclone.web.RequestHandler):
-    def get(self, name):
-        if name.endswith('.css'):
-            self.set_header("Content-Type", "text/css")
-        self.write(FilePath("static").preauthChild(name).open().read())
-
 def makeWebApp(app):
     return cyclone.web.Application(handlers=[
         (r"/", root),
@@ -132,6 +126,5 @@ def makeWebApp(app):
         (r"/seekPlayOrPause", seekPlayOrPause),
         (r"/output", output),
         (r"/go", goButton),
-        (r"/static/(.*)", static),
         ], app=app)
 

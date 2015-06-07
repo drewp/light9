@@ -151,7 +151,6 @@ if __name__ == "__main__":
         (r'/live', Live),
         (r'/effectsUpdates', EffectsUpdates),
         (r'/snapshot', Snapshot),
-        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'static/'}),
         (r'/(.*)', Static,
          {"path" : "light9/subserver",
           "default_filename" : "index.jade"}),
