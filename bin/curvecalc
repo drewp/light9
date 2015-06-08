@@ -56,16 +56,14 @@ class Main(object):
         self.lastSeenInputTime = 0
         self.currentSubterms = [] # Subterm objects that are synced to the graph
 
+        self.setTheme()
         wtree = self.wtree = Gtk.Builder()
         wtree.add_from_file("light9/curvecalc/curvecalc.glade")
         mainwin = wtree.get_object("MainWindow")
         
         mainwin.connect("destroy", self.onQuit)
         wtree.connect_signals(self)
-        Gtk.rc_parse("theme/marble-ice/gtk-2.0/gtkrc")
-        Gtk.rc_parse_string("""style "default" {font_name = "sans 9"}""")
-        if self.opts.reload:
-            self.refreshTheme()
+
         mainwin.show_all()
 
         mainwin.connect("delete-event", lambda *args: reactor.crash())
@@ -118,7 +116,7 @@ class Main(object):
                 
         # may not work
         wtree.get_object("paned1").set_position(600)
-
+        
     def setupNewSubZone(self):
         self.wtree.get_object("newSubZone").drag_dest_set(
             flags=Gtk.DestDefaults.ALL,
@@ -295,11 +293,26 @@ class Main(object):
             add_one_subterm(term, self.curveset, master)
         master.show_all()
         log.debug("%s table children showing" % len(master.get_children()))
-        
-    def refreshTheme(self):
-        Gtk.rc_reparse_all()
-        reactor.callLater(1, self.refreshTheme)
 
+    def setTheme(self):
+        settings = Gtk.Settings.get_default()
+        settings.set_property("gtk-application-prefer-dark-theme", True)
+
+        providers = []
+        providers.append(Gtk.CssProvider())
+        providers[-1].load_from_path("theme/Just-Dark/gtk-3.0/gtk.css")
+        providers.append(Gtk.CssProvider())
+        providers[-1].load_from_data('''
+          * { font-size: 92%; }
+          .button:link { font-size: 7px }
+        ''')
+        
+        screen = Gdk.Display.get_default_screen(Gdk.Display.get_default())
+        for p in providers:
+            Gtk.StyleContext.add_provider_for_screen(
+                screen, p,
+                Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+        
     def onSubtermChildAdded(self, subtermsTable, *args):
         # this would probably work, but isn't getting called
         log.info("onSubtermChildAdded")
