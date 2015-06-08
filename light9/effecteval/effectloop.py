@@ -98,7 +98,7 @@ class EffectLoop(object):
         if self.currentPlaying:
             t += max(0, now - self.songTimeFetch)
         return t
-        
+
     @inlineCallbacks
     def sendLevels(self):
         t1 = time.time()

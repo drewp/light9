@@ -37,6 +37,7 @@ class ServiceAddress(object):
 
 curveCalc = ServiceAddress(L9['curveCalc'])
 dmxServer = ServiceAddress(L9['dmxServer'])
+dmxServerZmq = ServiceAddress(L9['dmxServerZmq'])
 effectEval = ServiceAddress(L9['effectEval'])
 keyboardComposer = ServiceAddress(L9['keyboardComposer'])
 musicPlayer = ServiceAddress(L9['musicPlayer'])

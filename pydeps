@@ -26,3 +26,5 @@ pyserial==2.7
 
 scales==1.0.9
 statprof==0.1.2
+txzmq==0.7.4
+

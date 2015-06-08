@@ -7,6 +7,7 @@ sh:netHome
   :patchReceiverUpdateHost "localhost";
   :curveCalc        <http://dash:8060/>;
   :dmxServer        <http://dash:8030/>;
+  :dmxServerZmq     <http://dash:8031/>;
   :effectEval       <http://dash:8070/>;
   :keyboardComposer <http://dash:8050/>;
   :musicPlayer      <http://dash:8040/>;

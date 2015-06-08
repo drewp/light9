@@ -34,6 +34,17 @@ from light9.io import ParportDMX, UsbDMX
 from light9.updatefreq import Updatefreq
 from light9 import networking
 
+from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection, ZmqRequestTimeoutError
+import json
+
+def startZmq(port, outputlevels):
+    zf = ZmqFactory()
+    e = ZmqEndpoint('bind', 'tcp://*:%s' % port)
+    s = ZmqPullConnection(zf, e)
+    def onPull(message):
+        msg = json.loads(message[0])
+        outputlevels(msg['clientid'], msg['levellist'])
+    s.onPull = onPull
 
 class ReceiverApplication(object):
     """
@@ -248,6 +259,8 @@ print "starting xmlrpc server on port %s" % port
 xmlrpcServe = XMLRPCServe(options)
 reactor.listenTCP(port,server.Site(xmlrpcServe))
 
+startZmq(networking.dmxServerZmq.port, xmlrpcServe.xmlrpc_outputlevels)
+                  
 oscApp = ReceiverApplication(9051, xmlrpcServe)
 
 reactor.run()
