@@ -1,0 +1,25 @@
+#!bin/python
+from run_local import log
+from rdflib import RDF, URIRef
+from light9 import networking, showconfig
+from light9.namespaces import L9
+
+from light9.rdfdb.syncedgraph import SyncedGraph
+from twisted.internet import reactor
+
+graph = SyncedGraph(networking.rdfdb.url, "homepageConfig")
+
+@graph.initiallySynced.addCallback
+def printConfig(result):
+    with graph.currentState() as current:
+        netHome = current.value(showconfig.showUri(), L9['networking'])
+        for role, server in current.predicate_objects(netHome):
+            if not server.startswith('http'):
+                continue
+            path = current.value(role, L9['urlPath'])
+            server = server.rstrip('/')
+            print "location /%(path)s { proxy_pass %(server)s; rewrite /[^/]+/(.*) /$1 break; }" % vars()
+
+    reactor.stop()
+
+reactor.run()

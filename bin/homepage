@@ -4,6 +4,8 @@ CONF=/tmp/light9_nginx.conf
 ROOT=`dirname $0`/..
 ROOT=${ROOT:a}
 
+bin/homepageConfig > /tmp/light9_nginx_routes.conf
+
 cat > $CONF <<EOF
 worker_processes 1;
 
@@ -19,11 +21,10 @@ http {
  include $ROOT/light9/web/mime.types;
  
  server {
-  listen 8052;
-  access_log /tmp/light9_homepage_access.log;
+  listen 8054;
+  access_log off;
 
-  location /rdfdb { proxy_pass http://localhost:8051/; }
-  location /ascoltami { proxy_pass http://localhost:8040/; rewrite /ascoltami(.*) $1 break; }
+  include "/tmp/light9_nginx_routes.conf";
 
   location / {
     root $ROOT/light9/web;

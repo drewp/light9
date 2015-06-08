@@ -41,7 +41,7 @@ def setTerminalTitle(s):
     if os.environ.get('TERM', '') in ['xterm', 'rxvt']:
         print "\033]0;%s\007" % s # not escaped/protected correctly
 
-if 'listsongs' not in sys.argv[0]:
+if 'listsongs' not in sys.argv[0] and 'homepageConfig' not in sys.argv[0]:
     setTerminalTitle('[%s] %s' % (socket.gethostname(), ' '.join(sys.argv)))
 
 # see http://www.youtube.com/watch?v=3cIOT9kM--g for commands that make

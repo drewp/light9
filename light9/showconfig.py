@@ -15,9 +15,8 @@ def getGraph():
         graph = Graph()
         # note that logging is probably not configured the first time
         # we're in here
-        print "reading n3 files around %r" % root()
+        warnings.warn("reading n3 files around %r" % root())
         for f in FilePath(root()).globChildren("*.n3") + FilePath(root()).globChildren("build/*.n3"):
-            print "reading %s" % f
             graph.parse(location=f.path, format='n3')
         _config = graph
     return _config

@@ -14,4 +14,15 @@ sh:netHome
   :keyboardComposer <http://plus:8050/>;
   :subComposer <http://plus:8054/>;
   :picamserve       <http://10.2.0.3:8001/>;
-  :vidref           <http://plus:8053/> .
+  :vidref           <http://dash:8053/> .
+
+:rdfdb            :urlPath "rdfdb" .
+:effectEval       :urlPath "effectEval" .
+:musicPlayer      :urlPath "ascoltami" .
+:dmxServer        :urlPath "dmxServer" .
+:oscDmxServer     :urlPath "oscDmxServer" .
+:curveCalc        :urlPath "curveCalc" .
+:keyboardComposer :urlPath "keyboardComposer" .
+:subComposer      :urlPath "subComposer" .
+:picamserve       :urlPath "picamserve" .
+:vidref           :urlPath "vidref" .
