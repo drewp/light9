@@ -1,0 +1,6 @@
+{
+  "name": "3rd-party polymer elements",
+  "dependencies": {
+    "polymer": "~1.0.3"
+  }
+}
