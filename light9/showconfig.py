@@ -58,30 +58,9 @@ def getSongsFromShow(graph, show):
     playList = graph.value(show, L9['playList'])
     if not playList:
         raise ValueError("%r has no l9:playList" % show)
-    songs = [
-        # this was graph.items(playlistUri) but i was getting other
-        # items from a totally different list! seems like bnode
-        # corruption.
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song1"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song2"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song3"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song4"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song5"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song6"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song7"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song8"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song9"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song10"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song11"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song12"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song13"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song14"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song15"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song16"),
-        URIRef("http://light9.bigasterisk.com/show/dance2014/song17"),
-    ]
-    # probably fixed with the patch in https://github.com/RDFLib/rdflib/issues/305
-    #songs = list(graph.items(playList))
+    # The patch in https://github.com/RDFLib/rdflib/issues/305 fixed a
+    # serious bug here.
+    songs = list(graph.items(playList))
 
     return songs
 
