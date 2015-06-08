@@ -117,6 +117,25 @@ button a {
     font-size: 140%;
 }
 
+/* ascoltami mini mode */
+@media (max-height: 600px) {
+    .songs {
+        -webkit-column-width: 9em;
+    }
+    .songs button {
+        font-size: initial;
+        height: initial;
+        width: 100%;
+        margin: initial;
+    }
+    .num {
+        font-size: initial;
+        padding: initial;
+    }
+    .commands button {
+        padding: 5px;
+    }
+}
 
 /* subserver */
 .vari {
