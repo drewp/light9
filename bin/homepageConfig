@@ -3,34 +3,33 @@ from run_local import log
 from rdflib import RDF, URIRef
 from light9 import networking, showconfig
 from light9.namespaces import L9
+from urlparse import urlparse
+from urllib import splitport
 
 from light9.rdfdb.syncedgraph import SyncedGraph
 from twisted.internet import reactor
 
-graph = SyncedGraph(networking.rdfdb.url, "homepageConfig")
+graph = showconfig.getGraph()
 
-@graph.initiallySynced.addCallback
-def printConfig(result):
-    with graph.currentState() as current:
-        netHome = current.value(showconfig.showUri(), L9['networking'])
-        for role, server in current.predicate_objects(netHome):
-            if not server.startswith('http'):
-                continue
-            path = current.value(role, L9['urlPath'])
-            server = server.rstrip('/')
-            print """
-            location /%(path)s {
+netHome = graph.value(showconfig.showUri(), L9['networking'])
+print "listen %s;" % splitport(urlparse(graph.value(netHome, L9['webServer'])).netloc)[1]
 
-              # for websocket
-              proxy_http_version 1.1;
-              proxy_set_header Upgrade $http_upgrade;
-              proxy_set_header Connection "upgrade";
-              proxy_set_header Host $host;
+for role, server in graph.predicate_objects(netHome):
+    if not server.startswith('http') or role == L9['webServer']:
+        continue
+    path = graph.value(role, L9['urlPath'])
+    if not path:
+        continue
+    server = server.rstrip('/')
+    print """
+    location /%(path)s {
 
-              proxy_pass %(server)s;
-              rewrite /[^/]+/(.*) /$1 break;
-            }""" % vars()
+      # for websocket
+      proxy_http_version 1.1;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_set_header Host $host;
 
-    reactor.stop()
-
-reactor.run()
+      proxy_pass %(server)s;
+      rewrite /[^/]+/(.*) /$1 break;
+    }""" % vars()

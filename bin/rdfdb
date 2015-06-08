@@ -421,8 +421,7 @@ if __name__ == "__main__":
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)
 
-    port = 8051
-    reactor.listenTCP(port, cyclone.web.Application(handlers=[
+    reactor.listenTCP(networking.rdfdb.port, cyclone.web.Application(handlers=[
         (r'/live', Live),
         (r'/graph', GraphResource),
         (r'/patches', Patches),
@@ -433,5 +432,5 @@ if __name__ == "__main__":
           "default_filename" : "index.xhtml"}),
 
         ], debug=True, db=db))
-    log.info("serving on %s" % port)
+    log.info("serving on %s" % networking.rdfdb.port)
     prof.run(reactor.run, profile=None)
