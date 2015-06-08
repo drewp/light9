@@ -23,5 +23,5 @@ function SyncedGraph(label) {
         $('#out').append($('<div>').text(JSON.stringify(d)));
     }
     
-    reconnectingWebSocket("ws://localhost:8051/liveSyncedGraph", onMessage);
+    reconnectingWebSocket("liveSyncedGraph", onMessage);
 }

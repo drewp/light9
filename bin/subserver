@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
-    graph = SyncedGraph(networking.rdfdb.url, "subserver")
+    graph = SyncedGraph(networking.rdfdb.url, "subServer")
 
     d = {}
     def updateSubs():
@@ -146,7 +146,7 @@ if __name__ == "__main__":
     graph.addHandler(updateSubs)
     
     
-    port = 8052
+    port = networking.subServer.port
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
         (r'/live', Live),
         (r'/effectsUpdates', EffectsUpdates),

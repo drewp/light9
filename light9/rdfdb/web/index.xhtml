@@ -8,7 +8,7 @@
   </head>
   <body>
     <h1>rdfdb</h1>
-    <p>status: <span id="status">starting...</span></p>
+    <div id="status">starting...</div>
     
     <section>
       <h2>Edits</h2>
@@ -52,7 +52,7 @@
 
               $('#out').append($('<div>').text(JSON.stringify(d)));
           }
-          reconnectingWebSocket("ws://localhost:8051/live", onMessage);
+          reconnectingWebSocket("live", onMessage);
       });
       // ]]>
     </script>

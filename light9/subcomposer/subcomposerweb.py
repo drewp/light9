@@ -11,7 +11,6 @@ def init(graph, session, currentSub):
     app = cyclone.web.Application(handlers=[
         (r'/()', SFH,
          {'path': 'light9/subcomposer', 'default_filename': 'index.html'}),
-        (r'/static/(.*)', SFH, {'path': 'static/'}),
         (r'/toggle', Toggle),
     ], debug=True, graph=graph, currentSub=currentSub)
     reactor.listenTCP(networking.subComposer.port, app)

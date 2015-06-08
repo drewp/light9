@@ -24,6 +24,7 @@ from lib.cycloneerr import PrettyErrorHandler
 
 class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
+        self.set_header('Content-Type', 'text/html')        
         self.write(open("light9/effecteval/effect.html").read())
     def delete(self):
         graph = self.settings.graph

@@ -18,7 +18,18 @@ def printConfig(result):
                 continue
             path = current.value(role, L9['urlPath'])
             server = server.rstrip('/')
-            print "location /%(path)s { proxy_pass %(server)s; rewrite /[^/]+/(.*) /$1 break; }" % vars()
+            print """
+            location /%(path)s {
+
+              # for websocket
+              proxy_http_version 1.1;
+              proxy_set_header Upgrade $http_upgrade;
+              proxy_set_header Connection "upgrade";
+              proxy_set_header Host $host;
+
+              proxy_pass %(server)s;
+              rewrite /[^/]+/(.*) /$1 break;
+            }""" % vars()
 
     reactor.stop()
 

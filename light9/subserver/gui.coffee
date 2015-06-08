@@ -18,7 +18,7 @@ $(document).on('click', 'a', (ev) ->
   return false if ev.target.tagName == 'INPUT'
 )
 
-reconnectingWebSocket "ws://localhost:8052/live", (msg) ->
+reconnectingWebSocket "live", (msg) ->
   model.subs(msg.subs) if msg.subs?
 
 

@@ -21,7 +21,7 @@ deleteEffect = (uri) ->
     url: 'effect?' + $.param({uri: uri})
   console.log("del", uri)
   
-reconnectingWebSocket "ws://localhost:8070/songEffectsUpdates", (msg) ->
+reconnectingWebSocket "songEffectsUpdates", (msg) ->
   for s in msg.songs
     for e in s.effects
       do (e) ->

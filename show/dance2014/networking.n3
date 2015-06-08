@@ -5,24 +5,25 @@
 show:dance2014 :networking sh:netHome .
 sh:netHome
   :patchReceiverUpdateHost "localhost";
-  :rdfdb            <http://localhost:8051/>;
-  :effectEval       <http://plus:8070/>;
-  :musicPlayer      <http://plus:8040/>;
-  :dmxServer        <http://plus:8030/>;
-  :oscDmxServer     <udp://plus:9050/>;
-  :curveCalc        <http://plus:8060/>;
-  :keyboardComposer <http://plus:8050/>;
-  :subComposer <http://plus:8054/>;
+  :curveCalc        <http://dash:8060/>;
+  :dmxServer        <http://dash:8030/>;
+  :effectEval       <http://dash:8070/>;
+  :keyboardComposer <http://dash:8050/>;
+  :musicPlayer      <http://dash:8040/>;
+  :oscDmxServer     <udp://dash:9050/>;
   :picamserve       <http://10.2.0.3:8001/>;
+  :rdfdb            <http://localhost:8051/>;
+  :subComposer      <http://dash:8055/>;
+  :subServer        <http://dash:8052/>;
   :vidref           <http://dash:8053/> .
 
-:rdfdb            :urlPath "rdfdb" .
-:effectEval       :urlPath "effectEval" .
-:musicPlayer      :urlPath "ascoltami" .
-:dmxServer        :urlPath "dmxServer" .
-:oscDmxServer     :urlPath "oscDmxServer" .
 :curveCalc        :urlPath "curveCalc" .
+:dmxServer        :urlPath "dmxServer" .
+:effectEval       :urlPath "effectEval" .
 :keyboardComposer :urlPath "keyboardComposer" .
-:subComposer      :urlPath "subComposer" .
+:musicPlayer      :urlPath "ascoltami" .
 :picamserve       :urlPath "picamserve" .
+:rdfdb            :urlPath "rdfdb" .
+:subComposer      :urlPath "subComposer" .
+:subServer        :urlPath "subServer" .
 :vidref           :urlPath "vidref" .

@@ -35,15 +35,16 @@ class ServiceAddress(object):
     def path(self, more):
         return self.url + str(more)
 
-dmxServer = ServiceAddress(L9['dmxServer'])
-oscDmxServer = ServiceAddress(L9['oscDmxServer'])
-musicPlayer = ServiceAddress(L9['musicPlayer'])
-keyboardComposer = ServiceAddress(L9['keyboardComposer'])
 curveCalc = ServiceAddress(L9['curveCalc'])
-vidref = ServiceAddress(L9['vidref'])
+dmxServer = ServiceAddress(L9['dmxServer'])
 effectEval = ServiceAddress(L9['effectEval'])
+keyboardComposer = ServiceAddress(L9['keyboardComposer'])
+musicPlayer = ServiceAddress(L9['musicPlayer'])
+oscDmxServer = ServiceAddress(L9['oscDmxServer'])
 picamserve = ServiceAddress(L9['picamserve'])
 rdfdb = ServiceAddress(L9['rdfdb'])
 subComposer = ServiceAddress(L9['subComposer'])
+subServer = ServiceAddress(L9['subServer'])
+vidref = ServiceAddress(L9['vidref'])
 
 patchReceiverUpdateHost = ServiceAddress(L9['patchReceiverUpdateHost'])

@@ -33,7 +33,7 @@ model.addToCurrentSong = (e) ->
     data: {drop: e.uri}
   })
 
-reconnectingWebSocket "ws://localhost:8052/effectsUpdates", (msg) ->
+reconnectingWebSocket "../effectsUpdates", (msg) ->
   model.chases(msg.chases) if msg.chases?
   model.classes(msg.classes) if msg.classes?
 
