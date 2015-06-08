@@ -29,7 +29,7 @@ model = new Model()
 model.addToCurrentSong = (e) ->
   $.ajax({
     type: 'POST'
-    url: '//localhost:8070/songEffects'
+    url: '/effectEval/songEffects'
     data: {drop: e.uri}
   })
 
