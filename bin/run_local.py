@@ -24,7 +24,9 @@ except ImportError:
     pass
 
 progName = sys.argv[0].split('/')[-1]
-log = logging.getLogger(progName)
+log = logging.getLogger() # this has to get the root logger
+log.name = progName # but we can rename it for clarity
+
 
 class CSH(coloredlogs.ColoredStreamHandler):
     def render_timestamp(self, created):
