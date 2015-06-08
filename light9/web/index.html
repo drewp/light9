@@ -1,0 +1,43 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/style.css">
+    <link rel="import" href="/lib/polymer/polymer.html">
+  </head>
+  <body>
+    <dom-module id="service-button">
+      <template>
+        <a class="big" href="{{withSlash}}">{{name}}</a>
+        <button on-click="click">window</button>
+      </template>
+    </dom-module>
+    <script>
+     Polymer({
+       is: "service-button",
+       properties: {
+         name: String,
+         withSlash: { type: String, computed: 'computeWithSlash(name)' },
+       },
+       computeWithSlash: function (name) {
+         return name + '/';
+       },
+       click: function() {
+         window.open(this.withSlash, '_blank',
+                     'scrollbars=1,resizable=1,titlebar=0,location=0');
+       }
+     });
+    </script>
+
+    <h1>light9 home page</h1>
+    
+    <p><service-button name="rdfdb"></service-button></p>
+    <p><service-button name="effectEval"></service-button></p>
+    <p><service-button name="ascoltami"></service-button></p>
+    <p><service-button name="subComposer"></service-button></p>
+    <p><service-button name="subServer"></service-button></p>
+    <p><service-button name="picamserve"></service-button></p>
+    <p><service-button name="vidref"></service-button></p>
+  </body>
+</html>

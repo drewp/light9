@@ -158,7 +158,16 @@ a.resource {
 a button {
     font-size: 60%;
 }
-
+a.big {
+    background-color: #384052;
+    padding: 9px;
+    text-shadow: rgba(0, 0, 0, 0.48) -1px -1px 0px;
+    color: rgb(172, 172, 255);
+    font-size: 160%;
+    margin: 0px;
+    display: inline-block;
+    border-radius: 5px;
+}
 
 /* rdfdb */
 #patches { /* wants flex box */
