@@ -7,15 +7,31 @@
     <link rel="import" href="/lib/polymer/polymer.html">
   </head>
   <body>
-    <dom-module id="service-button">
+    <dom-module id="service-button-row">
+      <style>
+       div {
+         display: flex;
+         justify-content: space-between;
+         padding: 2px 3px;
+       }
+       div:hover {
+         background: gray;
+         }
+       .left {
+         display: inline-block;
+         margin-right: 3px;
+       }
+      </style>
       <template>
-        <a class="big" href="{{withSlash}}">{{name}}</a>
-        <button on-click="click">window</button>
+        <div>
+          <span class="left"><a class="big" href="{{withSlash}}">{{name}}</a></span>
+          <span><button on-click="click">window</button></span>
+        </div>
       </template>
     </dom-module>
     <script>
      Polymer({
-       is: "service-button",
+       is: "service-button-row",
        properties: {
          name: String,
          withSlash: { type: String, computed: 'computeWithSlash(name)' },
@@ -31,13 +47,17 @@
     </script>
 
     <h1>light9 home page</h1>
+
+    <div style="float: left">
+      <service-button-row name="rdfdb"></service-button-row>
+      <service-button-row name="effectEval"></service-button-row>
+      <service-button-row name="ascoltami"></service-button-row>
+      <service-button-row name="subComposer"></service-button-row>
+      <service-button-row name="subServer"></service-button-row>
+      <service-button-row name="picamserve"></service-button-row>
+      <service-button-row name="vidref"></service-button-row>
+      <service-button-row name="."></service-button-row>
+    </div>
     
-    <p><service-button name="rdfdb"></service-button></p>
-    <p><service-button name="effectEval"></service-button></p>
-    <p><service-button name="ascoltami"></service-button></p>
-    <p><service-button name="subComposer"></service-button></p>
-    <p><service-button name="subServer"></service-button></p>
-    <p><service-button name="picamserve"></service-button></p>
-    <p><service-button name="vidref"></service-button></p>
   </body>
 </html>
