@@ -9,6 +9,9 @@ tests_watch:
 
 # needed packages: python-gtk2 python-imaging
 
+binexec:
+	chmod a+x bin/*
+
 install_python_deps: link_to_sys_packages
 	env/bin/pip install -U -r pydeps
 
@@ -71,3 +74,5 @@ darcs_show_checkpoint:
 arduino_upload: /usr/share/arduino/Arduino.mk
 	cd rgbled
 	make upload
+
+effect_node_setup: create_virtualenv packages binexec install_python_deps
