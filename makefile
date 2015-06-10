@@ -64,3 +64,10 @@ raspberry_pi_packages:
 darcs_show_checkpoint:
 	darcs add --quiet --recursive ${LIGHT9_SHOW} 
 	darcs rec -a -m "checkpoint show data" ${LIGHT9_SHOW}
+
+/usr/share/arduino/Arduino.mk:
+	sudo aptitude install arduino-mk
+
+arduino_upload: /usr/share/arduino/Arduino.mk
+	cd rgbled
+	make upload
