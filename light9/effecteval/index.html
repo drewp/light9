@@ -4,6 +4,7 @@
     <title>effecteval</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/style.css">
+    <link rel="import" href="effect-components.html">
   </head>
   <body>
     <div id="status">starting...</div>
@@ -11,22 +12,6 @@
     <h1>Effect instances</h1>
     <div><a href=".">View all songs</a></div>
     <!-- subscribe to a query of all effects and their songs -->
-    <ul data-bind="foreach: songs">
-      <li>
-        <a class="song" data-bind="attr: {href: uri}, click: $root.focusSong">Song <span data-bind="text: label"></span></a>
-        <ul>
-          <!-- ko foreach: effects -->
-          <li>
-            <a class="effect" data-bind="attr: {href: 'effect?'+jQuery.param({uri: uri})}, text: label"></a> <button data-bind="click: deleteEffect">Delete</button>
-          </li>
-          <!-- /ko -->
-          <li class="dropTarget" data-bind="event: {dragover: $root.dragover, dragenter: $root.dragover, drop: function(data, event) { $root.drop(uri, event); }}">Add another (drop a sub or effect class)</li>
-        </ul>
-      </li>
-    </ul>
-    <script src="/lib/jquery-2.1.1.min.js"></script>
-    <script src="/lib/knockout-3.1.0.js"></script>
-    <script src="/websocket.js"></script>
-    <script src="index.js"></script>
+    <song-effect-list></song-effect-list>
   </body>
 </html>

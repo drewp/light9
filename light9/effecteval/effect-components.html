@@ -1,0 +1,108 @@
+<link rel="import" href="/lib/polymer/polymer.html">
+<script src="/websocket.js"></script>
+<script src="/lib/jquery-2.1.1.min.js"></script>
+
+<dom-module id="song-effect-list">
+  <template>
+    <template is="dom-repeat" items="{{songs}}" as="song">
+      <li>
+        <a class="song"
+           href="{{song.uri}}"
+           on-click="focusSong">Song <span>{{song.label}}</span></a>
+        <ul>
+          <template is="dom-repeat" items="{{song.effects}}" as="effect">
+            <li>
+              <l9-effect uri="{{effect.uri}}"
+                         label="{{effect.label}}"></l9-effect>
+            </li>
+          </template>
+          <li>
+            <effect-drop-target song-uri="{{song.uri}}"></effect-drop-target>
+          </li>
+        </ul>
+      </li>
+    </template>
+  </template>
+</dom-module>
+<script>
+ Polymer({
+   is: "song-effect-list",
+   properties: {
+     songs: Object
+   },
+   ready: function() {
+     reconnectingWebSocket("songEffectsUpdates", function(msg) {
+       var m, s;
+       m = window.location.search.match(/song=(http[^&]+)/);
+       if (m) {
+         var match = decodeURIComponent(m[1]);
+         this.songs = msg.songs.filter(function(s) { return s.uri == match; });
+       } else {
+         this.songs = msg.songs;
+       }
+     }.bind(this));
+   },
+   focusSong: function(ev) {
+     ev.preventDefault()
+     window.location.search = '?' + $.param({song: ev.model.song.uri});
+   }
+ });
+</script>
+
+<dom-module id="l9-effect">
+  <template>
+    <a class="effect" href="{{href}}">{{label}}</a>
+    <button on-click="deleteEffect">Delete</button>
+  </template>
+</dom-module>
+<script>
+ Polymer({
+   is: "l9-effect",
+   properties: {
+     uri: String,
+     label: String,
+     href: {
+       type: String,
+       computed: 'computeHref(uri)'
+     }
+   },
+   computeHref: function(uri) {
+     return 'effect?'+jQuery.param({uri: uri});
+   },
+   deleteEffect: function() {
+     $.ajax({
+       type: 'DELETE',
+       url: 'effect?' + $.param({uri: this.uri})
+     });
+     console.log("del", this.uri);
+   }
+ });
+</script>
+
+<dom-module id="effect-drop-target">
+  <template>
+    <div class="dropTarget"
+        on-dragenter="dragover"
+        on-dragover="dragover"
+        on-drop="drop">Add another (drop a sub or effect class)</div>
+  </template>
+</dom-module>
+<script>
+ Polymer({
+   is: "effect-drop-target",
+   properties: {
+     songUri: String
+   },
+   dragover: function(event) {
+     event.preventDefault()
+     event.dataTransfer.dropEffect = 'copy'
+   },
+   drop: function(event) {
+     event.preventDefault()
+     $.post('songEffects', {
+       uri: this.songUri,
+       drop: event.dataTransfer.getData('text/uri-list')
+     });
+   }
+ });
+</script>
