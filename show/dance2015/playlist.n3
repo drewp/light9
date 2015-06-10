@@ -1,0 +1,54 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2015/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+show:dance2015 :musicRoot "show/dance2015/music/" .
+
+show:dance2015 :playList (
+  sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
+  sh:song6  sh:song7  sh:song8  sh:song9  sh:song10
+  sh:song11 sh:song12 sh:song13 sh:song14 sh:song15
+  sh:song16 sh:song17
+) .
+
+sh:song1 a :Song; rdfs:label  "01 dancingqueen-crop";        :songFilename "01-dancingqueen-crop.wav" .
+sh:song2 a :Song; rdfs:label  "02 gotta-dance-boost";        :songFilename "02-gotta-dance-boost.wav" .
+sh:song3 a :Song; rdfs:label  "03 tonight-crop";             :songFilename "03-tonight-crop.wav" .
+sh:song4 a :Song; rdfs:label  "04 cheek-denoise";            :songFilename "04-cheek-denoise.wav" .
+sh:song5 a :Song; rdfs:label  "05 sohappy-crop";             :songFilename "05-sohappy-crop.wav" .
+sh:song6 a :Song; rdfs:label  "06 comedance";                :songFilename "06-comedance.wav" .
+sh:song7 a :Song; rdfs:label  "07 mix";                      :songFilename "07-mix.wav" .
+sh:song8 a :Song; rdfs:label  "08 mix";                      :songFilename "08-mix.wav" .
+sh:song9 a :Song; rdfs:label  "09 mix";                      :songFilename "09-mix.wav" .
+sh:song10 a :Song; rdfs:label "10 happy-crop";               :songFilename "10-happy-crop.wav" .
+sh:song11 a :Song; rdfs:label "11 gointo-declick1";          :songFilename "11-gointo-declick1.wav" .
+sh:song12 a :Song; rdfs:label "12 clip";                     :songFilename "12-clip.wav" .
+sh:song13 a :Song; rdfs:label "13 mix";                      :songFilename "13-mix.wav" .
+sh:song14 a :Song; rdfs:label "14 machine-crop";             :songFilename "14-machine-crop.wav" .
+sh:song15 a :Song; rdfs:label "15 mix";                      :songFilename "15-mix.wav" .
+sh:song16 a :Song; rdfs:label "16 mix-fixword";              :songFilename "16-mix-fixword.wav" .
+sh:song17 a :Song; rdfs:label "17 dancetothemusic-extended"; :songFilename "17-dancetothemusic-extended.wav" .
+
+
+
+# wavecurve should probably be responsible for making these when it
+# makes the curve files.
+sh:song1 :curve sh:song1music, sh:song1smooth_music. sh:song1music a :Curve; rdfs:label "music"; :pointsFile "song1-music" . sh:song1smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song1-smooth_music" .
+sh:song2 :curve sh:song2music, sh:song2smooth_music. sh:song2music a :Curve; rdfs:label "music"; :pointsFile "song2-music" . sh:song2smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song2-smooth_music" .
+sh:song3 :curve sh:song3music, sh:song3smooth_music. sh:song3music a :Curve; rdfs:label "music"; :pointsFile "song3-music" . sh:song3smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song3-smooth_music" .
+sh:song4 :curve sh:song4music, sh:song4smooth_music. sh:song4music a :Curve; rdfs:label "music"; :pointsFile "song4-music" . sh:song4smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song4-smooth_music" .
+sh:song5 :curve sh:song5music, sh:song5smooth_music. sh:song5music a :Curve; rdfs:label "music"; :pointsFile "song5-music" . sh:song5smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song5-smooth_music" .
+sh:song6 :curve sh:song6music, sh:song6smooth_music. sh:song6music a :Curve; rdfs:label "music"; :pointsFile "song6-music" . sh:song6smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song6-smooth_music" .
+sh:song7 :curve sh:song7music, sh:song7smooth_music. sh:song7music a :Curve; rdfs:label "music"; :pointsFile "song7-music" . sh:song7smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song7-smooth_music" .
+sh:song8 :curve sh:song8music, sh:song8smooth_music. sh:song8music a :Curve; rdfs:label "music"; :pointsFile "song8-music" . sh:song8smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song8-smooth_music" .
+sh:song9 :curve sh:song9music, sh:song9smooth_music. sh:song9music a :Curve; rdfs:label "music"; :pointsFile "song9-music" . sh:song9smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song9-smooth_music" .
+sh:song10 :curve sh:song10music, sh:song10smooth_music. sh:song10music a :Curve; rdfs:label "music"; :pointsFile "song10-music" . sh:song10smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song10-smooth_music" .
+sh:song11 :curve sh:song11music, sh:song11smooth_music. sh:song11music a :Curve; rdfs:label "music"; :pointsFile "song11-music" . sh:song11smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song11-smooth_music" .
+sh:song12 :curve sh:song12music, sh:song12smooth_music. sh:song12music a :Curve; rdfs:label "music"; :pointsFile "song12-music" . sh:song12smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song12-smooth_music" .
+sh:song13 :curve sh:song13music, sh:song13smooth_music. sh:song13music a :Curve; rdfs:label "music"; :pointsFile "song13-music" . sh:song13smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song13-smooth_music" .
+sh:song14 :curve sh:song14music, sh:song14smooth_music. sh:song14music a :Curve; rdfs:label "music"; :pointsFile "song14-music" . sh:song14smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song14-smooth_music" .
+sh:song15 :curve sh:song15music, sh:song15smooth_music. sh:song15music a :Curve; rdfs:label "music"; :pointsFile "song15-music" . sh:song15smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song15-smooth_music" .
+sh:song16 :curve sh:song16music, sh:song16smooth_music. sh:song16music a :Curve; rdfs:label "music"; :pointsFile "song16-music" . sh:song16smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song16-smooth_music" .
+sh:song17 :curve sh:song17music, sh:song17smooth_music. sh:song17music a :Curve; rdfs:label "music"; :pointsFile "song17-music" . sh:song17smooth_music a :Curve; rdfs:label "smooth music"; :pointsFile "song17-smooth_music" .

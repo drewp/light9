@@ -1,0 +1,102 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+@prefix ch: <http://light9.bigasterisk.com/theater/piedmont/channel/> .
+@prefix chase: <http://light9.bigasterisk.com/chase/> .
+
+# when these are inserted, a curve called 'env' will be added to this
+# code, so multiply by that. Also if you mention 'music' anywhere, an
+# output 'music' will be set to the current song.
+
+
+effect:cycFlash a :EffectClass;
+  rdfs:label "cycFlash";
+  :code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * nsin(t*2) * env" .
+
+# Notes for quneo pads:
+# 48 49 50 51
+# 44 45 46 47
+# 40 41 42 43
+# 36 37 38 39
+  
+  
+effect:cycToMusic a :EffectClass; rdfs:label "cyc to music";
+:quneoNote 36;
+:code "out = <http://light9.bigasterisk.com/show/dance2013/sub/cyc> * music * env" .
+
+
+effect:fullToMusic a :EffectClass; rdfs:label "full to music";
+:quneoNote 38;
+:code "out = <http://light9.bigasterisk.com/show/dance2014/sub/full> * music * env" .
+
+
+
+effect:blacklight a :EffectClass;
+  rdfs:label "blacklight";
+  :quneoNote 37;
+  :code 
+    "out = [env * p1, env * p2, env * p4]",
+    "p1 = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .3",
+    "p2 = Strip.solid('LR', (0,0,1))",
+    "p4 = Blacklight(1)" 
+    .
+
+    
+effect:whiteLed a :EffectClass;
+  rdfs:label "whiteLed";
+  :code "out = Strip.solid('LR', (1,1,1)) * env" .
+
+    
+effect:slowColor a :EffectClass;
+  rdfs:label "slow color chase";
+  :quneoNote 37;
+  :code
+    "period = 5",
+    "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
+    "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)",
+    "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period)",
+    "out = [r*env,y*env,b*env]"
+    .
+
+chase:backchase a :Chase; :channels (
+<http://light9.bigasterisk.com/theater/piedmont/channel/b14-yel>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b15-red>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b21-edge>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b22-c>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b26-edge>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b32-red>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b34-yel>
+) .
+
+
+effect:backChase a :EffectClass;
+  rdfs:label "back chase";
+  :code "out = chase(t, names=backchase, ontime=.3, offset=-.11) * env" .
+
+effect:backChaseSlower a :EffectClass;
+  rdfs:label "back chase slower";
+  :code "out = chase(t, names=backchase, ontime=.7, offset=-.11) * env" .
+
+chase:frontrand a :Chase; :channels (
+<http://light9.bigasterisk.com/theater/piedmont/channel/f11-blue>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f3>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f8-fill>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f9-pool-r>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f10>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f1-blue>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f4-pool-l>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f5-fill>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f7>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f2>
+<http://light9.bigasterisk.com/theater/piedmont/channel/sharlyn>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f12-purp>
+) .
+
+
+effect:frontrandChase a :EffectClass;
+  rdfs:label "frontrand chase";
+  :code "out = chase(t, names=frontrand, ontime=.3, offset=-.11) * env" .
