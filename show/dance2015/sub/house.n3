@@ -1,0 +1,37 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house> a ns1:Submaster ;
+    ns1:color "#400040";
+    rdfs:label "house" ;
+        ns1:group "showsliders"; ns1:order "3";
+
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/house/map/129986475>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/house/map/276467481>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/house/map/453669385>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/house/map/49746335>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/house/map/543618080> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house/map/129986475> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house3> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house/map/276467481> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house1> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house/map/453669385> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house2> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house/map/49746335> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house4> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/house/map/543618080> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house-side> ;
+    ns1:level 1e+00 .
+
