@@ -161,7 +161,7 @@ class Pics(cyclone.web.RequestHandler):
 log.setLevel(logging.INFO)
 
 with cameraCls() as camera:
-    port = 8001
+    port = 8208
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
         (r'/pic', Pic),
         (r'/pics', Pics),
