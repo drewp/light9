@@ -1,6 +1,17 @@
 #include <Arduino.h>
 #include <Adafruit_NeoPixel.h>
 
+/*
+Pin D3: blacklight pwm
+Pin D5: neo strip 1
+Pin D6: neo strip 2
+Pin D7: R
+Pin D8: G
+Pin D9: B
+Pin D10: blacklight 2
+ */
+
+
 // Parameter 1 = number of pixels in strip
 // Parameter 2 = pin number (most are valid)
 // Parameter 3 = pixel type flags, add together as needed:
@@ -8,26 +19,51 @@
 //   NEO_GRB     Pixels are wired for GRB bitstream
 //   NEO_KHZ400  400 KHz bitstream (e.g. FLORA pixels)
 //   NEO_KHZ800  800 KHz bitstream (e.g. High Density LED strip)
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(50, 5, NEO_RGB + NEO_KHZ800);
-
-// max about 26 with malloc; 36 works with a static array in the class
+Adafruit_NeoPixel strip0 = Adafruit_NeoPixel(50, 5, NEO_RGB + NEO_KHZ800);
+Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(50, 6, NEO_RGB + NEO_KHZ800);
 
 #define debugLed 13
 void intro() {
-  uint32_t red = strip.Color(255,0,0), black = strip.Color(0,0,0);
-  strip.setPixelColor(0,   red); strip.show(); delay(100);
-  strip.setPixelColor(0, black); strip.show(); delay(100);
-  strip.setPixelColor(0,   red); strip.show(); delay(100);
-  strip.setPixelColor(0, black); strip.show(); delay(100);
+  uint32_t red = strip0.Color(255,0,0), black = strip0.Color(0,0,0);
+  for (Adafruit_NeoPixel* strip = &strip0; strip != &strip1; strip = &strip1) {
+    strip->setPixelColor(0,   red); strip->show(); delay(100);
+    strip->setPixelColor(0, black); strip->show(); delay(100);
+    strip->setPixelColor(0,   red); strip->show(); delay(100);
+    strip->setPixelColor(0, black); strip->show(); delay(100);
+  }
 }
+
+void setStrip(Adafruit_NeoPixel& strip) {
+  digitalWrite(debugLed, 1);
+  for (uint8_t i=0; i < strip.numPixels(); i++) {
+    while (Serial.available() < 3) {
+    }
+    byte r = Serial.read();
+    byte g = Serial.read();
+    byte b = Serial.read();
+    strip.setPixelColor(i, strip.Color(g, r, b));
+  }
+  strip.show();
+
+  digitalWrite(debugLed, 0);
+}
+
 int main(void) {
   init();
   pinMode(debugLed, OUTPUT);
-  strip.begin();
+
+  pinMode(3, OUTPUT);
+  pinMode(7, OUTPUT);
+  pinMode(8, OUTPUT);
+  pinMode(9, OUTPUT);
+  pinMode(10, OUTPUT);
+
+  strip0.begin();
+  strip1.begin();
   intro(); 
   Serial.begin(115200);
  
-  uint8_t i,r,g,b;
+  uint8_t i;
   while (1) {
     while (Serial.available() <= 2) {
     }
@@ -37,22 +73,23 @@ int main(void) {
     }
     i = Serial.read(); // command
     if (i == 0) { // set strip: 0x60 0x00 <numPixels * 3 bytes>
-      digitalWrite(debugLed, 1);
-      for (i=0; i < strip.numPixels(); i++) {
-        while (Serial.available() < 3) {
-        }
-        r = Serial.read();
-        g = Serial.read();
-        b = Serial.read();
-        strip.setPixelColor(i, strip.Color(g, r, b));
-      }
-      strip.show();
-
-      digitalWrite(debugLed, 0);
-    } else if (i == 1) { // set pwm on D3: 0x60 0x01 <level>
+      setStrip(strip0);
+    } else if (i == 1) { // strip 1
+      setStrip(strip1);
+    } else if (i == 2) { // set pwm on D3: 0x60 0x02 <level>
       while (Serial.available() < 1) {
       }
       analogWrite(3, Serial.read());
+    } else if (i == 3) { // set pwm on D10: 0x60 0x03 <level>
+      while (Serial.available() < 1) {
+      }
+      analogWrite(10, Serial.read());
+    } else if (i == 4) { // set r/g/b: 0x60 0x04 <r> <g> <b>
+       while (Serial.available() < 3) {
+       }
+       analogWrite(7, Serial.read());
+       analogWrite(8, Serial.read());
+       analogWrite(9, Serial.read());
     } else {
         // unknown command
     }
