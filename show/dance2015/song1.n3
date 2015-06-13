@@ -4,103 +4,39 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2015/song1> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song1/curve-1>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-2>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-3>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-4>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-5>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-6>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-7>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-8>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-9> ;
-    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song1/effect-9> .
+<http://light9.bigasterisk.com/show/dance2015/song1> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song1/curve-10>,
+        <http://light9.bigasterisk.com/show/dance2015/song1/curve-12>,
+        <http://light9.bigasterisk.com/show/dance2015/song1/curve-13> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song1/effect-1>,
+        <http://light9.bigasterisk.com/show/dance2015/song1/effect-2> .
+
+<http://light9.bigasterisk.com/show/dance2015/song1/curve-11> a ns1:Curve ;
+    rdfs:label "" .
+
+<http://light9.bigasterisk.com/show/dance2015/song1/effect-9> ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-9>",
+        "out = Strip.solid('LR', (1,1,1)) * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song1/curve-10> a ns1:Curve ;
+    rdfs:label "demo11111" .
+
+<http://light9.bigasterisk.com/show/dance2015/song1/curve-12> a ns1:Curve ;
+    rdfs:label "whiteLed" .
+
+<http://light9.bigasterisk.com/show/dance2015/song1/curve-13> a ns1:Curve ;
+    rdfs:label "blacklight" .
 
 <http://light9.bigasterisk.com/show/dance2015/song1/effect-1> a ns1:Effect,
         <http://light9.bigasterisk.com/effect/whiteLed> ;
     rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-1>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-12>",
+        "out = Strip.solid('LRW', (1,1,1)) * env" .
 
 <http://light9.bigasterisk.com/show/dance2015/song1/effect-2> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-2>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-3> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-3>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-4> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-4>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-5> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-5>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-6> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-6>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-7> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/slowColor> ;
-    rdfs:label "slow color chase" ;
-    ns1:code "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period)",
-        "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-7>",
-        "out = [r*env,y*env,b*env]",
-        "period = 5",
-        "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
-        "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-8> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/slowColor> ;
-    rdfs:label "slow color chase" ;
-    ns1:code "b = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * nsin((t+.6) / period)",
-        "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-8>",
-        "out = [r*env,y*env,b*env]",
-        "period = 5",
-        "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
-        "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-1> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-2> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-3> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-4> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-5> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-6> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-7> a ns1:Curve ;
-    rdfs:label "slow color chase" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-8> a ns1:Curve ;
-    rdfs:label "slow color chase" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-9> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-9> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-9>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
+        <http://light9.bigasterisk.com/effect/blacklight> ;
+    rdfs:label "blacklight" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-13>",
+        "out = [env * p1, env * p2, env * p4]",
+        "p1 = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .3",
+        "p2 = Strip.solid('LRW', (0,0,1))",
+        "p4 = Blacklight(1)" .
 
