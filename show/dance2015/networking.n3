@@ -13,7 +13,7 @@ sh:netHome
   :keyboardComposer <http://dash:8205/>;
   :musicPlayer      <http://dash:8206/>;
   :oscDmxServer     <udp://dash:8207/>;
-  :picamserve       <http://10.2.0.3:8208/>;
+  :picamserve       <http://10.1.0.41:8208/>;
   :rdfdb            <http://dash:8209/>;
   :subComposer      <http://dash:8210/>;
   :subServer        <http://dash:8211/>;
