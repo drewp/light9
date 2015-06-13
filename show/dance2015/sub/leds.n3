@@ -1,0 +1,34 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sub: <http://light9.bigasterisk.com/show/dance2015/sub/> .
+@prefix eff: <http://light9.bigasterisk.com/sub/drive/> .
+
+sub:neo1 a :Submaster ; rdfs:label "neo1" ; :drivesEffect eff:e1 .
+eff:e1 a :Effect ;
+    :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/neo1>)",
+             "out = Strip.solid('L', (1,1,1)) * level" .
+
+sub:neo2 a :Submaster ; rdfs:label "neo2" ; :drivesEffect eff:e2 .
+eff:e2 a :Effect,
+        <http://light9.bigasterisk.com/effect/whiteLed> ;
+    :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/neo2>)",
+             "out = Strip.solid('R', (1,1,1)) * level" .
+
+sub:wideRed a :Submaster ; rdfs:label "widered" ; :drivesEffect eff:e3 .
+eff:e3 a :Effect;
+    :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/wideRed>)",
+             "out = Strip.solid('W', (1,0,0)) * level" .
+
+sub:wideGreen a :Submaster ; rdfs:label "widegreen" ; :drivesEffect eff:e4 .
+eff:e4 a :Effect;
+    :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/wideGreen>)",
+             "out = Strip.solid('W', (0,1,0)) * level" .
+
+sub:wideBlue a :Submaster ; rdfs:label "wideblue" ; :drivesEffect eff:e5 .
+eff:e5 a :Effect;
+    :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/wideBlue>)",
+             "out = Strip.solid('W', (0,0,1)) * level" .
+

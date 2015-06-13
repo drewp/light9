@@ -7,6 +7,7 @@
 <http://light9.bigasterisk.com/show/dance2013/sub/blue> a ns1:Submaster ;
     rdfs:label "blue" ;
     ns1:color "#0000ff" ;
+    ns1:drivesEffect <http://light9.bigasterisk.com/show/dance2015/blueLed> ;
     ns1:group "color" ;
     ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/285520676>,
         <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/564473998>,
@@ -27,5 +28,9 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/754352965> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue1> ;
-    ns1:level 1e+00 .
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/show/dance2015/blueLed> a ns1:Effect ;
+    ns1:code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2013/sub/blue>)",
+        "out = Strip.solid('LRW', (0,0,1)) * level" .
 
