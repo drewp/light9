@@ -54,7 +54,6 @@ class EffectsUpdates(cyclone.websocket.WebSocketHandler):
             classes.append({'uri': e,
                             'label': graph.label(e),
                             'code': graph.value(e, L9['code'])})
-        print "sendMessage", classes
         self.sendMessage({'classes': classes})
 
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):

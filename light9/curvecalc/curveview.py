@@ -1126,6 +1126,7 @@ class CurveRow(object):
         controls.add(box)
 
         curve_name_label = Gtk.LinkButton()
+        print "need to truncate this name length somehow"
         def update_label():
             # todo: abort if we don't still exist...
             p = curve_name_label.props
