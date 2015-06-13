@@ -6,56 +6,26 @@
 
 <http://light9.bigasterisk.com/show/dance2013/sub/blue> a ns1:Submaster ;
     rdfs:label "blue" ;
-    ns1:color "#0000ff";    ns1:group "color";
+    ns1:color "#0000ff" ;
+    ns1:group "color" ;
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/285520676>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/564473998>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/656200727>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/754352965> .
 
-    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/245085077>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/381609671>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/536526494>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/642834876>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/659210217>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/68042273>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/721791433>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/761872566>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/940402239>,
-        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/970547308> .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/245085077> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f1-blue> ;
-    ns1:level 4.05e-01 .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/381609671> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb2-b> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/536526494> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue4> ;
-    ns1:level 1e+00 .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/642834876> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/285520676> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue3> ;
     ns1:level 1e+00 .
 
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/659210217> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f11-blue> ;
-    ns1:level 3.8e-01 .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/68042273> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue1> ;
+<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/564473998> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue4> ;
     ns1:level 1e+00 .
 
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/721791433> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/656200727> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue2> ;
     ns1:level 1e+00 .
 
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/761872566> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
-    ns1:level 5.8e-01 .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/940402239> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb1-b> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/970547308> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f12-purp> ;
+<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/754352965> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue1> ;
     ns1:level 1e+00 .
 
