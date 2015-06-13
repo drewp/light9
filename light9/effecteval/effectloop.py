@@ -174,13 +174,45 @@ class EffectLoop(object):
 
 Z = numpy.zeros((50, 3), dtype=numpy.uint8)
 
+class ControlBoard(object):
+    def __init__(self, dev='/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0'):
+        self.board = serial.Serial(dev, baudrate=115200)
+
+    def _8bitMessage(self, floatArray):
+        px255 = (numpy.clip(floatArray, 0, 1) * 255).astype(numpy.uint8)
+        return px255.reshape((-1,)).tostring()
+        
+    def setStrip(self, which, pixels):
+        """
+        which: 0 or 1 to pick the strip
+        pixels: (50, 3) array of 0..1 floats
+        """
+        command = {0: '\x00', 1: '\x01'}[which]
+        if pixels.shape != (50, 3):
+            raise ValueError("pixels was %s" % pixels.shape)
+        self.board.write('\x60' + command + self._8bitMessage(pixels))
+
+    def setUv(self, which, level):
+        """
+        which: 0 or 1
+        level: 0 to 1
+        """
+        command = {0: '\x02', 1: '\x03'}[which]
+        self.board.write('\x60' + command + chr(max(0, min(1, level)) * 255))
+
+    def setRgb(self, color):
+        """
+        color: (1, 3) array of 0..1 floats
+        """
+        if color.shape != (1, 3):
+            raise ValueError("color was %s" % color.shape)
+        self.board.write('\x60\x04%s' + self._8bitMessage(color))
+
+        
 class LedLoop(EffectLoop):
     def initOutput(self):
         kw = dict(baudrate=115200)
-        self.boards = {
-            'L': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027JI6-if00-port0', **kw),
-            'R': serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0', **kw),
-        }
+        self.boards = serial.Serial('/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0', **kw)
         self.lastSentBacklight = None
         
     def combineOutputs(self, outputs):
