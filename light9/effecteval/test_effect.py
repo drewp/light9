@@ -8,8 +8,11 @@ from rdflib import URIRef
 
 def isCurve(self, uri):
     return 'curve' in uri
+def isSub(self, uri):
+    return 'sub' in uri
 
 @mock.patch('light9.effecteval.effect.CodeLine._uriIsCurve', new=isCurve)
+@mock.patch('light9.effecteval.effect.CodeLine._uriIsSub', new=isSub)
 @mock.patch('light9.effecteval.effect.CodeLine._resourcesAsPython',
             new=lambda self, r: self.expr)
 class TestAsPython(unittest.TestCase):
@@ -53,6 +56,13 @@ class TestAsPython(unittest.TestCase):
         self.assertEqual('curve(_res0, t+.01)', expr)
         self.assertEqual({'_res0': URIRef('http://example/curve1')}, uris)
 
+    def test_sub_uri_expands_to_sub_lookup_func(self):
+        ec = CodeLine(graph=None, code='x = <http://example/sub1>')
+        _, inExpr, expr, uris = ec._asPython()
+        self.assertEqual('currentSubLevel(_res0)', expr)
+        self.assertEqual({'_res0': URIRef('http://example/sub1')}, uris)
+        
+        
 @mock.patch('light9.effecteval.effect.CodeLine._uriIsCurve', new=isCurve)
 @mock.patch('light9.effecteval.effect.CodeLine._resourcesAsPython',
             new=lambda self, r: self.expr)

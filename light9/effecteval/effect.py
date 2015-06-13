@@ -35,17 +35,20 @@ class CodeLine(object):
         self.uriCounter = 0
         resources = {}
 
-        def alreadyInCurveFunc(s, i):
-            prefix = 'curve('
+        def alreadyInFunc(prefix, s, i):
             return i >= len(prefix) and s[i-len(prefix):i] == prefix
 
         def repl(m):
             v = '_res%s' % self.uriCounter
             self.uriCounter += 1
             r = resources[v] = URIRef(m.group(1))
-            if self._uriIsCurve(r):
-                if not alreadyInCurveFunc(m.string, m.start()):
-                    return 'curve(%s, t)' % v
+            for uriTypeMatches, wrapFuncName, addlArgs in [
+                    (self._uriIsCurve(r), 'curve', ', t'),
+                    (self._uriIsSub(r), 'currentSubLevel', ''),
+            ]:
+                if uriTypeMatches:
+                    if not alreadyInFunc(wrapFuncName + '(', m.string, m.start()):
+                        return '%s(%s%s)' % (wrapFuncName, v, addlArgs)
             return v
         outExpr = re.sub(r'<(http\S*?)>', repl, expr)
         return lname, expr, outExpr, resources
@@ -60,6 +63,9 @@ class CodeLine(object):
     def _uriIsCurve(self, uri):
         # this result could vary with graph changes (rare)
         return self.graph.contains((uri, RDF.type, L9['Curve']))
+
+    def _uriIsSub(self, uri):
+        return self.graph.contains((uri, RDF.type, L9['Submaster']))
         
     @prof.logTime
     def _resourcesAsPython(self, resources):

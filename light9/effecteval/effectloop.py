@@ -52,6 +52,12 @@ class EffectLoop(object):
         
         for effectUri in self.graph.objects(self.currentSong, L9['effect']):
             self.currentEffects.append(EffectNode(self.graph, effectUri))
+
+
+        for sub in self.graph.subjects(RDF.type, L9['Submaster']):
+            for effectUri in self.graph.objects(sub, L9['drivesEffect']):
+                self.currentEffects.append(EffectNode(self.graph, effectUri))
+                
         log.info('now we have %s effects', len(self.currentEffects))
         
     @inlineCallbacks
