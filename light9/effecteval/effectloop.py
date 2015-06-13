@@ -113,10 +113,13 @@ class EffectLoop(object):
         try:
             with self.stats.sendLevels.time():
                 if self.currentSong is not None:
+                    log.debug('allEffectOutputs')
                     with self.stats.evals.time():
                         outputs = self.allEffectOutputs(self.estimatedSongTime())
+                    log.debug('combineOutputs')
                     combined = self.combineOutputs(outputs)
                     self.logLevels(t1, combined)
+                    log.debug('sendOutput')
                     with self.stats.sendOutput.time():
                         yield self.sendOutput(combined)
                 
