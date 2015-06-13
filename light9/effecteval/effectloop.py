@@ -226,7 +226,7 @@ class LedLoop(EffectLoop):
     def combineOutputs(self, outputs):
         combined = {'L': Z, 'R': Z,
                     'blacklight0': 0, 'blacklight1': 0,
-                    'rgb': numpy.zeros((1, 3), dtype=numpy.float16)}
+                    'W': numpy.zeros((1, 3), dtype=numpy.float16)}
         
         for out in outputs:
             log.debug('combine output %r', out)
@@ -236,7 +236,8 @@ class LedLoop(EffectLoop):
             elif isinstance(out, Effects.Strip):
                 pixels = numpy.array(out.pixels, dtype=numpy.float16)
                 for w in out.which:
-                    combined[w] = numpy.maximum(combined[w], pixels)
+                    combined[w] = numpy.maximum(
+                        combined[w], pixels[:1,:] if w == 'W' else pixels)
                 
         return combined
 
@@ -247,7 +248,7 @@ class LedLoop(EffectLoop):
                 ('setStrip', (1,), combined['R']),
                 ('setUv', (0,), combined['blacklight0']),
                 ('setUv', (1,), combined['blacklight1']),
-                ('setRgb', (), combined['rgb']),
+                ('setRgb', (), combined['W']),
             ]:
             key = (meth, selectArgs)
             compValue = value.tolist() if isinstance(value, numpy.ndarray) else value
