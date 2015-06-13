@@ -214,7 +214,7 @@ class ControlBoard(object):
         """
         if color.shape != (1, 3):
             raise ValueError("color was %s" % color.shape)
-        self._dev.write('\x60\x04%s' + self._8bitMessage(color))
+        self._dev.write('\x60\x04' + self._8bitMessage(color))
         self._dev.flush()
 
         

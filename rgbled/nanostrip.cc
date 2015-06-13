@@ -55,12 +55,7 @@ int main(void) {
   init();
   pinMode(debugLed, OUTPUT);
 
-  pinMode(3, OUTPUT);
-  pinMode(6, OUTPUT);
-  pinMode(9, OUTPUT);
-  pinMode(10, OUTPUT);
-  pinMode(11, OUTPUT);
-  
+    
   strip0.begin();
   strip1.begin();
   intro(); 
