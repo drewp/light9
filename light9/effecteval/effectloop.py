@@ -154,7 +154,7 @@ class EffectLoop(object):
                 now = time.time()
                 if now > self.lastErrorLog + 5:
                     if hasattr(exc, 'expr'):
-                        log.error('in expression %r', exc.expr)
+                        log.exception('in expression %r', exc.expr)
                     log.error("effect %s: %s" % (e.uri, exc))
                     self.lastErrorLog = now
         log.debug('eval %s effects, got %s outputs', len(self.currentEffects), len(outputs))
@@ -182,7 +182,7 @@ Z = numpy.zeros((50, 3), dtype=numpy.float16)
 
 class ControlBoard(object):
     def __init__(self, dev='/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0'):
-        self._dev = None#serial.Serial(dev, baudrate=115200)
+        self._dev = serial.Serial(dev, baudrate=115200)
 
     def _8bitMessage(self, floatArray):
         px255 = (numpy.clip(floatArray, 0, 1) * 255).astype(numpy.uint8)
@@ -221,7 +221,7 @@ class ControlBoard(object):
 class LedLoop(EffectLoop):
     def initOutput(self):
         self.board = ControlBoard()
-        self.lastSent = {}
+        self.lastSent = {} # what's in arduino's memory
         
     def combineOutputs(self, outputs):
         combined = {'L': Z, 'R': Z,
@@ -229,6 +229,7 @@ class LedLoop(EffectLoop):
                     'rgb': numpy.zeros((1, 3), dtype=numpy.float16)}
         
         for out in outputs:
+            log.debug('combine output %r', out)
             if isinstance(out, Effects.Blacklight):
                 key = 'blacklight%s' % out.which
                 combined[key] = max(combined[key], out)
@@ -247,14 +248,17 @@ class LedLoop(EffectLoop):
                 ('setUv', (0,), combined['blacklight0']),
                 ('setUv', (1,), combined['blacklight1']),
                 ('setRgb', (), combined['rgb']),
-        ]:
+            ]:
             key = (meth, selectArgs)
-            if self.lastSent.get(key) == value:
+            compValue = value.tolist() if isinstance(value, numpy.ndarray) else value
+            
+            if self.lastSent.get(key) == compValue:
                 continue
 
             log.debug('value changed: %s(%s %s)', meth, selectArgs, value)
+            
             getattr(self.board, meth)(*(selectArgs + (value,)))
-            self.lastSent[key] = value
+            self.lastSent[key] = compValue
                 
         yield succeed(None) # there was an attempt at an async send
         

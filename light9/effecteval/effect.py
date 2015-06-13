@@ -127,6 +127,32 @@ class EffectNode(object):
             inNames.discard(outName)
             deps[outName] = inNames
         self.codes = [codeFromOutput[n] for n in toposort.toposort_flatten(deps)]
+
+    def _currentSubSettingValues(self, sub):
+        """what KC subSettings are setting levels right now?"""
+        cs = self.graph.currentState
+        with cs(tripleFilter=(None, L9['sub'], sub)) as g1:
+            for subj in g1.subjects(L9['sub'], sub):
+                with cs(tripleFilter=(subj, None, None)) as g2:
+                    if (subj, RDF.type, L9['SubSetting']) in g2:
+                        v = g2.value(subj, L9['level']).toPython()
+                        yield v
+
+    def currentSubLevel(self, uri):
+        """what's the max level anyone (probably KC) is
+        holding this sub to right now?"""
+        if isinstance(uri, Submaster.Submaster):
+            # likely the uri was spotted and replaced
+            uri = uri.uri
+        if not isinstance(uri, URIRef):
+            raise TypeError("got %r" % uri)
+
+        foundLevels = list(self._currentSubSettingValues(uri))
+        
+        if not foundLevels:
+            return 0
+        
+        return max(foundLevels)
         
     def eval(self, songTime):
         ns = {'t': songTime}
@@ -134,6 +160,7 @@ class EffectNode(object):
 
         ns.update(dict(
             curve=lambda c, t: c.eval(t),
+            currentSubLevel=self.currentSubLevel,
             ))
 
         for c in self.codes:
