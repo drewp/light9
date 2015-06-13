@@ -231,8 +231,10 @@ class LedLoop(EffectLoop):
         for out in outputs:
             log.debug('combine output %r', out)
             if isinstance(out, Effects.Blacklight):
-                key = 'blacklight%s' % out.which
-                combined[key] = max(combined[key], out)
+                # no picking yet
+                #key = 'blacklight%s' % out.which
+                for key in ['blacklight0', 'blacklight1']:
+                    combined[key] = max(combined[key], out)
             elif isinstance(out, Effects.Strip):
                 pixels = numpy.array(out.pixels, dtype=numpy.float16)
                 for w in out.which:
