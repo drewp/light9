@@ -44,7 +44,8 @@ class CodeLine(object):
             r = resources[v] = URIRef(m.group(1))
             for uriTypeMatches, wrapFuncName, addlArgs in [
                     (self._uriIsCurve(r), 'curve', ', t'),
-                    (self._uriIsSub(r), 'currentSubLevel', ''),
+                    # I'm pretty sure this shouldn't be auto-applied: it's reasonable to refer to a sub and not want its current value
+                    #(self._uriIsSub(r), 'currentSubLevel', ''),
             ]:
                 if uriTypeMatches:
                     if not alreadyInFunc(wrapFuncName + '(', m.string, m.start()):
