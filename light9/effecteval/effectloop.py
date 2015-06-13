@@ -208,7 +208,7 @@ class ControlBoard(object):
         level: 0 to 1
         """
         command = {0: '\x02', 1: '\x03'}[which]
-        self._dev.write('\x60' + command + chr(max(0, min(1, level)) * 255))
+        self._dev.write('\x60' + command + chr(int(max(0, min(1, level)) * 255)))
         self._dev.flush()
 
     def setRgb(self, color):
