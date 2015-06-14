@@ -107,7 +107,6 @@ class EffectLoop(object):
 
     @inlineCallbacks
     def sendLevels(self):
-        print ''
         t1 = time.time()
         log.debug("time since last call: %.1f ms" % (1000 * (t1 - self.lastSendLevelsTime)))
         self.lastSendLevelsTime = t1
@@ -235,16 +234,17 @@ class LedLoop(EffectLoop):
         for out in outputs:
             log.debug('combine output %r', out)
 
-
             # workaround- somehow these subs that drive fx aren't
-            # sending their fx, so we react to the sub
+            # sending their fx during playback (KC only), so we react
+            # to the sub itself
             if isinstance(out, Submaster.Submaster) and '*' in out.name:
                 level = float(out.name.split('*')[1])
                 n = out.name.split('*')[0]
-                if n == 'widered': out = Effects.Strip.solid('W', (1,0,0)) * level
-                if n == 'widegreen': out = Effects.Strip.solid('W', (0,1,0)) * level
-                if n == 'wideblue': out = Effects.Strip.solid('W', (0,0,1)) * level
-                if n == 'whiteled': out = Effects.Strip.solid('W', (1,.5,.5)) * level
+                if n == 'widered': out = Effects.Strip.solid('LRW', (1,0,0)) * level
+                if n == 'widegreen': out = Effects.Strip.solid('LRW', (0,1,0)) * level
+                if n == 'wideblue': out = Effects.Strip.solid('LRW', (0,0,1)) * level
+                if n == 'whiteled': out = Effects.Strip.solid('LRW', (1,.7,.7)) * level
+                if n == 'blacklight': out = Effects.Blacklight(level) # missing blues!
  
             if isinstance(out, Effects.Blacklight):
                 # no picking yet
