@@ -238,6 +238,7 @@ class WatchedFiles(object):
 
         if ctx not in self.graphFiles:
             outFile = fileForUri(self.dirUriMap, ctx)
+            assert '//' not in outFile, (outFile, self.dirUriMap, ctx)
             log.info("starting new file %r", outFile)
             self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
                                              self.patch, self.getSubgraph)
@@ -416,7 +417,7 @@ if __name__ == "__main__":
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
     db = Db(dirUriMap={os.environ['LIGHT9_SHOW'].rstrip('/') + '/':
-                       showconfig.showUri()})
+                       showconfig.showUri() + '/'})
 
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)
