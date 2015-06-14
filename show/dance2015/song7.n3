@@ -80,7 +80,7 @@
         <http://light9.bigasterisk.com/effect/midChase> ;
     rdfs:label "back chase" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song7/curve-7>",
-        "out = chase(t, names=midrand, ontime=.3, offset=-.11) * env" .
+        "out = chase(t+.2, names=mid, ontime=60/127.*2, offset=0) * env" .
 
 <http://light9.bigasterisk.com/show/dance2015/song7/effect-8> a ns1:Effect ;
     rdfs:label "whiteled" ;
