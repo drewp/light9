@@ -1,3 +1,6 @@
+import logging
+log = logging.getLogger('observable')
+
 class _NoNewVal(object):
     pass
 
@@ -18,7 +21,7 @@ class Observable(object):
         if newVal is _NoNewVal:
             return self.val
         if newVal == self.val:
-            print "%r unchanged from %r" % (newVal, self.val)
+            log.debug("%r unchanged from %r", newVal, self.val)
             return
         self.val = newVal
         for s in self.subscribers:
