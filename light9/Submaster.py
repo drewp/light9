@@ -194,7 +194,7 @@ class PersistentSubmaster(Submaster):
         typeStmt = (self.uri, RDF.type, L9['Submaster'])
         with self.graph.currentState(tripleFilter=typeStmt) as current:
             try:
-                log.debug("submaster's type statement is in %r" %
+                log.debug("submaster's type statement is in %r so we save there" %
                           list(current.contextsForStatement(typeStmt)))
                 ctx = current.contextsForStatement(typeStmt)[0]
             except IndexError:
