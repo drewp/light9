@@ -46,7 +46,7 @@ class Submaster(object):
         return self.levels
 
     def no_nonzero(self):
-        return (not self.levels.values()) or not (max(self.levels.values()) > 0)
+        return all(v == 0 for v in self.levels.itervalues())
 
     def __mul__(self, scalar):
         return Submaster("%s*%s" % (self.name, scalar),

@@ -164,6 +164,10 @@ class EffectNode(object):
             currentSubLevel=self.currentSubLevel,
             ))
 
+        # I think this is slowing effecteval. Could we cache results
+        # that we know haven't changed, like if a curve returns 0
+        # again, we can skip an eval() call on the line that uses it
+        
         for c in self.codes:
             codeNs = ns.copy()
             codeNs.update(c.pyResources)
