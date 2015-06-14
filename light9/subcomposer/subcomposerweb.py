@@ -19,7 +19,6 @@ def init(graph, session, currentSub):
 class Toggle(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
         chan = URIRef(self.get_argument('chan'))
-        log.info("toggle %r", chan)
         sub = self.settings.currentSub()
         
         chanKey = Literal(chan.rsplit('/', 1)[1])
