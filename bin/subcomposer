@@ -72,6 +72,8 @@ class Subcomposer(tk.Frame):
         tk.Frame.__init__(self, master, bg='black')
         self.graph = graph
         self.session = session
+        self.launchTime = time.time()
+        self.localSerial = 0
 
         # this is a URIRef or Local. Strangely, the Local case still
         # has a uri, which you can get from
@@ -158,13 +160,20 @@ class Subcomposer(tk.Frame):
 
         @graph.addHandler
         def graphChanged():
+            # some bug where SC is making tons of graph edits and many
+            # are failing. this calms things down.
+            log.warn('skip graphChanged')
+            return
+        
             s = graph.value(self.session, L9['currentSub'])
+            log.debug('HANDLER getting session currentSub from graph: %s', s)
             if s is None:
                 s = self.switchToLocal()
             self.currentSub(Submaster.PersistentSubmaster(graph, s))
 
         @self.currentSub.subscribe
         def subChanged(newSub):
+            log.debug('HANDLER currentSub changed to %s', newSub)
             if newSub is None:
                 graph.patchObject(self.session,
                                   self.session, L9['currentSub'], None)
@@ -176,21 +185,25 @@ class Subcomposer(tk.Frame):
             localStmt = (newSub.uri, RDF.type, L9['LocalSubmaster'])
             with graph.currentState(tripleFilter=localStmt) as current:
                 if newSub and localStmt in current:
+                    log.debug('  HANDLER set _currentChoice to Local')
                     self._currentChoice(Local)
                 else:
                     # i think right here is the point that the last local
-                    # becomes garbage, and we could clean it up. 
+                    # becomes garbage, and we could clean it up.
+                    log.debug('  HANDLER set _currentChoice to newSub.uri')
                     self._currentChoice(newSub.uri)
 
         dispatcher.connect(self.levelsChanged, "sub levels changed")
             
         @self._currentChoice.subscribe
         def choiceChanged(newChoice):
+            log.debug('HANDLER choiceChanged to %s', newChoice)
             if newChoice is Local:
                 newChoice = self.switchToLocal()
             if newChoice is not None:
-                self.currentSub(Submaster.PersistentSubmaster(
-                    graph, newChoice))
+                newSub = Submaster.PersistentSubmaster(graph, newChoice)
+                log.debug('write new choice to currentSub, from %r to %r', self.currentSub(), newSub)
+                self.currentSub(newSub)
 
     def levelsChanged(self, sub):
         if sub == self.currentSub():
@@ -202,8 +215,10 @@ class Subcomposer(tk.Frame):
         """
         # todo: where will these get stored, or are they local to this
         # subcomposer process and don't use PersistentSubmaster at all?
-
-        new = URIRef("http://light9.bigasterisk.com/sub/local/%s" % time.time())
+        localId = "%s-%s" % (self.launchTime, self.localSerial)
+        self.localSerial += 1
+        new = URIRef("http://light9.bigasterisk.com/sub/local/%s" % localId)
+        log.debug('making up a local sub %s', new)
         self.graph.patch(Patch(addQuads=[
             (new, RDF.type, L9['Submaster'], self.session),
             (new, RDF.type, L9['LocalSubmaster'], self.session),
