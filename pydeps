@@ -1,5 +1,5 @@
 rdflib==4.1.2
-Twisted==15.2.1
+Twisted==14.0.0
 webcolors==1.4
 Louie==1.1
 cyclone==1.1
