@@ -193,7 +193,7 @@ class KeyboardComposer(Frame, SubClient):
         self.sub_name.pack(side=LEFT)
 
     def redraw_sliders(self):
-        self.graph.addHandler(self.draw_sliders)
+        self.draw_sliders()
         if len(self.rows):
             self.change_row(self.current_row)
             self.rows[self.current_row].focus()
