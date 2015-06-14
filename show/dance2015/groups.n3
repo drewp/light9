@@ -1,0 +1,7 @@
+@prefix : <http://light9.bigasterisk.com/> .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/half-left> :group "sides"; :order "1" .
+<http://light9.bigasterisk.com/show/dance2015/sub/half-right> :group "sides"; :order "3" .
+<http://light9.bigasterisk.com/show/dance2015/sub/center> :group "sides"; :order "2" .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/full> :group "showsliders"  .
