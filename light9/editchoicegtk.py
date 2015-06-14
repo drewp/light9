@@ -1,6 +1,8 @@
+import logging
 from gi.repository import Gtk
 from gi.repository import Gdk
 from rdflib import URIRef
+log = logging.getLogger('editchoicegtk')
 
 class Local(object):
     """placeholder for the local uri that EditChoice does not
@@ -50,7 +52,9 @@ class EditChoice(Gtk.HBox):
             dtype = selection_data.get_data_type()
             if dtype.name() not in ['text/uri-list', 'TEXT']:
                 raise ValueError("unknown DnD selection type %r" % dtype)
-            self.resourceObservable(URIRef(selection_data.get_data().strip()))
+            data = selection_data.get_data().strip()
+            log.debug('drag_data_received data=%r', data)
+            self.resourceObservable(URIRef(data))
         
         self.currentLink.drag_dest_set(
             flags=Gtk.DestDefaults.ALL,
