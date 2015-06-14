@@ -22,7 +22,7 @@ class EffectLoop(object):
     def __init__(self, graph, stats):
         self.graph, self.stats = graph, stats
         self.currentSong = None
-        self.currentEffects = []
+        self.currentEffects = [] # EffectNodes for the current song plus the submaster ones
         self.lastLogTime = 0
         self.lastLogMsg = ""
         self.lastErrorLog = 0
@@ -107,6 +107,7 @@ class EffectLoop(object):
 
     @inlineCallbacks
     def sendLevels(self):
+        print ''
         t1 = time.time()
         log.debug("time since last call: %.1f ms" % (1000 * (t1 - self.lastSendLevelsTime)))
         self.lastSendLevelsTime = t1

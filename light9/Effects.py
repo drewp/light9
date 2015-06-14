@@ -20,6 +20,10 @@ class Strip(object):
     """list of r,g,b tuples for sending to an LED strip"""
     which = 'L' # LR means both. W is the wide one
     pixels = []
+
+    def __repr__(self):
+        return '<Strip which=%r px0=%r>' % (self.which, self.pixels[0,:])
+    
     @classmethod
     def solid(cls, which='L', color=(1,1,1), hsv=None):
         """hsv overrides color"""
