@@ -4,174 +4,232 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2015/sessions/subcomposer/default> ns1:currentSub <http://light9.bigasterisk.com/sub/local/1434254816.38-1> ;
-    ns1:windowGeometry "324x638+2633+262" .
+<http://light9.bigasterisk.com/show/dance2015/sessions/subcomposer/default> ns1:currentSub <http://light9.bigasterisk.com/sub/local/1434300681.76-2> ;
+    ns1:windowGeometry "324x638+2619+415" .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-0> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434299246.18-0> a ns1:LocalSubmaster,
         ns1:Submaster .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434299246.18-1> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2> a ns1:LocalSubmaster,
         ns1:Submaster ;
-    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/122288521>,
-        <http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/37338556>,
-        <http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/540912978>,
-        <http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/586963650>,
-        <http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/601300143>,
-        <http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/928878846> .
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/106933558>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/260985958>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/385770727>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/489187655>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/513941658>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/528326543>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/533772155>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/558726636>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/645147862>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/651380694>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/660012103>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/928115249>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/961827008>,
+        <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/98329844> .
 
-<http://light9.bigasterisk.com/sub/local/1434250887.97-0> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434300527.33-0> a ns1:LocalSubmaster,
         ns1:Submaster .
 
-<http://light9.bigasterisk.com/sub/local/1434250887.97-2> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434300527.33-1> a ns1:LocalSubmaster,
         ns1:Submaster .
 
-<http://light9.bigasterisk.com/sub/local/1434252997.17-0> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434300533.41-0> a ns1:LocalSubmaster,
         ns1:Submaster .
 
-<http://light9.bigasterisk.com/sub/local/1434253071.25-0> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434300533.41-1> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434300533.41-1/map/350478473> .
+
+<http://light9.bigasterisk.com/sub/local/1434300615.31-0> a ns1:LocalSubmaster,
         ns1:Submaster .
 
-<http://light9.bigasterisk.com/sub/local/1434253071.25-2> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434300615.31-1> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434300615.31-1/map/434097581>,
+        <http://light9.bigasterisk.com/sub/local/1434300615.31-1/map/995462113> .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-0> a ns1:LocalSubmaster,
         ns1:Submaster .
 
-<http://light9.bigasterisk.com/sub/local/1434254499.01-0> a ns1:LocalSubmaster,
-        ns1:Submaster .
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/128564414>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/163698938>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/166524636>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/254505174>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/376932617>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/485496260>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/51615278>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/665943479>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/668423281>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/771586172>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/794343502>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/813302003>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/820650187>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/833501161>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/842073877>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/872852663>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/926085456>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/954614070> .
 
-<http://light9.bigasterisk.com/sub/local/1434254499.01-1> a ns1:LocalSubmaster,
-        ns1:Submaster .
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/106933558> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f9> ;
+    ns1:level 0e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434254816.38-0> a ns1:LocalSubmaster,
-        ns1:Submaster .
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/260985958> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/sharlyn> ;
+    ns1:level 0 .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/122288521> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f7> ;
-    ns1:level 9.65e-01 .
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/385770727> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b36> ;
+    ns1:level 0 .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/37338556> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/489187655> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f11> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/513941658> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f3> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/528326543> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b35> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/533772155> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f5> ;
-    ns1:level 5e-03 .
+    ns1:level 0e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/540912978> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b32> ;
-    ns1:level 1e+00 .
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/558726636> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f12-out> ;
+    ns1:level 0e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/586963650> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/645147862> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f8> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/651380694> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f7> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/660012103> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f4> ;
-    ns1:level 1e+00 .
+    ns1:level 1 .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/601300143> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/928115249> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f1> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/961827008> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f10> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/98329844> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f2-out> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1434300533.41-1/map/350478473> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f1> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1434300615.31-1/map/434097581> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f1> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1434300615.31-1/map/995462113> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b36> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/128564414> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f2-out> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/163698938> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f10> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/166524636> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f3-r> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/254505174> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f1> ;
     ns1:level 0e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434250483.65-1/map/928878846> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f8> ;
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/376932617> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f4-purp> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/485496260> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f2-c> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/51615278> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f9> ;
     ns1:level 1e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1> a ns1:LocalSubmaster,
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/665943479> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f3> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/668423281> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f11> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/771586172> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f5> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/794343502> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f8> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/813302003> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f7> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/820650187> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f5-rose-x2> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/833501161> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f4> ;
+    ns1:level 1 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/842073877> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f12-out> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/872852663> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b36> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/926085456> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/sharlyn> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-1/map/954614070> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f7-c> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434300681.76-2> a ns1:LocalSubmaster,
         ns1:Submaster ;
-    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/159418886>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/198236919>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/216333976>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/362962017>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/376229141>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/377576333>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/381403614>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/397302535>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/399633873>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/413760192>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/454108710>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/514333629>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/515406830>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/566697250>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/620169325>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/621195051>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/694325956>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/707942826>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/82643314>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/876465514>,
-        <http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/949922333> .
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434300681.76-2/map/121799689>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-2/map/384820218>,
+        <http://light9.bigasterisk.com/sub/local/1434300681.76-2/map/921657822> .
 
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/159418886> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b12> ;
+<http://light9.bigasterisk.com/sub/local/1434300681.76-2/map/121799689> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
     ns1:level 0e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/198236919> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b26> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/216333976> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/sub/local/1434300681.76-2/map/384820218> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-r> ;
-    ns1:level 0e+00 .
+    ns1:level 1e+00 .
 
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/362962017> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b33> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/376229141> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b23> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/377576333> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b35> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/381403614> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b24> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/397302535> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/sub/local/1434300681.76-2/map/921657822> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-g> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/399633873> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b15> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/413760192> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b21> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/454108710> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b16> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/514333629> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/strobespeed> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/515406830> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b34> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/566697250> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b31> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/620169325> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b14> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/621195051> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b22> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/694325956> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b13> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/707942826> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/strobebright> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/82643314> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b11> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/876465514> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b32> ;
-    ns1:level 0e+00 .
-
-<http://light9.bigasterisk.com/sub/local/1434254816.38-1/map/949922333> a ns1:ChannelSetting ;
-    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b25> ;
     ns1:level 0e+00 .
 

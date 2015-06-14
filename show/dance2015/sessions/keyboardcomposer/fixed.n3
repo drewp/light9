@@ -5,15 +5,9 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed> ns1:currentRow 0 ;
-    ns1:subSetting <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/193681237>,
-        <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/741270798> ;
-    ns1:windowGeometry "532x665+1243+341" .
+    ns1:subSetting <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/811016598> .
 
-<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/193681237> a ns1:SubSetting ;
-    ns1:level 5.5e-01 ;
+<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/811016598> a ns1:SubSetting ;
+    ns1:level 3.3e-01 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/house> .
-
-<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/741270798> a ns1:SubSetting ;
-    ns1:level 0e+00 ;
-    ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/cools> .
 
