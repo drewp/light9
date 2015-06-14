@@ -8,10 +8,15 @@
     rdfs:label "orange" ;
     ns1:color "#f08000" ;
     ns1:group "color" ;
-    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/619060040>,
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/114459943>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/619060040>,
         <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/628707653>,
         <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/727000307>,
         <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/904074843> .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/orange/map/114459943> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b22> ;
+    ns1:level 6.6e-01 .
 
 <http://light9.bigasterisk.com/show/dance2013/sub/orange/map/619060040> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/oran1> ;
