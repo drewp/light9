@@ -111,7 +111,6 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         debugKey = '[id=%s]' % (id(p) % 1000)
         print ''
         log.debug("apply local patch %s %s", debugKey, p)
-        import traceback; traceback.print_stack()
         try:
             patchQuads(self._graph,
                        deleteQuads=p.delQuads,

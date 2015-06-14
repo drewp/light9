@@ -108,7 +108,6 @@ class Main(object):
             if newSong is Local:
                 raise NotImplementedError('what do i patch')
             log.debug('songChoiceToGraph is going to set to %r', newSong)
-            import traceback; traceback.print_stack()
 
             # I get bogus newSong values in here sometimes. This
             # workaround may not even be helping.
