@@ -29,7 +29,7 @@
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/815737034>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/86661074>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/993407436> ;
-    ns1:windowGeometry "692x790+2233+317" .
+    ns1:windowGeometry "692x790+2033+296" .
 
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/122321463> a ns1:SubSetting ;
     ns1:level 0e+00 ;

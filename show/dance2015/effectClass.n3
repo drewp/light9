@@ -88,18 +88,18 @@ effect:backChaseSlower a :EffectClass;
   :code "out = chase(t, names=backchase, ontime=.7, offset=-.11) * env" .
 
 chase:frontrand a :Chase; :channels (
-<http://light9.bigasterisk.com/theater/piedmont/channel/f11-blue>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f11>
 <http://light9.bigasterisk.com/theater/piedmont/channel/f3>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f8-fill>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f9-pool-r>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f8>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f9>
 <http://light9.bigasterisk.com/theater/piedmont/channel/f10>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f1-blue>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f4-pool-l>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f5-fill>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f1>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f4>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f5>
 <http://light9.bigasterisk.com/theater/piedmont/channel/f7>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f2>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f2-out>
 <http://light9.bigasterisk.com/theater/piedmont/channel/sharlyn>
-<http://light9.bigasterisk.com/theater/piedmont/channel/f12-purp>
+<http://light9.bigasterisk.com/theater/piedmont/channel/f12-out>
 ) .
 
 

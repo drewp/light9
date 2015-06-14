@@ -8,12 +8,14 @@
         <http://light9.bigasterisk.com/show/dance2015/song14/curve-2>,
         <http://light9.bigasterisk.com/show/dance2015/song14/curve-3>,
         <http://light9.bigasterisk.com/show/dance2015/song14/curve-4>,
-        <http://light9.bigasterisk.com/show/dance2015/song14/curve-5> ;
+        <http://light9.bigasterisk.com/show/dance2015/song14/curve-5>,
+        <http://light9.bigasterisk.com/show/dance2015/song14/curve-6> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2015/song14/effect-1>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-2>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-3>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-4>,
-        <http://light9.bigasterisk.com/show/dance2015/song14/effect-5> .
+        <http://light9.bigasterisk.com/show/dance2015/song14/effect-5>,
+        <http://light9.bigasterisk.com/show/dance2015/song14/effect-6> .
 
 <http://light9.bigasterisk.com/show/dance2015/song14/curve-1> a ns1:Curve ;
     rdfs:label "center" .
@@ -29,6 +31,9 @@
 
 <http://light9.bigasterisk.com/show/dance2015/song14/curve-5> a ns1:Curve ;
     rdfs:label "whiteLed" .
+
+<http://light9.bigasterisk.com/show/dance2015/song14/curve-6> a ns1:Curve ;
+    rdfs:label "frontrand chase" .
 
 <http://light9.bigasterisk.com/show/dance2015/song14/effect-1> a ns1:Effect ;
     rdfs:label "center" ;
@@ -55,4 +60,10 @@
     rdfs:label "whiteLed" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song14/curve-5>",
         "out = [Strip.solid('LR', (1,1,1)) * env, Strip.solid('W', (1,.5,.5)) * env]" .
+
+<http://light9.bigasterisk.com/show/dance2015/song14/effect-6> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/frontrandChase> ;
+    rdfs:label "frontrand chase" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song14/curve-6>",
+        "out = chase(t, names=frontrand, ontime=.25, offset=0) * env" .
 
