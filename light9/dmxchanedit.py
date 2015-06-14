@@ -23,7 +23,7 @@ import math, logging
 from decimal import Decimal
 from light9.namespaces import L9
 log = logging.getLogger('dmxchanedit')
-stdfont = ('Arial', 9)
+stdfont = ('Arial', 7)
 
 def gradient(lev, low=(80,80,180), high=(255,55,50)):
      out = [int(l+lev*(h-l)) for h,l in zip(high,low)]
