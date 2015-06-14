@@ -77,7 +77,7 @@ class Main(object):
 
         self.registerGraphToSongChoice(wtree, session, graph, songChoice)
         self.registerSongChoiceToGraph(session, graph, songChoice)
-        self.current_player_song = self.registerCurrentPlayerSongToUi(wtree, graph, songChoice)
+        self.registerCurrentPlayerSongToUi(wtree, graph, songChoice)
 
         ec = EditChoice(graph, songChoice, label="Editing song:")
         wtree.get_object("currentSongEditChoice").add(ec)
@@ -103,14 +103,27 @@ class Main(object):
         graph.addHandler(setSong)
 
     def registerSongChoiceToGraph(self, session, graph, songChoice):
-        def songToGraph(newSong):
+        self.muteSongChoiceUntil = 0
+        def songChoiceToGraph(newSong):
             if newSong is Local:
                 raise NotImplementedError('what do i patch')
-            log.debug('songToGraph is going to set to %r', newSong)
+            log.debug('songChoiceToGraph is going to set to %r', newSong)
             import traceback; traceback.print_stack()
+
+            # I get bogus newSong values in here sometimes. This
+            # workaround may not even be helping.
+            now = time.time()
+            if now < self.muteSongChoiceUntil:
+                log.debug('muted')
+                return
+            self.muteSongChoiceUntil = now + 1
+            
             graph.patchObject(context=session, subject=session,
                               predicate=L9['currentSong'], newObject=newSong)
-        songChoice.subscribe(songToGraph)
+            
+            
+            
+        songChoice.subscribe(songChoiceToGraph)
 
     def registerCurrentPlayerSongToUi(self, wtree, graph, songChoice):
         """current_player_song 'song' param -> playerSong ui
@@ -127,13 +140,12 @@ class Main(object):
                 graph.addHandler(setLabel)
                 ps.set_uri(song)
             if song != songChoice():
-                log.debug('song %s != songChoice %s', song, songChoice())
                 if wtree.get_object("followPlayerSongChoice").get_active():
                     log.debug('followPlayerSongChoice is on')
                     songChoice(song)
                 
         dispatcher.connect(current_player_song, "current_player_song")
-        return current_player_song
+        self.current_player_song = current_player_song
         
     def setupNewSubZone(self):
         self.wtree.get_object("newSubZone").drag_dest_set(
