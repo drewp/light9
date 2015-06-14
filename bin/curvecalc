@@ -75,32 +75,9 @@ class Main(object):
 
         songChoice = Observable(None) # to be connected with the session song
 
-        def setSong():
-            songChoice(graph.value(session, L9['currentSong']))
-            dispatcher.send("song_has_changed")
-        graph.addHandler(setSong)
-        # next here, watch songChoice and patch the graph
-        def songToGraph(newSong):
-            if newSong is Local:
-                raise NotImplementedError('what do i patch')
-            graph.patchObject(context=session, subject=session,
-                              predicate=L9['currentSong'], newObject=newSong)
-        songChoice.subscribe(songToGraph)
-        def current_player_song(song):
-            # (this is run on every frame)
-            ps = wtree.get_object("playerSong")
-            if URIRef(ps.get_uri()) != song:
-                print "update playerSong"
-                def setLabel():
-                    ps.set_label(graph.label(song))
-                graph.addHandler(setLabel)
-                ps.set_uri(song)
-            if song != songChoice():
-                if wtree.get_object("followPlayerSongChoice").get_active():
-                    songChoice(song)
-                
-        self.current_player_song = current_player_song
-        dispatcher.connect(current_player_song, "current_player_song")
+        self.registerGraphToSongChoice(wtree, session, graph, songChoice)
+        self.registerSongChoiceToGraph(session, graph, songChoice)
+        self.current_player_song = self.registerCurrentPlayerSongToUi(wtree, graph, songChoice)
 
         ec = EditChoice(graph, songChoice, label="Editing song:")
         wtree.get_object("currentSongEditChoice").add(ec)
@@ -116,6 +93,47 @@ class Main(object):
                 
         # may not work
         wtree.get_object("paned1").set_position(600)
+
+    def registerGraphToSongChoice(self, wtree, session, graph, songChoice):
+        def setSong():
+            current = graph.value(session, L9['currentSong'])
+            if not wtree.get_object("followPlayerSongChoice").get_active():
+                songChoice(current)
+                dispatcher.send("song_has_changed")
+        graph.addHandler(setSong)
+
+    def registerSongChoiceToGraph(self, session, graph, songChoice):
+        def songToGraph(newSong):
+            if newSong is Local:
+                raise NotImplementedError('what do i patch')
+            log.debug('songToGraph is going to set to %r', newSong)
+            import traceback; traceback.print_stack()
+            graph.patchObject(context=session, subject=session,
+                              predicate=L9['currentSong'], newObject=newSong)
+        songChoice.subscribe(songToGraph)
+
+    def registerCurrentPlayerSongToUi(self, wtree, graph, songChoice):
+        """current_player_song 'song' param -> playerSong ui
+        and
+        current_player_song 'song' param -> songChoice, if you're in autofollow
+        """
+        def current_player_song(song):
+            # (this is run on every frame)
+            ps = wtree.get_object("playerSong")
+            if URIRef(ps.get_uri()) != song:
+                log.debug("update playerSong to %s", ps.get_uri())
+                def setLabel():
+                    ps.set_label(graph.label(song))
+                graph.addHandler(setLabel)
+                ps.set_uri(song)
+            if song != songChoice():
+                log.debug('song %s != songChoice %s', song, songChoice())
+                if wtree.get_object("followPlayerSongChoice").get_active():
+                    log.debug('followPlayerSongChoice is on')
+                    songChoice(song)
+                
+        dispatcher.connect(current_player_song, "current_player_song")
+        return current_player_song
         
     def setupNewSubZone(self):
         self.wtree.get_object("newSubZone").drag_dest_set(
