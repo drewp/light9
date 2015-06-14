@@ -71,6 +71,13 @@ chase:backchase a :Chase; :channels (
 <http://light9.bigasterisk.com/theater/piedmont/channel/b33>
 ) .
 
+chase:midrand a :Chase; :channels (
+    ch:down-c1 ch:down-wide ch:down-c3 ch:down-c4 ch:down-wide ch:down-c1 ch:down-c3 ch:down-c2 ch:down-c3 ch:down-c4 ch:down-wide ch:down-c1 ch:down-c4 ch:down-c2 ch:down-wide ch:down-c2 ch:down-c4 ch:down-c1    
+) .
+
+effect:midChase a :EffectClass;
+  rdfs:label "mid chase";
+  :code "out = chase(t, names=midrand, ontime=.3, offset=-.11) * env" .
 
 effect:backChase a :EffectClass;
   rdfs:label "back chase";

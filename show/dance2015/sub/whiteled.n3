@@ -1,8 +1,8 @@
-@prefix ns1: <http://light9.bigasterisk.com/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix : <http://light9.bigasterisk.com/> .
 
-<http://light9.bigasterisk.com/show/dance2015/song14/curve-1> ns1:points "0 0 61.28 0 63.28 1 101.4 1 103.4 0" .
+<http://light9.bigasterisk.com/show/dance2015/sub/whiteled> rdfs:label "whiteled" ; a :Submaster .
 

@@ -32,11 +32,15 @@ eff:e5 a :Effect;
     :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/wideBlue>)",
              "out = Strip.solid('W', (0,0,1)) * level" .
 
-sub:blacklight a :Submaster ; rdfs:label "blacklight" ; :drivesEffect eff:e6, eff:e7 .
+sub:blacklight a :Submaster ; rdfs:label "blacklight" ; :drivesEffect eff:e6 .
 eff:e6 a :Effect;
     :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/blacklight>)",
-             "out = Blacklight(level)" .
-eff:e7 a :Effect;
-    :code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/blacklight>)",
-             "out = Strip.solid('LRW', (0, 0, .16)) * level" .
+             "out = [Blacklight(level), Strip.solid('LRW', (0, 0, .16)) * level]" .
+
+
+<http://light9.bigasterisk.com/show/dance2015/sub/whiteled> rdfs:label "whiteled" ; a :Submaster ; :drivesEffect eff:e8 .
+eff:e8 a :Effect;
+:code "level = currentSubLevel(<http://light9.bigasterisk.com/show/dance2015/sub/whiteled>)",
+
+             "out = [Strip.solid('LR', (1,1,1)) * level, Strip.solid('W', (1,.5,.5)) * level]" .
 

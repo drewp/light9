@@ -4,7 +4,18 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+<http://light9.bigasterisk.com/show/dance2015/song16> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song16/curve-10> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song16/effect-1> .
+
 <http://light9.bigasterisk.com/show/dance2015/song16/effect-4> ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-9>",
         "music = curve(<http://light9.bigasterisk.com/show/dance2015/song16music>, t+.05)",
         "out = <http://light9.bigasterisk.com/show/dance2015/sub/full> * music * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-10> a ns1:Curve ;
+    rdfs:label "widered" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-1> a ns1:Effect ;
+    rdfs:label "widered" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-10>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/wideRed> * env" .
 
