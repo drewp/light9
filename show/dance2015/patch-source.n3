@@ -2,7 +2,7 @@
 @prefix dmx: <http://light9.bigasterisk.com/dmx/> .
 
 [ :name "f1";      :output dmx:c1 ] .
-[ :name "f2";      :output dmx:c2 ] .
+[ :name "f2-out";      :output dmx:c2 ] .
 [ :name "f3";      :output dmx:c3 ] .
 [ :name "f4";      :output dmx:c4 ] .
 [ :name "f5";      :output dmx:c5 ] .
@@ -12,16 +12,16 @@
 [ :name "f9";      :output dmx:c9 ] .
 [ :name "f10";     :output dmx:c10 ] .
 [ :name "f11";     :output dmx:c11 ] .
-[ :name "f12";     :output dmx:c12 ] .
+[ :name "f12-out";     :output dmx:c12 ] .
 
 #[ :name "c13"; :output dmx:c13 ] .
 #[ :name "c14"; :output dmx:c14 ] .
 #[ :name "c15"; :output dmx:c15 ] .
-#[ :name "c16"; :output dmx:c16 ] .
-#[ :name "c17"; :output dmx:c17 ] .
-#[ :name "c18"; :output dmx:c18 ] .
-[ :name "down-c-P"; :output dmx:c19 ] .
-#[ :name "c20"; :output dmx:c20 ] .
+[ :name "down-wide"; :output dmx:c16 ] .
+[ :name "down-c1"; :output dmx:c17 ] .
+[ :name "down-c2"; :output dmx:c18 ] .
+[ :name "down-c3"; :output dmx:c19 ] .
+[ :name "down-c4"; :output dmx:c20 ] .
 
 [ :name "oran1"; :output dmx:c21 ] .
 [ :name "oran2"; :output dmx:c25 ] .
@@ -40,8 +40,8 @@
 [ :name "red3"; :output dmx:c32 ] .
 [ :name "red4"; :output dmx:c36 ] .
 
-[ :name "upright"; :output dmx:c37 ] .
-[ :name "upleft"; :output dmx:c38 ] .
+#[ :name "upright"; :output dmx:c37 ] .
+#[ :name "upleft"; :output dmx:c38 ] .
 
 #[ :name "c39"; :output dmx:c39 ] .
 #[ :name "c40"; :output dmx:c40 ] .

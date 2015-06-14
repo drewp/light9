@@ -4,39 +4,14 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2015/song1> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song1/curve-10>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-12>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/curve-13> ;
-    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song1/effect-1>,
-        <http://light9.bigasterisk.com/show/dance2015/song1/effect-2> .
+<http://light9.bigasterisk.com/show/dance2015/song1> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song1/curve-14> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song1/effect-3> .
 
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-11> a ns1:Curve ;
-    rdfs:label "" .
+<http://light9.bigasterisk.com/show/dance2015/song1/curve-14> a ns1:Curve ;
+    rdfs:label "houseside" .
 
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-9> ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-9>",
-        "out = Strip.solid('LR', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-10> a ns1:Curve ;
-    rdfs:label "demo11111" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-12> a ns1:Curve ;
-    rdfs:label "whiteLed" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/curve-13> a ns1:Curve ;
-    rdfs:label "blacklight" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-1> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/whiteLed> ;
-    rdfs:label "whiteLed" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-12>",
-        "out = Strip.solid('LRW', (1,1,1)) * env" .
-
-<http://light9.bigasterisk.com/show/dance2015/song1/effect-2> a ns1:Effect,
-        <http://light9.bigasterisk.com/effect/blacklight> ;
-    rdfs:label "blacklight" ;
-    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-13>",
-        "out = [env * p1, env * p2, env * p4]",
-        "p1 = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .3",
-        "p2 = Strip.solid('LRW', (0,0,1))",
-        "p4 = Blacklight(1)" .
+<http://light9.bigasterisk.com/show/dance2015/song1/effect-3> a ns1:Effect ;
+    rdfs:label "houseside" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song1/curve-14>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/houseside> * env" .
 

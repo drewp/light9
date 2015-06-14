@@ -10,6 +10,7 @@
     ns1:drivesEffect <http://light9.bigasterisk.com/show/dance2015/blueLed> ;
     ns1:group "color" ;
     ns1:lightLevel <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/285520676>,
+        <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/497215064>,
         <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/564473998>,
         <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/656200727>,
         <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/754352965> .
@@ -17,6 +18,10 @@
 <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/285520676> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue3> ;
     ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2013/sub/blue/map/497215064> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-b> ;
+    ns1:level 0 .
 
 <http://light9.bigasterisk.com/show/dance2013/sub/blue/map/564473998> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/blue4> ;

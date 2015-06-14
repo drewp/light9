@@ -1,0 +1,567 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2015/sessions/subcomposer/default> ns1:currentSub <http://light9.bigasterisk.com/show/dance2015/sub/full> ;
+    ns1:windowGeometry "404x774+2586+315" .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.95> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.98> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434242853.99/map/225009865>,
+        <http://light9.bigasterisk.com/sub/local/1434242853.99/map/236941844>,
+        <http://light9.bigasterisk.com/sub/local/1434242853.99/map/530575691>,
+        <http://light9.bigasterisk.com/sub/local/1434242853.99/map/621842575>,
+        <http://light9.bigasterisk.com/sub/local/1434242853.99/map/710976161>,
+        <http://light9.bigasterisk.com/sub/local/1434242853.99/map/991164721> .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.04> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.08> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.13> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.18> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.23> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.28> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.33> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.38> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.43> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.49> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.54> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.59> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.64> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.7> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.74> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.79> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.85> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.89> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.94> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242871.99> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.05> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.09> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.15> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.21> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.26> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.31> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.36> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.4> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.45> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.51> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.57> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.62> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.67> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.72> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.77> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.83> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.88> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.93> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242872.99> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.05> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.1> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.16> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.21> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.26> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.31> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.37> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.42> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.47> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.53> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.59> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.63> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.69> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.74> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.79> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.84> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.89> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242873.95> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.01> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.06> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.11> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.17> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.22> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.28> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.33> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.39> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.44> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.48> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.54> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.6> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.65> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.71> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.77> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.82> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.89> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242874.94> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.06> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.11> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.15> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.21> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.27> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.32> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.38> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.43> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.47> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.54> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.6> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.67> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.73> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.8> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.86> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242875.93> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242876.01> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242940.96> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242941.01> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243246.07> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243251.44> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243251.51> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243801.77> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243801.85> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243822.52> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.5> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.54> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.58> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.61> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.67> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.71> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.75> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.79> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.83> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.86> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.92> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243911.96> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243936.93> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243937.01> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243946.67> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243946.72> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434243946.77> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434244210.12> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434244210.22> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434244716.91> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434244717.0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245033.54> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245033.63> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245161> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245193> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245194> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245195> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245196> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245197> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245198> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434245401> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434246066> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434246066/map/18034585>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/225700048>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/383815244>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/526998266>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/685854701>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/742555120>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/943891761>,
+        <http://light9.bigasterisk.com/sub/local/1434246066/map/946420480> .
+
+<http://light9.bigasterisk.com/sub/local/1434246518> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434246718.34-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434246718.34-1> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247156.63-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247156.63-1> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434247156.63-1/map/410138489>,
+        <http://light9.bigasterisk.com/sub/local/1434247156.63-1/map/92346838> .
+
+<http://light9.bigasterisk.com/sub/local/1434247156.63-2> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247479.42-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247479.42-1> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-1> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434247576.42-1/map/849244550> .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-2> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/391826994>,
+        <http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/77422356>,
+        <http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/794430931>,
+        <http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/818680547> .
+
+<http://light9.bigasterisk.com/sub/local/1434247998.46-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434247998.46-2> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434248100.37-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434248100.37-2> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99/map/225009865> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/post-r> ;
+    ns1:level 1e-02 .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99/map/236941844> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/rgb3-mode> ;
+    ns1:level 5e-03 .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99/map/530575691> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b15> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99/map/621842575> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b16> ;
+    ns1:level 9.85e-01 .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99/map/710976161> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b11> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434242853.99/map/991164721> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b21> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/18034585> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b21> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/225700048> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b25> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/383815244> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/strobespeed> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/526998266> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/cyc-right> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/685854701> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b24> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/742555120> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b23> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/943891761> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b11> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434246066/map/946420480> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b22> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434247156.63-1/map/410138489> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b13> ;
+    ns1:level 3e-02 .
+
+<http://light9.bigasterisk.com/sub/local/1434247156.63-1/map/92346838> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b11> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-1/map/849244550> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/post-l> ;
+    ns1:level 0 .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/391826994> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b15> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/77422356> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/down-wide> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/794430931> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b11> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434247576.42-2/map/818680547> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b16> ;
+    ns1:level 0e+00 .
+

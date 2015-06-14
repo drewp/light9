@@ -1,0 +1,17 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<http://light9.bigasterisk.com/show/dance2015/song17> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song17/curve-1> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song17/effect-1> .
+
+<http://light9.bigasterisk.com/show/dance2015/song17/curve-1> a ns1:Curve ;
+    rdfs:label "houseside" .
+
+<http://light9.bigasterisk.com/show/dance2015/song17/effect-1> a ns1:Effect ;
+    rdfs:label "houseside" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song17/curve-1>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/houseside> * env" .
+

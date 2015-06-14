@@ -1,10 +1,10 @@
 #Processed by Id: cwm.py,v 1.197 2007/12/13 15:38:39 syosi Exp 
-        #    using base file:///home/drewp/projects-local/light9/show/dance2015/patch-source.n3
+        #    using base file:///home/drewp/projects/light9/show/dance2015/patch-source.n3
         
 #  Notation3 generation by
 #       notation3.py,v 1.200 2007/12/11 21:18:08 syosi Exp
 
-#   Base was: file:///home/drewp/projects-local/light9/show/dance2015/patch-source.n3
+#   Base was: file:///home/drewp/projects/light9/show/dance2015/patch-source.n3
      @prefix : <http://light9.bigasterisk.com/> .
     @prefix ch: <http://light9.bigasterisk.com/theater/piedmont/channel/> .
     @prefix dmx: <http://light9.bigasterisk.com/dmx/> .
@@ -110,9 +110,25 @@
          :output dmx:c42;
          rdfs:label "cyc-right" .
     
-    ch:down-c-P     a :Channel;
+    ch:down-c1     a :Channel;
+         :output dmx:c17;
+         rdfs:label "down-c1" .
+    
+    ch:down-c2     a :Channel;
+         :output dmx:c18;
+         rdfs:label "down-c2" .
+    
+    ch:down-c3     a :Channel;
          :output dmx:c19;
-         rdfs:label "down-c-P" .
+         rdfs:label "down-c3" .
+    
+    ch:down-c4     a :Channel;
+         :output dmx:c20;
+         rdfs:label "down-c4" .
+    
+    ch:down-wide     a :Channel;
+         :output dmx:c16;
+         rdfs:label "down-wide" .
     
     ch:f1     a :Channel;
          :output dmx:c1;
@@ -126,13 +142,13 @@
          :output dmx:c11;
          rdfs:label "f11" .
     
-    ch:f12     a :Channel;
+    ch:f12-out     a :Channel;
          :output dmx:c12;
-         rdfs:label "f12" .
+         rdfs:label "f12-out" .
     
-    ch:f2     a :Channel;
+    ch:f2-out     a :Channel;
          :output dmx:c2;
-         rdfs:label "f2" .
+         rdfs:label "f2-out" .
     
     ch:f3     a :Channel;
          :output dmx:c3;
@@ -261,13 +277,5 @@
     ch:strobespeed     a :Channel;
          :output dmx:c47;
          rdfs:label "strobespeed" .
-    
-    ch:upleft     a :Channel;
-         :output dmx:c38;
-         rdfs:label "upleft" .
-    
-    ch:upright     a :Channel;
-         :output dmx:c37;
-         rdfs:label "upright" .
     
 #ENDS

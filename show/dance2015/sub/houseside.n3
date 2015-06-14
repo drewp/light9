@@ -4,12 +4,51 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2013/sub/houseside> a ns1:Submaster ;
-    ns1:color "#400020";
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside> a ns1:Submaster ;
     rdfs:label "houseside" ;
-    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1371346683.43/map/579807785> .
+    ns1:lightLevel <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/347681609>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/474473701>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/546886320>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/593593421>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/608325870>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/924070076>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/945991814>,
+        <http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/964122089>,
+        <http://light9.bigasterisk.com/sub/local/1434217744.72/map/527070692> .
 
-<http://light9.bigasterisk.com/sub/local/1371346683.43/map/579807785> a ns1:ChannelSetting ;
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/347681609> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f7> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/474473701> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f5> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/546886320> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f4> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/593593421> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f8> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/608325870> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f1> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/924070076> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f2> ;
+    ns1:level 1e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/945991814> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/sharlyn> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2015/sub/houseside/map/964122089> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/f9> ;
+    ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434217744.72/map/527070692> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/house-side> ;
     ns1:level 1e+00 .
 

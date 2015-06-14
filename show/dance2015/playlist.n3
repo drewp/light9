@@ -13,24 +13,23 @@ show:dance2015 :playList (
   sh:song16 sh:song17
 ) .
 
-sh:song1 a :Song; rdfs:label  "01 dancingqueen-crop";        :songFilename "01-dancingqueen-crop.wav" .
-sh:song2 a :Song; rdfs:label  "02 gotta-dance-boost";        :songFilename "02-gotta-dance-boost.wav" .
-sh:song3 a :Song; rdfs:label  "03 tonight-crop";             :songFilename "03-tonight-crop.wav" .
-sh:song4 a :Song; rdfs:label  "04 cheek-denoise";            :songFilename "04-cheek-denoise.wav" .
-sh:song5 a :Song; rdfs:label  "05 sohappy-crop";             :songFilename "05-sohappy-crop.wav" .
-sh:song6 a :Song; rdfs:label  "06 comedance";                :songFilename "06-comedance-replacepop.wav" .
-sh:song7 a :Song; rdfs:label  "07 mix";                      :songFilename "07-mix.wav" .
-sh:song8 a :Song; rdfs:label  "08 mix";                      :songFilename "08-mix.wav" .
-sh:song9 a :Song; rdfs:label  "09 mix";                      :songFilename "09-mix.wav" .
-sh:song10 a :Song; rdfs:label "10 happy-crop";               :songFilename "10-happy-crop.wav" .
-sh:song11 a :Song; rdfs:label "11 gointo-declick1";          :songFilename "11-gointo-declick1.wav" .
-sh:song12 a :Song; rdfs:label "12 clip";                     :songFilename "12-clip-declick1.wav" .
-sh:song13 a :Song; rdfs:label "13 mix";                      :songFilename "13-mix-declick1.wav" .
-sh:song14 a :Song; rdfs:label "14 machine-crop";             :songFilename "14-machine-crop.wav" .
-sh:song15 a :Song; rdfs:label "15 mix";                      :songFilename "15-mix.wav" .
-sh:song16 a :Song; rdfs:label "16 mix-fixword";              :songFilename "16-mix-fixword.wav" .
-sh:song17 a :Song; rdfs:label "17 dancetothemusic-extended"; :songFilename "17-dancetothemusic-extended.wav" .
-
+sh:song1 a :Song; rdfs:label  "01 opening [all]";                   :songFilename "01-dancingqueen-crop.wav" .
+sh:song2 a :Song; rdfs:label  "02 specialty / gotta dance [jr/sr]"; :songFilename "02-gotta-dance-boost.wav" .
+sh:song3 a :Song; rdfs:label  "03 dance with me tonight [2]";       :songFilename "03-tonight-crop.wav" .
+sh:song4 a :Song; rdfs:label  "04 dancing cheek [4]";               :songFilename "04-cheek-denoise.wav" .
+sh:song5 a :Song; rdfs:label  "05 happy just [1]";                  :songFilename "05-sohappy-crop.wav" .
+sh:song6 a :Song; rdfs:label  "06 come dance with me [3]";          :songFilename "06-comedance-replacepop.wav" .
+sh:song7 a :Song; rdfs:label  "07 you should be dancin [4]";        :songFilename "07-mix.wav" .
+sh:song8 a :Song; rdfs:label  "08 your mama don't [2]";             :songFilename "08-mix.wav" .
+sh:song9 a :Song; rdfs:label  "09 do you wanna [1]";                :songFilename "09-mix.wav" .
+sh:song10 a :Song; rdfs:label "10 dancing happy [4]";               :songFilename "10-happy-crop.wav" .
+sh:song11 a :Song; rdfs:label "11 go into your dance [3]";          :songFilename "11-gointo-declick1.wav" .
+sh:song12 a :Song; rdfs:label "12 specialty [sr]";                  :songFilename "12-clip-declick1.wav" .
+sh:song13 a :Song; rdfs:label "13 shall we [1]";                    :songFilename "13-mix-declick1.wav" .
+sh:song14 a :Song; rdfs:label "14 dancin machine [2]";              :songFilename "14-machine-crop.wav" .
+sh:song15 a :Song; rdfs:label "15 everybody dance [3]";             :songFilename "15-mix.wav" .
+sh:song16 a :Song; rdfs:label "16 #1 hits [4]";                     :songFilename "16-mix-fixword.wav" .
+sh:song17 a :Song; rdfs:label "17 dance to the music [all]";        :songFilename "17-dancetothemusic-extended.wav" .
 
 
 # wavecurve should probably be responsible for making these when it
