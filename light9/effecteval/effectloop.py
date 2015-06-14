@@ -234,6 +234,18 @@ class LedLoop(EffectLoop):
         
         for out in outputs:
             log.debug('combine output %r', out)
+
+
+            # workaround- somehow these subs that drive fx aren't
+            # sending their fx, so we react to the sub
+            if isinstance(out, Submaster.Submaster) and '*' in out.name:
+                level = float(out.name.split('*')[1])
+                n = out.name.split('*')[0]
+                if n == 'widered': out = Effects.Strip.solid('W', (1,0,0)) * level
+                if n == 'widegreen': out = Effects.Strip.solid('W', (0,1,0)) * level
+                if n == 'wideblue': out = Effects.Strip.solid('W', (0,0,1)) * level
+                if n == 'whiteled': out = Effects.Strip.solid('W', (1,.5,.5)) * level
+ 
             if isinstance(out, Effects.Blacklight):
                 # no picking yet
                 #key = 'blacklight%s' % out.which
