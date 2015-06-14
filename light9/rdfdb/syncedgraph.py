@@ -82,6 +82,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         should just fail them. There should be a notification back to
         UIs who want to show that we're doing a resync.
         """
+        log.info('resync')
         self._sender.cancelAll()
         # this should be locked so only one resync goes on at once
         return cyclone.httpclient.fetch(
@@ -107,15 +108,24 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         # these could fail if we're out of sync. One approach:
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
-        log.debug("apply local patch %s", p)
+        debugKey = '[id=%s]' % (id(p) % 1000)
+        print ''
+        log.debug("apply local patch %s %s", debugKey, p)
+        import traceback; traceback.print_stack()
         try:
-            patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
+            patchQuads(self._graph,
+                       deleteQuads=p.delQuads,
+                       addQuads=p.addQuads,
+                       perfect=True)
         except ValueError as e:
             log.error(e)
             self.sendFailed(None)
             return
+        log.debug('runDepsOnNewPatch')
         self.runDepsOnNewPatch(p)
+        log.debug('sendPatch')
         self._sender.sendPatch(p).addErrback(self.sendFailed)
+        log.debug('patch is done %s', debugKey)
 
     def sendFailed(self, result):
         """
@@ -133,6 +143,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         """
         central server has sent us a patch
         """
+        log.debug('_onPatch server has sent us %s', p)
         patchQuads(self._graph, p.delQuads, p.addQuads, perfect=True)
         log.debug("graph now has %s statements" % len(self._graph))
         try:

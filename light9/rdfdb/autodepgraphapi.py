@@ -1,7 +1,7 @@
 import logging
 from rdflib import RDF, RDFS
 from light9.rdfdb.currentstategraphapi import contextsForStatementNoWildcards
-log = logging.getLogger('syncedgraph')
+log = logging.getLogger('autodepgraphapi')
 
 class AutoDepGraphApi(object):
     """
@@ -43,10 +43,12 @@ class AutoDepGraphApi(object):
         # it gives the same result, I don't call the handler?
 
         self.currentFuncs.append(func)
+        log.debug('graph.currentFuncs push %s', func)
         try:
             func()
         finally:
             self.currentFuncs.pop()
+            log.debug('graph.currentFuncs pop %s. stack now has %s', func, len(self.currentFuncs))
 
     def runDepsOnNewPatch(self, p):
         """
@@ -55,6 +57,7 @@ class AutoDepGraphApi(object):
         """
         for func in self._watchers.whoCares(p):
             # todo: forget the old handlers for this func
+            log.debug('runDepsOnNewPatch calling watcher %s', p)
             self.addHandler(func)
 
     def _getCurrentFunc(self):
