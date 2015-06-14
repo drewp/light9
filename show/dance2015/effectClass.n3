@@ -33,23 +33,19 @@ effect:fullToMusic a :EffectClass; rdfs:label "full to music";
 :quneoNote 38;
 :code "out = <http://light9.bigasterisk.com/show/dance2015/sub/full> * music * env" .
 
-
-
 effect:blacklight a :EffectClass;
   rdfs:label "blacklight";
   :quneoNote 37;
   :code 
     "out = [env * p1, env * p2, env * p4]",
     "p1 = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * .3",
-    "p2 = Strip.solid('LR', (0,0,1))",
+    "p2 = Strip.solid('LRW', (0,0,1))",
     "p4 = Blacklight(1)" 
     .
-
     
 effect:whiteLed a :EffectClass;
   rdfs:label "whiteLed";
-  :code "out = Strip.solid('LR', (1,1,1)) * env" .
-
+  :code "out = [Strip.solid('LR', (1,1,1)) * env, Strip.solid('W', (1,.5,.5)) * env]" .
     
 effect:slowColor a :EffectClass;
   rdfs:label "slow color chase";
@@ -63,13 +59,16 @@ effect:slowColor a :EffectClass;
     .
 
 chase:backchase a :Chase; :channels (
-<http://light9.bigasterisk.com/theater/piedmont/channel/b14-yel>
-<http://light9.bigasterisk.com/theater/piedmont/channel/b15-red>
-<http://light9.bigasterisk.com/theater/piedmont/channel/b21-edge>
-<http://light9.bigasterisk.com/theater/piedmont/channel/b22-c>
-<http://light9.bigasterisk.com/theater/piedmont/channel/b26-edge>
-<http://light9.bigasterisk.com/theater/piedmont/channel/b32-red>
-<http://light9.bigasterisk.com/theater/piedmont/channel/b34-yel>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b14>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b15>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b21>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b22>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b23>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b24>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b25>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b26>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b32>
+<http://light9.bigasterisk.com/theater/piedmont/channel/b33>
 ) .
 
 
