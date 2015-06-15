@@ -10,14 +10,16 @@
         <http://light9.bigasterisk.com/show/dance2015/song14/curve-4>,
         <http://light9.bigasterisk.com/show/dance2015/song14/curve-5>,
         <http://light9.bigasterisk.com/show/dance2015/song14/curve-6>,
-        <http://light9.bigasterisk.com/show/dance2015/song14/curve-7> ;
+        <http://light9.bigasterisk.com/show/dance2015/song14/curve-7>,
+        <http://light9.bigasterisk.com/show/dance2015/song14/curve-8> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2015/song14/effect-1>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-2>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-3>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-4>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-5>,
         <http://light9.bigasterisk.com/show/dance2015/song14/effect-6>,
-        <http://light9.bigasterisk.com/show/dance2015/song14/effect-7> .
+        <http://light9.bigasterisk.com/show/dance2015/song14/effect-7>,
+        <http://light9.bigasterisk.com/show/dance2015/song14/effect-8> .
 
 <http://light9.bigasterisk.com/show/dance2015/song14/curve-1> a ns1:Curve ;
     rdfs:label "center" .
@@ -39,6 +41,9 @@
 
 <http://light9.bigasterisk.com/show/dance2015/song14/curve-7> a ns1:Curve ;
     rdfs:label "slow color chase" .
+
+<http://light9.bigasterisk.com/show/dance2015/song14/curve-8> a ns1:Curve ;
+    rdfs:label "strobe" .
 
 <http://light9.bigasterisk.com/show/dance2015/song14/effect-1> a ns1:Effect ;
     rdfs:label "center" ;
@@ -81,4 +86,9 @@
         "period = 1",
         "r = <http://light9.bigasterisk.com/show/dance2013/sub/red> * nsin(t / period)",
         "y = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * nsin((t+.3) / period)" .
+
+<http://light9.bigasterisk.com/show/dance2015/song14/effect-8> a ns1:Effect ;
+    rdfs:label "strobe" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song14/curve-8>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/strobe> * env" .
 
