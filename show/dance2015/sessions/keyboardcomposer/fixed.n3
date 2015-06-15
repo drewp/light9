@@ -9,6 +9,6 @@
     ns1:windowGeometry "393x724+1321+62" .
 
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/fixed/map/811016598> a ns1:SubSetting ;
-    ns1:level 5.5e-01 ;
+    ns1:level 3.2e-01 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/house> .
 
