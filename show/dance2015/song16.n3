@@ -4,8 +4,34 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2015/song16> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song16/curve-10> ;
-    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song16/effect-1> .
+<http://light9.bigasterisk.com/show/dance2015/song16> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song16/curve-10>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-11>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-12>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-13>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-14>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-15>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-16>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-17>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-18>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-19>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-20>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-21>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-22>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/curve-23> ;
+    ns1:effect <http://light9.bigasterisk.com/show/dance2015/song16/effect-1>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-10>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-11>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-12>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-13>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-14>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-15>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-2>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-3>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-5>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-6>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-7>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-8>,
+        <http://light9.bigasterisk.com/show/dance2015/song16/effect-9> .
 
 <http://light9.bigasterisk.com/show/dance2015/song16/effect-4> ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-9>",
         "music = curve(<http://light9.bigasterisk.com/show/dance2015/song16music>, t+.05)",
@@ -14,8 +40,115 @@
 <http://light9.bigasterisk.com/show/dance2015/song16/curve-10> a ns1:Curve ;
     rdfs:label "widered" .
 
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-11> a ns1:Curve ;
+    rdfs:label "mid chase" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-12> a ns1:Curve ;
+    rdfs:label "yellow" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-13> a ns1:Curve ;
+    rdfs:label "red" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-14> a ns1:Curve ;
+    rdfs:label "cools" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-15> a ns1:Curve ;
+    rdfs:label "center" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-16> a ns1:Curve ;
+    rdfs:label "mid-down" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-17> a ns1:Curve ;
+    rdfs:label "f-normal" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-18> a ns1:Curve ;
+    rdfs:label "green" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-19> a ns1:Curve ;
+    rdfs:label "whiteled" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-20> a ns1:Curve ;
+    rdfs:label "frontrand chase" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-21> a ns1:Curve ;
+    rdfs:label "back chase" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-22> a ns1:Curve ;
+    rdfs:label "strobe" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/curve-23> a ns1:Curve ;
+    rdfs:label "full" .
+
 <http://light9.bigasterisk.com/show/dance2015/song16/effect-1> a ns1:Effect ;
     rdfs:label "widered" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-10>",
         "out = <http://light9.bigasterisk.com/show/dance2015/sub/wideRed> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-10> a ns1:Effect ;
+    rdfs:label "green" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-18>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/green> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-11> a ns1:Effect ;
+    rdfs:label "whiteled" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-19>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/whiteled> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-12> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/frontrandChase> ;
+    rdfs:label "frontrand chase" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-20>",
+        "out = chase(t, names=frontrand, ontime=.3, offset=-.11) * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-13> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/backChase> ;
+    rdfs:label "back chase" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-21>",
+        "out = chase(t, names=backchase, ontime=60/130., offset=0) * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-14> a ns1:Effect ;
+    rdfs:label "strobe" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-22>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/strobe> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-15> a ns1:Effect ;
+    rdfs:label "full" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-23>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/full> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-2> a ns1:Effect,
+        <http://light9.bigasterisk.com/effect/midChase> ;
+    rdfs:label "mid chase" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-11>",
+        "out = chase(t, names=midrand, ontime=.3, offset=-.11) * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-3> a ns1:Effect ;
+    rdfs:label "yellow" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-12>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/yellow> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-5> a ns1:Effect ;
+    rdfs:label "red" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-13>",
+        "out = <http://light9.bigasterisk.com/show/dance2013/sub/red> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-6> a ns1:Effect ;
+    rdfs:label "cools" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-14>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/cools> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-7> a ns1:Effect ;
+    rdfs:label "center" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-15>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/center> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-8> a ns1:Effect ;
+    rdfs:label "mid-down" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-16>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/mid-down> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song16/effect-9> a ns1:Effect ;
+    rdfs:label "f-normal" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song16/curve-17>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/f-normal> * env" .
 

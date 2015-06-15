@@ -11,7 +11,8 @@
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-5>,
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-6>,
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-7>,
-        <http://light9.bigasterisk.com/show/dance2015/song7/curve-8> ;
+        <http://light9.bigasterisk.com/show/dance2015/song7/curve-8>,
+        <http://light9.bigasterisk.com/show/dance2015/song7/curve-9> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2015/song7/effect-1>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-2>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-3>,
@@ -19,7 +20,8 @@
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-5>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-6>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-7>,
-        <http://light9.bigasterisk.com/show/dance2015/song7/effect-8> .
+        <http://light9.bigasterisk.com/show/dance2015/song7/effect-8>,
+        <http://light9.bigasterisk.com/show/dance2015/song7/effect-9> .
 
 <http://light9.bigasterisk.com/show/dance2015/song7/curve-1> a ns1:Curve ;
     rdfs:label "orange" .
@@ -44,6 +46,9 @@
 
 <http://light9.bigasterisk.com/show/dance2015/song7/curve-8> a ns1:Curve ;
     rdfs:label "whiteled" .
+
+<http://light9.bigasterisk.com/show/dance2015/song7/curve-9> a ns1:Curve ;
+    rdfs:label "strobe" .
 
 <http://light9.bigasterisk.com/show/dance2015/song7/effect-1> a ns1:Effect ;
     rdfs:label "orange" ;
@@ -86,4 +91,9 @@
     rdfs:label "whiteled" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song7/curve-8>",
         "out = <http://light9.bigasterisk.com/show/dance2015/sub/whiteled> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song7/effect-9> a ns1:Effect ;
+    rdfs:label "strobe" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song7/curve-9>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/strobe> * env" .
 
