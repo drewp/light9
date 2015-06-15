@@ -5,6 +5,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <http://light9.bigasterisk.com/show/dance2015/song7> ns1:curve <http://light9.bigasterisk.com/show/dance2015/song7/curve-1>,
+        <http://light9.bigasterisk.com/show/dance2015/song7/curve-10>,
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-2>,
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-3>,
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-4>,
@@ -14,6 +15,7 @@
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-8>,
         <http://light9.bigasterisk.com/show/dance2015/song7/curve-9> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2015/song7/effect-1>,
+        <http://light9.bigasterisk.com/show/dance2015/song7/effect-10>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-2>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-3>,
         <http://light9.bigasterisk.com/show/dance2015/song7/effect-4>,
@@ -25,6 +27,9 @@
 
 <http://light9.bigasterisk.com/show/dance2015/song7/curve-1> a ns1:Curve ;
     rdfs:label "orange" .
+
+<http://light9.bigasterisk.com/show/dance2015/song7/curve-10> a ns1:Curve ;
+    rdfs:label "center" .
 
 <http://light9.bigasterisk.com/show/dance2015/song7/curve-2> a ns1:Curve ;
     rdfs:label "cyc" .
@@ -54,6 +59,11 @@
     rdfs:label "orange" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song7/curve-1>",
         "out = <http://light9.bigasterisk.com/show/dance2013/sub/orange> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song7/effect-10> a ns1:Effect ;
+    rdfs:label "center" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song7/curve-10>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/center> * env" .
 
 <http://light9.bigasterisk.com/show/dance2015/song7/effect-2> a ns1:Effect ;
     rdfs:label "cyc" ;
