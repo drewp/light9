@@ -9,11 +9,13 @@
         <http://light9.bigasterisk.com/show/dance2015/song9/curve-3>,
         <http://light9.bigasterisk.com/show/dance2015/song9/curve-4>,
         <http://light9.bigasterisk.com/show/dance2015/song9/curve-5>,
-        <http://light9.bigasterisk.com/show/dance2015/song9/curve-6> ;
+        <http://light9.bigasterisk.com/show/dance2015/song9/curve-6>,
+        <http://light9.bigasterisk.com/show/dance2015/song9/curve-7> ;
     ns1:effect <http://light9.bigasterisk.com/show/dance2015/song9/effect-1>,
         <http://light9.bigasterisk.com/show/dance2015/song9/effect-2>,
         <http://light9.bigasterisk.com/show/dance2015/song9/effect-3>,
-        <http://light9.bigasterisk.com/show/dance2015/song9/effect-5> .
+        <http://light9.bigasterisk.com/show/dance2015/song9/effect-5>,
+        <http://light9.bigasterisk.com/show/dance2015/song9/effect-6> .
 
 <http://light9.bigasterisk.com/show/dance2015/song9/effect-4> a ns1:Effect ;
     rdfs:label "blacklight" ;
@@ -38,6 +40,9 @@
 <http://light9.bigasterisk.com/show/dance2015/song9/curve-6> a ns1:Curve ;
     rdfs:label "mid chase" .
 
+<http://light9.bigasterisk.com/show/dance2015/song9/curve-7> a ns1:Curve ;
+    rdfs:label "blacklight" .
+
 <http://light9.bigasterisk.com/show/dance2015/song9/effect-1> a ns1:Effect ;
     rdfs:label "song9" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song9/curve-1>",
@@ -58,4 +63,9 @@
     rdfs:label "blue" ;
     ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song9/curve-5>",
         "out = <http://light9.bigasterisk.com/show/dance2013/sub/blue> * env" .
+
+<http://light9.bigasterisk.com/show/dance2015/song9/effect-6> a ns1:Effect ;
+    rdfs:label "blacklight" ;
+    ns1:code "env = <http://light9.bigasterisk.com/show/dance2015/song9/curve-7>",
+        "out = <http://light9.bigasterisk.com/show/dance2015/sub/blacklight> * env" .
 

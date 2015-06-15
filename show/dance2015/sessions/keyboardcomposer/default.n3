@@ -4,7 +4,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default> ns1:currentRow 0 ;
+<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default> ns1:currentRow 5 ;
     ns1:subSetting <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/122321463>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/170938033>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/230116562>,
@@ -13,6 +13,7 @@
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/264703736>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/277318006>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/282544071>,
+        <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/294728756>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/434663259>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/44220221>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/45918244>,
@@ -20,10 +21,12 @@
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/483305466>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/498522978>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/555253481>,
+        <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/601354977>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/605795374>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/607059053>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/608338830>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/661711525>,
+        <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/681202760>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/698094296>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/700158041>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/749359773>,
@@ -32,7 +35,7 @@
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/815737034>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/86661074>,
         <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/993407436> ;
-    ns1:windowGeometry "692x790+2057+237" .
+    ns1:windowGeometry "692x790+2057+323" .
 
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/122321463> a ns1:SubSetting ;
     ns1:level 0e+00 ;
@@ -66,6 +69,10 @@
     ns1:level 0e+00 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/highfill> .
 
+<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/294728756> a ns1:SubSetting ;
+    ns1:level 0e+00 ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2014/sub/sharlyn> .
+
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/434663259> a ns1:SubSetting ;
     ns1:level 0e+00 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/wideBlue> .
@@ -94,6 +101,10 @@
     ns1:level 0e+00 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2013/sub/blue> .
 
+<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/601354977> a ns1:SubSetting ;
+    ns1:level 0e+00 ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/full> .
+
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/605795374> a ns1:SubSetting ;
     ns1:level 0e+00 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/strobe> .
@@ -109,6 +120,10 @@
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/661711525> a ns1:SubSetting ;
     ns1:level 0e+00 ;
     ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/cools> .
+
+<http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/681202760> a ns1:SubSetting ;
+    ns1:level 0e+00 ;
+    ns1:sub <http://light9.bigasterisk.com/show/dance2015/sub/houseside> .
 
 <http://light9.bigasterisk.com/show/dance2015/sessions/keyboardcomposer/default/map/698094296> a ns1:SubSetting ;
     ns1:level 0e+00 ;
