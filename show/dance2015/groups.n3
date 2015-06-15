@@ -5,3 +5,4 @@
 <http://light9.bigasterisk.com/show/dance2015/sub/center> :group "sides"; :order "2" .
 
 <http://light9.bigasterisk.com/show/dance2015/sub/full> :group "showsliders"  .
+<http://light9.bigasterisk.com/show/dance2015/sub/curtain> :group "showsliders"  .

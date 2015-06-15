@@ -4,8 +4,8 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2015/sessions/subcomposer/default> ns1:currentSub <http://light9.bigasterisk.com/show/dance2015/sub/strobe> ;
-    ns1:windowGeometry "324x638+2797+343" .
+<http://light9.bigasterisk.com/show/dance2015/sessions/subcomposer/default> ns1:currentSub <http://light9.bigasterisk.com/sub/local/1434334345.15-1> ;
+    ns1:windowGeometry "324x638+3124+343" .
 
 <http://light9.bigasterisk.com/sub/local/1434299246.18-0> a ns1:LocalSubmaster,
         ns1:Submaster .
@@ -113,6 +113,15 @@
         <http://light9.bigasterisk.com/sub/local/1434311371.29-1/map/552866626> .
 
 <http://light9.bigasterisk.com/sub/local/1434319733.06-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434334256.77-0> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434334256.77-2> a ns1:LocalSubmaster,
+        ns1:Submaster .
+
+<http://light9.bigasterisk.com/sub/local/1434334345.15-0> a ns1:LocalSubmaster,
         ns1:Submaster .
 
 <http://light9.bigasterisk.com/sub/local/1434299246.18-2/map/106933558> a ns1:ChannelSetting ;
@@ -306,4 +315,12 @@
 <http://light9.bigasterisk.com/sub/local/1434311371.29-1/map/552866626> a ns1:ChannelSetting ;
     ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/down-c4> ;
     ns1:level 0e+00 .
+
+<http://light9.bigasterisk.com/sub/local/1434334345.15-1> a ns1:LocalSubmaster,
+        ns1:Submaster ;
+    ns1:lightLevel <http://light9.bigasterisk.com/sub/local/1434334345.15-1/map/989850457> .
+
+<http://light9.bigasterisk.com/sub/local/1434334345.15-1/map/989850457> a ns1:ChannelSetting ;
+    ns1:channel <http://light9.bigasterisk.com/theater/piedmont/channel/b16> ;
+    ns1:level 0 .
 
