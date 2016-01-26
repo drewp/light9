@@ -59,12 +59,12 @@ def inGraph(spoc, graph):
         return False
     return spoi in graph.quads()
 
-
+# some of the following workarounds may be fixed in https://github.com/RDFLib/rdflib/issues/299
 def graphFromQuads(q):
     g = ConjunctiveGraph()
     #g.addN(q) # no effect on nquad output
     for s,p,o,c in q:
-        #g.get_context(c).add((s,p,o)) # kind of works with broken rdflib nquad serializer code
+        #g.get_context(c).add((s,p,o)) # kind of works with broken rdflib nquad serializer code; you need this for json_ld serialize to work :(
         g.store.add((s,p,o), c) # no effect on nquad output
     return g
 
