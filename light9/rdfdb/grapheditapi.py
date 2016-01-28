@@ -1,7 +1,7 @@
 import random, logging
 from itertools import chain
 from rdflib import URIRef, RDF
-from light9.rdfdb.patch import Patch
+from light9.rdfdb.patch import Patch, quadsWithContextUris
 log = logging.getLogger('graphedit')
 
 class GraphEditApi(object):
@@ -31,6 +31,16 @@ class GraphEditApi(object):
     def patchObject(self, context, subject, predicate, newObject):
         p = self.getObjectPatch(context, subject, predicate, newObject)
         log.info("patchObject %r" % p.jsonRepr)
+        self.patch(p)
+
+    def patchSubgraph(self, context, newGraph):
+        """
+        replace all statements in 'context' with the quads in newGraph.
+        This is not cooperating with currentState.
+        """
+        old = set(quadsWithContextUris(self._graph.quads((None, None, None, context))))
+        new = set(quadsWithContextUris(newGraph))
+        p = Patch(delQuads=old - new, addQuads=new - old)
         self.patch(p)
         
     def patchMapping(self, context, subject, predicate, nodeClass, keyPred, valuePred, newKey, newValue):
@@ -88,3 +98,21 @@ class GraphEditApi(object):
                                   self._graph.triples((node, None, None),
                                                       context=context))])
         self.patch(p)
+
+import unittest
+from rdflib import ConjunctiveGraph
+class TestPatchSubgraph(unittest.TestCase):
+    def testCollapsesIdenticalQuads(self):
+        appliedPatches = []
+        class Obj(GraphEditApi):
+            def patch(self, p):
+                appliedPatches.append(p)
+        obj = Obj()
+        obj._graph = ConjunctiveGraph()
+        stmt1 = (URIRef('s'), URIRef('p'), URIRef('o'), URIRef('g'))
+        obj._graph.addN([stmt1])
+        obj.patchSubgraph(URIRef('g'), [stmt1])
+        self.assertEqual(len(appliedPatches), 1)
+        p = appliedPatches[0]
+        self.assert_(p.isNoop())
+        self.assertEqual(p.jsonRepr, '{"patch": {"adds": "", "deletes": ""}}')

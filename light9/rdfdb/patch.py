@@ -10,6 +10,8 @@ def quadsWithContextUris(quads):
     yield the given quads, correcting any context values that are
     Graphs into URIRefs
     """
+    if isinstance(quads, ConjunctiveGraph):
+        quads = quads.quads(ALLSTMTS)
     for s,p,o,c in quads:
         if isinstance(c, Graph):
             c = c.identifier
@@ -66,8 +68,8 @@ class Patch(object):
         """
         make a patch that changes oldGraph to newGraph
         """
-        old = set(quadsWithContextUris(oldGraph.quads(ALLSTMTS)))
-        new = set(quadsWithContextUris(newGraph.quads(ALLSTMTS)))
+        old = set(quadsWithContextUris(oldGraph))
+        new = set(quadsWithContextUris(newGraph))
         return cls(addQuads=list(new - old), delQuads=list(old - new))
 
     def __nonzero__(self):
@@ -194,7 +196,12 @@ class TestPatchFromDiff(unittest.TestCase):
         p = Patch.fromDiff(g1, g2)
         self.assertEqual(p.addQuads, [])
         self.assertEqual(p.delQuads, [stmt1])
-        
+
+    def testQuadSequenceOkInsteadOfGraph(self):
+        p = Patch.fromDiff([stmt1], ConjunctiveGraph())
+        self.assertEqual(p.delQuads, [stmt1])
+        p = Patch.fromDiff(ConjunctiveGraph(), [stmt1])
+        self.assertEqual(p.addQuads, [stmt1])
         
 class TestPatchGetContext(unittest.TestCase):
     def testEmptyPatchCantGiveContext(self):

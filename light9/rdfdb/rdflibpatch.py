@@ -93,15 +93,20 @@ def serializeQuad(g):
 def inContext(graph, newContext):
     """
     make a ConjunctiveGraph where all the triples in the given graph
-    are now in newContext
+    (or collection) are now in newContext (a uri)
     """
-    return graphFromQuads([(s,p,o,newContext) for s,p,o in graph])
+    return graphFromQuads((s,p,o,newContext) for s,p,o in graph)
 
 def contextsForStatement(graph, triple):
     return [q[3] for q in graph.quads(triple)]
 
 
 A = U("http://a"); B = U("http://b")
+class TestInContext(unittest.TestCase):
+    def testResultHasQuads(self):
+        g = inContext([(A,A,A)], B)
+        self.assertEqual(list(g.quads())[0], (A,A,A,B))
+    
 class TestContextsForStatement(unittest.TestCase):
     def testNotFound(self):
         g = graphFromQuads([(A,A,A,A)])
