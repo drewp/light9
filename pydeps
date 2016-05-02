@@ -28,3 +28,4 @@ scales==1.0.9
 statprof==0.1.2
 txzmq==0.7.4
 
+pyusb==1.0.0
