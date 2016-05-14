@@ -64,11 +64,15 @@ class UsbDMX(BaseIO):
 
     def _dmx(self):
         if self.out is None:
-            sys.path.append("dmx_usb_module")
-            from dmx import Dmx
-            self.out = Dmx(self.port)
+            if self.port == 'udmx':
+                from udmx import Udmx
+                self.out = Udmx()
+                self.out.write = self.out.SendDMX
+            else:
+                sys.path.append("dmx_usb_module")
+                from dmx import Dmx
+                self.out = Dmx(self.port)
         return self.out
-        
 
     def sendlevels(self, levels):
         if self.dummy:
@@ -78,7 +82,7 @@ class UsbDMX(BaseIO):
         packet = '\x00' + ''.join([chr(int(lev * 255 / 100)) 
                                   for lev in levels]) + "\x55"
         self._dmx().write(packet)
-
+        
 class SerialPots(BaseIO):
     """
     this is a dummy object (that returns zeros forever) until you call startup()
