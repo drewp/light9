@@ -4,20 +4,20 @@
 
 show:dance2015 :networking sh:netHome .
 sh:netHome
-  :webServer        <http://plus:8200/>;
-  :patchReceiverUpdateHost "plus";
-  :curveCalc        <http://plus:8201/>;
-  :dmxServer        <http://plus:8202/>;
-  :dmxServerZmq     <http://plus:8203/>;
-  :effectEval       <http://plus:8204/>;
-  :keyboardComposer <http://plus:8205/>;
-  :musicPlayer      <http://plus:8206/>;
-  :oscDmxServer     <udp://plus:8207/>;
-  :picamserve       <http://dancecam:8208/>;
-  :rdfdb            <http://plus:8209/>;
-  :subComposer      <http://plus:8210/>;
-  :subServer        <http://plus:8211/>;
-  :vidref           <http://plus:8212/> .
+  :webServer        <http://dash:8200/>;
+  :patchReceiverUpdateHost "dash";
+  :curveCalc        <http://dash:8201/>;
+  :dmxServer        <http://dash:8202/>;
+  :dmxServerZmq     <http://dash:8203/>;
+  :effectEval       <http://dash:8204/>;
+  :keyboardComposer <http://dash:8205/>;
+  :musicPlayer      <http://dash:8206/>;
+  :oscDmxServer     <udp://dash:8207/>;
+  :picamserve       <http://10.1.0.41:8208/>;
+  :rdfdb            <http://dash:8209/>;
+  :subComposer      <http://dash:8210/>;
+  :subServer        <http://dash:8211/>;
+  :vidref           <http://dash:8212/> .
 
 :curveCalc        :urlPath "curveCalc" .
 :dmxServer        :urlPath "dmxServer" .

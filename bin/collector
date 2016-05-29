@@ -1,0 +1,63 @@
+#!bin/python
+from __future__ import division
+from rdflib import Graph, URIRef, Literal
+from twisted.internet import reactor
+from twisted.web.server import Site
+from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
+import json
+import klein
+
+import run_local
+from light9.collector.output import EnttecDmx, Udmx
+from light9.collector.collector import Collector
+from light9.namespaces import L9
+from light9 import networking
+
+class WebServer(object):
+    app = klein.Klein()
+    def __init__(self, collector):
+        self.collector = collector
+        
+    @app.route('/attrs', methods=['PUT'])
+    def putAttrs(self, request):
+        body = json.load(request.content)
+        settings = []
+        for device, attr, value in body['settings']:
+            settings.append((URIRef(device), URIRef(attr), Literal(value)))
+        self.collector.setAttrs(body['client'],
+                                body['clientSession'],
+                                settings)
+        request.setResponseCode(202)
+
+def startZmq(port, collector):
+    zf = ZmqFactory()
+    e = ZmqEndpoint('bind', 'tcp://*:%s' % port)
+    s = ZmqPullConnection(zf, e)
+    def onPull(message):
+        # todo: new compressed protocol where you send all URIs up
+        # front and then use small ints to refer to devices and
+        # attributes in subsequent requests.
+        message[0]
+        collector.setAttrs()
+    s.onPull = onPull
+        
+def main():
+    config = Graph()
+    # todo: replace with rdfdb's loaded graph, and notice changes
+    config.parse('show/dance2016/output.n3', format='n3')
+
+    # todo: drive outputs with config files
+    outputs = [EnttecDmx(L9['output/dmx0/'], 70, '/dev/dmx0'),
+               Udmx(L9['output/udmx/'], 70)]
+    c = Collector(config, outputs)
+
+    server = WebServer(c)
+    startZmq(networking.collectorZmq.port, c)
+    
+    reactor.listenTCP(networking.collector.port,
+                      Site(server.app.resource()),
+                      interface='::')
+    reactor.run()
+
+if __name__ == '__main__':
+    main()

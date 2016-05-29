@@ -1,4 +1,4 @@
-NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect"
+NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect light9.collector.collector_test light9.collector.output_test"
 
 tests:
 	eval env/bin/nosetests -x $(NOSEARGS)
@@ -6,6 +6,9 @@ tests:
 tests_watch:
 	eval env/bin/nosetests --with-watcher $(NOSEARGS)
 
+
+tests_coverage:
+	eval env/bin/nosetests --with-coverage --cover-erase --cover-html --cover-html-dir=/tmp/light9-cov/  --cover-package=light9 --cover-branches $(NOSEARGS)
 
 # needed packages: python-gtk2 python-imaging
 
