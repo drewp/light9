@@ -1,0 +1,152 @@
+# This file contains a list of extended regular expressions, one per
+# line. A file path matching any of these expressions will be filtered
+# out during `darcs add', or when the `--look-for-adds' flag is passed
+# to `darcs whatsnew' and `record'.  The entries in ~/.darcs/boring (if
+# it exists) supplement those in this file.
+# 
+# Blank lines, and lines beginning with an octothorpe (#) are ignored.
+# See regex(7) for a description of extended regular expressions.
+
+### compiler and interpreter intermediate files
+# haskell (ghc) interfaces
+\.hi$
+\.hi-boot$
+\.o-boot$
+# object files
+\.o$
+\.o\.cmd$
+# profiling haskell
+\.p_hi$
+\.p_o$
+# haskell program coverage resp. profiling info
+\.tix$
+\.prof$
+# fortran module files
+\.mod$
+# linux kernel
+\.ko\.cmd$
+\.mod\.c$
+(^|/)\.tmp_versions($|/)
+# *.ko files aren't boring by default because they might
+# be Korean translations rather than kernel modules
+# \.ko$
+# python, emacs, java byte code
+\.py[co]$
+\.elc$
+\.class$
+# objects and libraries; lo and la are libtool things
+\.(obj|a|exe|so|lo|la)$
+# compiled zsh configuration files
+\.zwc$
+# Common LISP output files for CLISP and CMUCL
+\.(fas|fasl|sparcf|x86f)$
+
+### build and packaging systems
+# cabal intermediates
+\.installed-pkg-config
+\.setup-config
+# standard cabal build dir, might not be boring for everybody
+# ^dist(/|$)
+# autotools
+(^|/)autom4te\.cache($|/)
+(^|/)config\.(log|status)$
+# microsoft web expression, visual studio metadata directories
+\_vti_cnf$
+\_vti_pvt$
+# gentoo tools
+\.revdep-rebuild.*
+# generated dependencies
+^\.depend$
+
+### version control systems
+# cvs
+(^|/)CVS($|/)
+\.cvsignore$
+# cvs, emacs locks
+^\.#
+# rcs
+(^|/)RCS($|/)
+,v$
+# subversion
+(^|/)\.svn($|/)
+# mercurial
+(^|/)\.hg($|/)
+# git
+(^|/)\.git($|/)
+# bzr
+\.bzr$
+# sccs
+(^|/)SCCS($|/)
+# darcs
+(^|/)_darcs($|/)
+(^|/)\.darcsrepo($|/)
+^\.darcs-temp-mail$
+-darcs-backup[[:digit:]]+$
+# gnu arch
+(^|/)(\+|,)
+(^|/)vssver\.scc$
+\.swp$
+(^|/)MT($|/)
+(^|/)\{arch\}($|/)
+(^|/).arch-ids($|/)
+# bitkeeper
+(^|/)BitKeeper($|/)
+(^|/)ChangeSet($|/)
+
+### miscellaneous
+# backup files
+~$
+\.bak$
+\.BAK$
+# patch originals and rejects
+\.orig$
+\.rej$
+# X server
+\..serverauth.*
+# image spam
+\#
+(^|/)Thumbs\.db$
+# vi, emacs tags
+(^|/)(tags|TAGS)$
+#(^|/)\.[^/]
+# core dumps
+(^|/|\.)core$
+# partial broken files (KIO copy operations)
+\.part$
+# waf files, see http://code.google.com/p/waf/
+(^|/)\.waf-[[:digit:].]+-[[:digit:]]+($|/)
+(^|/)\.lock-wscript$
+# mac os finder
+(^|/)\.DS_Store$
+
+^\.installed.cfg
+^\.coverage
+^\.keyboardcomposer\.savedlevels
+^\.light9-window-geometry
+^_test_show
+^bin/ipython
+^bin/python
+^dmx_usb_module/.gitignore
+^dmx_usb_module/Module.symvers
+^dmx_usb_module/build/temp.linux-x86_64-2.7
+^dmx_usb_module/dmx.c
+^dmx_usb_module/dmx_usb.ko
+^dmx_usb_module/dmx_usb_test
+^dmx_usb_module/modules.order
+^env
+^env_pi
+^lib/python2.7
+# keep bower.json nonboring
+^light9/web/lib/[acdefghijklmnopqrstuvwyzQ]
+^show/dance20../music
+^show/dance201./sessions/?
+^show/dance2011
+^show/dance2012
+^show/dance2013/build
+^show/dance2014/build/?
+^show/dance2014/music
+^stagesim/three.js-master
+^tkdnd
+
+# temporary!
+rgbled/build-nano328/
