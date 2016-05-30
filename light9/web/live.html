@@ -23,11 +23,12 @@
                properties: {
                    status: {type: String, value: 'init'},
                    clientSession: {value: ""+Date.now()},
-                   this: {type: Object, notify: true}
+                   self: {type: Object, notify: true}
                },
                ready: function() {
+                   this.self = this;
                    var self = this;
-                   self.this = self;
+                   
                    self.$.put.addEventListener(
                        'error', function() { self.status = 'err'; });
                    self.$.put.addEventListener(
@@ -111,7 +112,7 @@
       <template>
         <style>
         </style>
-        <light9-collector-client this="{{client}}"></light9-collector-client>
+        <light9-collector-client self="{{client}}"></light9-collector-client>
         <h1>live</h1>
 
         <ul>
