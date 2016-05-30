@@ -48,5 +48,6 @@ class TestResolve(unittest.TestCase):
                          resolve(None, L9['color'], ['#ff0300', '#000400']))
     def testMaxes3Colors(self):
         self.assertEqual('#112233',
-                         resolve(None, L9['color'], ['#110000', '#002200', '#000033']))
+                         resolve(None, L9['color'],
+                                 ['#110000', '#002200', '#000033']))
         

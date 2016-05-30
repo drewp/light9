@@ -1,25 +1,21 @@
 import unittest
 import datetime
 from freezegun import freeze_time
-from rdflib import  Literal, Graph, Namespace
-from rdflib.parser import StringInputSource
+from rdflib import Namespace
 
 from light9.namespaces import L9, DEV
 from light9.collector.collector import Collector, outputMap
+from light9.rdfdb.mock_syncedgraph import MockSyncedGraph
 
 UDMX = Namespace('http://light9.bigasterisk.com/output/udmx/')
 DMX0 = Namespace('http://light9.bigasterisk.com/output/dmx0/')
 
-
-def fromN3(n3):
-    out = Graph()
-    out.parse(StringInputSource('''
-        @prefix : <http://light9.bigasterisk.com/> .
+PREFIX = '''
+   @prefix : <http://light9.bigasterisk.com/> .
         @prefix dev: <http://light9.bigasterisk.com/device/> .
         @prefix udmx: <http://light9.bigasterisk.com/output/udmx/> .
         @prefix dmx0: <http://light9.bigasterisk.com/output/dmx0/> .
-    ''' + n3), format='n3')
-    return out
+'''
 
 class MockOutput(object):
     def __init__(self, connections):
@@ -38,27 +34,27 @@ class MockOutput(object):
 class TestOutputMap(unittest.TestCase):
     def testWorking(self):
         out0 = MockOutput([(0, DMX0['c1'])])
-        m = outputMap(fromN3('''
+        m = outputMap(MockSyncedGraph(PREFIX + '''
           dmx0:c1 :connectedTo dev:inst1Brightness .
           dev:inst1 a :Device; :brightness dev:inst1Brightness .
         '''), [out0])
         self.assertEqual({(DEV['inst1'], L9['brightness']): (out0, 0)}, m)
     def testMissingOutput(self):
         out0 = MockOutput([(0, DMX0['c1'])])
-        self.assertRaises(KeyError, outputMap, fromN3('''
+        self.assertRaises(KeyError, outputMap, MockSyncedGraph(PREFIX + '''
           dmx0:c2 :connectedTo dev:inst1Brightness .
           dev:inst1 a :Device; :brightness dev:inst1Brightness .
         '''), [out0])
 
     def testMissingOutputConnection(self):
         out0 = MockOutput([(0, DMX0['c1'])])
-        self.assertRaises(ValueError, outputMap, fromN3('''
+        self.assertRaises(ValueError, outputMap, MockSyncedGraph(PREFIX + '''
           dev:inst1 a :Device; :brightness dev:inst1Brightness .
         '''), [out0])
 
     def testMultipleOutputConnections(self):
         out0 = MockOutput([(0, DMX0['c1'])])
-        self.assertRaises(ValueError, outputMap, fromN3('''
+        self.assertRaises(ValueError, outputMap, MockSyncedGraph(PREFIX + '''
           dmx0:c1 :connectedTo dev:inst1Brightness .
           dmx0:c2 :connectedTo dev:inst1Brightness .
           dev:inst1 a :Device; :brightness dev:inst1Brightness .
@@ -68,7 +64,7 @@ class TestOutputMap(unittest.TestCase):
 
 class TestCollector(unittest.TestCase):
     def setUp(self):
-        self.config = fromN3('''
+        self.config = MockSyncedGraph(PREFIX + '''
 
         udmx:c1 :connectedTo dev:colorStripRed .
         udmx:c2 :connectedTo dev:colorStripGreen .
@@ -151,10 +147,29 @@ class TestCollector(unittest.TestCase):
         self.assertEqual([[204], 'flush', [127], 'flush'], self.dmx0.updates)
 
     def testNewSessionDropsPreviousSettingsOfOtherAttrs(self):
-        c = Collector(self.config, outputs=[self.dmx0, self.udmx])
+        
+        c = Collector(MockSyncedGraph(PREFIX + '''
 
-        c.setAttrs('client1', 'sess1', [(DEV['colorStrip'], L9['red'], 1)])
-        c.setAttrs('client1', 'sess2', [(DEV['colorStrip'], L9['green'], 1)])
+        udmx:c1 :connectedTo dev:colorStripRed .
+        udmx:c2 :connectedTo dev:colorStripGreen .
+        udmx:c3 :connectedTo dev:colorStripBlue .
+        udmx:c4 :connectedTo dev:colorStripMode .
+
+        dev:colorStrip a :Device, :ChauvetColorStrip;
+          :red dev:colorStripRed;
+          :green dev:colorStripGreen;
+          :blue dev:colorStripBlue;
+          :mode dev:colorStripMode .
+
+        dmx0:c1 :connectedTo dev:inst1Brightness .
+        dev:inst1 a :Device, :Dimmer;
+          :brightness dev:inst1Brightness .
+        '''), outputs=[self.dmx0, self.udmx])
+
+        c.setAttrs('client1', 'sess1',
+                   [(DEV['colorStrip'], L9['color'], '#ff0000')])
+        c.setAttrs('client1', 'sess2',
+                   [(DEV['colorStrip'], L9['color'], '#00ff00')])
 
         self.assertEqual([[255, 0, 0, 215], 'flush',
                           [0, 255, 0, 215], 'flush'], self.udmx.updates)
