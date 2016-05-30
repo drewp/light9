@@ -14,7 +14,7 @@ graph = showconfig.getGraph()
 netHome = graph.value(showconfig.showUri(), L9['networking'])
 print "listen %s;" % splitport(urlparse(graph.value(netHome, L9['webServer'])).netloc)[1]
 
-for role, server in graph.predicate_objects(netHome):
+for role, server in sorted(graph.predicate_objects(netHome)):
     if not server.startswith('http') or role == L9['webServer']:
         continue
     path = graph.value(role, L9['urlPath'])
