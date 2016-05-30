@@ -60,6 +60,9 @@ gst_packages:
 packages:
 	sudo aptitude install coffeescript freemind normalize-audio audacity python-pygoocanvas python-pygame gir1.2-goocanvas-2.0-9 libffi-dev tix libzmq3 python-dev libssl-dev
 
+bower:
+	cd light9/web/lib; bower install
+
 raspberry_pi_virtualenv:
 	mkdir -p env_pi
 	virtualenv --system-site-packages env_pi
