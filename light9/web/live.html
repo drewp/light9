@@ -14,9 +14,21 @@
     <dom-module id="light9-live-control">
       <template>
         <style>
+         paper-slider { width: 100%; }
         </style>
         <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
-        <paper-slider min="0" max="1" step=".01" editable content-type="application/json" immediate-value="{{v1}}"></paper-slider>
+
+        <template is="dom-if" if="{{useSlider}}">
+          <paper-slider min="0"
+                        max="{{max}}"
+                        step=".01"
+                        editable
+                        content-type="application/json"
+                        immediate-value="{{v1}}"></paper-slider>
+        </template>
+        <template is="dom-if" if="{{useColor}}">
+          <input type="color" id="col" on-input="onPickedColor" value="{{pickedColor}}">
+        </template>
       </template>
       <script>
        HTMLImports.whenReady(function () {
@@ -25,12 +37,19 @@
                properties: {
                    device: {type: String},
                    attr: {type: String},
+                   max: {type: Number, value: 1},
                    v1: {type: Number, notify: true, observer: "ch"},
+                   useSlider: {type: Boolean, computed: '_useSlider(attr)'},
+                   useColor: {type: Boolean, computed: '_useColor(attr)'},
+                   pickedColor: {observer: 'onPickedColor'},
                },
                ready: function() {
                    // only need 1 ping for the clientsession, not one per
                    // control.
                    setInterval(this.ping.bind(this), 9000);
+               },
+               onPickedColor: function(ev) {
+                   this.ch(ev.target.value);
                },
                ch: function(lev) {
                    this.$.put.body = JSON.stringify({
@@ -46,22 +65,36 @@
                        "client":"c",
                        "clientSession":"cs"});
                    this.$.put.generateRequest();
-               }
+               },
+               _useSlider: function(attr) {
+                   return attr != 'http://light9.bigasterisk.com/color';
+               },
+               _useColor: function(attr) {
+                   return attr == 'http://light9.bigasterisk.com/color';
+               },
            });
        });
       </script>
     </dom-module>
     <light9-live-control
         device="http://light9.bigasterisk.com/device/colorStrip"
-        attr="http://light9.bigasterisk.com/red"
+        attr="http://light9.bigasterisk.com/color"
     ></light9-live-control>
-    <light9-live-control
-        device="http://light9.bigasterisk.com/device/colorStrip"
-        attr="http://light9.bigasterisk.com/green"
-    ></light9-live-control>
-    <light9-live-control
-        device="http://light9.bigasterisk.com/device/colorStrip"
-        attr="http://light9.bigasterisk.com/blue"
-    ></light9-live-control>
+    <hr>
+    <h2>moving</h2>
+    rx <light9-live-control
+           device="http://light9.bigasterisk.com/device/moving1"
+           attr="http://light9.bigasterisk.com/rx" max="540"
+       ></light9-live-control>
+    ry <light9-live-control
+           device="http://light9.bigasterisk.com/device/moving1"
+           attr="http://light9.bigasterisk.com/ry" max="240"
+       ></light9-live-control>
+    color    <light9-live-control
+                 device="http://light9.bigasterisk.com/device/moving1"
+                 attr="http://light9.bigasterisk.com/color"
+             ></light9-live-control>
+    
+    
   </body>
 </html>

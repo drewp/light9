@@ -9,5 +9,9 @@
     "jquery-ui": "~1.11.4",
     "QueryString": "http://unixpapa.com/js/QueryString.js",
     "knockout": "~3.4.0"
+  },
+  "resolutions": {
+    "paper-styles": "^1.1.4",
+    "web-animations-js": "^2.2.0"
   }
 }

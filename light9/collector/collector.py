@@ -1,15 +1,11 @@
 from __future__ import division
 import time
 import logging
-from webcolors import hex_to_rgb
 from light9.namespaces import L9, RDF, DEV
 from light9.collector.output import setListElem
+from light9.collector.device import toOutputAttrs
 
 log = logging.getLogger('collector')
-
-#class Device(object):
-#    def setAttrs():
-#        pass
 
 def outputMap(graph, outputs):
     """From rdf config graph, compute a map of
@@ -55,12 +51,19 @@ class Collector(object):
                 staleClients.append(c)
         for c in staleClients:
             del self.lastRequest[c]
+
+    def _deviceType(self, d):
+        for t in self.config.objects(d, RDF.type):
+            if t == L9['Device']:
+                continue
+            return t
         
     def setAttrs(self, client, clientSession, settings):
         """
-        settings is a list of (device, attr, value). Interpret rgb colors,
-        resolve conflicting values, and call
-        Output.update/Output.flush to send the new outputs.
+        settings is a list of (device, attr, value). These attrs are
+        device attrs. We resolve conflicting values, process them into
+        output attrs, and call Output.update/Output.flush to send the
+        new outputs.
 
         Call with settings=[] to ping us that your session isn't dead.
         """
@@ -77,28 +80,29 @@ class Collector(object):
         for d, a, v in settings:
             prevClientSettings[(d, a)] = v
         self.lastRequest[client] = (clientSession, now, prevClientSettings)
-        
-        pendingOut = {} # output : values
 
-        # device always wants this
-        self.setAttr(DEV['colorStrip'], L9['mode'], 215/255, pendingOut)
-        
+
+        deviceAttrs = {} # device: {attr: value}
         for _, _, settings in self.lastRequest.itervalues():
             for (device, attr), value in settings.iteritems():
+                # resolving conflicts goes around here
+                deviceAttrs.setdefault(device, {})[attr] = value
+
+        outputAttrs = {} # device: {attr: value}
+        for d in deviceAttrs:
+            outputAttrs[d] = toOutputAttrs(self._deviceType(d), deviceAttrs[d])
+        
+        pendingOut = {} # output : values
+        for device, attrs in outputAttrs.iteritems():
+            for attr, value in attrs.iteritems():
                 self.setAttr(device, attr, value, pendingOut)
 
         self.flush(pendingOut)
 
     def setAttr(self, device, attr, value, pendingOut):
-        if attr == L9['color']:
-            [self.setAttr(device, a, x / 255, pendingOut) for a, x in zip(
-                [L9['red'], L9['green'], L9['blue']],
-                hex_to_rgb(value))]
-            return
-            
         output, index = self.outputMap[(device, attr)]
         outList = pendingOut.setdefault(output, [])
-        setListElem(outList, index, int(float(value) * 255), combine=max)
+        setListElem(outList, index, value, combine=max)
 
     def flush(self, pendingOut):
         """write any changed outputs"""
