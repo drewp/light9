@@ -399,10 +399,10 @@ class Live(cyclone.websocket.WebSocketHandler):
         self.sendMessage(message)
 
 class NoExts(cyclone.web.StaticFileHandler):
-    # .xhtml pages can be get() without .xhtml on them
+    # .html pages can be get() without .html on them
     def get(self, path, *args, **kw):
         if path and '.' not in path:
-            path = path + ".xhtml"
+            path = path + ".html"
         cyclone.web.StaticFileHandler.get(self, path, *args, **kw)
 
 if __name__ == "__main__":
@@ -430,7 +430,7 @@ if __name__ == "__main__":
 
         (r'/(.*)', NoExts,
          {"path" : "light9/rdfdb/web",
-          "default_filename" : "index.xhtml"}),
+          "default_filename" : "index.html"}),
 
         ], debug=True, db=db))
     log.info("serving on %s" % networking.rdfdb.port)
