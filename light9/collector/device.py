@@ -65,7 +65,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         return {
             L9['xRotation']: int(math.floor(rx8)),
             # didn't find docs on this, but from tests it looks like 64 fine steps takes you to the next coarse step
-            L9['xFine']: _8bit((rx8 % 1.0) / 4),
+            L9['xFine']: _8bit(1 - (rx8 % 1.0)),
             L9['yRotation']: int(math.floor(ry8)),
             L9['yFine']: _8bit((ry8 % 1.0) / 4),
             L9['rotationSpeed']: 0,
