@@ -102,6 +102,11 @@ class AutoDepGraphApi(object):
         self._watchers.addPredObjWatcher(func, predicate, object)
         return self._graph.subjects(predicate, object)
 
+    def predicate_objects(self, subject):
+        func = self._getCurrentFunc()
+        self._watchers.addSubjectWatcher(func, subject)
+        return self._graph.predicate_objects(subject)
+        
     def items(self, listUri):
         """generator. Having a chain of watchers on the results is not
         well-tested yet"""
@@ -142,6 +147,7 @@ class _GraphWatchers(object):
         self._handlersSp = {} # (s,p): set(handlers)
         self._handlersPo = {} # (p,o): set(handlers)
         self._handlersSpo = {} # (s,p,o): set(handlers)
+        self._handlersS = {} # s: set(handlers)
 
     def addSubjPredWatcher(self, func, s, p):
         if func is None:
@@ -159,6 +165,9 @@ class _GraphWatchers(object):
     def addTripleWatcher(self, func, triple):
         self._handlersSpo.setdefault(triple, set()).add(func)
 
+    def addSubjectWatcher(self, func, s):
+        self._handlersS.setdefault(s, set()).add(func)
+        
     def whoCares(self, patch):
         """what handler functions would care about the changes in this patch?
 
@@ -184,6 +193,13 @@ class _GraphWatchers(object):
                               [(s, p, o) for s, p, o, c in patch.delQuads])
         for triple, funcs in self._handlersSpo.iteritems():
             if triple in affectedTriples:
+                ret.update(funcs)
+                funcs.clear()
+                
+        affectedSubjs = set([s for s, p, o, c in patch.addQuads]+
+                            [s for s, p, o, c in patch.delQuads])
+        for subj, funcs in self._handlersS.iteritems():
+            if subj in affectedSubjs:
                 ret.update(funcs)
                 funcs.clear()
                 
