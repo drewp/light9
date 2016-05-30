@@ -1,5 +1,11 @@
+from __future__ import division
 from rdflib import URIRef
 import sys
+import usb.core
+import logging
+from twisted.internet import task
+from greplin import scales
+log = logging.getLogger('output')
 
 def setListElem(outList, index, value, fill=0, combine=lambda old, new: new):
     if len(outList) < index:
@@ -10,6 +16,11 @@ def setListElem(outList, index, value, fill=0, combine=lambda old, new: new):
         outList[index] = combine(outList[index], value)
 
 class Output(object):
+    """
+    send an array of values to some output device. Call update as
+    often as you want- the result will be sent as soon as possible,
+    and with repeats as needed to outlast hardware timeouts.
+    """
     def __init__(self):
         raise NotImplementedError
         
@@ -49,25 +60,65 @@ class DmxOutput(Output):
 
 
 class EnttecDmx(DmxOutput):
+    stats = scales.collection('/output/enttecDmx',
+                              scales.PmfStat('write'),
+                              scales.PmfStat('update'))
+
     def __init__(self, baseUri, channels, devicePath='/dev/dmx0'):
         DmxOutput.__init__(self, baseUri, channels)
 
         sys.path.append("dmx_usb_module")
         from dmx import Dmx
         self.dev = Dmx(devicePath)
+        self.currentBuffer = ''
+        task.LoopingCall(self._loop).start(1 / 50)
 
+    @stats.update.time()
     def update(self, values):
-         # I was outputting on 76 and it was turning on the light at
-        # dmx75. So I added the 0 byte.
-        packet = '\x00' + ''.join(map(chr, values)) + "\x55"
-        self.dev.write(packet)
+        log.info('enttec %s', ' '.join(map(str, values)))
+
+        # I was outputting on 76 and it was turning on the light at
+        # dmx75. So I added the 0 byte. No notes explaining the footer byte.
+        self.currentBuffer = '\x00' + ''.join(map(chr, values)) + "\x00"
+
+    @stats.write.time()
+    def _loop(self):
+        self.dev.write(self.currentBuffer)
 
 class Udmx(DmxOutput):
+    stats = scales.collection('/output/udmx',
+                              scales.PmfStat('update'),
+                              scales.PmfStat('write'),
+                              scales.IntStat('usbErrors'))
     def __init__(self, baseUri, channels):
         DmxOutput.__init__(self, baseUri, channels)
         
         from light9.io.udmx import Udmx
         self.dev = Udmx()
+        self.currentBuffer = ''
+        self.lastSentBuffer = None
+        # Doesn't actually need to get called repeatedly, but we do
+        # need these two things:
+        #   1. A throttle so we don't lag behind sending old updates.
+        #   2. Retries if there are usb errors.
+        # Copying the LoopingCall logic accomplishes those with a
+        # little wasted time if there are no updates.
+        task.LoopingCall(self._loop).start(1 / 50)
 
+    @stats.update.time()
     def update(self, values):
-        self.dev.SendDMX(''.join(map(chr, values)))
+        log.info('udmx %s', ' '.join(map(str, values)))
+        self.currentBuffer = ''.join(map(chr, values))
+    
+    def _loop(self):
+        if self.lastSentBuffer == self.currentBuffer:
+            return
+        with Udmx.stats.write.time():
+            # frequently errors with usb.core.USBError
+            try:
+                self.dev.SendDMX(self.currentBuffer)
+                self.lastSentBuffer = self.currentBuffer
+                return
+            except usb.core.USBError:
+                Udmx.stats.usbErrors += 1
+

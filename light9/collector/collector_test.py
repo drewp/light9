@@ -69,14 +69,17 @@ class TestOutputMap(unittest.TestCase):
 class TestCollector(unittest.TestCase):
     def setUp(self):
         self.config = fromN3('''
+        
         udmx:c1 :connectedTo dev:colorStripRed .
         udmx:c2 :connectedTo dev:colorStripGreen .
         udmx:c3 :connectedTo dev:colorStripBlue .
+        udmx:c4 :connectedTo dev:colorStripMode .
 
         dev:colorStrip a :Device;
           :red dev:colorStripRed;
           :green dev:colorStripGreen;
-          :blue dev:colorStripBlue .
+          :blue dev:colorStripBlue;
+          :mode dev:colorStripMode .
 
         dmx0:c1 :connectedTo dev:inst1Brightness .
         dev:inst1 a :Device;
@@ -86,7 +89,8 @@ class TestCollector(unittest.TestCase):
         self.dmx0 = MockOutput([(0, DMX0['c1'])])
         self.udmx = MockOutput([(0, UDMX['c1']),
                                 (1, UDMX['c2']),
-                                (2, UDMX['c3'])])
+                                (2, UDMX['c3']),
+                                (3, UDMX['c4'])])
 
     def testRoutesSimpleOutput(self):
         c = Collector(self.config, outputs=[self.dmx0, self.udmx])
@@ -94,7 +98,7 @@ class TestCollector(unittest.TestCase):
         c.setAttrs('client', 'sess1',
                    [(DEV['colorStrip'], L9['green'], Literal(1.0))])
 
-        self.assertEqual([[0, 255], 'flush'], self.udmx.updates)
+        self.assertEqual([[0, 255, 0, 215], 'flush'], self.udmx.updates)
         self.assertEqual([], self.dmx0.updates)
 
     def testRoutesColorOutput(self):
@@ -103,7 +107,7 @@ class TestCollector(unittest.TestCase):
         c.setAttrs('client', 'sess1',
                    [(DEV['colorStrip'], L9['color'], Literal('#ff0000'))])
 
-        self.assertEqual([[255, 0, 0], 'flush'], self.udmx.updates)
+        self.assertEqual([[255, 0, 0, 215], 'flush'], self.udmx.updates)
         self.assertEqual([], self.dmx0.updates)
 
     def testOutputMaxOfTwoClients(self):
@@ -114,7 +118,8 @@ class TestCollector(unittest.TestCase):
         c.setAttrs('client2', 'sess1',
                    [(DEV['colorStrip'], L9['color'], Literal('#333333'))])
 
-        self.assertEqual([[255, 0, 0], 'flush', [255, 51, 51], 'flush'],
+        self.assertEqual([[255, 0, 0, 215], 'flush',
+                          [255, 51, 51, 215], 'flush'],
                          self.udmx.updates)
         self.assertEqual([], self.dmx0.updates)
         
@@ -125,7 +130,9 @@ class TestCollector(unittest.TestCase):
         c.setAttrs('client2', 'sess1', [(DEV['colorStrip'], L9['red'], .6)])
         c.setAttrs('client1', 'sess1', [(DEV['colorStrip'], L9['red'], .5)])
         
-        self.assertEqual([[204], 'flush', [204], 'flush', [153], 'flush'],
+        self.assertEqual([[204, 0, 0, 215], 'flush',
+                          [204, 0, 0, 215], 'flush',
+                          [153, 0, 0, 215], 'flush'],
                          self.udmx.updates)
         self.assertEqual([], self.dmx0.updates)
         
@@ -136,18 +143,28 @@ class TestCollector(unittest.TestCase):
         c.setAttrs('client2', 'sess1', [(DEV['inst1'], L9['brightness'], .5)])
 
         # ok that udmx is flushed twice- it can screen out its own duplicates
-        self.assertEqual([[204], 'flush', [204], 'flush'], self.udmx.updates)
+        self.assertEqual([[204, 0, 0, 215], 'flush',
+                          [204, 0, 0, 215], 'flush'], self.udmx.updates)
         self.assertEqual([[127], 'flush'], self.dmx0.updates)
         
     def testNewSessionReplacesPreviousOutput(self):
+        # ..as opposed to getting max'd with it
         c = Collector(self.config, outputs=[self.dmx0, self.udmx])
 
         c.setAttrs('client1', 'sess1', [(DEV['inst1'], L9['brightness'], .8)])
         c.setAttrs('client1', 'sess2', [(DEV['inst1'], L9['brightness'], .5)])
         
-        self.assertEqual([], self.udmx.updates)
         self.assertEqual([[204], 'flush', [127], 'flush'], self.dmx0.updates)
-       
+
+    def testNewSessionDropsPreviousSettingsOfOtherAttrs(self):
+        c = Collector(self.config, outputs=[self.dmx0, self.udmx])
+
+        c.setAttrs('client1', 'sess1', [(DEV['colorStrip'], L9['red'], 1)])
+        c.setAttrs('client1', 'sess2', [(DEV['colorStrip'], L9['green'], 1)])
+        
+        self.assertEqual([[255, 0, 0, 215], 'flush',
+                          [0, 255, 0, 215], 'flush'], self.udmx.updates)
+        
     def testClientIsForgottenAfterAWhile(self):
         with freeze_time(datetime.datetime.now()) as ft:
             c = Collector(self.config, outputs=[self.dmx0, self.udmx])
@@ -158,3 +175,13 @@ class TestCollector(unittest.TestCase):
             c.setAttrs('cli2', 'sess1', [(DEV['inst1'], L9['brightness'], .4)])
             self.assertEqual([[127], 'flush', [127], 'flush', [102], 'flush'],
                              self.dmx0.updates)
+
+    def testClientUpdatesAreCollected(self):
+        c = Collector(self.config, outputs=[self.dmx0, self.udmx])
+
+        c.setAttrs('client1', 'sess1', [(DEV['colorStrip'], L9['red'], 1)])
+        c.setAttrs('client1', 'sess1', [(DEV['colorStrip'], L9['green'], 1)])
+        
+        self.assertEqual([[255, 0, 0, 215], 'flush',
+                          [255, 255, 0, 215], 'flush'], self.udmx.updates)
+        self.assertEqual([], self.dmx0.updates)

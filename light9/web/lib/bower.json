@@ -1,6 +1,8 @@
 {
   "name": "3rd-party polymer elements",
   "dependencies": {
-    "polymer": "~1.0.3"
+    "polymer": "~1.4.0",
+    "paper-slider": "PolymerElements/paper-slider#~1.0.11",
+    "iron-ajax": "PolymerElements/iron-ajax#~1.2.0"
   }
 }

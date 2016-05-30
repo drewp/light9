@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/style.css">
+    <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="/lib/polymer/polymer.html">
+    <link rel="import" href="/lib/paper-slider/paper-slider.html">
+    <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+  </head>
+  <body>
+    live
+    <dom-module id="light9-live-control">
+      <template>
+        <style>
+        </style>
+        <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
+        <paper-slider min="0" max="1" step=".01" editable content-type="application/json" immediate-value="{{v1}}"></paper-slider>
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-live-control",
+               properties: {
+                   device: {type: String},
+                   attr: {type: String},
+                   v1: {type: Number, notify: true, observer: "ch"},
+               },
+               ready: function() {
+                   // only need 1 ping for the clientsession, not one per
+                   // control.
+                   setInterval(this.ping.bind(this), 9000);
+               },
+               ch: function(lev) {
+                   this.$.put.body = JSON.stringify({
+                       "settings":[
+                           [this.device, this.attr, lev]],
+                       "client":"c",
+                       "clientSession":"cs"});
+                   this.$.put.generateRequest();
+               },
+               ping: function() {
+                   this.$.put.body = JSON.stringify({
+                       "settings":[],
+                       "client":"c",
+                       "clientSession":"cs"});
+                   this.$.put.generateRequest();
+               }
+           });
+       });
+      </script>
+    </dom-module>
+    <light9-live-control
+        device="http://light9.bigasterisk.com/device/colorStrip"
+        attr="http://light9.bigasterisk.com/red"
+    ></light9-live-control>
+    <light9-live-control
+        device="http://light9.bigasterisk.com/device/colorStrip"
+        attr="http://light9.bigasterisk.com/green"
+    ></light9-live-control>
+    <light9-live-control
+        device="http://light9.bigasterisk.com/device/colorStrip"
+        attr="http://light9.bigasterisk.com/blue"
+    ></light9-live-control>
+  </body>
+</html>

@@ -5,50 +5,65 @@ from twisted.internet import reactor
 from twisted.web.server import Site
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 import json
+import logging
 import klein
+from greplin import scales
+from greplin.scales.twistedweb import StatsResource
 
-import run_local
+from run_local import log
 from light9.collector.output import EnttecDmx, Udmx
 from light9.collector.collector import Collector
 from light9.namespaces import L9
 from light9 import networking
 
 class WebServer(object):
+    stats = scales.collection('/webServer',
+                              scales.PmfStat('setAttr'))
     app = klein.Klein()
     def __init__(self, collector):
         self.collector = collector
         
     @app.route('/attrs', methods=['PUT'])
     def putAttrs(self, request):
-        body = json.load(request.content)
-        settings = []
-        for device, attr, value in body['settings']:
-            settings.append((URIRef(device), URIRef(attr), Literal(value)))
-        self.collector.setAttrs(body['client'],
-                                body['clientSession'],
-                                settings)
-        request.setResponseCode(202)
+        with WebServer.stats.setAttr.time():
+            body = json.load(request.content)
+            settings = []
+            for device, attr, value in body['settings']:
+                settings.append((URIRef(device), URIRef(attr), Literal(value)))
+            self.collector.setAttrs(body['client'],
+                                    body['clientSession'],
+                                    settings)
+            request.setResponseCode(202)
 
+    @app.route('/stats', methods=['GET'])
+    def getStats(self, request):
+        return StatsResource('collector')
+        
 def startZmq(port, collector):
+    stats = scales.collection('/zmqServer',
+                              scales.PmfStat('setAttr'))
+    
     zf = ZmqFactory()
     e = ZmqEndpoint('bind', 'tcp://*:%s' % port)
     s = ZmqPullConnection(zf, e)
     def onPull(message):
-        # todo: new compressed protocol where you send all URIs up
-        # front and then use small ints to refer to devices and
-        # attributes in subsequent requests.
-        message[0]
-        collector.setAttrs()
+        with stats.setAttrZmq.time():
+            # todo: new compressed protocol where you send all URIs up
+            # front and then use small ints to refer to devices and
+            # attributes in subsequent requests.
+            message[0]
+            collector.setAttrs()
     s.onPull = onPull
-        
+
 def main():
+    log.setLevel(logging.DEBUG)
     config = Graph()
     # todo: replace with rdfdb's loaded graph, and notice changes
     config.parse('show/dance2016/output.n3', format='n3')
 
     # todo: drive outputs with config files
-    outputs = [EnttecDmx(L9['output/dmx0/'], 70, '/dev/dmx0'),
-               Udmx(L9['output/udmx/'], 70)]
+    outputs = [EnttecDmx(L9['output/dmx0/'], 100, '/dev/dmx0'),
+               Udmx(L9['output/udmx/'], 100)]
     c = Collector(config, outputs)
 
     server = WebServer(c)
@@ -57,6 +72,8 @@ def main():
     reactor.listenTCP(networking.collector.port,
                       Site(server.app.resource()),
                       interface='::')
+    log.info('serving http on %s, zmq on %s', networking.collector.port,
+             networking.collectorZmq.port)
     reactor.run()
 
 if __name__ == '__main__':

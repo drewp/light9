@@ -1,9 +1,11 @@
 from __future__ import division
 import time
+import logging
 from webcolors import hex_to_rgb
-from light9.namespaces import L9, RDF
+from light9.namespaces import L9, RDF, DEV
 from light9.collector.output import setListElem
 
+log = logging.getLogger('collector')
 
 #class Device(object):
 #    def setAttrs():
@@ -34,6 +36,7 @@ def outputMap(graph, outputs):
             else:
                 output, index = outIndex[outputPorts[0]]
             ret[(dev, attr)] = output, index
+            log.debug('outputMap (%r, %r) -> %r, %r', dev, attr, output, index)
     
     return ret
         
@@ -43,7 +46,7 @@ class Collector(object):
         self.outputs = outputs
         self.clientTimeoutSec = clientTimeoutSec
         self.outputMap = outputMap(config, outputs) # (device, attr) : (output, index)
-        self.lastRequest = {} # client : (session, time, settings)
+        self.lastRequest = {} # client : (session, time, {(dev,attr): latestValue})
 
     def _forgetStaleClients(self, now):
         staleClients = []
@@ -57,16 +60,31 @@ class Collector(object):
         """
         settings is a list of (device, attr, value). Interpret rgb colors,
         resolve conflicting values, and call
-        Output.update/Output.flush to send the new outputs
+        Output.update/Output.flush to send the new outputs.
+
+        Call with settings=[] to ping us that your session isn't dead.
         """
         now = time.time()
-        self.lastRequest[client] = (clientSession, now, settings)
 
         self._forgetStaleClients(now)
+        row = self.lastRequest.get(client)
+        if row is not None:
+            sess, _, prevClientSettings = row
+            if sess != clientSession:
+                prevClientSettings = {}
+        else:
+            prevClientSettings = {}
+        for d, a, v in settings:
+            prevClientSettings[(d, a)] = v
+        self.lastRequest[client] = (clientSession, now, prevClientSettings)
         
         pendingOut = {} # output : values
+
+        # device always wants this
+        self.setAttr(DEV['colorStrip'], L9['mode'], 215/255, pendingOut)
+        
         for _, _, settings in self.lastRequest.itervalues():
-            for device, attr, value in settings:
+            for (device, attr), value in settings.iteritems():
                 self.setAttr(device, attr, value, pendingOut)
 
         self.flush(pendingOut)
