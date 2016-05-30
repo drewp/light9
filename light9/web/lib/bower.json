@@ -6,6 +6,8 @@
     "iron-ajax": "PolymerElements/iron-ajax#~1.2.0",
     "jquery": "~2.2.4",
     "underscore": "~1.8.3",
-    "jquery-ui": "~1.11.4"
+    "jquery-ui": "~1.11.4",
+    "QueryString": "http://unixpapa.com/js/QueryString.js",
+    "knockout": "~3.4.0"
   }
 }
