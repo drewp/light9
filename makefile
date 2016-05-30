@@ -17,7 +17,7 @@ binexec:
 
 install_python_deps: link_to_sys_packages
 	env/bin/pip install twisted
-	env/bin/pip install -U -r pydeps
+	env/bin/pip install -U -r requirements.txt
 
 DP=/usr/lib/python2.7/dist-packages
 SP=env/lib/python2.7/site-packages
