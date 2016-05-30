@@ -2,7 +2,7 @@ from __future__ import division
 import logging
 import math
 from light9.namespaces import L9, RDF, DEV
-from webcolors import hex_to_rgb
+from webcolors import hex_to_rgb, rgb_to_hex
 
 log = logging.getLogger('device')
 
@@ -35,9 +35,15 @@ def _8bit(f):
 def resolve(deviceType, deviceAttr, values):
     """
     return one value to use for this attr, given a set of them that
-    have come in simultaneously
+    have come in simultaneously. len(values) >= 1.
     """
-    raise NotImplementedError
+    if len(values) == 1:
+        return values[0]
+    if deviceAttr == L9['color']:
+        rgbs = [hex_to_rgb(v) for v in values]
+        return rgb_to_hex([max(*component) for component in zip(*rgbs)])
+        
+    return max(values)
     
 def toOutputAttrs(deviceType, deviceAttrSettings):
     """
@@ -55,7 +61,8 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['blue']: b
             }
     elif deviceType == L9['Dimmer']:
-        return {L9['brightness']: _8bit(deviceAttrSettings.get(L9['brightness'], 0))}
+        return {L9['brightness']:
+                _8bit(deviceAttrSettings.get(L9['brightness'], 0))}
     elif deviceType == L9['Mini15']:
         inp = deviceAttrSettings
         rx8 = float(inp.get(L9['rx'], 0)) / 540 * 255

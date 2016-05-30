@@ -3,7 +3,7 @@ import time
 import logging
 from light9.namespaces import L9, RDF, DEV
 from light9.collector.output import setListElem
-from light9.collector.device import toOutputAttrs
+from light9.collector.device import toOutputAttrs, resolve
 
 log = logging.getLogger('collector')
 
@@ -85,8 +85,10 @@ class Collector(object):
         deviceAttrs = {} # device: {attr: value}
         for _, _, settings in self.lastRequest.itervalues():
             for (device, attr), value in settings.iteritems():
-                # resolving conflicts goes around here
-                deviceAttrs.setdefault(device, {})[attr] = value
+                attrs = deviceAttrs.setdefault(device, {})
+                if attr in attrs:
+                    value = resolve(device, attr, [attrs[attr], value])
+                attrs[attr] = value
 
         outputAttrs = {} # device: {attr: value}
         for d in deviceAttrs:
