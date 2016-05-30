@@ -10,13 +10,54 @@
     <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
   </head>
   <body>
-    live
+    
+    <dom-module id="light9-collector-client">
+      <template>
+        <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
+        <span>{{status}}</span>
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-collector-client",
+               properties: {
+                   status: {type: String, value: 'init'},
+                   clientSession: {value: ""+Date.now()},
+                   this: {type: Object, notify: true}
+               },
+               ready: function() {
+                   var self = this;
+                   self.this = self;
+                   self.$.put.addEventListener(
+                       'error', function() { self.status = 'err'; });
+                   self.$.put.addEventListener(
+                       'request', function() { self.status = 'send'; });
+                   self.$.put.addEventListener(
+                       'response', function() { self.status = 'ok'; });
+                   // collector gives up on clients after 10sec
+                   setInterval(self.ping.bind(self), 9000);
+                   self.status = 'ready';
+               },               
+               ping: function() {
+                   this.send([]);
+               },
+               send: function(settings) {
+                   this.$.put.body = JSON.stringify({
+                       "settings": settings,
+                       "client": window.location.href,
+                       "clientSession": this.clientSession});
+                   this.$.put.generateRequest();
+               }
+           });
+       });
+      </script>
+    </dom-module>
+       
     <dom-module id="light9-live-control">
       <template>
         <style>
          paper-slider { width: 100%; }
         </style>
-        <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
 
         <template is="dom-if" if="{{useSlider}}">
           <paper-slider min="0"
@@ -24,10 +65,13 @@
                         step=".01"
                         editable
                         content-type="application/json"
-                        immediate-value="{{v1}}"></paper-slider>
+                        immediate-value="{{immediateSlider}}"></paper-slider>
         </template>
         <template is="dom-if" if="{{useColor}}">
-          <input type="color" id="col" on-input="onPickedColor" value="{{pickedColor}}">
+          <input type="color"
+                 id="col"
+                 on-input="onPickedColor"
+                 value="{{pickedColor}}">
         </template>
       </template>
       <script>
@@ -35,36 +79,22 @@
            Polymer({
                is: "light9-live-control",
                properties: {
+                   client: {type: Object},
                    device: {type: String},
                    attr: {type: String},
                    max: {type: Number, value: 1},
-                   v1: {type: Number, notify: true, observer: "ch"},
+                   immediateSlider: {notify: true, observer: "onChange"},
                    useSlider: {type: Boolean, computed: '_useSlider(attr)'},
                    useColor: {type: Boolean, computed: '_useColor(attr)'},
                    pickedColor: {observer: 'onPickedColor'},
                },
                ready: function() {
-                   // only need 1 ping for the clientsession, not one per
-                   // control.
-                   setInterval(this.ping.bind(this), 9000);
                },
                onPickedColor: function(ev) {
-                   this.ch(ev.target.value);
+                   this.onChange(ev.target.value);
                },
-               ch: function(lev) {
-                   this.$.put.body = JSON.stringify({
-                       "settings":[
-                           [this.device, this.attr, lev]],
-                       "client":"c",
-                       "clientSession":"cs"});
-                   this.$.put.generateRequest();
-               },
-               ping: function() {
-                   this.$.put.body = JSON.stringify({
-                       "settings":[],
-                       "client":"c",
-                       "clientSession":"cs"});
-                   this.$.put.generateRequest();
+               onChange: function(lev) {
+                   this.client.send([[this.device, this.attr, lev]]);
                },
                _useSlider: function(attr) {
                    return attr != 'http://light9.bigasterisk.com/color';
@@ -76,25 +106,59 @@
        });
       </script>
     </dom-module>
-    <light9-live-control
-        device="http://light9.bigasterisk.com/device/colorStrip"
-        attr="http://light9.bigasterisk.com/color"
-    ></light9-live-control>
-    <hr>
-    <h2>moving</h2>
-    rx <light9-live-control
-           device="http://light9.bigasterisk.com/device/moving1"
-           attr="http://light9.bigasterisk.com/rx" max="540"
-       ></light9-live-control>
-    ry <light9-live-control
-           device="http://light9.bigasterisk.com/device/moving1"
-           attr="http://light9.bigasterisk.com/ry" max="240"
-       ></light9-live-control>
-    color    <light9-live-control
-                 device="http://light9.bigasterisk.com/device/moving1"
-                 attr="http://light9.bigasterisk.com/color"
-             ></light9-live-control>
     
+    <dom-module id="light9-live-controls">
+      <template>
+        <style>
+        </style>
+        <light9-collector-client this="{{client}}"></light9-collector-client>
+        <h1>live</h1>
+
+        <ul>
+          <li>
+            <h2>colorstrip</h2>
+            <light9-live-control
+                client="{{client}}"
+                device="http://light9.bigasterisk.com/device/colorStrip"
+                attr="http://light9.bigasterisk.com/color"
+            ></light9-live-control>
+          </li>
+          <li>
+            <h2>moving</h2>
+            rx <light9-live-control
+                   client="{{client}}"
+                   device="http://light9.bigasterisk.com/device/moving1"
+                   attr="http://light9.bigasterisk.com/rx" max="540"
+               ></light9-live-control>
+            ry <light9-live-control
+                   client="{{client}}"
+                   device="http://light9.bigasterisk.com/device/moving1"
+                   attr="http://light9.bigasterisk.com/ry" max="240"
+               ></light9-live-control>
+            color <light9-live-control
+                      client="{{client}}"
+                      device="http://light9.bigasterisk.com/device/moving1"
+                      attr="http://light9.bigasterisk.com/color"
+                  ></light9-live-control>
+          </li>
+        </ul>
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-live-controls",
+               properties: {
+
+               },
+               ready: function() {
+
+               },
+           });
+       });
+      </script>
+    </dom-module>
+    
+    <light9-live-controls></light9-live-controls>    
     
   </body>
 </html>
