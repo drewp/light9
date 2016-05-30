@@ -15,6 +15,8 @@ from light9.collector.output import EnttecDmx, Udmx
 from light9.collector.collector import Collector
 from light9.namespaces import L9
 from light9 import networking
+from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.rdfdb import clientsession
 
 class WebServer(object):
     stats = scales.collection('/webServer',
@@ -55,16 +57,12 @@ def startZmq(port, collector):
             collector.setAttrs()
     s.onPull = onPull
 
-def main():
-    log.setLevel(logging.DEBUG)
-    config = Graph()
-    # todo: replace with rdfdb's loaded graph, and notice changes
-    config.parse('show/dance2016/output.n3', format='n3')
+def launch(graph):
 
     # todo: drive outputs with config files
     outputs = [EnttecDmx(L9['output/dmx0/'], 100, '/dev/dmx0'),
                Udmx(L9['output/udmx/'], 100)]
-    c = Collector(config, outputs)
+    c = Collector(graph, outputs)
 
     server = WebServer(c)
     startZmq(networking.collectorZmq.port, c)
@@ -74,6 +72,15 @@ def main():
                       interface='::')
     log.info('serving http on %s, zmq on %s', networking.collector.port,
              networking.collectorZmq.port)
+    
+    
+def main():
+    log.setLevel(logging.DEBUG)
+
+
+    graph = SyncedGraph(networking.rdfdb.url, "collector")
+
+    graph.initiallySynced.addCallback(lambda _: launch(graph))
     reactor.run()
 
 if __name__ == '__main__':

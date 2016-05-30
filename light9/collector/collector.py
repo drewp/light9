@@ -37,12 +37,21 @@ def outputMap(graph, outputs):
     return ret
         
 class Collector(object):
-    def __init__(self, config, outputs, clientTimeoutSec=10):
-        self.config = config
+    def __init__(self, graph, outputs, clientTimeoutSec=10):
+        self.graph = graph
         self.outputs = outputs
         self.clientTimeoutSec = clientTimeoutSec
-        self.outputMap = outputMap(config, outputs) # (device, attr) : (output, index)
+
+        self.graph.addHandler(self.rebuildOutputMap)
         self.lastRequest = {} # client : (session, time, {(dev,attr): latestValue})
+
+    def rebuildOutputMap(self):
+        self.outputMap = outputMap(self.graph, self.outputs) # (device, attr) : (output, index)
+        self.deviceType = {} # uri: type that's a subclass of Device
+        for dev in self.graph.subjects(RDF.type, L9['Device']):
+            for t in self.graph.objects(dev, RDF.type):
+                if t != L9['Device']:
+                    self.deviceType[dev] = t
 
     def _forgetStaleClients(self, now):
         staleClients = []
@@ -52,12 +61,6 @@ class Collector(object):
         for c in staleClients:
             del self.lastRequest[c]
 
-    def _deviceType(self, d):
-        for t in self.config.objects(d, RDF.type):
-            if t == L9['Device']:
-                continue
-            return t
-        
     def setAttrs(self, client, clientSession, settings):
         """
         settings is a list of (device, attr, value). These attrs are
@@ -92,7 +95,7 @@ class Collector(object):
 
         outputAttrs = {} # device: {attr: value}
         for d in deviceAttrs:
-            outputAttrs[d] = toOutputAttrs(self._deviceType(d), deviceAttrs[d])
+            outputAttrs[d] = toOutputAttrs(self.deviceType[d], deviceAttrs[d])
         
         pendingOut = {} # output : values
         for device, attrs in outputAttrs.iteritems():
