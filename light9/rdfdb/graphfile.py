@@ -130,6 +130,8 @@ class GraphFile(object):
             print e
             traceback.print_exc()
             log.error("%s syntax error", self.path)
+            # todo: likely bug- if a file has this error upon first
+            # read, I think we don't retry it right.
             return
         except IOError as e:
             log.error("%s rereading %s: %r", self.path, self.uri, e)
