@@ -1,0 +1,53 @@
+<link rel="import" href="/lib/polymer/polymer.html">
+
+<!-- (potentially-zoomed) spectrogram view -->
+<dom-module id="light9-timeline-audio">
+  <template>
+    <style>
+     :host {
+         display: block;
+         background: red;
+     }
+     div {
+         width: 100%;
+         height: 100%;
+         overflow: hidden;
+     }
+     img {
+         height: 100%;
+         position: relative;
+     }
+    </style>
+    <div>
+      <img src="show/dance2016/spectrogram/01-dream.png"
+           style="width: {{imgWidth}} ; left: {{imgLeft}}">
+    </div>
+  </template>
+  <script>
+   Polymer({
+       is: "light9-timeline-audio",
+       properties: {
+           uri: {type: String, notify: true}, // song
+           zoom: {type: Object, notify: true},
+           imgWidth: { computed: '_imgWidth(zoom)' },
+           imgLeft: { computed: '_imgLeft(zoom)' },
+       },
+       ready: function() {
+           this.zoom = {duration: 0};
+       },
+       _imgWidth: function(zoom) {
+           if (!zoom.duration) {
+               return "100%";
+           }
+           return (100 / ((zoom.t2 - zoom.t1) / zoom.duration)) + "%";
+       },
+       _imgLeft: function(zoom) {
+           if (!zoom.duration) {
+               return "0";
+           }
+           return (-100 * zoom.t1 / zoom.duration) + "%";
+       },
+       
+   });
+  </script>
+</dom-module>
