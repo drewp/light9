@@ -3,15 +3,6 @@
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
 
 
-<script>
- var zoomSpec = {
-     duration: 190,
-     t1: 102,
-     t2: 161
-     };
-     
-</script>
-
 <!-- Whole editor- include this on your page.
      Most coordinates are relative to this element.
    -->
@@ -32,7 +23,7 @@
      light9-timeline-time-zoomed {
          flex-grow: 1;
      }
-     light9-timeline-diagram-layer, light9-timeline-adjustors {
+     light9-timeline-diagram-layer, light9-timeline-adjusters {
          position: absolute;
          left: 0;
          top: 0;
@@ -51,18 +42,39 @@
          See from current time -> end .. shift+esc
          Zoom all .. ctrl+esc
        -->
-    <light9-timeline-audio></light9-timeline-audio>
-    <light9-timeline-time-zoomed></light9-timeline-time-zoomed>
-    <light9-timeline-diagram-layer></light9-timeline-diagram-layer>
-    <light9-timeline-adjustors></light9-timeline-adjustors>
+    <light9-timeline-audio id="audio"></light9-timeline-audio> <!-- should have a zoom-out cursor on it, or zigzag the one cursor -->
+    <light9-timeline-time-zoomed id="zoomed" zoom="{{viewState.zoomSpec}}"></light9-timeline-time-zoomed>
+    <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
+    <light9-timeline-adjusters id="adjusters"></light9-timeline-adjusters>
   </template>
   <script>
    Polymer({
        is: "light9-timeline-editor",
-    behaviors: [
-      Polymer.IronResizableBehavior
-    ],
+       behaviors: [
+           Polymer.IronResizableBehavior
+       ],
        properties: {
+           viewState: {type: Object}
+       },
+       ready: function() {
+           this.viewState = { // anything not persisted in the model
+               zoomSpec: {
+                   duration: 190,
+                   t1: 102,
+                   t2: 161
+               },
+                              cursor: {
+                                  t: 105,
+                              }
+           };
+
+           setInterval(function() {
+               this.viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000);
+               this.$.dia.setCursor(this.$.audio.offsetTop, this.$.audio.offsetHeight,
+                                    this.$.zoomed.$.time.offsetTop, this.$.zoomed.$.time.offsetHeight,
+                                    this.viewState.zoomSpec,
+                                    this.viewState.cursor);
+           }.bind(this), 50);
        }
    });
   </script>
@@ -96,13 +108,12 @@
          flex-grow: 1;
      }
     </style>
-    <light9-timeline-cursor></light9-timeline-cursor>
     <div>
-    <light9-timeline-time-axis></light9-timeline-time-axis>
-    <light9-timeline-audio zoom="{{zoom}}"></light9-timeline-audio>
-    <template is="dom-repeat" items="{{rows}}">
-      <light9-timeline-graph-row></light9-timeline-graph-row>
-    </template>
+      <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
+      <light9-timeline-audio zoom="{{zoom}}"></light9-timeline-audio>
+      <template is="dom-repeat" items="{{rows}}">
+        <light9-timeline-graph-row></light9-timeline-graph-row>
+      </template>
     </div>
   </template>
   <script>
@@ -113,7 +124,7 @@
     ],
        properties: {
            rows: {value: [0, 1, 2, 3]},
-           zoom: {value: zoomSpec}
+           zoom: {type: Object, notify: true}
        }
    });
   </script>
@@ -126,14 +137,20 @@
        - zoom arcs
        - notes
        - annotations on notes
-       - connectors between adjustors and their targets
+       - connectors between adjusters and their targets
      
      This element is not responsible for any hit detection. Things you click (rows,
-     notes, adjustors, etc) are caught on their respective elements. (But is that
+     notes, adjusters, etc) are caught on their respective elements. (But is that
      wrong in the case of notes?)
    -->
 <dom-module id="light9-timeline-diagram-layer">
   <template>
+    <style>
+     svg {
+         width: 100%;
+         height: 100%;
+     }
+    </style>
 <svg
    xmlns:dc="http://purl.org/dc/elements/1.1/"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -142,7 +159,7 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="0 0 1006 600"
+   viewBox="0 0 1021 600"
 >
   <g
      inkscape:label="Layer 1"
@@ -280,25 +297,69 @@
          id="text4908"
          sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan4910" x="499" y="242.66205">color</tspan></text>
     </g>
+   
+    <g id="notes">
+    </g>
+    <g id="cursor">
+      <path id="cursor1" style="fill:none; stroke:#ff0303; stroke-width:1.5; stroke-linecap:butt;" />
+      <path id="cursor2" style="fill:#9c0303;" />
+      <path id="cursor3" style="fill:none; stroke:#ff0303; stroke-width:3; stroke-linecap:butt;" />
+    </g>
   </g>
 </svg>
 
   </template>
   <script>
-       Polymer({
-           is: "light9-timeline-diagram-layer",
-           properties: {
-           },
-           ready: function() {
-window.setNote = this.setNote.bind(this);
-           },
-           setNote: function(uri, x1, x2, y1, y2) {
-               console.log('set', uri, x1, x2, y1, y2);
-               var s = '<path style="fill:#53774b;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.50000012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m '+x1+','+y2+' 70.00357,-68.30517 169.70563,0 161.5297134,68.30517"/>';
-               console.log(s);
-               this.$.layer1.innerHTML += s;
+   function svgPathFromPoints(pts) {
+       var out = "";
+       pts.forEach(function(p) {
+           if (out.length == 0) {
+               out = 'M ';
+           } else {
+               out += 'L ';
            }
+           out += '' + p[0] + ',' + p[1] + ' ';
        });
+       return out;
+   }
+   
+   Polymer({
+       is: "light9-timeline-diagram-layer",
+       properties: {
+       },
+       ready: function() {
+           window.setNote = this.setNote.bind(this);
+
+           this.cursorPath = {
+               top: this.querySelector("#cursor1"),
+               mid: this.querySelector("#cursor2"),
+               bot: this.querySelector("#cursor3")
+               };
+               
+       },
+       setNote: function(uri, x1, x2, y1, y2) {
+           console.log('set', uri, x1, x2, y1, y2);
+
+           var d = svgPathFromPoints([[x1, y2], [x1*.75 + x2*.25, y1], [x1*.25 + x2*.75, y1], [x2, y2]]);
+           
+           var s = '<path style="fill:#53774b;fill-opacity:1;stroke:#000000;stroke-width:1.50000012;" d="' + d + '"/>';
+           console.log(s);
+           this.$.notes.innerHTML += s;
+       },
+       setCursor: function(y1, h1, y2, h2, zoom, cursor) {
+           var xZoomedOut = this.offsetParent.offsetWidth * cursor.t / zoom.duration;
+           var xZoomedIn = this.offsetParent.offsetWidth * (cursor.t - zoom.t1) / (zoom.t2 - zoom.t1); // replace with d3 scale
+           this.cursorPath.top.setAttribute('d', svgPathFromPoints([[xZoomedOut, y1], [xZoomedOut, y1 + h1]]));
+           this.cursorPath.mid.setAttribute('d', svgPathFromPoints([
+               [xZoomedIn + 2, y2 + h2],
+               [xZoomedIn - 2, y2 + h2],
+               [xZoomedOut - 1, y1 + h1],
+               [xZoomedOut + 1, y1 + h1],
+           ]) + ' Z');
+           this.cursorPath.bot.setAttribute('d', svgPathFromPoints([[xZoomedIn, y2 + h2], [xZoomedIn, this.offsetParent.offsetHeight]]));
+
+       }
+   });
   </script>
 </dom-module>
 
@@ -389,6 +450,7 @@ window.setNote = this.setNote.bind(this);
     <light9-timeline-note-inline-attrs></light9-timeline-note-inline-attrs>
   </template>
   <script>
+   window.xserial = 0;
    Polymer({
        is: "light9-timeline-note",
        behaviors: [
@@ -402,29 +464,33 @@ window.setNote = this.setNote.bind(this);
        
        _onIronResize: function() {
 
-           var r = this.getBoundingClientRect();
-           setNote('myuri', 60, 180, r.top, r.bottom);
+           setNote('myuri', 60 + 150 * (window.xserial++), 180, this.offsetTop, this.offsetTop + this.offsetHeight);
            
-           if (this.parent)
-               console.log(this.parent.offsetWidth, this.parent.offsetHeight)
        } 
    });
   </script>
 </dom-module>
 
-<!-- All the adjustors you can edit or select.
+<!-- All the adjusters you can edit or select.
      This element manages their layout and suppresion.
      Owns the selection.
-     Maybe includes selecting things that don't even have adjustors -->
-<dom-module id="light9-timeline-adjustors">
+     Maybe includes selecting things that don't even have adjusters.
+     Maybe manages the layout of other labels and text too, to avoid overlaps.
+   -->
+<dom-module id="light9-timeline-adjusters">
   <template>
     <style>
+     :host {
+ pointer-events: none;
+         }
     </style>
-    <div>{{greeting}}</div>
+
+    <light9-timeline-adjuster center="{x: 50, y: 200}"></light9-timeline-adjuster>
+    <light9-timeline-adjuster center="{x: 90, y: 200}"></light9-timeline-adjuster>
   </template>
   <script>
    Polymer({
-       is: "light9-timeline-adjustors",
+       is: "light9-timeline-adjusters",
        properties: {
        }
    });
@@ -433,20 +499,46 @@ window.setNote = this.setNote.bind(this);
 
 <!-- Yellow dotted handle that you can adjust to edit something.
      Knows an attribute to edit and the true screen location, even if
-     parent <light9-timeline-adjustors> has offset us a bit to avoid a
+     parent <light9-timeline-adjusters> has offset us a bit to avoid a
      text overlap.
      Draws affordance arrows and a connector line if we're far
      away from the point that we edit.
      May grow to a bigger editor when you click or drag.
    -->
-<dom-module id="light9-timeline-adjustor">
+<dom-module id="light9-timeline-adjuster">
   <template>
-    <span>{{value}}</span>
+    <style>
+     table {
+         position: absolute;
+         z-index: 2;
+         border-collapse: collapse;
+     }
+     td {
+         text-align: center;
+         font-size: 20px;
+     }
+     span {
+         font-size: 16px;
+         background: rgba(255, 255, 0, 0.5);
+         border: 3px yellow dotted;
+         border-radius: 8px;
+         padding: 5px;
+     }
+    </style>
+    <table style="left: {{center.x}}px; top: {{center.y}}px">
+      <tr><td></td><td>↑</td><td></td></tr>
+      <tr><td>←</td><td><span>{{value}}</span></td><td>→</td></tr>
+      <tr><td></td><td>↓</td><td></td></tr>
+    </table>
+    
   </template>
   <script>
    Polymer({
-       is: "light9-timeline-adjustor",
+       is: "light9-timeline-adjuster",
        properties: {
+           center: {type: Object, notify: true},
+           target: {type: Object, notify: true},
+           value: {value: '0.26'}
        }
    });
   </script>
