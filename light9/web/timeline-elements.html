@@ -26,6 +26,11 @@
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
      }
+     #debug {
+         position: fixed;
+         right: 0;
+         bottom: 0;
+         }
     </style>
     <div>
       timeline editor: song [uri] <button>unlink</button>
@@ -41,6 +46,7 @@
     <light9-timeline-time-zoomed id="zoomed" zoom="{{viewState.zoomSpec}}"></light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
     <light9-timeline-adjusters id="adjusters" adjs="{{adjs}}"></light9-timeline-adjusters>
+    <div id="debug">[[debug]]</div>
   </template>
  
 </dom-module>

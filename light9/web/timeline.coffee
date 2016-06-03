@@ -19,14 +19,13 @@ class Adjustable
   # have a <light9-timeline-adjuster> associated. This object does the
   # layout and positioning.
   constructor: (@config) ->
-    @_center = @config.getTarget().add(@config.getSuggestedTargetOffset())
+    # config has getTarget, getSuggestedTargetOffset, getValue
 
   getDisplayValue: () ->
-    # todo
-    d3.format(".4g")(@config.getValue())
+    d3.format(".4g")(@_getValue())
 
   getCenter: () -> # vec2 of pixels
-    @_center
+    @getTarget().add(@config.getSuggestedTargetOffset())
 
   getTarget: () -> # vec2 of pixels
     @config.getTarget()
@@ -34,11 +33,11 @@ class Adjustable
   subscribe: (onChange) ->
     # change could be displayValue or center or target. This likely
     # calls onChange right away if there's any data yet.
-    
+    setInterval((() => onChange()), 100)
 
   startDrag: () ->
     # todo
-    @dragStartValue = @getValue()
+    @dragStartValue = @_getValue()
 
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
@@ -50,20 +49,38 @@ class Adjustable
   endDrag: () ->
     0
 
+class AdjustableFloatJsValue extends Adjustable
+  constructor: (@config) ->
+    # config has obj, key, valueLow, targetLow, valueHigh, targetHigh, getSuggestedTargetOffset, onChange
+    @_normalizedValue = d3.scaleLinear().domain([@config.valueLow, @config.valueHigh]).range([0, 1])
+
+  _getValue: () ->
+    @config.obj[@config.key]
+
+  getTarget: () ->
+    f = @_normalizedValue(@_getValue())
+    [l, h] = [@config.targetLow, @config.targetHigh]
+    return l.add(h.subtract(l).multiply(f))
+    
+  continueDrag: (pos) ->
+    # pos is vec2 of pixels relative to the drag start
+    
+    # todo
+    newValue = @dragStartValue + pos.e(1) * .1
+    @config.obj[@config.key] = newValue
+    @config.onChange()
+
+
 class AdjustableFloatObject extends Adjustable
   constructor: (@config) ->
-    # config has graph, subj, pred, ctx
+    # config has graph, subj, pred, ctx, getSuggestedTargetOffset
     super(@config)
 
-  getValue: () -> # for drag math
+  _getValue: () -> # for drag math
     @config.graph.floatValue(@config.subj, @config.pred)
 
-  getCenter: () ->
-    
-    $V([100 + 200 * @getValue(), 200])
-
-  getDisplayValue: () ->
-    d3.format(".4g")(@getValue())
+  getCenter: () ->    
+    $V([100 + 200 * @_getValue(), 200])
 
   subscribe: (onChange) ->
     @config.graph.subscribe @config.subj, @config.pred, null, (patch) =>
@@ -81,6 +98,9 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     viewState: { type: Object }
+    debug: {type: String, computed: '_debug(viewState.zoomSpec.t1)'}
+  _debug: (viewState) ->
+    JSON.stringify(@viewState)
   attached: ->
     @viewState =
       zoomSpec:
@@ -95,17 +115,18 @@ Polymer
 
 
     animCursor = () => 
-      @viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
+      #@viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
       @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
-                       @$.zoomed.$.time.offsetTop, @$.zoomed.$.time.offsetHeight,
+                       @$.zoomed.$.time.offsetTop,
+                       @$.zoomed.$.time.offsetHeight,
                        @fullZoomX, @zoomInX, @viewState.cursor)
 
       @set('viewState.zoomSpec.t1', 80 + 10 * Math.sin(Date.now() / 3000))
       
-    setInterval(animCursor, 50)
+    #setInterval(animCursor, 50)
 
     setTimeout(() =>
-      @adjs = @persistDemo()#@makeZoomAdjs().concat(@persistDemo())
+      @adjs = @makeZoomAdjs().concat(@persistDemo())
     , 100)
 
   persistDemo: ->
@@ -130,17 +151,28 @@ Polymer
       ]
 
   makeZoomAdjs: ->
-    left = new Adjustable({
-      getValue: () => (@viewState.zoomSpec.t1)
-      getTarget: () => $V([@fullZoomX(@viewState.zoomSpec.t1), @$.audio.offsetTop + @$.audio.offsetHeight / 2])
+    
+    left = new AdjustableFloatJsValue({
+      obj: @viewState.zoomSpec,
+      key: 't1'
+      valueLow: 0
+      valueHigh: @viewState.zoomSpec.duration
+      targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
+      targetHigh: $V([@offsetWidth, 30])
       getSuggestedTargetOffset: () => $V([-30, 0])
-      })
+      onChange: () => @notifyPath('viewState.zoomSpec.t1', @viewState.zoomSpec.t1)
+    })
 
-    right = new Adjustable({
-      getValue: () => (@viewState.zoomSpec.t2)
-      getTarget: () => $V([@fullZoomX(@viewState.zoomSpec.t2), @$.audio.offsetTop + @$.audio.offsetHeight / 2])
+    right = new AdjustableFloatJsValue({
+      obj: @viewState.zoomSpec,
+      key: 't2'
+      valueLow: 0
+      valueHigh: @viewState.zoomSpec.duration
+      targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
+      targetHigh: $V([@offsetWidth, 30])
       getSuggestedTargetOffset: () => $V([30, 0])
-      })
+      onChange: () => @notifyPath('viewState.zoomSpec.t2', @viewState.zoomSpec.t2)
+    })
     return [left, right]
 
 
@@ -160,7 +192,6 @@ Polymer
       type: Object
       
   onAdj: (adj) ->
-    console.log('adj is here', adj, @adj)
     @adj.subscribe () =>
       @displayValue = @adj.getDisplayValue()
       center = @adj.getCenter()
