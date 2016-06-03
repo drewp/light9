@@ -2,7 +2,6 @@
 <link rel="import" href="light9-timeline-audio.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
 
-
 <!-- Whole editor- include this on your page.
      Most coordinates are relative to this element.
    -->
@@ -25,17 +24,13 @@
      }
      light9-timeline-diagram-layer, light9-timeline-adjusters {
          position: absolute;
-         left: 0;
-         top: 0;
-         right: 0;
-         bottom: 0;
+         left: 0; top: 0; right: 0; bottom: 0;
      }
     </style>
     <div>
       timeline editor: song [uri] <button>unlink</button>
       <label><input type="checkbox"> follow player song choice</label>
     </div>
-
     <!--
          Old zoom menu:
          See current time .. esc
@@ -45,39 +40,9 @@
     <light9-timeline-audio id="audio"></light9-timeline-audio> <!-- should have a zoom-out cursor on it, or zigzag the one cursor -->
     <light9-timeline-time-zoomed id="zoomed" zoom="{{viewState.zoomSpec}}"></light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
-    <light9-timeline-adjusters id="adjusters"></light9-timeline-adjusters>
+    <light9-timeline-adjusters id="adjusters" adjs="{{adjs}}"></light9-timeline-adjusters>
   </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-editor",
-       behaviors: [
-           Polymer.IronResizableBehavior
-       ],
-       properties: {
-           viewState: {type: Object}
-       },
-       ready: function() {
-           this.viewState = { // anything not persisted in the model
-               zoomSpec: {
-                   duration: 190,
-                   t1: 102,
-                   t2: 161
-               },
-                              cursor: {
-                                  t: 105,
-                              }
-           };
-
-           setInterval(function() {
-               this.viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000);
-               this.$.dia.setCursor(this.$.audio.offsetTop, this.$.audio.offsetHeight,
-                                    this.$.zoomed.$.time.offsetTop, this.$.zoomed.$.time.offsetHeight,
-                                    this.viewState.zoomSpec,
-                                    this.viewState.cursor);
-           }.bind(this), 50);
-       }
-   });
-  </script>
+ 
 </dom-module>
 
 
@@ -146,167 +111,48 @@
 <dom-module id="light9-timeline-diagram-layer">
   <template>
     <style>
+     :host {
+         pointer-events: none;
+         }
      svg {
          width: 100%;
          height: 100%;
+         pointer-events: none;
      }
     </style>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   viewBox="0 0 1021 600"
->
-  <g
-     inkscape:label="Layer 1"
-     inkscape:groupmode="layer"
-     id="layer1">
-    <path
-       style="display:inline;fill:#758f8a;fill-opacity:0.32421055;fill-rule:evenodd;stroke:none;stroke-width:1px;"
-       d="m -559.27177,395.81 2.22362,-54.79762 C -204.84146,338.25666 -8.4912266,336.03416 0.40325327,297.52215 9.8280633,285.70343 40.880483,289.65152 49.016853,296.10794 c 20.15718,42.1653 270.720527,47.21149 589.526257,46.31865 l -4.2185,53.3834 z"
-       id="path4837"
-       sodipodi:nodetypes="ccccccc" />
-    <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.30736844"
-       d="M 0.75681338,294.44118 C -5.8919466,328.78953 -182.9094,341.3924 -555.73623,340.04956"
-       id="path4862"
-       sodipodi:nodetypes="cc" />
-    <path
-       sodipodi:nodetypes="cc"
-       id="path4864"
-       d="m 48.622093,293.73407 c 6.6488,34.34835 183.666187,46.95123 556.493117,45.60839"
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:0.30736844" />
-    <path
-       style="display:inline;fill:none;fill-rule:evenodd;stroke:#000000;stroke-width:1px;"
-       d="m -570.58547,460.25772 1210.56688,0"
-       id="path5354"/>
-    <path
-       style="fill:#53774b;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.50000012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
-       d="m -393.10167,652.33195 70.00357,-68.30517 169.70563,0 161.5297134,68.30517"
-       id="note1"
-       sodipodi:nodetypes="cccc" />
-    <rect
-       style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:0.12637365;fill-rule:evenodd;stroke:none;stroke-width:1.10000002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;"
-       id="note1Attrs"
-       width="108"
-       height="47"
-       x="-234.38405"
-       y="598.8988"
-       rx="0"
-       ry="0" />
-    <path
-       id="path4246"
-       d="m -153.53195,562.60592 0,19.81802"
-       style="opacity:0.21600001;fill:none;fill-rule:evenodd;stroke:#d4d4d4;stroke-width:0.92825276;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475824, 2.78475824;stroke-dashoffset:0;stroke-opacity:1" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;"
-       x="-338.38403"
-       y="631.3988"
-       id="text4290"
-       sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4292" x="-338.38403" y="631.3988">spotchase</tspan></text>
-    <rect
-       style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#1ed8ec;fill-opacity:0.53846154;fill-rule:evenodd;stroke:#f2ff0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1;"
-       id="rect4294"
-       width="22.5"
-       height="17"
-       x="-224.88405"
-       y="603.8988" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;"
-       x="-192.88405"
-       y="615.8988"
-       id="text4296"
-       sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4298" x="-192.88405" y="615.8988">color</tspan></text>
-    <rect
-       y="620.97205"
-       x="-224.98763"
-       height="17"
-       width="22.5"
-       id="rect4304"
-       style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#1ed8ec;fill-opacity:0;fill-rule:evenodd;stroke:#f2ff0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1;" />
-    <g
-       id="g4310"
-       transform="translate(-880.47502,196.64838)" >
-      <circle
-         r="6"
-         cy="432.78705"
-         cx="666.625"
-         id="path4306"
-         style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#1ed8ec;fill-opacity:0;fill-rule:evenodd;stroke:#000000;stroke-width:1.10000014;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;" />
-      <circle
-         style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#1ed8ec;fill-opacity:0;fill-rule:evenodd;stroke:#000000;stroke-width:1.10000014;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;"
-         id="circle4308"
-         cx="666.625"
-         cy="432.78705"
-         r="3.6249998" />
-    </g>
-    <path
-       style="opacity:0.21600001;fill:none;fill-rule:evenodd;stroke:#d4d4d4;stroke-width:0.92825276;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475822, 2.78475822;stroke-dashoffset:0;stroke-opacity:1"
-       d="m 7.2180534,637.60592 0,13.56802"
-       id="path4314"/>
-    <path
-       id="path4332"
-       d="m -393.38403,639.64882 0,12.75"
-       style="opacity:0.21600001;fill:none;fill-rule:evenodd;stroke:#d4d4d4;stroke-width:1.00000012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:3.00000026, 3.00000026;stroke-dashoffset:0;stroke-opacity:1" />
-    <path
-       style="opacity:1;fill:none;fill-rule:evenodd;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;stroke-opacity:1"
-       d="m -22.190957,301.51493 22.56802038,0"
-       id="adjConnector"/>
-    <path
-       sodipodi:nodetypes="cccc"
-       id="path4893"
-       d="m -568.94472,458.6374 2.17576,-52.2338 1205.37474,0 1.5058,52.2338"
-       style="fill:#216ca1;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:1.50000012;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;"
-       x="-535.36261"
-       y="433.71609"
-       id="noteLabel"
-       sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4902" x="-535.36261" y="433.71609">song4</tspan></text>
-    <g
-       id="noteAttrs"
-       transform="translate(-930.38403,193.23677)" >
-      <rect
-         style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#ffffff;fill-opacity:0.12637365;fill-rule:evenodd;stroke:none;stroke-width:1.10000002;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;"
-         id="rect4904"
-         width="108"
-         height="33"
-         x="454.5"
-         y="223.66205"
-         rx="0"
-         ry="0" />
-      <rect
-         style="color:#000000;display:inline;overflow:visible;solid-color:#000000;solid-opacity:1;fill:#1ed8ec;fill-opacity:0.53846154;fill-rule:evenodd;stroke:#f2ff0e;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2, 2;stroke-dashoffset:0;stroke-opacity:1;"
-         id="rect4906"
-         width="22.5"
-         height="17"
-         x="467"
-         y="230.66205" />
-      <text
-         xml:space="preserve"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;"
-         x="499"
-         y="242.66205"
-         id="text4908"
-         sodipodi:linespacing="125%"><tspan sodipodi:role="line" id="tspan4910" x="499" y="242.66205">color</tspan></text>
-    </g>
-   
-    <g id="notes">
-    </g>
-    <g id="cursor">
-      <path id="cursor1" style="fill:none; stroke:#ff0303; stroke-width:1.5; stroke-linecap:butt;" />
-      <path id="cursor2" style="fill:#9c0303;" />
-      <path id="cursor3" style="fill:none; stroke:#ff0303; stroke-width:3; stroke-linecap:butt;" />
-    </g>
-  </g>
-</svg>
+    <svg
+        xmlns:dc="http://purl.org/dc/elements/1.1/"
+        xmlns:cc="http://creativecommons.org/ns#"
+        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+        xmlns:svg="http://www.w3.org/2000/svg"
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+        viewBox="0 0 1021 600"
+    >
+      <g id="layer1">
+        
+        <path
+            style="fill:none;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;"
+            d="m 202.190957,301.51493 22.56802038,0"
+            id="adjConnector"/>
+        <text
+            xml:space="preserve"
+            style="font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"
+            x="-338.38403"
+            y="631.3988"
+            id="text4290"
+            sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4292" x="-338.38403" y="631.3988">spotchase</tspan></text>
+        
+        <g id="notes">
+        </g>
+        <g id="cursor">
+          <path id="cursor1" style="fill:none; stroke:#ff0303; stroke-width:1.5; stroke-linecap:butt;" />
+          <path id="cursor2" style="fill:#9c0303;" />
+          <path id="cursor3" style="fill:none; stroke:#ff0303; stroke-width:3; stroke-linecap:butt;" />
+        </g>
+      </g>
+    </svg>
 
   </template>
   <script>
@@ -335,16 +181,19 @@
                mid: this.querySelector("#cursor2"),
                bot: this.querySelector("#cursor3")
                };
-               
+
+           this.noteById = {};
        },
        setNote: function(uri, x1, x2, y1, y2) {
-           console.log('set', uri, x1, x2, y1, y2);
-
-           var d = svgPathFromPoints([[x1, y2], [x1*.75 + x2*.25, y1], [x1*.25 + x2*.75, y1], [x2, y2]]);
+           var elem = this.noteById[uri];
+           if (!elem) {
+               var s = '<path id="'+uri+'" style="fill:#53774b; stroke:#000000; stroke-width:1.5;"/>';
+               this.$.notes.innerHTML += s;
+               elem = this.noteById[uri] = this.$.notes.lastChild;
+           }
            
-           var s = '<path style="fill:#53774b;fill-opacity:1;stroke:#000000;stroke-width:1.50000012;" d="' + d + '"/>';
-           console.log(s);
-           this.$.notes.innerHTML += s;
+           var d = svgPathFromPoints([[x1, y2], [x1*.75 + x2*.25, y1], [x1*.25 + x2*.75, y1], [x2, y2]]);
+           elem.setAttribute('d', d);
        },
        setCursor: function(y1, h1, y2, h2, zoom, cursor) {
            var xZoomedOut = this.offsetParent.offsetWidth * cursor.t / zoom.duration;
@@ -481,17 +330,18 @@
   <template>
     <style>
      :host {
- pointer-events: none;
-         }
+     }
     </style>
 
-    <light9-timeline-adjuster center="{x: 50, y: 200}"></light9-timeline-adjuster>
-    <light9-timeline-adjuster center="{x: 90, y: 200}"></light9-timeline-adjuster>
+    <template is="dom-repeat" items="{{adjs}}">
+      <light9-timeline-adjuster adj="{{item}}"></light9-timeline-adjuster>
+    </template>
   </template>
   <script>
    Polymer({
        is: "light9-timeline-adjusters",
        properties: {
+           adjs: { type: Array }
        }
    });
   </script>
@@ -523,25 +373,18 @@
          border: 3px yellow dotted;
          border-radius: 8px;
          padding: 5px;
+
+         cursor: ew-resize;
+         -webkit-user-select: none;
      }
     </style>
-    <table style="left: {{center.x}}px; top: {{center.y}}px">
+    <table id="top" style$="left: {{centerStyle.x}}px; top: {{centerStyle.y}}px">
       <tr><td></td><td>↑</td><td></td></tr>
-      <tr><td>←</td><td><span>{{value}}</span></td><td>→</td></tr>
+      <tr><td>←</td><td><span id="label">{{value}}</span></td><td>→</td></tr>
       <tr><td></td><td>↓</td><td></td></tr>
     </table>
     
   </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-adjuster",
-       properties: {
-           center: {type: Object, notify: true},
-           target: {type: Object, notify: true},
-           value: {value: '0.26'}
-       }
-   });
-  </script>
 </dom-module>
 
 <!-- sometimes we draw attrs within the shape of a note. -->
@@ -557,3 +400,9 @@
    });
   </script>
 </dom-module>
+
+<script src="/lib/sylvester/sylvester.js"></script>
+<script src="/lib/d3/d3.js"></script>
+<script src="/lib/N3.js/browser/n3-browser.js"></script>
+<script src="graph.js"></script>
+<script src="timeline.js"></script>
