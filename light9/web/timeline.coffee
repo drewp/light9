@@ -1,4 +1,4 @@
-
+log = console.log
 window.graph = new SyncedGraph('noServerYet', {
 '': 'http://light9.bigasterisk.com/',
 'xsd', 'http://www.w3.org/2001/XMLSchema#',
@@ -9,16 +9,71 @@ window.graph.loadTrig("
 @prefix dev: <http://light9.bigasterisk.com/device/> .
 
 <http://example.com/> {
-  :demoResource :startTime 0.5 .
+  :demoResource :startTime 0.5; :endTime 1.6 .
 }
     ")
 
     
 class Adjustable
-  # 
+  # Some value you can edit in the UI, probably by dragging stuff. May
+  # have a <light9-timeline-adjuster> associated. This object does the
+  # layout and positioning.
   constructor: (@config) ->
-    @center = @config.getTarget().add(@config.getSuggestedTargetOffset())
-    @getValue = @config.getValue
+    @_center = @config.getTarget().add(@config.getSuggestedTargetOffset())
+
+  getDisplayValue: () ->
+    # todo
+    d3.format(".4g")(@config.getValue())
+
+  getCenter: () -> # vec2 of pixels
+    @_center
+
+  getTarget: () -> # vec2 of pixels
+    @config.getTarget()
+            
+  subscribe: (onChange) ->
+    # change could be displayValue or center or target. This likely
+    # calls onChange right away if there's any data yet.
+    
+
+  startDrag: () ->
+    # todo
+    @dragStartValue = @getValue()
+
+  continueDrag: (pos) ->
+    # pos is vec2 of pixels relative to the drag start
+    
+    # todo
+    newValue = @dragStartValue + pos.e(0) * .1
+    graph.patchObject(@_subj, @_pred, graph.Literal(newValue), @_ctx)
+
+  endDrag: () ->
+    0
+
+class AdjustableFloatObject extends Adjustable
+  constructor: (@config) ->
+    # config has graph, subj, pred, ctx
+    super(@config)
+
+  getValue: () -> # for drag math
+    @config.graph.floatValue(@config.subj, @config.pred)
+
+  getCenter: () ->
+    
+    $V([100 + 200 * @getValue(), 200])
+
+  getDisplayValue: () ->
+    d3.format(".4g")(@getValue())
+
+  subscribe: (onChange) ->
+    @config.graph.subscribe @config.subj, @config.pred, null, (patch) =>
+      onChange()
+    
+  continueDrag: (pos) ->
+    # pos is vec2 of pixels relative to the drag start
+    
+    newValue = @dragStartValue + pos.e(1) / 200
+    @config.graph.patchObject(@config.subj, @config.pred, @config.graph.Literal(newValue), @_ctx)
 
       
 Polymer
@@ -35,7 +90,7 @@ Polymer
       cursor:
         t: 105
 
-    @fullZoomX = d3.scale.linear().domain([0, @viewState.zoomSpec.duration]).range([0, @offsetWidth])
+    @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration]).range([0, @offsetWidth])
 
     animCursor = () => 
       @viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
@@ -48,21 +103,29 @@ Polymer
     setInterval(animCursor, 50)
 
     setTimeout(() =>
-      @adjs = @persistDemo() #@makeZoomAdjs().concat(@persistDemo())
-    , 3000)
-
+      @adjs = @persistDemo()#@makeZoomAdjs().concat(@persistDemo())
+    , 100)
 
   persistDemo: ->
-    adj = new Adjustable({
-      getValue: () => (graph.floatValue(
-        graph.Uri(':demoResource'),
-        graph.Uri(':startTime')))
-      getTarget: () => $V([200, 300])
-      getSuggestedTargetOffset: () => $V([-30, 0])
+    ctx = graph.Uri('http://example.com/')
+    return [
+      new AdjustableFloatObject({
+        graph: graph
+        subj: graph.Uri(':demoResource')
+        pred: graph.Uri(':startTime')
+        ctx: ctx
+        getTarget: () => $V([200, 300])
+        getSuggestedTargetOffset: () => $V([-30, 0])
       })
-    console.log(adj.config.getValue())
-
-    return [adj]
+      new AdjustableFloatObject({
+        graph: graph
+        subj: graph.Uri(':demoResource')
+        pred: graph.Uri(':endTime')
+        ctx: ctx
+        getTarget: () => $V([300, 300])
+        getSuggestedTargetOffset: () => $V([30, 0])
+      })
+      ]
 
   makeZoomAdjs: ->
     left = new Adjustable({
@@ -85,40 +148,30 @@ Polymer
     adj:
       type: Object
       notify: true
+      observer: 'onAdj'
     target:
       type: Object
       notify: true
-    value:
+    displayValue:
       type: String
-      computed: '_value(adj.value)'
     centerStyle:
-      computed: '_centerStyle(adj.center)'
+      type: Object
       
-  _value: (adjValue) ->
-    d3.format(".4g")(adjValue)
-    
-  _centerStyle: (center) ->
-    {
-      x: center.e(1)
-      y: center.e(2)
-    }
-    
-  ready: ->
-    subj = graph.Uri(':demoResource')
-    pred = graph.Uri(':startTime')
-    ctx = graph.Uri('http://example.com/')
-    graph.subscribe subj, pred, null, (patch) =>
-      for q in patch.addQuads
-        @set('adj.value', graph.toJs(q.object))
-    
-    drag = d3.behavior.drag()
+  onAdj: (adj) ->
+    console.log('adj is here', adj, @adj)
+    @adj.subscribe () =>
+      @displayValue = @adj.getDisplayValue()
+      center = @adj.getCenter()
+      @centerStyle = {x: center.e(1), y: center.e(2)}
+        
+  attached: ->
+    drag = d3.drag()
     sel = d3.select(@$.label)
     sel.call(drag)
-    drag.origin((d) -> {x: @offsetLeft, y: @offsetTop})
-    drag.on 'dragstart', () =>
-      drag._startValue = @adj.getValue()
-
+    drag.subject((d) -> {x: @offsetLeft, y: @offsetTop})
+    drag.container(@offsetParent)
+    drag.on('start', () => @adj?.startDrag())
     drag.on 'drag', () =>
-      console.log('drag', d3.event)
-      newValue = drag._startValue + d3.event.x * .1
-      graph.patchObject(subj, pred, graph.Literal(newValue), ctx)
+      @adj?.continueDrag($V([d3.event.x, d3.event.y]))
+    drag.on('end', () => @adj?.endDrag())
+  

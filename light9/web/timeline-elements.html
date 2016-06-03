@@ -378,9 +378,9 @@
          -webkit-user-select: none;
      }
     </style>
-    <table id="top" style$="left: {{centerStyle.x}}px; top: {{centerStyle.y}}px">
+    <table id="top" style$="left: [[centerStyle.x]]px; top: [[centerStyle.y]]px">
       <tr><td></td><td>↑</td><td></td></tr>
-      <tr><td>←</td><td><span id="label">{{value}}</span></td><td>→</td></tr>
+      <tr><td>←</td><td><span id="label">[[displayValue]]</span></td><td>→</td></tr>
       <tr><td></td><td>↓</td><td></td></tr>
     </table>
     
@@ -402,7 +402,7 @@
 </dom-module>
 
 <script src="/lib/sylvester/sylvester.js"></script>
-<script src="/lib/d3/d3.js"></script>
+<script src="/lib/d3/build/d3.js"></script>
 <script src="/lib/N3.js/browser/n3-browser.js"></script>
 <script src="graph.js"></script>
 <script src="timeline.js"></script>
