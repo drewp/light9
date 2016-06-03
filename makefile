@@ -62,6 +62,7 @@ packages:
 
 bower:
 	cd light9/web/lib; bower install
+	cd light9/web/N3.js; npm install; npm run browser
 
 raspberry_pi_virtualenv:
 	mkdir -p env_pi
