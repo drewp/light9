@@ -137,7 +137,7 @@
 ^env_pi
 ^lib/python2.7
 # keep bower.json nonboring
-^light9/web/lib/[acdefghijklmnopqrstuvwyzQ]
+^light9/web/lib/[acdefghijklmnopqrstuvwyzQN]
 ^show/dance20../music
 ^show/dance201./sessions/?
 ^show/dance2011
