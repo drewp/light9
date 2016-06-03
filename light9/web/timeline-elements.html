@@ -60,11 +60,6 @@
          height: 100%;
 
      }
-     light9-timeline-cursor {
-         width: 0;
-         height: 100%;
-         z-index: 1;
-         }
      light9-timeline-audio {
          width: 100%;
          height: 90px;
@@ -248,36 +243,6 @@
     ],
        properties: {
            
-       }
-   });
-  </script>
-</dom-module>
-
-<!-- playback cursor on top of everything. Maybe other cursors too: hover, snap, etc -->
-<dom-module id="light9-timeline-cursor">
-  <template>
-    <style>
-     :host {
-         /* parent has arranged for us to be 0 wide and the proper height */
-     }
-     div {
-         background: red;
-         position: relative;
-         height: 100%;
-         width: 3px;
-         box-shadow: 3px 0 5px rgba(0, 0, 0, 0.34);
-     }
-    </style>
-    <div style="left: {{x}}px"></div>
-  </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-cursor",
-       properties: {
-           x: {type: Number}
-       },
-       ready: function () {
-           setInterval(function() { this.x = 50 + 35 * Math.sin(Date.now()/4); }.bind(this), 50);
        }
    });
   </script>
