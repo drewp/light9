@@ -81,7 +81,7 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     viewState: { type: Object }
-  ready: ->
+  attached: ->
     @viewState =
       zoomSpec:
         duration: 190
@@ -90,13 +90,15 @@ Polymer
       cursor:
         t: 105
 
-    @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration]).range([0, @offsetWidth])
+    @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
+    @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1, @viewState.zoomSpec.t2]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
+
 
     animCursor = () => 
       @viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
       @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                        @$.zoomed.$.time.offsetTop, @$.zoomed.$.time.offsetHeight,
-                       @viewState.zoomSpec, @viewState.cursor)
+                       @fullZoomX, @zoomInX, @viewState.cursor)
 
       @set('viewState.zoomSpec.t1', 80 + 10 * Math.sin(Date.now() / 3000))
       
