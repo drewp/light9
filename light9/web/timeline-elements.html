@@ -33,7 +33,11 @@
     </style>
     <div>
       <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
-      <light9-music id="music" song="{{song}}" t="{{songTime}}" playing="{{songPlaying}}"></light9-music>
+      <light9-music id="music"
+                    song="{{song}}"
+                    t="{{songTime}}"
+                    playing="{{songPlaying}}"
+                    duration="{{songDuration}}"></light9-music>
       timeline editor: song [{{song}}] <button>unlink</button>
       <label><input type="checkbox"> follow player song choice</label>
     </div>

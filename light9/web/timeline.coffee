@@ -9,6 +9,7 @@ Polymer
     graph: {type: Object, notify: true}
     song: {type: String, notify: true}
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
+    songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}
   width: ko.observable(1)
   listeners:
@@ -16,19 +17,23 @@ Polymer
   _onIronResize: ->
     @width(@offsetWidth)
   _onSongTime: (t) ->
-    @viewState.cursor.t(t) if @viewState
+    @viewState.cursor.t(t)
+  _onSongDuration: (d) ->
+    @viewState.zoomSpec.duration(d)
 
-  attached: ->
-    @dia = @$.dia
+  ready: ->
     @viewState =
       zoomSpec:
-        duration: ko.observable(190)
-        t1: ko.observable(102)
-        t2: ko.observable(161)
+        duration: ko.observable(100)
+        t1: ko.observable(0) # need validation to stay in bounds and not go too close
+        t2: ko.observable(100)
       cursor:
-        t: ko.observable(105)
+        t: ko.observable(20)
       mouse:
         pos: ko.observable($V([0,0]))
+    
+  attached: ->
+    @dia = @$.dia
 
     ko.computed =>
       @debug = ko.toJSON(@viewState)
@@ -66,10 +71,47 @@ Polymer
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
         @$.dia.setMouse(@viewState.mouse.pos())
+
+  animatedZoom: (newT1, newT2, secs) ->
+    fps = 30
+    oldT1 = @viewState.zoomSpec.t1()
+    oldT2 = @viewState.zoomSpec.t2()
+    lastTime = 0
+    for step in [0..secs * fps]
+      frac = step / (secs * fps)
+      do (frac) =>
+        gotoStep = =>
+          @viewState.zoomSpec.t1((1 - frac) * oldT1 + frac * newT1)
+          @viewState.zoomSpec.t2((1 - frac) * oldT2 + frac * newT2)
+          console.log('to', frac, @viewState.zoomSpec.t1(), @viewState.zoomSpec.t2())
+        delay = frac * secs * 1000
+        setTimeout(gotoStep, delay)
+        lastTime = delay
+    setTimeout(=>
+        @viewState.zoomSpec.t1(newT1)
+        @viewState.zoomSpec.t2(newT2)
+      , lastTime + 10)
+      
     
   bindKeys: ->
+    
     shortcut.add "Ctrl+P", (ev) =>
       @$.music.seekPlayOrPause(@zoomInX.invert(@viewState.mouse.pos().e(1)))
+
+    zoomAnimSec = .2
+    shortcut.add "Ctrl+Escape", =>
+      @animatedZoom(0, @viewState.zoomSpec.duration(), zoomAnimSec)
+    shortcut.add "Shift+Escape", =>
+      @animatedZoom(@songTime - 2, @viewState.zoomSpec.duration(), zoomAnimSec)
+    shortcut.add "Escape", =>
+      zs = @viewState.zoomSpec
+      visSeconds = zs.t2() - zs.t1()
+      margin = visSeconds * .4
+      # buggy: really needs t1/t2 to limit their ranges
+      if @songTime < zs.t1() or @songTime > zs.t2() - visSeconds * .6
+        newCenter = @songTime + margin
+        @animatedZoom(newCenter - visSeconds / 2,
+                      newCenter + visSeconds / 2, zoomAnimSec)
 
   persistDemo: ->
     ctx = @graph.Uri('http://example.com/')

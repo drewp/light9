@@ -24,9 +24,8 @@ Polymer
       @statusTitle = "GET "+req.url+ " -> " + req.status + " " + req.statusText
       setTimeout(@poll.bind(@), 2000)
     @poll()
-    setInterval(@estimateTimeLoop.bind(@), 50)
+    setInterval(@estimateTimeLoop.bind(@), 30)
     
-
   estimateTimeLoop: ->
     if @playing
       @t = @remoteT + (Date.now() - @remoteAsOfMs) / 1000
