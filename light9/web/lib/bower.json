@@ -8,7 +8,7 @@
     "underscore": "~1.8.3",
     "jquery-ui": "~1.11.4",
     "QueryString": "http://unixpapa.com/js/QueryString.js",
-    "knockout": "~3.4.0",
+    "knockout": "knockoutjs#^3.4.0",
     "sylvester": "~0.1.3",
     "d3": "https://github.com/d3/d3.git#e7194db33090a0afc06c77a959594361ffb949df",
     "rdflib.js": "https://github.com/linkeddata/rdflib.js.git#920e59fe37",

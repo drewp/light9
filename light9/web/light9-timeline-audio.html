@@ -39,15 +39,17 @@
            if (!zoom.duration) {
                return "100%";
            }
+
            return (100 / ((zoom.t2 - zoom.t1) / zoom.duration)) + "%";
        },
        _imgLeft: function(zoom) {
            if (!zoom.duration) {
                return "0";
            }
-           return (-100 * zoom.t1 / zoom.duration) + "%";
+
+           var percentPerSec = 100 / (zoom.t2 - zoom.t1);
+           return (-percentPerSec * zoom.t1) + '%';
        },
-       
    });
   </script>
 </dom-module>

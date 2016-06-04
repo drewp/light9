@@ -65,7 +65,9 @@ class window.SyncedGraph
 
   applyAndSendPatch: (patch, cb) ->
     @applyPatch(patch)
-    console.log('patch to server:', patch)
+    #console.log('patch to server:')
+    #console.log('  delete:', JSON.stringify(patch.delQuads))
+    #console.log('  add:', JSON.stringify(patch.addQuads))
     # post to server
 
   applyPatch: (patch) ->

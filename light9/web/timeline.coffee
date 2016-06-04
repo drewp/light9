@@ -49,26 +49,28 @@ class Adjustable
   endDrag: () ->
     0
 
-class AdjustableFloatJsValue extends Adjustable
+class AdjustableFloatObservable extends Adjustable
   constructor: (@config) ->
-    # config has obj, key, valueLow, targetLow, valueHigh, targetHigh, getSuggestedTargetOffset, onChange
-    @_normalizedValue = d3.scaleLinear().domain([@config.valueLow, @config.valueHigh]).range([0, 1])
+    # config has observable, valueLow, targetLow, valueHigh, targetHigh, getSuggestedTargetOffset
+    ko.computed =>
+      @_normalizedValue = d3.scaleLinear().domain([
+        ko.unwrap(@config.valueLow),
+        ko.unwrap(@config.valueHigh)]).range([0, 1])
 
   _getValue: () ->
-    @config.obj[@config.key]
+    @config.observable()
 
   getTarget: () ->
     f = @_normalizedValue(@_getValue())
-    [l, h] = [@config.targetLow, @config.targetHigh]
-    return l.add(h.subtract(l).multiply(f))
+    [lo, hi] = [ko.unwrap(@config.targetLow),
+                ko.unwrap(@config.targetHigh)]
+    return lo.add(hi.subtract(lo).multiply(f))
     
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
     
-    # todo
-    newValue = @dragStartValue + pos.e(1) * .1
-    @config.obj[@config.key] = newValue
-    @config.onChange()
+    newValue = @dragStartValue + pos.e(1) * .2
+    @config.observable(newValue)
 
 
 class AdjustableFloatObject extends Adjustable
@@ -98,21 +100,23 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     viewState: { type: Object }
-    debug: {type: String, computed: '_debug(viewState.zoomSpec.t1)'}
-  _debug: (viewState) ->
-    JSON.stringify(@viewState)
+    debug: {type: String}
+    
   attached: ->
     @viewState =
       zoomSpec:
-        duration: 190
-        t1: 102
-        t2: 161
+        duration: ko.observable(190)
+        t1: ko.observable(102)
+        t2: ko.observable(161)
       cursor:
-        t: 105
+        t: ko.observable(105)
 
-    @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
-    @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1, @viewState.zoomSpec.t2]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
+    ko.computed =>
+      @debug = ko.toJSON(@viewState)
 
+    ko.computed =>
+      @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
+      @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
 
     animCursor = () => 
       #@viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
@@ -121,7 +125,7 @@ Polymer
                        @$.zoomed.$.time.offsetHeight,
                        @fullZoomX, @zoomInX, @viewState.cursor)
 
-      @set('viewState.zoomSpec.t1', 80 + 10 * Math.sin(Date.now() / 3000))
+      @viewState.zoomSpec.t1(80 + 10 * Math.sin(Date.now() / 3000))
       
     #setInterval(animCursor, 50)
 
@@ -152,26 +156,22 @@ Polymer
 
   makeZoomAdjs: ->
     
-    left = new AdjustableFloatJsValue({
-      obj: @viewState.zoomSpec,
-      key: 't1'
+    left = new AdjustableFloatObservable({
+      observable: @viewState.zoomSpec.t1,
       valueLow: 0
       valueHigh: @viewState.zoomSpec.duration
       targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
       targetHigh: $V([@offsetWidth, 30])
       getSuggestedTargetOffset: () => $V([-30, 0])
-      onChange: () => @notifyPath('viewState.zoomSpec.t1', @viewState.zoomSpec.t1)
     })
 
-    right = new AdjustableFloatJsValue({
-      obj: @viewState.zoomSpec,
-      key: 't2'
+    right = new AdjustableFloatObservable({
+      observable: @viewState.zoomSpec.t2,
       valueLow: 0
       valueHigh: @viewState.zoomSpec.duration
       targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
       targetHigh: $V([@offsetWidth, 30])
       getSuggestedTargetOffset: () => $V([30, 0])
-      onChange: () => @notifyPath('viewState.zoomSpec.t2', @viewState.zoomSpec.t2)
     })
     return [left, right]
 

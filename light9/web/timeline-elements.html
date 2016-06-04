@@ -42,7 +42,7 @@
          See from current time -> end .. shift+esc
          Zoom all .. ctrl+esc
        -->
-    <light9-timeline-audio id="audio"></light9-timeline-audio> <!-- should have a zoom-out cursor on it, or zigzag the one cursor -->
+    <light9-timeline-audio id="audio"></light9-timeline-audio>
     <light9-timeline-time-zoomed id="zoomed" zoom="{{viewState.zoomSpec}}"></light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
     <light9-timeline-adjusters id="adjusters" adjs="{{adjs}}"></light9-timeline-adjusters>
@@ -76,7 +76,7 @@
     </style>
     <div>
       <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
-      <light9-timeline-audio zoom="{{zoom}}"></light9-timeline-audio>
+      <light9-timeline-audio zoom="{{zoomFlattened}}"></light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
         <light9-timeline-graph-row></light9-timeline-graph-row>
       </template>
@@ -85,12 +85,18 @@
   <script>
    Polymer({
        is: "light9-timeline-time-zoomed",
-    behaviors: [
-      Polymer.IronResizableBehavior
-    ],
+       behaviors: [
+           Polymer.IronResizableBehavior
+       ],
        properties: {
            rows: {value: [0, 1, 2, 3]},
-           zoom: {type: Object, notify: true}
+           zoom: {type: Object, notify: true, observer: 'onZoom'},
+           zoomFlattened: {type: Object, notify: true}
+       },
+       onZoom: function() {
+           ko.computed(function() {
+               this.zoomFlattened = ko.toJS(this.zoom);
+           }.bind(this));
        }
    });
   </script>
@@ -378,5 +384,6 @@
 <script src="/lib/sylvester/sylvester.js"></script>
 <script src="/lib/d3/build/d3.js"></script>
 <script src="/lib/N3.js/browser/n3-browser.js"></script>
+<script src="/lib/knockout/dist/knockout.js"></script>
 <script src="graph.js"></script>
 <script src="timeline.js"></script>
