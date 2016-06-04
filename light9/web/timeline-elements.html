@@ -1,42 +1,8 @@
 <link rel="import" href="/lib/polymer/polymer.html">
 <link rel="import" href="light9-timeline-audio.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="rdfdb-synced-graph.html">
 
-<dom-module id="rdfdb-synced-graph">
-  <template>
-    <style>
-     :host { display: none; }
-    </style>
-  </template>
-  <script src="graph.js"></script>
-  <script>
-   Polymer({
-       is: "rdfdb-synced-graph",
-       properties: {
-           graph: {type: Object, notify: true}
-       },
-       ready: function() {
-           this.graph = new SyncedGraph('noServerYet', {
-               '': 'http://light9.bigasterisk.com/',
-               'xsd': 'http://www.w3.org/2001/XMLSchema#',
-           });
-           this.graph.loadTrig(
-'          @prefix : <http://light9.bigasterisk.com/> .'+
-'          @prefix dev: <http://light9.bigasterisk.com/device/> .'+
-'          <http://example.com/> {'+
-'            :demoResource0 :startTime 1; :endTime 120 .'+
-'            :demoResource1 :startTime 13; :endTime 16 .'+
-'            :demoResource2 :startTime 38; :endTime 60 .'+
-'            :demoResource3 :startTime 56; :endTime 60 .'+
-'            :demoResource4 :startTime 73; :endTime 74 .'+
-'            :demoResource5 :startTime 91; :endTime 105 .'+
-'            :demoResource6 :startTime 110; :endTime 120 .'+
-'            :demoResource7 :startTime 133; :endTime 140 .'+
-'          }');
-       }
-   });
-  </script>
-</dom-module>
 
 <!-- Whole editor- include this on your page.
      Most coordinates are relative to this element.
@@ -364,8 +330,8 @@
 </dom-module>
 
 <script src="/lib/sylvester/sylvester.js"></script>
-<script src="/lib/d3/build/d3.js"></script>
-<script src="/lib/N3.js/browser/n3-browser.js"></script>
+<script src="/lib/d3/build/d3.min.js"></script>
+<script src="/lib/N3.js/browser/n3-browser.min.js"></script>
 <script src="/lib/knockout/dist/knockout.js"></script>
 <script src="adjustable.js"></script>
 <script src="timeline.js"></script>

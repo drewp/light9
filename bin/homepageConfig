@@ -16,7 +16,7 @@ print "listen %s;" % splitport(urlparse(graph.value(netHome, L9['webServer'])).n
 
 def location(path, server):
     print """
-    location /%(path)s {
+    location /%(path)s/ {
 
       # for websocket
       proxy_http_version 1.1;
