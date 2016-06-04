@@ -7,7 +7,12 @@ Polymer
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
-    
+  width: ko.observable(1)
+  listeners:
+    'iron-resize': '_onIronResize'
+  _onIronResize: ->
+    @width(@offsetWidth)
+
   attached: ->
     @dia = @$.dia
     @viewState =
@@ -22,9 +27,8 @@ Polymer
       @debug = ko.toJSON(@viewState)
 
     ko.computed =>
-      # todo: need to trigger this when @offsetWidth changes, too
-      @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @offsetWidth])
-      @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @offsetWidth])
+      @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @width()])
+      @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @width()])
       @$.adjusters.updateAllCoords()
 
     animCursor = () => 
@@ -38,9 +42,8 @@ Polymer
       
     setInterval(animCursor, 50)
 
-    setTimeout(() =>
-      @adjs = @makeZoomAdjs().concat(@persistDemo())
-    , 500)
+    @adjs = @makeZoomAdjs().concat(@persistDemo())
+
 
   persistDemo: ->
     ctx = @graph.Uri('http://example.com/')
