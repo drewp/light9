@@ -56,6 +56,7 @@ Polymer
     @adjs = @makeZoomAdjs().concat(@persistDemo())
     @trackMouse()
     @bindKeys()
+    @bindWheelZoom()
 
   trackMouse: ->
     # not just for show- we use the mouse pos sometimes
@@ -71,6 +72,21 @@ Polymer
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
         @$.dia.setMouse(@viewState.mouse.pos())
+
+  bindWheelZoom: ->
+    # tried d3.zoom but couldn't figure it out
+    zoom = d3.zoom()
+    zoom.filter ->
+      # LMB drag is for selection, but MMB can scroll
+      return !(event.type == 'mousedown' && event.button != 1)
+    zoom.extent([[0, 0], [196, 1]])
+    zoom.translateExtent([[0, 0], [196, 1]])
+    zoom.on 'zoom', (a,b,c) =>
+      xf = d3.event.transform
+      log('zoom', xf)
+      @viewState.zoomSpec.t1(xf.invertX(0))
+      @viewState.zoomSpec.t2(xf.invertX(@viewState.zoomSpec.duration()))
+    d3.select(@$.zoomed).call(zoom)
 
   animatedZoom: (newT1, newT2, secs) ->
     fps = 30
@@ -90,11 +106,9 @@ Polymer
     setTimeout(=>
         @viewState.zoomSpec.t1(newT1)
         @viewState.zoomSpec.t2(newT2)
-      , lastTime + 10)
-      
+      , lastTime + 10)  
     
   bindKeys: ->
-    
     shortcut.add "Ctrl+P", (ev) =>
       @$.music.seekPlayOrPause(@zoomInX.invert(@viewState.mouse.pos().e(1)))
 
