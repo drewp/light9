@@ -53,6 +53,9 @@ class Adjustable
     else
       rootElem = ev.target.closest('light9-timeline-editor')
 
+    if ev.touches?.length
+      ev = ev.touches[0]
+      
     # storing root on the object to remember it across calls in case
     # you drag outside the editor.
     @root = rootElem.getBoundingClientRect() if rootElem

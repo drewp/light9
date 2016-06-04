@@ -26,6 +26,8 @@ Polymer
         t2: ko.observable(161)
       cursor:
         t: ko.observable(105)
+      mouse:
+        pos: ko.observable($V([0,0]))
 
     ko.computed =>
       @debug = ko.toJSON(@viewState)
@@ -45,6 +47,21 @@ Polymer
                        @$.zoomed.$.time.offsetHeight,
                        @fullZoomX, @zoomInX, @viewState.cursor)
 
+    # this isn't firing on phone during pen drag
+    for evName in ['mousemove', 'touchmove']
+      @addEventListener evName, (ev) =>
+        ev.preventDefault()
+        
+        if ev.touches?.length
+          ev = ev.touches[0]
+
+        # consolidate with _editorCoordinates version
+        @root = @getBoundingClientRect()
+        @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
+
+        @$.dia.setMouse(@viewState.mouse.pos())
+        @debug = evName + ' ' + ev.clientX + ' ' + ev.layerX + ' ' + ev.movementX + ' ' + ev.offsetX + ' ' + ev.pageX + ' ' + ev.x 
+  
     @adjs = @makeZoomAdjs().concat(@persistDemo())
 
   persistDemo: ->
@@ -230,10 +247,10 @@ Polymer
     d3.select(@$.timeAxis).attr('transform', 'translate(0,'+yTop+')').call(axis)
 
   setMouse: (pos) ->
-    elem = @getOrCreateElem('mouse-x', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})
-    elem.setAttribute('d', svgPathFromPoints([[-999, pos.e(2)], [999, pos.e(2)]]))
-    elem = @getOrCreateElem('mouse-y', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})
-    elem.setAttribute('d', svgPathFromPoints([[pos.e(1), -999], [pos.e(1), 999]]))   
+    elem = @getOrCreateElem('mouse-x', 'mouse', 'path', {style: "fill:none;stroke:#fff;stroke-width:0.5;"})
+    elem.setAttribute('d', svgPathFromPoints([[-9999, pos.e(2)], [9999, pos.e(2)]]))
+    elem = @getOrCreateElem('mouse-y', 'mouse', 'path', {style: "fill:none;stroke:#fff;stroke-width:0.5;"})
+    elem.setAttribute('d', svgPathFromPoints([[pos.e(1), -9999], [pos.e(1), 9999]]))   
 
   getOrCreateElem: (uri, groupId, tag, attrs) ->
     elem = @elemById[uri]
