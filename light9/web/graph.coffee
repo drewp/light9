@@ -15,15 +15,22 @@ class GraphWatchers
     
   unsubscribe: (subscription) ->
     throw Error('not implemented')
+
+  matchingHandlers: (quad) ->
+    matches = []
+    for subjDict in [@handlersSp[quad.subject] || {}, @handlersSp[null] || {}]
+      for subjPredMatches in [subjDict[quad.predicate] || [], subjDict[null] || []]
+        matches = matches.concat(subjPredMatches)
+    return matches
     
   graphChanged: (patch) ->
     for quad in patch.delQuads
-      for cb in ((@handlersSp[quad.subject] || {})[quad.predicate] || [])
+      for cb in @matchingHandlers(quad)
         # currently calls multiple times, which is ok, but we might
         # group things into fewer patches
         cb({delQuads: [quad], addQuads: []})
     for quad in patch.addQuads
-      for cb in ((@handlersSp[quad.subject] || {})[quad.predicate] || [])
+      for cb in @matchingHandlers(quad)
         cb({delQuads: [], addQuads: [quad]})
 
 

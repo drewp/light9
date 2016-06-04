@@ -56,18 +56,18 @@ Polymer
         subj: subj
         pred: @graph.Uri(':startTime')
         ctx: ctx
-        getTargetTransform: (value) => $V([@zoomInX(value), 300])
+        getTargetTransform: (value) => $V([@zoomInX(value), 600])
         getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
-        getSuggestedTargetOffset: () => $V([-30, 80])
+        getSuggestedTargetOffset: () => $V([0, -80])
       }))
       adjs.push(new AdjustableFloatObject({
         graph: @graph
         subj: subj
         pred: @graph.Uri(':endTime')
         ctx: ctx
-        getTargetTransform: (value) => $V([@zoomInX(value), 300])
+        getTargetTransform: (value) => $V([@zoomInX(value), 600])
         getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
-        getSuggestedTargetOffset: () => $V([30, 100])
+        getSuggestedTargetOffset: () => $V([0, -80])
       }))
     return adjs
 
@@ -124,7 +124,9 @@ Polymer
 Polymer
   is: 'light9-timeline-graph-row'
   behaviors: [ Polymer.IronResizableBehavior ]
-  properties: {}
+  properties:
+    graph: { type: Object, notify: true }
+    zoomInX: { type: Object, notify: true }
 
   
 window.xserial = 0
@@ -132,9 +134,18 @@ Polymer
   is: 'light9-timeline-note'
   behaviors: [ Polymer.IronResizableBehavior ]
   listeners: 'iron-resize': '_onIronResize'
-  properties: {}
+  properties:
+    graph: { type: Object, notify: true }
+    zoomInX: { type: Object, notify: true, observer: '_onIronResize' }
+  ready: ->
+    @graph.subscribe("http://light9.bigasterisk.com/demoResource6", null, null, @_onIronResize.bind(@))
   _onIronResize: ->
-    setNote 'myuri', 60 + 150 * window.xserial++, 180, @offsetTop, @offsetTop + @offsetHeight
+    return if !@zoomInX
+    subj = "http://light9.bigasterisk.com/demoResource6"
+    setNote(subj,
+            @zoomInX(@graph.floatValue(subj, @graph.Uri(':startTime'))),
+            @zoomInX(@graph.floatValue(subj, @graph.Uri(':endTime'))),
+            @offsetTop, @offsetTop + @offsetHeight)
 
 Polymer
   is: "light9-timeline-adjusters"

@@ -47,7 +47,7 @@
          Zoom all .. ctrl+esc
        -->
     <light9-timeline-audio id="audio"></light9-timeline-audio>
-    <light9-timeline-time-zoomed id="zoomed" zoom="{{viewState.zoomSpec}}"></light9-timeline-time-zoomed>
+    <light9-timeline-time-zoomed id="zoomed" graph="{{graph}}" zoom="{{viewState.zoomSpec}}" zoom-in-x="{{zoomInX}}"></light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
     <light9-timeline-adjusters id="adjusters" dia="{{dia}}" adjs="{{adjs}}"></light9-timeline-adjusters>
     <div id="debug">[[debug]]</div>
@@ -81,7 +81,7 @@
       <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
       <light9-timeline-audio id="audio" zoom="{{zoomFlattened}}"></light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
-        <light9-timeline-graph-row></light9-timeline-graph-row>
+        <light9-timeline-graph-row graph="{{graph}}" zoom-in-x="{{zoomInX}}"></light9-timeline-graph-row>
       </template>
     </div>
   </template>
@@ -92,7 +92,9 @@
            Polymer.IronResizableBehavior
        ],
        properties: {
-           rows: {value: [0, 1, 2, 3]},
+           graph: { type: Object, notify: true },
+           zoomInX: { type: Object, notify: true },
+           rows: {value: [0]},
            zoom: {type: Object, notify: true, observer: 'onZoom'},
            zoomFlattened: {type: Object, notify: true}
        },
@@ -178,8 +180,8 @@
          display: flex;
      }
     </style>
-    <template is="dom-repeat" items="[1,2,3]">
-      <light9-timeline-note></light9-timeline-note>
+    <template is="dom-repeat" items="[1]">
+      <light9-timeline-note graph="{{graph}}" zoom-in-x="{{zoomInX}}"></light9-timeline-note>
     </template>
   </template>
 </dom-module>
@@ -194,7 +196,7 @@
      :host {
          display: block;
          background: green;
-         outline: 2px solid red;
+         /* outline: 2px solid red; */
      }
     </style>
     <light9-timeline-note-inline-attrs></light9-timeline-note-inline-attrs>
@@ -228,16 +230,19 @@
 <dom-module id="light9-timeline-adjuster">
   <template>
     <style>
+     /* 
+     #top {outline: 2px solid rgba(255, 0, 0, 0.25);}
+     table {outline: 2px solid rgba(0, 0, 255, 0.19);}
+     */
+     
      #top {
          position: absolute;
          display: inline-block;
-         outline: 2px solid rgba(255, 0, 0, 0.25);
      }
      table {
          position: relative;
          left: -50%;
          top: -40px; /* percent had no effect */
-         outline: 2px solid rgba(0, 0, 255, 0.19);
          z-index: 2;
          border-collapse: collapse;
      }
