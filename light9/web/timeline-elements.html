@@ -45,7 +45,7 @@
     <light9-timeline-audio id="audio"></light9-timeline-audio>
     <light9-timeline-time-zoomed id="zoomed" zoom="{{viewState.zoomSpec}}"></light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
-    <light9-timeline-adjusters id="adjusters" adjs="{{adjs}}"></light9-timeline-adjusters>
+    <light9-timeline-adjusters id="adjusters" dia="{{dia}}" adjs="{{adjs}}"></light9-timeline-adjusters>
     <div id="debug">[[debug]]</div>
   </template>
  
@@ -128,21 +128,12 @@
      }
     </style>
     <svg
-        xmlns:dc="http://purl.org/dc/elements/1.1/"
-        xmlns:cc="http://creativecommons.org/ns#"
-        xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-        xmlns:svg="http://www.w3.org/2000/svg"
         xmlns="http://www.w3.org/2000/svg"
+        xmlns:svg="http://www.w3.org/2000/svg"
         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-        xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
         viewBox="0 0 1021 600"
     >
       <g id="layer1">
-        
-        <path
-            style="fill:none;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;"
-            d="m 202.190957,301.51493 22.56802038,0"
-            id="adjConnector"/>
         <text
             xml:space="preserve"
             style="font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"
@@ -150,9 +141,9 @@
             y="631.3988"
             id="text4290"
             sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4292" x="-338.38403" y="631.3988">spotchase</tspan></text>
-        
-        <g id="notes">
-        </g>
+        <g id="mouse"></g>
+        <g id="notes"></g>
+        <g id="connectors"></g>
         <g id="cursor">
           <path id="cursor1" style="fill:none; stroke:#ff0303; stroke-width:1.5; stroke-linecap:butt;" />
           <path id="cursor2" style="fill:#9c0303;" />
@@ -257,14 +248,16 @@
     </style>
 
     <template is="dom-repeat" items="{{adjs}}">
-      <light9-timeline-adjuster adj="{{item}}"></light9-timeline-adjuster>
+      <light9-timeline-adjuster dia="{{dia}}" adj="{{item}}"></light9-timeline-adjuster>
     </template>
   </template>
   <script>
    Polymer({
        is: "light9-timeline-adjusters",
        properties: {
-           adjs: { type: Array }
+           adjs: { type: Array },
+           dia: { type: Object }
+           
        }
    });
   </script>
@@ -281,8 +274,16 @@
 <dom-module id="light9-timeline-adjuster">
   <template>
     <style>
-     table {
+     #top {
          position: absolute;
+         display: inline-block;
+         outline: 2px solid rgba(255, 0, 0, 0.25);
+     }
+     table {
+         position: relative;
+         left: -50%;
+         top: -40px; /* percent had no effect */
+         outline: 2px solid rgba(0, 0, 255, 0.19);
          z-index: 2;
          border-collapse: collapse;
      }
@@ -300,12 +301,20 @@
          cursor: ew-resize;
          -webkit-user-select: none;
      }
+     span.empty {
+         width: 30px;
+         height: 13px;
+         display: inline-block;
+         background: rgba(0,0,0,0);
+     }
     </style>
-    <table id="top" style$="left: [[centerStyle.x]]px; top: [[centerStyle.y]]px">
-      <tr><td></td><td>↑</td><td></td></tr>
-      <tr><td>←</td><td><span id="label">[[displayValue]]</span></td><td>→</td></tr>
-      <tr><td></td><td>↓</td><td></td></tr>
-    </table>
+    <div id="top" style$="left: [[centerStyle.x]]px; top: [[centerStyle.y]]px">
+      <table>
+        <tr><td></td><td style="visibility: hidden">↑</td><td></td></tr>
+        <tr><td>←</td><td><span id="label" class$="[[spanClass]]">[[displayValue]]</span></td><td>→</td></tr>
+        <tr><td></td><td style="visibility: hidden">↓</td><td></td></tr>
+      </table>
+    </div>
     
   </template>
 </dom-module>

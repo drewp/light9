@@ -9,7 +9,7 @@ window.graph.loadTrig("
 @prefix dev: <http://light9.bigasterisk.com/device/> .
 
 <http://example.com/> {
-  :demoResource :startTime 0.5; :endTime 1.6 .
+  :demoResource :startTime 110; :endTime 120 .
 }
     ")
 
@@ -19,9 +19,10 @@ class Adjustable
   # have a <light9-timeline-adjuster> associated. This object does the
   # layout and positioning.
   constructor: (@config) ->
-    # config has getTarget, getSuggestedTargetOffset, getValue
+    # config has getTarget, getSuggestedTargetOffset, getValue, emptyBox
 
   getDisplayValue: () ->
+    return '' if @config.emptyBox
     d3.format(".4g")(@_getValue())
 
   getCenter: () -> # vec2 of pixels
@@ -51,7 +52,7 @@ class Adjustable
 
 class AdjustableFloatObservable extends Adjustable
   constructor: (@config) ->
-    # config has observable, valueLow, targetLow, valueHigh, targetHigh, getSuggestedTargetOffset
+    # config has observable, getValueForPos, valueLow, targetLow, valueHigh, targetHigh, getSuggestedTargetOffset
     ko.computed =>
       @_normalizedValue = d3.scaleLinear().domain([
         ko.unwrap(@config.valueLow),
@@ -65,13 +66,34 @@ class AdjustableFloatObservable extends Adjustable
     [lo, hi] = [ko.unwrap(@config.targetLow),
                 ko.unwrap(@config.targetHigh)]
     return lo.add(hi.subtract(lo).multiply(f))
+
+  _editorCoordinates: () -> # vec2 of mouse relative to <l9-t-editor>
+    ev = d3.event.sourceEvent
+
+    if ev.target.tagName == "LIGHT9-TIMELINE-EDITOR"
+      rootElem = ev.target
+    else
+      rootElem = ev.target.closest('light9-timeline-editor')
+    
+    @root = rootElem.getBoundingClientRect() if rootElem
+    offsetParentPos = $V([ev.pageX - @root.left, ev.pageY - @root.top])
+
+    setMouse(offsetParentPos)
+    return offsetParentPos 
     
   continueDrag: (pos) ->
-    # pos is vec2 of pixels relative to the drag start
+    # pos is vec2 of pixels relative to the drag start.
+
+    epos = @_editorCoordinates()
+    log('offsetParentPos', epos.elements)
     
-    newValue = @dragStartValue + pos.e(1) * .2
+    newValue = @config.getValueForPos(epos)
     @config.observable(newValue)
 
+  subscribe: (onChange) ->
+    ko.computed =>
+      @config.observable()
+      onChange()
 
 class AdjustableFloatObject extends Adjustable
   constructor: (@config) ->
@@ -103,6 +125,7 @@ Polymer
     debug: {type: String}
     
   attached: ->
+    @dia = @$.dia
     @viewState =
       zoomSpec:
         duration: ko.observable(190)
@@ -142,7 +165,7 @@ Polymer
         pred: graph.Uri(':startTime')
         ctx: ctx
         getTarget: () => $V([200, 300])
-        getSuggestedTargetOffset: () => $V([-30, 0])
+        getSuggestedTargetOffset: () => $V([-30, 80])
       })
       new AdjustableFloatObject({
         graph: graph
@@ -150,31 +173,60 @@ Polymer
         pred: graph.Uri(':endTime')
         ctx: ctx
         getTarget: () => $V([300, 300])
-        getSuggestedTargetOffset: () => $V([30, 0])
+        getSuggestedTargetOffset: () => $V([30, 100])
       })
       ]
 
   makeZoomAdjs: ->
-    
+    dur = @viewState.zoomSpec.duration
+    valForPos = (pos) =>
+        x = pos.e(1)
+        t = @fullZoomX.invert(x)
     left = new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t1,
       valueLow: 0
-      valueHigh: @viewState.zoomSpec.duration
+      valueHigh: dur
       targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
       targetHigh: $V([@offsetWidth, 30])
       getSuggestedTargetOffset: () => $V([-30, 0])
+      getValueForPos: valForPos
     })
 
     right = new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t2,
       valueLow: 0
-      valueHigh: @viewState.zoomSpec.duration
+      valueHigh: dur
       targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
       targetHigh: $V([@offsetWidth, 30])
       getSuggestedTargetOffset: () => $V([30, 0])
+      getValueForPos: valForPos
     })
-    return [left, right]
 
+    panObs = ko.pureComputed({
+        read: () =>
+          (@viewState.zoomSpec.t1() + @viewState.zoomSpec.t2()) / 2
+        write: (value) =>
+          zs = @viewState.zoomSpec
+          span = zs.t2() - zs.t1()
+          zs.t1(value - span / 2)
+          zs.t2(value + span / 2)
+      })
+
+    pan = new AdjustableFloatObservable({
+      observable: panObs
+      emptyBox: true
+      valueLow: 0
+      valueHigh: dur
+      # not right- the sides shouldn't be able to go offscreen
+      targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
+      targetHigh: $V([@offsetWidth, 30])
+      getSuggestedTargetOffset: () => $V([0, 0])
+      getValueForPos: valForPos
+      })
+      
+    return [left, right, pan]
+
+_adjusterSerial = 0
 
 Polymer
   is: 'light9-timeline-adjuster'
@@ -190,14 +242,23 @@ Polymer
       type: String
     centerStyle:
       type: Object
-      
+    spanClass:
+      type: String
+      value: ''
+
   onAdj: (adj) ->
     @adj.subscribe () =>
+      @spanClass = if @adj.config.emptyBox then 'empty' else ''
       @displayValue = @adj.getDisplayValue()
       center = @adj.getCenter()
       @centerStyle = {x: center.e(1), y: center.e(2)}
+      @dia?.setAdjusterConnector(@myId, @adj.getCenter(),
+                                @adj.getTarget())
         
   attached: ->
+    @myId = 'adjuster-' + _adjusterSerial
+    _adjusterSerial += 1
+    
     drag = d3.drag()
     sel = d3.select(@$.label)
     sel.call(drag)
@@ -212,6 +273,7 @@ Polymer
 svgPathFromPoints = (pts) ->
   out = ''
   pts.forEach (p) ->
+    p = p.elements if p.elements # for vec2
     if out.length == 0
       out = 'M '
     else
@@ -225,26 +287,40 @@ Polymer
   properties: {}
   ready: ->
     window.setNote = @setNote.bind(this)
+    window.setMouse = @setMouse.bind(this)
     @cursorPath =
       top: @querySelector('#cursor1')
       mid: @querySelector('#cursor2')
       bot: @querySelector('#cursor3')
-    @noteById = {}
-    return
-  setNote: (uri, x1, x2, y1, y2) ->
-    elem = @noteById[uri]
+    @elemById = {}
+
+  setMouse: (pos) ->
+    elem = @getOrCreateElem('mouse-x', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})
+    elem.setAttribute('d', svgPathFromPoints([[-999, pos.e(2)], [999, pos.e(2)]]))
+    elem = @getOrCreateElem('mouse-y', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})
+    elem.setAttribute('d', svgPathFromPoints([[pos.e(1), -999], [pos.e(1), 999]]))
+    
+
+  getOrCreateElem: (uri, groupId, tag, attrs) ->
+    elem = @elemById[uri]
     if !elem
-      s = '<path id="' + uri + '" style="fill:#53774b; stroke:#000000; stroke-width:1.5;"/>'
-      @$.notes.innerHTML += s
-      elem = @noteById[uri] = @$.notes.lastChild
+      elem = @elemById[uri] = document.createElementNS("http://www.w3.org/2000/svg", tag)
+      @$[groupId].appendChild(elem)
+      elem.setAttribute('id', uri)
+      for k,v of attrs
+        elem.setAttribute(k, v)
+    return elem
+    
+  setNote: (uri, x1, x2, y1, y2) ->
+    elem = @getOrCreateElem(uri, 'notes', 'path', {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
     d = svgPathFromPoints([
       [x1, y2]
       [x1 * .75 + x2 * .25, y1]
       [x1 * .25 + x2 * .75, y1]
       [x2, y2]
     ])
-    elem.setAttribute 'd', d
-    return
+    elem.setAttribute('d', d)
+
   setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
     xZoomedOut = fullZoomX(cursor.t)
     xZoomedIn = zoomInX(cursor.t)
@@ -262,7 +338,7 @@ Polymer
       [xZoomedIn, y2 + h2]
       [xZoomedIn, @offsetParent.offsetHeight]
     ])
-    return
-  setAdjusterConnector: (id, center, target) ->
-    console.log 'setAdjusterConnector', id, center, target
-    return
+
+  setAdjusterConnector: (uri, center, target) ->
+    elem = @getOrCreateElem(uri, 'connectors', 'path', {style: "fill:none;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;"})
+    elem.setAttribute('d', svgPathFromPoints([center, target]))
