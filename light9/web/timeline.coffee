@@ -1,26 +1,12 @@
 log = console.log
-window.graph = new SyncedGraph('noServerYet', {
-'': 'http://light9.bigasterisk.com/',
-'xsd', 'http://www.w3.org/2001/XMLSchema#',
-  })
-  
-window.graph.loadTrig("
-@prefix : <http://light9.bigasterisk.com/> .
-@prefix dev: <http://light9.bigasterisk.com/device/> .
 
-<http://example.com/> {
-  :demoResource :startTime 110; :endTime 120 .
-}
-    ")
-
-    
-      
 Polymer
   is: 'light9-timeline-editor'
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     viewState: { type: Object }
     debug: {type: String}
+    graph: {type: Object, notify: true}
     
   attached: ->
     @dia = @$.dia
@@ -36,44 +22,50 @@ Polymer
       @debug = ko.toJSON(@viewState)
 
     ko.computed =>
-      @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
-      @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @offsetWidth]) # need to update this if width changes or if duration changes
+      # todo: need to trigger this when @offsetWidth changes, too
+      @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @offsetWidth])
+      @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @offsetWidth])
+      @$.adjusters.updateAllCoords()
 
     animCursor = () => 
-      #@viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
+      @viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
       @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                        @$.zoomed.$.time.offsetTop,
                        @$.zoomed.$.time.offsetHeight,
                        @fullZoomX, @zoomInX, @viewState.cursor)
 
-      @viewState.zoomSpec.t1(80 + 10 * Math.sin(Date.now() / 3000))
+      #@viewState.zoomSpec.t1(80 + 10 * Math.sin(Date.now() / 3000))
       
-    #setInterval(animCursor, 50)
+    setInterval(animCursor, 50)
 
     setTimeout(() =>
       @adjs = @makeZoomAdjs().concat(@persistDemo())
-    , 100)
+    , 500)
 
   persistDemo: ->
-    ctx = graph.Uri('http://example.com/')
-    return [
-      new AdjustableFloatObject({
-        graph: graph
-        subj: graph.Uri(':demoResource')
-        pred: graph.Uri(':startTime')
+    ctx = @graph.Uri('http://example.com/')
+    adjs = []
+    for n in [0..7]
+      subj = @graph.Uri(':demoResource'+n)
+      adjs.push(new AdjustableFloatObject({
+        graph: @graph
+        subj: subj
+        pred: @graph.Uri(':startTime')
         ctx: ctx
-        getTarget: () => $V([200, 300])
+        getTargetTransform: (value) => $V([@zoomInX(value), 300])
+        getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
         getSuggestedTargetOffset: () => $V([-30, 80])
-      })
-      new AdjustableFloatObject({
-        graph: graph
-        subj: graph.Uri(':demoResource')
-        pred: graph.Uri(':endTime')
+      }))
+      adjs.push(new AdjustableFloatObject({
+        graph: @graph
+        subj: subj
+        pred: @graph.Uri(':endTime')
         ctx: ctx
-        getTarget: () => $V([300, 300])
+        getTargetTransform: (value) => $V([@zoomInX(value), 300])
+        getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
         getSuggestedTargetOffset: () => $V([30, 100])
-      })
-      ]
+      }))
+    return adjs
 
   makeZoomAdjs: ->
     yMid = @$.audio.offsetTop + @$.audio.offsetHeight / 2
@@ -120,6 +112,17 @@ Polymer
       
     return [left, right, pan]
 
+
+Polymer
+  is: "light9-timeline-adjusters"
+  properties:
+    adjs: { type: Array },
+    dia: { type: Object }
+  updateAllCoords: ->
+    for elem in @querySelectorAll('light9-timeline-adjuster')
+      elem.updateDisplay()
+    
+
 _adjusterSerial = 0
 
 Polymer
@@ -141,7 +144,9 @@ Polymer
       value: ''
 
   onAdj: (adj) ->
-    @adj.subscribe () =>
+    @adj.subscribe(@updateDisplay.bind(this))
+
+  updateDisplay: () ->
       @spanClass = if @adj.config.emptyBox then 'empty' else ''
       @displayValue = @adj.getDisplayValue()
       center = @adj.getCenter()
@@ -180,20 +185,15 @@ Polymer
   is: 'light9-timeline-diagram-layer'
   properties: {}
   ready: ->
+    @elemById = {}
     window.setNote = @setNote.bind(this)
     window.setMouse = @setMouse.bind(this)
-    @cursorPath =
-      top: @querySelector('#cursor1')
-      mid: @querySelector('#cursor2')
-      bot: @querySelector('#cursor3')
-    @elemById = {}
 
   setMouse: (pos) ->
     elem = @getOrCreateElem('mouse-x', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})
     elem.setAttribute('d', svgPathFromPoints([[-999, pos.e(2)], [999, pos.e(2)]]))
     elem = @getOrCreateElem('mouse-y', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})
-    elem.setAttribute('d', svgPathFromPoints([[pos.e(1), -999], [pos.e(1), 999]]))
-    
+    elem.setAttribute('d', svgPathFromPoints([[pos.e(1), -999], [pos.e(1), 999]]))   
 
   getOrCreateElem: (uri, groupId, tag, attrs) ->
     elem = @elemById[uri]
@@ -216,6 +216,12 @@ Polymer
     elem.setAttribute('d', d)
 
   setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
+    @cursorPath =
+      top: @querySelector('#cursor1')
+      mid: @querySelector('#cursor2')
+      bot: @querySelector('#cursor3')
+    return if !@cursorPath.top
+    
     xZoomedOut = fullZoomX(cursor.t)
     xZoomedIn = zoomInX(cursor.t)
     @cursorPath.top.setAttribute 'd', svgPathFromPoints([

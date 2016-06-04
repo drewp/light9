@@ -45,6 +45,22 @@ class Adjustable
   endDrag: () ->
     0
 
+  _editorCoordinates: () -> # vec2 of mouse relative to <l9-t-editor>
+    ev = d3.event.sourceEvent
+
+    if ev.target.tagName == "LIGHT9-TIMELINE-EDITOR"
+      rootElem = ev.target
+    else
+      rootElem = ev.target.closest('light9-timeline-editor')
+
+    # storing root on the object to remember it across calls in case
+    # you drag outside the editor.
+    @root = rootElem.getBoundingClientRect() if rootElem
+    offsetParentPos = $V([ev.pageX - @root.left, ev.pageY - @root.top])
+
+    setMouse(offsetParentPos) # for debugging
+    return offsetParentPos 
+
 class window.AdjustableFloatObservable extends Adjustable
   constructor: (@config) ->
     # config also has:
@@ -54,27 +70,11 @@ class window.AdjustableFloatObservable extends Adjustable
 
   _getValue: () ->
     @config.observable()
-
-  _editorCoordinates: () -> # vec2 of mouse relative to <l9-t-editor>
-    ev = d3.event.sourceEvent
-
-    if ev.target.tagName == "LIGHT9-TIMELINE-EDITOR"
-      rootElem = ev.target
-    else
-      rootElem = ev.target.closest('light9-timeline-editor')
-    
-    @root = rootElem.getBoundingClientRect() if rootElem
-    offsetParentPos = $V([ev.pageX - @root.left, ev.pageY - @root.top])
-
-    setMouse(offsetParentPos)
-    return offsetParentPos 
     
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start.
 
     epos = @_editorCoordinates()
-    log('offsetParentPos', epos.elements)
-    
     newValue = @config.getValueForPos(epos)
     @config.observable(newValue)
 
@@ -85,15 +85,22 @@ class window.AdjustableFloatObservable extends Adjustable
 
 class window.AdjustableFloatObject extends Adjustable
   constructor: (@config) ->
-    # config has graph, subj, pred, ctx, getSuggestedTargetOffset
+    # config also has:
+    #   graph
+    #   subj
+    #   pred
+    #   ctx
+    #   getTargetTransform(value) -> getTarget result for value
+    #   getValueForPos
+
     super(@config)
 
-  _getValue: () -> # for drag math
+  _getValue: () ->
     @config.graph.floatValue(@config.subj, @config.pred)
 
-  getCenter: () ->    
-    $V([100 + 200 * @_getValue(), 200])
-
+  getTarget: () ->
+    @config.getTargetTransform(@_getValue())
+    
   subscribe: (onChange) ->
     @config.graph.subscribe @config.subj, @config.pred, null, (patch) =>
       onChange()
@@ -101,5 +108,5 @@ class window.AdjustableFloatObject extends Adjustable
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
     
-    newValue = @dragStartValue + pos.e(1) / 200
+    newValue = @config.getValueForPos(@_editorCoordinates())
     @config.graph.patchObject(@config.subj, @config.pred, @config.graph.Literal(newValue), @_ctx)
