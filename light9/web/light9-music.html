@@ -15,6 +15,10 @@
      }
     </style>
     <iron-ajax id="getTime" url="/ascoltami/time"></iron-ajax>
+    <iron-ajax id="seek"
+               method="POST"
+               url="/ascoltami/seekPlayOrPause"
+               content-type="application/json"></iron-ajax>
     <span>[[status]][[turboSign]]</span>
   </template>
   <script src="light9-music.js"></script>

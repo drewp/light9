@@ -9,6 +9,7 @@ Polymer
     graph: {type: Object, notify: true}
     song: {type: String, notify: true}
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
+    songPlaying: {type: Boolean, notify: true}
   width: ko.observable(1)
   listeners:
     'iron-resize': '_onIronResize'
@@ -46,23 +47,29 @@ Polymer
                        @$.zoomed.$.time.offsetTop,
                        @$.zoomed.$.time.offsetHeight,
                        @fullZoomX, @zoomInX, @viewState.cursor)
+  
+    @adjs = @makeZoomAdjs().concat(@persistDemo())
+    @trackMouse()
+    @bindKeys()
 
-    # this isn't firing on phone during pen drag
+  trackMouse: ->
+    # not just for show- we use the mouse pos sometimes
     for evName in ['mousemove', 'touchmove']
       @addEventListener evName, (ev) =>
         ev.preventDefault()
-        
+
+        # todo: consolidate with _editorCoordinates version
         if ev.touches?.length
           ev = ev.touches[0]
 
-        # consolidate with _editorCoordinates version
         @root = @getBoundingClientRect()
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
         @$.dia.setMouse(@viewState.mouse.pos())
-        @debug = evName + ' ' + ev.clientX + ' ' + ev.layerX + ' ' + ev.movementX + ' ' + ev.offsetX + ' ' + ev.pageX + ' ' + ev.x 
-  
-    @adjs = @makeZoomAdjs().concat(@persistDemo())
+    
+  bindKeys: ->
+    shortcut.add "Ctrl+P", (ev) =>
+      @$.music.seekPlayOrPause(@zoomInX.invert(@viewState.mouse.pos().e(1)))
 
   persistDemo: ->
     ctx = @graph.Uri('http://example.com/')

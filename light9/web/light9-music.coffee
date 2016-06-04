@@ -9,8 +9,10 @@ Polymer
     turboSign: { type: String, notify: true }
     
     duration: { type: Number, notify: true }
-    playing: { type: Boolean, notify: true }
     song: { type: String, notify: true }
+    # It does not yet work to write back to the playing/t
+    # properties. See seekPlayOrPause.
+    playing: { type: Boolean, notify: true }
     t: { type: Number, notify: true }
     
   ready: ->
@@ -23,6 +25,7 @@ Polymer
       setTimeout(@poll.bind(@), 2000)
     @poll()
     setInterval(@estimateTimeLoop.bind(@), 50)
+    
 
   estimateTimeLoop: ->
     if @playing
@@ -31,13 +34,15 @@ Polymer
       @t = @remoteT
     
   poll: ->
+    clearTimeout(@nextPoll) if @nextPoll
     @$.getTime.generateRequest()
     @status = "♫"
+    
   onResponse: ->
     @status = " "
-    r = @$.getTime.lastResponse
+    @lastResponse = @$.getTime.lastResponse
     now = Date.now()
-    if !r.playing && r.t != @remoteT
+    if !@lastResponse.playing && @lastResponse.t != @remoteT
       # likely seeking in another tool
       @turboUntil = now + 1000
     if now < @turboUntil
@@ -47,14 +52,18 @@ Polymer
       @turboSign = " "
       delay = 700
     
-    setTimeout(@poll.bind(@), delay)
-    @duration = r.duration
-    @playing = r.playing
-    @song = r.song
+    @nextPoll = setTimeout(@poll.bind(@), delay)
+    @duration = @lastResponse.duration
+    @playing = @lastResponse.playing
+    @song = @lastResponse.song
 
-    @remoteT = r.t
+    @remoteT = @lastResponse.t
     @remoteAsOfMs = now
 
+  seekPlayOrPause: (t) ->
+    @$.seek.body = {t: t}
+    @$.seek.generateRequest()
     
-
+    @turboUntil = Date.now() + 1000
+    @poll()
     
