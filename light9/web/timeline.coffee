@@ -207,4 +207,62 @@ Polymer
     drag.on 'drag', () =>
       @adj?.continueDrag($V([d3.event.x, d3.event.y]))
     drag.on('end', () => @adj?.endDrag())
-  
+
+
+svgPathFromPoints = (pts) ->
+  out = ''
+  pts.forEach (p) ->
+    if out.length == 0
+      out = 'M '
+    else
+      out += 'L '
+    out += '' + p[0] + ',' + p[1] + ' '
+    return
+  out
+
+Polymer
+  is: 'light9-timeline-diagram-layer'
+  properties: {}
+  ready: ->
+    window.setNote = @setNote.bind(this)
+    @cursorPath =
+      top: @querySelector('#cursor1')
+      mid: @querySelector('#cursor2')
+      bot: @querySelector('#cursor3')
+    @noteById = {}
+    return
+  setNote: (uri, x1, x2, y1, y2) ->
+    elem = @noteById[uri]
+    if !elem
+      s = '<path id="' + uri + '" style="fill:#53774b; stroke:#000000; stroke-width:1.5;"/>'
+      @$.notes.innerHTML += s
+      elem = @noteById[uri] = @$.notes.lastChild
+    d = svgPathFromPoints([
+      [x1, y2]
+      [x1 * .75 + x2 * .25, y1]
+      [x1 * .25 + x2 * .75, y1]
+      [x2, y2]
+    ])
+    elem.setAttribute 'd', d
+    return
+  setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
+    xZoomedOut = fullZoomX(cursor.t)
+    xZoomedIn = zoomInX(cursor.t)
+    @cursorPath.top.setAttribute 'd', svgPathFromPoints([
+      [xZoomedOut, y1]
+      [xZoomedOut, y1 + h1]
+    ])
+    @cursorPath.mid.setAttribute 'd', svgPathFromPoints([
+      [xZoomedIn + 2, y2 + h2]
+      [xZoomedIn - 2, y2 + h2]
+      [xZoomedOut - 1, y1 + h1]
+      [xZoomedOut + 1, y1 + h1]
+    ]) + ' Z'
+    @cursorPath.bot.setAttribute 'd', svgPathFromPoints([
+      [xZoomedIn, y2 + h2]
+      [xZoomedIn, @offsetParent.offsetHeight]
+    ])
+    return
+  setAdjusterConnector: (id, center, target) ->
+    console.log 'setAdjusterConnector', id, center, target
+    return

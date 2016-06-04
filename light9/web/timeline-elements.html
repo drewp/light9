@@ -162,64 +162,7 @@
     </svg>
 
   </template>
-  <script>
-   function svgPathFromPoints(pts) {
-       var out = "";
-       pts.forEach(function(p) {
-           if (out.length == 0) {
-               out = 'M ';
-           } else {
-               out += 'L ';
-           }
-           out += '' + p[0] + ',' + p[1] + ' ';
-       });
-       return out;
-   }
-   
-   Polymer({
-       is: "light9-timeline-diagram-layer",
-       properties: {
-       },
-       ready: function() {
-           window.setNote = this.setNote.bind(this);
-
-           this.cursorPath = {
-               top: this.querySelector("#cursor1"),
-               mid: this.querySelector("#cursor2"),
-               bot: this.querySelector("#cursor3")
-               };
-
-           this.noteById = {};
-       },
-       setNote: function(uri, x1, x2, y1, y2) {
-           var elem = this.noteById[uri];
-           if (!elem) {
-               var s = '<path id="'+uri+'" style="fill:#53774b; stroke:#000000; stroke-width:1.5;"/>';
-               this.$.notes.innerHTML += s;
-               elem = this.noteById[uri] = this.$.notes.lastChild;
-           }
-           
-           var d = svgPathFromPoints([[x1, y2], [x1*.75 + x2*.25, y1], [x1*.25 + x2*.75, y1], [x2, y2]]);
-           elem.setAttribute('d', d);
-       },
-       setCursor: function(y1, h1, y2, h2, fullZoomX, zoomInX, cursor) {
-           var xZoomedOut = fullZoomX(cursor.t);
-           var xZoomedIn = zoomInX(cursor.t);
-           this.cursorPath.top.setAttribute('d', svgPathFromPoints([
-               [xZoomedOut, y1],
-               [xZoomedOut, y1 + h1]]));
-           this.cursorPath.mid.setAttribute('d', svgPathFromPoints([
-               [xZoomedIn + 2, y2 + h2],
-               [xZoomedIn - 2, y2 + h2],
-               [xZoomedOut - 1, y1 + h1],
-               [xZoomedOut + 1, y1 + h1]]) + ' Z');
-           this.cursorPath.bot.setAttribute('d', svgPathFromPoints([
-               [xZoomedIn, y2 + h2],
-               [xZoomedIn, this.offsetParent.offsetHeight]]));
-
-       }
-   });
-  </script>
+ 
 </dom-module>
 
 
