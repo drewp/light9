@@ -85,3 +85,6 @@ arduino_upload: /usr/share/arduino/Arduino.mk
 	make upload
 
 effect_node_setup: create_virtualenv packages binexec install_python_deps
+
+coffee:
+	coffee -cw light9/web/*.coffee
