@@ -29,6 +29,7 @@ Polymer
     ko.computed =>
       @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @width()])
       @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @width()])
+      @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
       @$.adjusters.updateAllCoords()
 
     animCursor = () => 
@@ -116,6 +117,12 @@ Polymer
     return [left, right, pan]
 
 Polymer
+  is: "light9-timeline-time-axis",
+  # for now since it's just one line calling dia,
+  # light9-timeline-editor does our drawing work.
+
+
+Polymer
   is: "light9-timeline-adjusters"
   properties:
     adjs: { type: Array },
@@ -190,6 +197,11 @@ Polymer
     @elemById = {}
     window.setNote = @setNote.bind(this)
     window.setMouse = @setMouse.bind(this)
+
+  setTimeAxis: (width, yTop, scale) ->
+    pxPerTick = 50
+    axis = d3.axisTop(scale).ticks(width / pxPerTick)
+    d3.select(@$.timeAxis).attr('transform', 'translate(0,'+yTop+')').call(axis)
 
   setMouse: (pos) ->
     elem = @getOrCreateElem('mouse-x', 'mouse', 'path', {style: "fill:none;stroke:#333;stroke-width:0.5;"})

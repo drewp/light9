@@ -80,7 +80,7 @@
     </style>
     <div>
       <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
-      <light9-timeline-audio zoom="{{zoomFlattened}}"></light9-timeline-audio>
+      <light9-timeline-audio id="audio" zoom="{{zoomFlattened}}"></light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
         <light9-timeline-graph-row></light9-timeline-graph-row>
       </template>
@@ -142,6 +142,7 @@
             y="631.3988"
             id="text4290"
             sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4292" x="-338.38403" y="631.3988">spotchase</tspan></text>
+        <g id="timeAxis" transform="translate(0,40)"></g>
         <g id="mouse"></g>
         <g id="notes"></g>
         <g id="connectors"></g>
@@ -159,15 +160,14 @@
 <!-- seconds labels -->
 <dom-module id="light9-timeline-time-axis">
   <template>
-    <pre>0 sec    10   20   30   40   50</pre>
+    <style>
+     div {
+         width: 100%;
+         height: 31px;
+     }
+    </style>
+    <div></div>
   </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-time-axis",
-       properties: {
-       }
-   });
-  </script>
 </dom-module>
 
 <!-- one row of notes -->
