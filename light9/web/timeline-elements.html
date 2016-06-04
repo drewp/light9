@@ -68,7 +68,6 @@
          display: flex;
          flex-direction: column;
          height: 100%;
-
      }
      light9-timeline-audio {
          width: 100%;
@@ -183,17 +182,6 @@
       <light9-timeline-note></light9-timeline-note>
     </template>
   </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-graph-row",
-       behaviors: [
-           Polymer.IronResizableBehavior
-       ],
-       properties: {
-           
-       }
-   });
-  </script>
 </dom-module>
 
 <!-- One trapezoid note shape in a row.
@@ -211,26 +199,6 @@
     </style>
     <light9-timeline-note-inline-attrs></light9-timeline-note-inline-attrs>
   </template>
-  <script>
-   window.xserial = 0;
-   Polymer({
-       is: "light9-timeline-note",
-       behaviors: [
-           Polymer.IronResizableBehavior
-       ],
-       listeners: {
-           'iron-resize': '_onIronResize'
-       },
-       properties: {
-       },
-       
-       _onIronResize: function() {
-
-           setNote('myuri', 60 + 150 * (window.xserial++), 180, this.offsetTop, this.offsetTop + this.offsetHeight);
-           
-       } 
-   });
-  </script>
 </dom-module>
 
 <!-- All the adjusters you can edit or select.
@@ -242,10 +210,7 @@
 <dom-module id="light9-timeline-adjusters">
   <template>
     <style>
-     :host {
-     }
     </style>
-
     <template is="dom-repeat" items="{{adjs}}">
       <light9-timeline-adjuster dia="{{dia}}" adj="{{item}}"></light9-timeline-adjuster>
     </template>

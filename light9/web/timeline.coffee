@@ -121,6 +121,20 @@ Polymer
   # for now since it's just one line calling dia,
   # light9-timeline-editor does our drawing work.
 
+Polymer
+  is: 'light9-timeline-graph-row'
+  behaviors: [ Polymer.IronResizableBehavior ]
+  properties: {}
+
+  
+window.xserial = 0
+Polymer
+  is: 'light9-timeline-note'
+  behaviors: [ Polymer.IronResizableBehavior ]
+  listeners: 'iron-resize': '_onIronResize'
+  properties: {}
+  _onIronResize: ->
+    setNote 'myuri', 60 + 150 * window.xserial++, 180, @offsetTop, @offsetTop + @offsetHeight
 
 Polymer
   is: "light9-timeline-adjusters"
