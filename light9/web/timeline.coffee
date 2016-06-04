@@ -115,7 +115,6 @@ Polymer
       
     return [left, right, pan]
 
-
 Polymer
   is: "light9-timeline-adjusters"
   properties:
