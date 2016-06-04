@@ -1,0 +1,11 @@
+<link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+
+<!-- remote control of ascoltami -->
+<dom-module id="light9-music">
+  <template>
+    <iron-ajax id="getTime" url="/ascoltami/time"></iron-ajax>
+    <span>[[status]]</span>
+  </template>
+  <script src="light9-music.js"></script>
+</dom-module>

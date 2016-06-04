@@ -2,6 +2,7 @@
 <link rel="import" href="light9-timeline-audio.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="rdfdb-synced-graph.html">
+<link rel="import" href="light9-music.html">
 
 
 <!-- Whole editor- include this on your page.
@@ -37,6 +38,7 @@
     </style>
     <div>
       <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
+      <light9-music></light9-music>
       timeline editor: song [uri] <button>unlink</button>
       <label><input type="checkbox"> follow player song choice</label>
     </div>
