@@ -178,6 +178,7 @@ Polymer
       ]
 
   makeZoomAdjs: ->
+    yMid = @$.audio.offsetTop + @$.audio.offsetHeight / 2
     dur = @viewState.zoomSpec.duration
     valForPos = (pos) =>
         x = pos.e(1)
@@ -186,9 +187,9 @@ Polymer
       observable: @viewState.zoomSpec.t1,
       valueLow: 0
       valueHigh: dur
-      targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
-      targetHigh: $V([@offsetWidth, 30])
-      getSuggestedTargetOffset: () => $V([-30, 0])
+      targetLow: $V([0, yMid])
+      targetHigh: $V([@offsetWidth, yMid])
+      getSuggestedTargetOffset: () => $V([-50, 0])
       getValueForPos: valForPos
     })
 
@@ -196,9 +197,9 @@ Polymer
       observable: @viewState.zoomSpec.t2,
       valueLow: 0
       valueHigh: dur
-      targetLow: $V([0, 30])  # y = @$.audio.offsetTop + @$.audio.offsetHeight / 2]
-      targetHigh: $V([@offsetWidth, 30])
-      getSuggestedTargetOffset: () => $V([30, 0])
+      targetLow: $V([0, yMid])
+      targetHigh: $V([@offsetWidth, yMid])
+      getSuggestedTargetOffset: () => $V([50, 0])
       getValueForPos: valForPos
     })
 
