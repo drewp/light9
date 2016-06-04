@@ -30,18 +30,14 @@
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
      }
-     #debug {
-         position: fixed;
-         right: 0;
-         bottom: 0;
-     }
     </style>
     <div>
       <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
-      <light9-music></light9-music>
-      timeline editor: song [uri] <button>unlink</button>
+      <light9-music song="{{song}}" t="{{songTime}}"></light9-music>
+      timeline editor: song [{{song}}] <button>unlink</button>
       <label><input type="checkbox"> follow player song choice</label>
     </div>
+    <div>[[debug]]</div>
     <!--
          Old zoom menu:
          See current time .. esc
@@ -52,11 +48,9 @@
     <light9-timeline-time-zoomed id="zoomed" graph="{{graph}}" zoom="{{viewState.zoomSpec}}" zoom-in-x="{{zoomInX}}"></light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
     <light9-timeline-adjusters id="adjusters" dia="{{dia}}" adjs="{{adjs}}"></light9-timeline-adjusters>
-    <div id="debug">[[debug]]</div>
   </template>
  
 </dom-module>
-
 
 <!-- the whole section that pans/zooms in time (most of the editor) -->
 <dom-module id="light9-timeline-time-zoomed">

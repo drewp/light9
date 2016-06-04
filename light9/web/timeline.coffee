@@ -7,11 +7,15 @@ Polymer
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
+    song: {type: String, notify: true}
+    songTime: {type: Number, notify: true, observer: '_onSongTime'}
   width: ko.observable(1)
   listeners:
     'iron-resize': '_onIronResize'
   _onIronResize: ->
     @width(@offsetWidth)
+  _onSongTime: (t) ->
+    @viewState.cursor.t(t) if @viewState
 
   attached: ->
     @dia = @$.dia
@@ -32,19 +36,16 @@ Polymer
       @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
       @$.adjusters.updateAllCoords()
 
-    animCursor = () => 
-      @viewState.cursor.t = 130 + 20 * Math.sin(Date.now() / 2000)
+    ko.computed =>
+      # zoomInX changing doesn't retrigger this, so I'll do it here
+      ko.toJS(@viewState.zoomSpec)
+      
       @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                        @$.zoomed.$.time.offsetTop,
                        @$.zoomed.$.time.offsetHeight,
                        @fullZoomX, @zoomInX, @viewState.cursor)
 
-      #@viewState.zoomSpec.t1(80 + 10 * Math.sin(Date.now() / 3000))
-      
-    setInterval(animCursor, 50)
-
     @adjs = @makeZoomAdjs().concat(@persistDemo())
-
 
   persistDemo: ->
     ctx = @graph.Uri('http://example.com/')
@@ -129,7 +130,7 @@ Polymer
     zoomInX: { type: Object, notify: true }
 
   
-window.xserial = 0
+
 Polymer
   is: 'light9-timeline-note'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -261,8 +262,8 @@ Polymer
       bot: @querySelector('#cursor3')
     return if !@cursorPath.top
     
-    xZoomedOut = fullZoomX(cursor.t)
-    xZoomedIn = zoomInX(cursor.t)
+    xZoomedOut = fullZoomX(cursor.t())
+    xZoomedIn = zoomInX(cursor.t())
     @cursorPath.top.setAttribute 'd', svgPathFromPoints([
       [xZoomedOut, y1]
       [xZoomedOut, y1 + h1]
