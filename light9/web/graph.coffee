@@ -1,3 +1,5 @@
+log = console.log
+
 # Patch is {addQuads: <quads>, delQuads: <quads>}
 # <quads> is [{subject: s, ...}, ...]
 

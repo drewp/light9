@@ -97,15 +97,18 @@ class window.AdjustableFloatObject extends Adjustable
     #   getValueForPos
 
     super(@config)
-
+    
   _getValue: () ->
-    @config.graph.floatValue(@config.subj, @config.pred)
+    # this is a big speedup- callers use _getValue about 4x as much as
+    # the graph changes and graph.floatValue is slow
+    @_currentValue
 
   getTarget: () ->
     @config.getTargetTransform(@_getValue())
     
   subscribe: (onChange) ->
     @config.graph.subscribe @config.subj, @config.pred, null, (patch) =>
+      @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)
       onChange()
     
   continueDrag: (pos) ->

@@ -38,22 +38,26 @@ Polymer
     ko.computed =>
       @debug = ko.toJSON(@viewState)
 
-    ko.computed =>
-      @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @width()])
-      @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @width()])
-      @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
-      @$.adjusters.updateAllCoords()
+    ko.computed( =>
+        @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @width()])
+        @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @width()])
+        @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
+        @$.adjusters.updateAllCoords()
+      ).extend({rateLimit: 5})
 
-    ko.computed =>
-      # zoomInX changing doesn't retrigger this, so I'll do it here
-      ko.toJS(@viewState.zoomSpec)
-      
-      @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
-                       @$.zoomed.$.time.offsetTop,
-                       @$.zoomed.$.time.offsetHeight,
-                       @fullZoomX, @zoomInX, @viewState.cursor)
-  
-    @adjs = @makeZoomAdjs().concat(@persistDemo())
+    ko.computed( =>
+        # zoomInX changing doesn't retrigger this, so I'll do it here
+        ko.toJS(@viewState.zoomSpec)
+        
+        @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
+                         @$.zoomed.$.time.offsetTop,
+                         @$.zoomed.$.time.offsetHeight,
+                         @fullZoomX, @zoomInX, @viewState.cursor)
+      )
+
+    setTimeout =>
+        @adjs = @makeZoomAdjs().concat(@persistDemo())
+      , 2000
     @trackMouse()
     @bindKeys()
     @bindWheelZoom()
