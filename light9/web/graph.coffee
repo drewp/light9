@@ -64,15 +64,23 @@ class window.SyncedGraph
   # Note that applyPatch is the only method to write to the graph, so
   # it can fire subscriptions.
 
-  constructor: (@patchSenderUrl, prefixes) ->
-    @graph = N3.Store()
-    @_addPrefixes(prefixes)
+  constructor: (@patchSenderUrl, @prefixes) ->
+    @resetStore()
     @_watchers = new GraphWatchers()
     @patchesToSend = []
+
+    @_reconnectionTimeout = null
     @newConnection()
+
+  resetStore: ->
+    if @graph?
+      @_watchers.graphChanged({addQuads: [], delQuads: @graph.find()})
+    @graph = N3.Store()
+    @_addPrefixes(@prefixes)
 
   newConnection: ->
     fullUrl = 'ws://' + window.location.host + @patchSenderUrl
+    @ws.close() if @ws?
     @ws = new WebSocket(fullUrl)
 
     @ws.onopen = =>
@@ -82,9 +90,12 @@ class window.SyncedGraph
 
     @ws.onerror = (e) =>
       log('ws error ' + e)
+      @ws.onclose()
 
     @ws.onclose = =>
       log('ws close')
+      clearTimeout(@_reconnectionTimeout) if @_reconnectionTimeout?
+      @_reconnectionTimeout = setTimeout(@newConnection.bind(@), 1000)
 
     @ws.onmessage = (evt) =>
       if evt.data == 'PONG'
@@ -100,7 +111,7 @@ class window.SyncedGraph
 
   onMessage: (msg) ->
     log('from rdfdb: ', msg)
-    
+      
     patch = {delQuads: [], addQuads: []}
 
     parseAdds = (cb) =>
