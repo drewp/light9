@@ -3,6 +3,13 @@ log = console.log
 # Patch is {addQuads: <quads>, delQuads: <quads>}
 # <quads> is [{subject: s, ...}, ...]
 
+# for mocha
+if require?
+  `window = {}`
+  `N3 = require('./lib/N3.js-1d2d975c10ad3252d38393c3ea97b36fd3ab986a/N3.js')`
+  `RdfDbClient = require('./rdfdbclient.js').RdfDbClient`
+  module.exports = window
+
 # (sloppily shared to rdfdbclient.coffee too)
 window.patchSizeSummary = (patch) ->
   '-' + patch.delQuads.length + ' +' + patch.addQuads.length
@@ -60,8 +67,9 @@ class window.SyncedGraph
     @_watchers = new GraphWatchers()
     @clearGraph()
 
-    @_client = new RdfDbClient(@patchSenderUrl, @clearGraph.bind(@),
-                               @_applyPatch.bind(@), @setStatus)
+    if @patchSenderUrl
+      @_client = new RdfDbClient(@patchSenderUrl, @clearGraph.bind(@),
+                                 @_applyPatch.bind(@), @setStatus)
     
   clearGraph: ->
     log('SyncedGraph clear')

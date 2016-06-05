@@ -1,5 +1,11 @@
 log = console.log
 
+# for mocha
+if require?
+  `window = {}`
+  `N3 = require('./lib/N3.js-1d2d975c10ad3252d38393c3ea97b36fd3ab986a/N3.js')`
+  module.exports = window
+
 
 toJsonPatch = (jsPatch, cb) ->
   out = {patch: {adds: '', deletes: ''}}

@@ -10,6 +10,13 @@ tests_watch:
 tests_coverage:
 	eval env/bin/nosetests --with-coverage --cover-erase --cover-html --cover-html-dir=/tmp/light9-cov/  --cover-package=light9 --cover-branches $(NOSEARGS)
 
+test_js_init:
+	npm install
+
+test_js:
+	coffee -c light9/web/*.coffee
+	node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register --globals window,N3 light9/web/graph_test.coffee
+
 # needed packages: python-gtk2 python-imaging
 
 binexec:
