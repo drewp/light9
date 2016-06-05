@@ -42,9 +42,14 @@
       <label><input type="checkbox"> follow player song choice</label>
     </div>
     <div>[[debug]]</div>
-    <light9-timeline-audio id="audio"></light9-timeline-audio>
+    <light9-timeline-audio id="audio"
+                           graph="{{graph}}"
+                           show="{{show}}"
+                           song="{{song}}"></light9-timeline-audio>
     <light9-timeline-time-zoomed id="zoomed"
                                  graph="{{graph}}"
+                                 song="{{song}}"
+                                 show="{{show}}"
                                  zoom="{{viewState.zoomSpec}}"
                                  zoom-in-x="{{zoomInX}}">
     </light9-timeline-time-zoomed>
@@ -81,6 +86,9 @@
     <div>
       <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
       <light9-timeline-audio id="audio"
+                             graph="{{graph}}"
+                             song="{{song}}"
+                             show="{{show}}"
                              zoom="{{zoomFlattened}}">
       </light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
@@ -98,6 +106,7 @@
        ],
        properties: {
            graph: { type: Object, notify: true },
+           song: { type: String, notify: true },
            zoomInX: { type: Object, notify: true },
            rows: {value: [0]},
            zoom: {type: Object, notify: true, observer: 'onZoom'},

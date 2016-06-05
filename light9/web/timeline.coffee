@@ -8,6 +8,7 @@ Polymer
     debug: {type: String}
     graph: {type: Object, notify: true}
     song: {type: String, notify: true}
+    show: {value: 'http://light9.bigasterisk.com/show/dance2016'}
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
     songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}

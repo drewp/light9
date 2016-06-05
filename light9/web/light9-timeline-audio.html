@@ -21,21 +21,46 @@
      }
     </style>
     <div>
-      <img src="show/dance2016/spectrogram/01-dream.png"
+      <img src="{{imgSrc}}"
            style="width: {{imgWidth}} ; left: {{imgLeft}}">
     </div>
   </template>
   <script>
+   log = console.log
    Polymer({
        is: "light9-timeline-audio",
        properties: {
-           uri: {type: String, notify: true}, // song
+           graph: {type: Object, notify: true, observer: '_imgSrc'},
+           show: {type: String, notify: true, observer: '_imgSrc'},
+           song: {type: String, notify: true, observer: '_imgSrc'}, // song
            zoom: {type: Object, notify: true},
+           imgSrc: { type: String, notify: true},
            imgWidth: { computed: '_imgWidth(zoom)' },
            imgLeft: { computed: '_imgLeft(zoom)' },
        },
        ready: function() {
            this.zoom = {duration: 0};
+       },
+       
+       _imgSrc: function() {
+           try {
+               // Should be subscriptions to root and filename
+               // that get replaced when the song changes.
+               if (this.graph && this.show && !this.subscribed) {
+                   this.subscribed = true;
+                   this.graph.subscribe(this.graph.Uri(this.show), null, null,
+                                        this._imgSrc.bind(this));
+               }
+               
+               var root = this.graph.stringValue(
+                   this.graph.Uri(this.show),
+                   this.graph.Uri(':spectrogramUrlRoot'));
+               var filename = this.graph.stringValue(
+                   this.song, this.graph.Uri(':songFilename'));
+               this.imgSrc = root + '/' + filename.replace('.wav', '.png');
+           } catch(e) {
+               log(e)
+           }
        },
        _imgWidth: function(zoom) {
            if (!zoom.duration) {

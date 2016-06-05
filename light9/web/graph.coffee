@@ -275,19 +275,23 @@ class window.SyncedGraph
   unsubscribe: (subscription) ->
     @_watchers.unsubscribe(subscription)
 
-
-  floatValue: (s, p) ->
+  _singleValue: (s, p) ->
     quads = @graph.findByIRI(s, p)
     switch quads.length
-      when 0 then throw new Error("no value for "+s+" "+p)
+      when 0
+        throw new Error("no value for "+s+" "+p)
       when 1
         obj = quads[0].object
-        return parseFloat(N3.Util.getLiteralValue(obj))
+        return N3.Util.getLiteralValue(obj)
       else
         throw new Error("too many values: " + JSON.stringify(quads))
+
+  floatValue: (s, p) ->
+    parseFloat(@_singleValue(s, p))
     
   stringValue: (s, p) ->
-
+    @_singleValue(s, p)
+    
   uriValue: (s, p) ->
 
   objects: (s, p) ->
