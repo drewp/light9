@@ -73,20 +73,20 @@ Polymer
 
         @$.dia.setMouse(@viewState.mouse.pos())
 
+  latestMouseTime: ->
+    @zoomInX.invert(@viewState.mouse.pos().e(1))
+
   bindWheelZoom: ->
-    # tried d3.zoom but couldn't figure it out
-    zoom = d3.zoom()
-    zoom.filter ->
-      # LMB drag is for selection, but MMB can scroll
-      return !(event.type == 'mousedown' && event.button != 1)
-    zoom.extent([[0, 0], [196, 1]])
-    zoom.translateExtent([[0, 0], [196, 1]])
-    zoom.on 'zoom', (a,b,c) =>
-      xf = d3.event.transform
-      log('zoom', xf)
-      @viewState.zoomSpec.t1(xf.invertX(0))
-      @viewState.zoomSpec.t2(xf.invertX(@viewState.zoomSpec.duration()))
-    d3.select(@$.zoomed).call(zoom)
+    @$.zoomed.addEventListener 'mousewheel', (ev) =>
+      zs = @viewState.zoomSpec
+
+      center = @latestMouseTime()
+      left = center - zs.t1()
+      right = zs.t2() - center
+      scale = Math.pow(1.005, ev.deltaY)
+
+      zs.t1(center - left * scale)
+      zs.t2(center + right * scale)
 
   animatedZoom: (newT1, newT2, secs) ->
     fps = 30
@@ -99,7 +99,6 @@ Polymer
         gotoStep = =>
           @viewState.zoomSpec.t1((1 - frac) * oldT1 + frac * newT1)
           @viewState.zoomSpec.t2((1 - frac) * oldT2 + frac * newT2)
-          console.log('to', frac, @viewState.zoomSpec.t1(), @viewState.zoomSpec.t2())
         delay = frac * secs * 1000
         setTimeout(gotoStep, delay)
         lastTime = delay
@@ -110,9 +109,9 @@ Polymer
     
   bindKeys: ->
     shortcut.add "Ctrl+P", (ev) =>
-      @$.music.seekPlayOrPause(@zoomInX.invert(@viewState.mouse.pos().e(1)))
+      @$.music.seekPlayOrPause(@latestMouseTime())
 
-    zoomAnimSec = .2
+    zoomAnimSec = .1
     shortcut.add "Ctrl+Escape", =>
       @animatedZoom(0, @viewState.zoomSpec.duration(), zoomAnimSec)
     shortcut.add "Shift+Escape", =>
