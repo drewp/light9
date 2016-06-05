@@ -108,7 +108,7 @@
            graph: { type: Object, notify: true },
            song: { type: String, notify: true },
            zoomInX: { type: Object, notify: true },
-           rows: {value: [0]},
+           rows: {value: [0,1,2]},
            zoom: {type: Object, notify: true, observer: 'onZoom'},
            zoomFlattened: {type: Object, notify: true}
        },
@@ -194,8 +194,9 @@
          display: flex;
      }
     </style>
-    <template is="dom-repeat" items="[1]">
+    <template is="dom-repeat" items="{{noteUris}}">
       <light9-timeline-note graph="{{graph}}"
+                            uri="{{item}}"
                             zoom-in-x="{{zoomInX}}">
       </light9-timeline-note>
     </template>

@@ -56,9 +56,8 @@ Polymer
                          @fullZoomX, @zoomInX, @viewState.cursor)
       )
 
-    setTimeout =>
-        @adjs = @makeZoomAdjs().concat(@persistDemo())
-      , 2000
+    @adjs = @makeZoomAdjs().concat(@persistDemo())
+
     @trackMouse()
     @bindKeys()
     @bindWheelZoom()
@@ -132,7 +131,7 @@ Polymer
                       newCenter + visSeconds / 2, zoomAnimSec)
 
   persistDemo: ->
-    ctx = @graph.Uri('http://light9.bigasterisk.com/show/dance2016/song1')
+    ctx = @graph.Uri(@song)
     adjs = []
     for n in [0..7]
       subj = @graph.Uri(':demoResource'+n)
@@ -212,26 +211,53 @@ Polymer
   properties:
     graph: { type: Object, notify: true }
     zoomInX: { type: Object, notify: true }
-
+    noteUris: { type: Array, notify: true }
+  ready: ->
+    @noteUris = []
+    @push('noteUris', 'http://light9.bigasterisk.com/show/dance2016/song1/n1')
   
 
 Polymer
   is: 'light9-timeline-note'
   behaviors: [ Polymer.IronResizableBehavior ]
-  listeners: 'iron-resize': '_onIronResize'
+  listeners: 'iron-resize': 'update'
   properties:
     graph: { type: Object, notify: true }
-    zoomInX: { type: Object, notify: true, observer: '_onIronResize' }
+    uri: { type: String, notify: true }
+    zoomInX: { type: Object, notify: true, observer: 'update' }
+  observers: [
+    'onUri(graph, uri)'
+    ]
   ready: ->
-    @graph.subscribe("http://light9.bigasterisk.com/demoResource6", null, null, @_onIronResize.bind(@))
-  _onIronResize: ->
+
+  onUri: ->
+    @graph.subscribe(@uri, null, null, @update.bind(@))
+    
+  update: ->
+    # update our note DOM and SVG elements based on the graph
+    U = (x) -> @graph.Uri(x)
     return if !@zoomInX
     try
-      subj = "http://light9.bigasterisk.com/demoResource6"
-      setNote(subj,
-              @zoomInX(@graph.floatValue(subj, @graph.Uri(':startTime'))),
-              @zoomInX(@graph.floatValue(subj, @graph.Uri(':endTime'))),
-              @offsetTop, @offsetTop + @offsetHeight)
+
+      worldPts = [] # (song time, value)
+
+      originTime = @graph.floatValue(@uri, U(':originTime'))
+      for curve in @graph.objects(@uri, U(':curve'))
+        if @graph.uriValue(curve, U(':attr')) == U(':strength')
+          
+          for pt in @graph.objects(curve, U(':point'))
+
+            worldPts.push($V([
+              originTime + @graph.floatValue(pt, U(':time')),
+              @graph.floatValue(pt, U(':value'))
+              ]))
+      worldPts.sort((a,b) -> a.e(1) > b.e(1))
+
+      screenPos = (pt) =>
+        $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
+
+      setNote(@uri, (screenPos(pt) for pt in worldPts))
+
     catch e
       log('during resize, ', e)
 
@@ -272,9 +298,10 @@ Polymer
       @spanClass = if @adj.config.emptyBox then 'empty' else ''
       @displayValue = @adj.getDisplayValue()
       center = @adj.getCenter()
+      target = @adj.getTarget()
+      return if isNaN(center.e(1))
       @centerStyle = {x: center.e(1), y: center.e(2)}
-      @dia?.setAdjusterConnector(@myId, @adj.getCenter(),
-                                @adj.getTarget())
+      @dia?.setAdjusterConnector(@myId, center, target)
         
   attached: ->
     @myId = 'adjuster-' + _adjusterSerial
@@ -332,15 +359,9 @@ Polymer
         elem.setAttribute(k, v)
     return elem
     
-  setNote: (uri, x1, x2, y1, y2) ->
+  setNote: (uri, curvePts) ->
     elem = @getOrCreateElem(uri, 'notes', 'path', {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
-    d = svgPathFromPoints([
-      [x1, y2]
-      [x1 * .75 + x2 * .25, y1]
-      [x1 * .25 + x2 * .75, y1]
-      [x2, y2]
-    ])
-    elem.setAttribute('d', d)
+    elem.setAttribute('d', svgPathFromPoints(curvePts))
 
   setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
     @cursorPath =
