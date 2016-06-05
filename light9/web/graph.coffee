@@ -289,19 +289,22 @@ class window.SyncedGraph
         throw new Error("no value for "+s+" "+p)
       when 1
         obj = quads[0].object
-        return N3.Util.getLiteralValue(obj)
+        return obj
       else
         throw new Error("too many values: " + JSON.stringify(quads))
 
   floatValue: (s, p) ->
-    parseFloat(@_singleValue(s, p))
+    parseFloat(N3.Util.getLiteralValue(@_singleValue(s, p)))
     
   stringValue: (s, p) ->
-    @_singleValue(s, p)
+    N3.Util.getLiteralValue(@_singleValue(s, p))
     
   uriValue: (s, p) ->
+    @_singleValue(s, p)
 
   objects: (s, p) ->
+    quads = @graph.findByIRI(s, p)
+    return (q.object for q in quads)
 
   subjects: (p, o) ->
 
