@@ -17,9 +17,15 @@ class GraphWatchers
     if not @handlersSp[s][p]
       @handlersSp[s][p] = []
     @handlersSp[s][p].push(onChange)
+    handle = {s: s, p: p, func: onChange}
+    return handle
     
   unsubscribe: (subscription) ->
-    throw Error('not implemented')
+    spList = @handlersSp[subscription.s][subscription.p]
+    i = spList.indexOf(subscription.func)
+    if i == -1
+      throw new Error('subscription not found')
+    spList.splice(i, 1)
 
   matchingHandlers: (quad) ->
     matches = []
@@ -267,10 +273,11 @@ class window.SyncedGraph
     # onChange is called with a patch that's limited to the quads
     # that match your request.
     # We call you immediately on existing triples.
-    @_watchers.subscribe(s, p, o, onChange)
+    handle = @_watchers.subscribe(s, p, o, onChange)
     immediatePatch = {delQuads: [], addQuads: @graph.findByIRI(s, p, o)}
     if immediatePatch.addQuads.length
       onChange(immediatePatch)
+    return handle
 
   unsubscribe: (subscription) ->
     @_watchers.unsubscribe(subscription)
