@@ -330,14 +330,13 @@ class Db(object):
             g.add(s)
         return g
 
-    def addClient(self, updateUri, label):
+    def addClient(self, newClient):
         [self.clients.remove(c)
-         for c in self.clients if c.updateUri == updateUri]
+         for c in self.clients if c.updateUri == newClient.updateUri]
 
-        log.info("new client %s at %s" % (label, updateUri))
-        c = Client(updateUri, label)
-        c.sendAll(self.graph)
-        self.clients.append(c)
+        log.info("new client %s at %s" % (newClient.label, newClient.updateUri))
+        newClient.sendAll(self.graph)
+        self.clients.append(newClient)
         self.sendClientsToAllLivePages()
 
     def sendClientsToAllLivePages(self):
@@ -371,7 +370,7 @@ class GraphClients(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
         upd = self.get_argument("clientUpdate")
         try:
-            self.settings.db.addClient(upd, self.get_argument("label"))
+            self.settings.db.addClient(Client(upd, self.get_argument("label")))
         except:
             import traceback
             traceback.print_exc()
