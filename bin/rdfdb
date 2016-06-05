@@ -417,6 +417,9 @@ class WebsocketClient(cyclone.websocket.WebSocketHandler):
             Failure(WebsocketDisconnect(reason)), self.wsClient)
 
     def messageReceived(self, message):
+        if message == 'PING':
+            self.sendMessage('PONG')
+            return
         log.info("got message from %r: %s", self.wsClient, message)
         p = Patch(jsonRepr=message)
         p.senderUpdateUri = self.wsClient.updateUri

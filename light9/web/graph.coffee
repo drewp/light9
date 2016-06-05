@@ -77,6 +77,8 @@ class window.SyncedGraph
 
     @ws.onopen = =>
       log('connected to', fullUrl)
+      @resetStore()
+      @pingLoop()
 
     @ws.onerror = (e) =>
       log('ws error ' + e)
@@ -85,7 +87,16 @@ class window.SyncedGraph
       log('ws close')
 
     @ws.onmessage = (evt) =>
+      if evt.data == 'PONG'
+        return
       @onMessage(JSON.parse(evt.data))
+
+  pingLoop: () ->
+    if @ws.readyState == @ws.OPEN
+      @ws.send('PING')
+      
+      clearTimeout(@_pingLoopTimeout) if @_pingLoopTimeout?
+      @_pingLoopTimeout = setTimeout(@pingLoop.bind(@), 10000)
 
   onMessage: (msg) ->
     log('from rdfdb: ', msg)
