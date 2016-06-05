@@ -3,20 +3,29 @@
 <dom-module id="rdfdb-synced-graph">
   <template>
     <style>
+     span {
+         display: inline-block;
+         border: 1px solid gray;
+         width: 18em;
+         background: #05335a;
+         color: #4fc1d4;
+     }
     </style>
+    <span>[[status]]</span>
   </template>
   <script src="graph.js"></script>
   <script>
    Polymer({
        is: "rdfdb-synced-graph",
        properties: {
-           graph: {type: Object, notify: true}
+           graph: {type: Object, notify: true},
+           status: {type: String, notify: true}
        },
        ready: function() {
            this.graph = new SyncedGraph('/rdfdb/syncedGraph', {
                '': 'http://light9.bigasterisk.com/',
                'xsd': 'http://www.w3.org/2001/XMLSchema#',
-           });
+           }, function(s) { this.status = s; }.bind(this));
            window.graph = this.graph;
        }
    });

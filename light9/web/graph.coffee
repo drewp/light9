@@ -84,15 +84,34 @@ parseJsonPatch = (jsonPatch, cb) ->
 
 class RdfDbClient
   # Send and receive patches from rdfdb
-  constructor: (@patchSenderUrl, @clearGraph, @applyPatch) ->
+  constructor: (@patchSenderUrl, @clearGraph, @applyPatch, @setStatus) ->
     @_patchesToSend = []
+    @_lastPingMs = -1
+    @_patchesReceived = 0
+    @_patchesSent = 0
 
     @_reconnectionTimeout = null
     @_newConnection()
 
+  _updateStatus: ->
+    ws = (if not @ws? then 'no' else switch @ws.readyState
+      when @ws.CONNECTING then 'connecting'
+      when @ws.OPEN then 'open'
+      when @ws.CLOSING then 'closing'
+      when @ws.CLOSED then 'close'
+      )
+
+    ping = if @_lastPingMs > 0 then @_lastPingMs else '...'
+    @setStatus("#{ws};
+      #{@_patchesReceived} recv
+      #{@_patchesSent} sent
+      #{@_patchesToSend.length} pending;
+      #{ping}ms")
+ 
   sendPatch: (patch) ->
     console.log('queue patch to server ', patchSizeSummary(patch))
     @_patchesToSend.push(patch)
+    @_updateStatus()
     @_continueSending()           
 
   _newConnection: ->
@@ -102,6 +121,7 @@ class RdfDbClient
 
     @ws.onopen = =>
       log('connected to', fullUrl)
+      @_updateStatus()
       @clearGraph()
       @_pingLoop()
 
@@ -111,6 +131,7 @@ class RdfDbClient
 
     @ws.onclose = =>
       log('ws close')
+      @_updateStatus()
       clearTimeout(@_reconnectionTimeout) if @_reconnectionTimeout?
       @_reconnectionTimeout = setTimeout(@_newConnection.bind(@), 1000)
 
@@ -119,6 +140,7 @@ class RdfDbClient
   _pingLoop: () ->
     if @ws.readyState == @ws.OPEN
       @ws.send('PING')
+      @_lastPingMs = -Date.now()
       
       clearTimeout(@_pingLoopTimeout) if @_pingLoopTimeout?
       @_pingLoopTimeout = setTimeout(@_pingLoop.bind(@), 10000)
@@ -126,8 +148,12 @@ class RdfDbClient
   _onMessage: (evt) ->
     msg = evt.data
     if msg == 'PONG'
+      @_lastPingMs = Date.now() + @_lastPingMs
+      @_updateStatus()
       return
     parseJsonPatch(msg, @applyPatch.bind(@))
+    @_patchesReceived++
+    @_updateStatus()
 
   _continueSending: ->
     if @ws.readyState != @ws.OPEN
@@ -141,11 +167,14 @@ class RdfDbClient
         toJsonPatch(patch, (json) =>
           log('send patch to server, ' + json.length + ' bytes')
           @ws.send(json)
+          @_patchesSent++
+          @_updateStatus()
           cb(null)
       )
 
     async.eachSeries(@_patchesToSend, sendOne, () =>
         @_patchesToSend = []
+        @_updateStatus()
       )
 
 class window.SyncedGraph
@@ -156,14 +185,14 @@ class window.SyncedGraph
   # Note that _applyPatch is the only method to write to the graph, so
   # it can fire subscriptions.
 
-  constructor: (@patchSenderUrl, @prefixes) ->
+  constructor: (@patchSenderUrl, @prefixes, @setStatus) ->
     # patchSenderUrl is the /syncedGraph path of an rdfdb server.
     # prefixes can be used in Uri(curie) calls.
     @_watchers = new GraphWatchers()
     @clearGraph()
 
     @_client = new RdfDbClient(@patchSenderUrl, @clearGraph.bind(@),
-                               @_applyPatch.bind(@))
+                               @_applyPatch.bind(@), @setStatus)
     
   clearGraph: ->
     log('SyncedGraph clear')
