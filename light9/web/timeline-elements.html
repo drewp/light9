@@ -42,16 +42,17 @@
       <label><input type="checkbox"> follow player song choice</label>
     </div>
     <div>[[debug]]</div>
-    <!--
-         Old zoom menu:
-         See current time .. esc
-         See from current time -> end .. shift+esc
-         Zoom all .. ctrl+esc
-       -->
     <light9-timeline-audio id="audio"></light9-timeline-audio>
-    <light9-timeline-time-zoomed id="zoomed" graph="{{graph}}" zoom="{{viewState.zoomSpec}}" zoom-in-x="{{zoomInX}}"></light9-timeline-time-zoomed>
+    <light9-timeline-time-zoomed id="zoomed"
+                                 graph="{{graph}}"
+                                 zoom="{{viewState.zoomSpec}}"
+                                 zoom-in-x="{{zoomInX}}">
+    </light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
-    <light9-timeline-adjusters id="adjusters" dia="{{dia}}" adjs="{{adjs}}"></light9-timeline-adjusters>
+    <light9-timeline-adjusters id="adjusters"
+                               dia="{{dia}}"
+                               adjs="{{adjs}}">
+    </light9-timeline-adjusters>
   </template>
  
 </dom-module>
@@ -79,9 +80,13 @@
     </style>
     <div>
       <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
-      <light9-timeline-audio id="audio" zoom="{{zoomFlattened}}"></light9-timeline-audio>
+      <light9-timeline-audio id="audio"
+                             zoom="{{zoomFlattened}}">
+      </light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
-        <light9-timeline-graph-row graph="{{graph}}" zoom-in-x="{{zoomInX}}"></light9-timeline-graph-row>
+        <light9-timeline-graph-row graph="{{graph}}"
+                                   zoom-in-x="{{zoomInX}}">
+        </light9-timeline-graph-row>
       </template>
     </div>
   </template>
@@ -181,7 +186,9 @@
      }
     </style>
     <template is="dom-repeat" items="[1]">
-      <light9-timeline-note graph="{{graph}}" zoom-in-x="{{zoomInX}}"></light9-timeline-note>
+      <light9-timeline-note graph="{{graph}}"
+                            zoom-in-x="{{zoomInX}}">
+      </light9-timeline-note>
     </template>
   </template>
 </dom-module>
@@ -218,7 +225,8 @@
 
     </style>
     <template is="dom-repeat" items="{{adjs}}">
-      <light9-timeline-adjuster dia="{{dia}}" adj="{{item}}"></light9-timeline-adjuster>
+      <light9-timeline-adjuster dia="{{dia}}"
+                                adj="{{item}}"></light9-timeline-adjuster>
     </template>
   </template>
 </dom-module>
