@@ -3,6 +3,9 @@ log = console.log
 # Patch is {addQuads: <quads>, delQuads: <quads>}
 # <quads> is [{subject: s, ...}, ...]
 
+patchSizeSummary = (patch) ->
+  '-' + patch.delQuads.length + ' +' + patch.addQuads.length
+
 # partial port of autodepgraphapi.py
 class GraphWatchers
   constructor: ->
@@ -36,6 +39,27 @@ class GraphWatchers
         cb({delQuads: [], addQuads: [quad]})
 
 
+jsonPatch = (jsPatch, cb) ->
+  out = {patch: {adds: '', deletes: ''}}
+
+  writeDels = (cb) ->
+    writer = N3.Writer({ format: 'N-Quads' })
+    writer.addTriples(jsPatch.delQuads)
+    writer.end((err, result) ->
+      out.patch.deletes = result
+      cb())
+
+  writeAdds = (cb) ->
+    writer = N3.Writer({ format: 'N-Quads' })
+    writer.addTriples(jsPatch.addQuads)
+    writer.end((err, result) ->
+      out.patch.adds = result
+      cb())
+    
+  async.parallel([writeDels, writeAdds], (err) ->
+      cb(JSON.stringify(out))
+    )
+
 class window.SyncedGraph
   # Note that applyPatch is the only method to write to the graph, so
   # it can fire subscriptions.
@@ -44,6 +68,7 @@ class window.SyncedGraph
     @graph = N3.Store()
     @_addPrefixes(prefixes)
     @_watchers = new GraphWatchers()
+    @patchesToSend = []
     @newConnection()
 
   newConnection: ->
@@ -83,6 +108,26 @@ class window.SyncedGraph
                       cb()
       
     async.parallel([parseAdds, parseDels], ((err) => @applyPatch(patch)))
+
+  _continueSending: ->
+    if @ws.readyState != @ws.OPEN
+      setTimeout(@_continueSending.bind(@), 500)
+      return
+
+    # we could call this less often and coalesce patches together to optimize
+    # the dragging cases.
+
+    sendOne = (patch, cb) =>
+        jsonPatch(patch, (json) =>
+          log('send patch to server, ' + json.length + ' bytes')
+          @ws.send(json)
+          cb(null)
+      )
+
+    async.eachSeries(@patchesToSend, sendOne, () =>
+        @patchesToSend = []
+      )
+    
       
   _addPrefixes: (prefixes) ->
     @graph.addPrefixes(prefixes)
@@ -92,6 +137,10 @@ class window.SyncedGraph
 
   Literal: (jsValue) ->
     N3.Util.createLiteral(jsValue)
+
+  LiteralRoundedFloat: (f) ->
+    N3.Util.createLiteral(d3.format(".3f")(f),
+                          "http://www.w3.org/2001/XMLSchema#decimal")
 
   toJs: (literal) ->
     # incomplete
@@ -113,10 +162,9 @@ class window.SyncedGraph
 
   applyAndSendPatch: (patch, cb) ->
     @applyPatch(patch)
-    console.log('patch to server:')
-    console.log('  delete:', JSON.stringify(patch.delQuads))
-    console.log('  add:', JSON.stringify(patch.addQuads))
-    # post to server
+    console.log('queue patch to server ', patchSizeSummary(patch))
+    @patchesToSend.push(patch)
+    @_continueSending()
 
   applyPatch: (patch) ->
     # In most cases you want applyAndSendPatch.
@@ -126,7 +174,7 @@ class window.SyncedGraph
       @graph.removeTriple(quad)
     for quad in patch.addQuads
       @graph.addTriple(quad)
-    log('applied patch -' + patch.delQuads.length + ' +' + patch.addQuads.length)
+    log('applied patch locally', patchSizeSummary(patch))
     @_watchers.graphChanged(patch)
 
   getObjectPatch: (s, p, newObject, g) ->

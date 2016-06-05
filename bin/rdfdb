@@ -417,9 +417,10 @@ class WebsocketClient(cyclone.websocket.WebSocketHandler):
             Failure(WebsocketDisconnect(reason)), self.wsClient)
 
     def messageReceived(self, message):
-        log.info("got message from %s: %s", self.connectionId, message)
-        # how
-        self.sendMessage(message)
+        log.info("got message from %r: %s", self.wsClient, message)
+        p = Patch(jsonRepr=message)
+        p.senderUpdateUri = self.wsClient.updateUri
+        self.settings.db.patch(p)
 
 liveClients = set()
 def sendToLiveClients(d=None, asJson=None):

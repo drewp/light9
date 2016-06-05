@@ -29,21 +29,18 @@ class Adjustable
   subscribe: (onChange) ->
     # change could be displayValue or center or target. This likely
     # calls onChange right away if there's any data yet.
-    setInterval((() => onChange()), 100)
+    throw new Error('not implemented')
 
   startDrag: () ->
-    # todo
-    @dragStartValue = @_getValue()
+    # override
 
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
-    
-    # todo
-    newValue = @dragStartValue + pos.e(0) * .1
-    graph.patchObject(@_subj, @_pred, graph.Literal(newValue), @_ctx)
 
+    # override
+    
   endDrag: () ->
-    0
+    # override
 
   _editorCoordinates: () -> # vec2 of mouse relative to <l9-t-editor>
     ev = d3.event.sourceEvent
@@ -115,4 +112,6 @@ class window.AdjustableFloatObject extends Adjustable
     # pos is vec2 of pixels relative to the drag start
     
     newValue = @config.getValueForPos(@_editorCoordinates())
-    @config.graph.patchObject(@config.subj, @config.pred, @config.graph.Literal(newValue), @_ctx)
+    @config.graph.patchObject(@config.subj, @config.pred,
+                              @config.graph.LiteralRoundedFloat(newValue),
+                              @config.ctx)
