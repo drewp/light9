@@ -404,15 +404,15 @@ class WebsocketClient(cyclone.websocket.WebSocketHandler):
 
     def connectionMade(self, *args, **kwargs):
         global _wsClientSerial
-        self.connectionId = 'connection-%s' % _wsClientSerial
-        log.info("new ws client %r", self.connectionId)
+        connectionId = 'connection-%s' % _wsClientSerial
         _wsClientSerial += 1
 
-        self.wsClient = WsClient(self.connectionId, self.sendMessage)
+        self.wsClient = WsClient(connectionId, self.sendMessage)
+        log.info("new ws client %r", self.wsClient)
         self.settings.db.addClient(self.wsClient)
 
     def connectionLost(self, reason):
-        log.info("bye ws client %r", self.connectionId)
+        log.info("bye ws client %r", self.wsClient)
         self.settings.db.clientErrored(
             Failure(WebsocketDisconnect(reason)), self.wsClient)
 
