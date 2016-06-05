@@ -3,6 +3,8 @@ function SyncedGraph(label) {
       like python SyncedGraph but talks over a websocket to
       rdfdb. This one has an API more conducive to reading and
       querying.
+
+      light9/web/graph.coffee is the newer attempt
     */
     var self = this;
 

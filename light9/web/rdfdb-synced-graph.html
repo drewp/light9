@@ -13,23 +13,11 @@
            graph: {type: Object, notify: true}
        },
        ready: function() {
-           this.graph = new SyncedGraph('noServerYet', {
+           this.graph = new SyncedGraph('/rdfdb/syncedGraph', {
                '': 'http://light9.bigasterisk.com/',
                'xsd': 'http://www.w3.org/2001/XMLSchema#',
            });
-           this.graph.loadTrig(
-               '          @prefix : <http://light9.bigasterisk.com/> .'+
-               '          @prefix dev: <http://light9.bigasterisk.com/device/> .'+
-               '          <http://example.com/> {'+
-               '            :demoResource0 :startTime 1; :endTime 120 .'+
-               '            :demoResource1 :startTime 13; :endTime 16 .'+
-               '            :demoResource2 :startTime 38; :endTime 60 .'+
-               '            :demoResource3 :startTime 56; :endTime 60 .'+
-               '            :demoResource4 :startTime 73; :endTime 74 .'+
-               '            :demoResource5 :startTime 91; :endTime 105 .'+
-               '            :demoResource6 :startTime 110; :endTime 120 .'+
-               '            :demoResource7 :startTime 133; :endTime 140 .'+
-               '          }');
+           window.graph = this.graph;
        }
    });
   </script>

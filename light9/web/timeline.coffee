@@ -131,7 +131,7 @@ Polymer
                       newCenter + visSeconds / 2, zoomAnimSec)
 
   persistDemo: ->
-    ctx = @graph.Uri('http://example.com/')
+    ctx = @graph.Uri('http://light9.bigasterisk.com/show/dance2016/song1')
     adjs = []
     for n in [0..7]
       subj = @graph.Uri(':demoResource'+n)
@@ -225,11 +225,14 @@ Polymer
     @graph.subscribe("http://light9.bigasterisk.com/demoResource6", null, null, @_onIronResize.bind(@))
   _onIronResize: ->
     return if !@zoomInX
-    subj = "http://light9.bigasterisk.com/demoResource6"
-    setNote(subj,
-            @zoomInX(@graph.floatValue(subj, @graph.Uri(':startTime'))),
-            @zoomInX(@graph.floatValue(subj, @graph.Uri(':endTime'))),
-            @offsetTop, @offsetTop + @offsetHeight)
+    try
+      subj = "http://light9.bigasterisk.com/demoResource6"
+      setNote(subj,
+              @zoomInX(@graph.floatValue(subj, @graph.Uri(':startTime'))),
+              @zoomInX(@graph.floatValue(subj, @graph.Uri(':endTime'))),
+              @offsetTop, @offsetTop + @offsetHeight)
+    catch e
+      log('during resize, ', e)
 
 Polymer
   is: "light9-timeline-adjusters"

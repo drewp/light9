@@ -40,11 +40,50 @@ class window.SyncedGraph
   # Note that applyPatch is the only method to write to the graph, so
   # it can fire subscriptions.
 
-  constructor: (patchSenderUrl, prefixes) ->
+  constructor: (@patchSenderUrl, prefixes) ->
     @graph = N3.Store()
     @_addPrefixes(prefixes)
     @_watchers = new GraphWatchers()
+    @newConnection()
 
+  newConnection: ->
+    fullUrl = 'ws://' + window.location.host + @patchSenderUrl
+    @ws = new WebSocket(fullUrl)
+
+    @ws.onopen = =>
+      log('connected to', fullUrl)
+
+    @ws.onerror = (e) =>
+      log('ws error ' + e)
+
+    @ws.onclose = =>
+      log('ws close')
+
+    @ws.onmessage = (evt) =>
+      @onMessage(JSON.parse(evt.data))
+
+  onMessage: (msg) ->
+    log('from rdfdb: ', msg)
+    
+    patch = {delQuads: [], addQuads: []}
+
+    parseAdds = (cb) =>
+      parser = N3.Parser()
+      parser.parse msg.patch.adds, (error, quad, prefixes) =>
+                    if (quad)
+                      patch.addQuads.push(quad)
+                    else
+                      cb()
+    parseDels = (cb) =>
+      parser = N3.Parser()
+      parser.parse msg.patch.deletes, (error, quad, prefixes) =>
+                    if (quad)
+                      patch.delQuads.push(quad)
+                    else
+                      cb()
+      
+    async.parallel([parseAdds, parseDels], ((err) => @applyPatch(patch)))
+      
   _addPrefixes: (prefixes) ->
     @graph.addPrefixes(prefixes)
         
@@ -87,6 +126,7 @@ class window.SyncedGraph
       @graph.removeTriple(quad)
     for quad in patch.addQuads
       @graph.addTriple(quad)
+    log('applied patch -' + patch.delQuads.length + ' +' + patch.addQuads.length)
     @_watchers.graphChanged(patch)
 
   getObjectPatch: (s, p, newObject, g) ->

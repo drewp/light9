@@ -1,0 +1,11 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+
+  :demoResource0 :startTime 1; :endTime 120.3 .
+  :demoResource1 :startTime 13; :endTime 16 .
+  :demoResource2 :startTime 38; :endTime 60 .
+  :demoResource3 :startTime 56; :endTime 60 .
+  :demoResource4 :startTime 73; :endTime 74 .
+  :demoResource5 :startTime 91.88; :endTime 105 .
+  :demoResource6 :startTime 110; :endTime 120 .
+  :demoResource7 :startTime 133; :endTime 140 .

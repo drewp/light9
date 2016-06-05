@@ -1,5 +1,5 @@
 {
-  "name": "3rd-party polymer elements",
+  "name": "3rd-party libs",
   "dependencies": {
     "polymer": "~1.4.0",
     "paper-slider": "PolymerElements/paper-slider#~1.0.11",
@@ -14,7 +14,8 @@
     "rdflib.js": "https://github.com/linkeddata/rdflib.js.git#920e59fe37",
     "rdfstore": "https://github.com/antoniogarrote/rdfstore-js.git#b3f7c0c9c1da9b26261af0d4858722fa982411bb",
     "N3.js": "https://github.com/RubenVerborgh/N3.js.git#04f4e21f4ccb351587dc00a3f26340b28d4bb10f",
-    "shortcut": "http://www.openjs.com/scripts/events/keyboard_shortcuts/shortcut.js"
+    "shortcut": "http://www.openjs.com/scripts/events/keyboard_shortcuts/shortcut.js",
+    "async": "https://github.com/caolan/async.git#^1.5.2"
   },
   "resolutions": {
     "paper-styles": "^1.1.4",
