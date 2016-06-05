@@ -129,6 +129,15 @@ log.setLevel(logging.DEBUG)
 
 from lib.cycloneerr import PrettyErrorHandler
 
+def sendGraphToClient(graph, client):
+    """send the client the whole graph contents"""
+    log.info("sending all graphs to %s at %s" %
+             (client.label, client.updateUri))
+    client.sendPatch(Patch(
+        addQuads=graph.quads(ALLSTMTS),
+        delQuads=[]))
+    
+
 class Client(object):
     """
     one of our syncedgraph clients
@@ -139,14 +148,6 @@ class Client(object):
 
     def __repr__(self):
         return "<%s client at %s>" % (self.label, self.updateUri)
-
-    def sendAll(self, graph):
-        """send the client the whole graph contents"""
-        log.info("sending all graphs to %s at %s" %
-                 (self.label, self.updateUri))
-        self.sendPatch(Patch(
-            addQuads=graph.quads(ALLSTMTS),
-            delQuads=[]))
 
     def sendPatch(self, p):
         return sendPatch(self.updateUri, p)
@@ -335,7 +336,7 @@ class Db(object):
          for c in self.clients if c.updateUri == newClient.updateUri]
 
         log.info("new client %s at %s" % (newClient.label, newClient.updateUri))
-        newClient.sendAll(self.graph)
+        sendGraphToClient(self.graph, newClient)
         self.clients.append(newClient)
         self.sendClientsToAllLivePages()
 
