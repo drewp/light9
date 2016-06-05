@@ -1,11 +1,30 @@
-@prefix : <http://light9.bigasterisk.com/> .
-@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-  :demoResource0 :startTime 1; :endTime 120.3 .
-  :demoResource1 :startTime 13; :endTime 16 .
-  :demoResource2 :startTime 38; :endTime 60 .
-  :demoResource3 :startTime 56; :endTime 60 .
-  :demoResource4 :startTime 73; :endTime 74 .
-  :demoResource5 :startTime 91.88; :endTime 105 .
-  :demoResource6 :startTime 110; :endTime 120 .
-  :demoResource7 :startTime 133; :endTime 140 .
+ns1:demoResource0 ns1:endTime 120.3 ;
+    ns1:startTime 1 .
+
+ns1:demoResource1 ns1:endTime 16 ;
+    ns1:startTime 13 .
+
+ns1:demoResource2 ns1:endTime 60 ;
+    ns1:startTime 38 .
+
+ns1:demoResource3 ns1:endTime 60 ;
+    ns1:startTime 56 .
+
+ns1:demoResource4 ns1:endTime 74 ;
+    ns1:startTime 73 .
+
+ns1:demoResource5 ns1:endTime 105 ;
+    ns1:startTime 84.14396887159533 .
+
+ns1:demoResource6 ns1:endTime 120 ;
+    ns1:startTime 110 .
+
+ns1:demoResource7 ns1:endTime 140 ;
+    ns1:startTime 133 .
+
