@@ -133,21 +133,19 @@ class Client(object):
     """
     one of our syncedgraph clients
     """
-    def __init__(self, updateUri, label, db):
-        self.db = db
+    def __init__(self, updateUri, label):
         self.label = label
         self.updateUri = updateUri
-        self.sendAll()
 
     def __repr__(self):
         return "<%s client at %s>" % (self.label, self.updateUri)
 
-    def sendAll(self):
+    def sendAll(self, graph):
         """send the client the whole graph contents"""
         log.info("sending all graphs to %s at %s" %
                  (self.label, self.updateUri))
         self.sendPatch(Patch(
-            addQuads=self.db.graph.quads(ALLSTMTS),
+            addQuads=graph.quads(ALLSTMTS),
             delQuads=[]))
 
     def sendPatch(self, p):
@@ -337,7 +335,9 @@ class Db(object):
          for c in self.clients if c.updateUri == updateUri]
 
         log.info("new client %s at %s" % (label, updateUri))
-        self.clients.append(Client(updateUri, label, self))
+        c = Client(updateUri, label)
+        c.sendAll(self.graph)
+        self.clients.append(c)
         self.sendClientsToAllLivePages()
 
     def sendClientsToAllLivePages(self):
