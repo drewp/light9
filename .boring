@@ -147,6 +147,7 @@
 ^show/dance2014/music
 ^stagesim/three.js-master
 ^tkdnd
+^node_modules
 
 # temporary!
 rgbled/build-nano328/

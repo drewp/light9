@@ -7,15 +7,20 @@ log = console.log
 if require?
   `window = {}`
   `N3 = require('./lib/N3.js-1d2d975c10ad3252d38393c3ea97b36fd3ab986a/N3.js')`
+  `d3 = require('./lib/d3/build/d3.min.js')`
   `RdfDbClient = require('./rdfdbclient.js').RdfDbClient`
   module.exports = window
 
-# (sloppily shared to rdfdbclient.coffee too)
-window.patchSizeSummary = (patch) ->
+RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
+
+patchSizeSummary = (patch) ->
   '-' + patch.delQuads.length + ' +' + patch.addQuads.length
 
+# (sloppily shared to rdfdbclient.coffee too)
+window.patchSizeSummary = patchSizeSummary
+
 # partial port of autodepgraphapi.py
-class GraphWatchers
+class GraphWatchers # throw this one away; use AutoDependencies
   constructor: ->
     @handlersSp = {} # {s: {p: [handlers]}}
   subscribe: (s, p, o, onChange) -> # return subscription handle
@@ -52,6 +57,49 @@ class GraphWatchers
       for cb in @matchingHandlers(quad)
         cb({delQuads: [], addQuads: [quad]})
 
+class Handler
+  # a function and the quad patterns it cared about
+  constructor: (@func) ->
+    patterns = [] # s,p,o,g quads that should trigger the next run
+  
+class AutoDependencies
+  constructor: () ->
+    @handlers = [] # all known Handlers (at least those with non-empty patterns)
+    @handlerStack = [] # currently running
+    
+  runHandler: (func) ->
+    # what if we have this func already? duplicate is safe?
+    
+    h = new Handler(func)
+    @handlers.push(h)
+    @_rerunHandler(h)
+    
+  _rerunHandler: (handler) ->
+    handler.patterns = []
+    @handlerStack.push(handler)
+    try
+      handler.func()
+    catch e
+      log('error running handler: ', e)
+      # assuming here it didn't get to do all its queries, we could
+      # add a *,*,*,* handler to call for sure the next time?
+    finally
+      #log('done. got: ', handler.patterns)
+      @handlerStack.pop()
+    # handler might have no watches, in which case we could forget about it
+    
+  graphChanged: (patch) ->
+    # SyncedGraph is telling us this patch just got applied to the graph.
+    for h in @handlers
+      @_rerunHandler(h)
+
+  askedFor: (s, p, o, g) ->
+    # SyncedGraph is telling us someone did a query that depended on
+    # quads in the given pattern.
+    current = @handlerStack[@handlerStack.length - 1]
+    if current?
+      current.patterns.push([s, p, o, g])
+      #log('push', s,p,o,g)
 
 class window.SyncedGraph
   # Main graph object for a browser to use. Syncs both ways with
@@ -64,15 +112,16 @@ class window.SyncedGraph
   constructor: (@patchSenderUrl, @prefixes, @setStatus) ->
     # patchSenderUrl is the /syncedGraph path of an rdfdb server.
     # prefixes can be used in Uri(curie) calls.
-    @_watchers = new GraphWatchers()
+    @_watchers = new GraphWatchers() # old
+    @_autoDeps = new AutoDependencies() # replaces GraphWatchers
     @clearGraph()
 
     if @patchSenderUrl
       @_client = new RdfDbClient(@patchSenderUrl, @clearGraph.bind(@),
                                  @_applyPatch.bind(@), @setStatus)
     
-  clearGraph: ->
-    log('SyncedGraph clear')
+  clearGraph: -> # for debugging
+    # just deletes the statements; watchers are unaffected.
     if @graph?
       @_applyPatch({addQuads: [], delQuads: @graph.find()})
 
@@ -112,9 +161,9 @@ class window.SyncedGraph
   quads: () -> # for debugging
     [q.subject, q.predicate, q.object, q.graph] for q in @graph.find()
 
-  applyAndSendPatch: (patch, cb) ->
+  applyAndSendPatch: (patch) ->
     @_applyPatch(patch)
-    @_client.sendPatch(patch)
+    @_client.sendPatch(patch) if @_client
 
   _applyPatch: (patch) ->
     # In most cases you want applyAndSendPatch.
@@ -124,8 +173,9 @@ class window.SyncedGraph
       @graph.removeTriple(quad)
     for quad in patch.addQuads
       @graph.addTriple(quad)
-    log('applied patch locally', patchSizeSummary(patch))
+    #log('applied patch locally', patchSizeSummary(patch))
     @_watchers.graphChanged(patch)
+    @_autoDeps.graphChanged(patch)
 
   getObjectPatch: (s, p, newObject, g) ->
     # send a patch which removes existing values for (s,p,*,c) and
@@ -153,7 +203,14 @@ class window.SyncedGraph
   unsubscribe: (subscription) ->
     @_watchers.unsubscribe(subscription)
 
+  runHandler: (func) ->
+    # runs your func once, tracking graph calls. if a future patch
+    # matches what you queried, we runHandler your func again (and
+    # forget your queries from the first time).
+    @_autoDeps.runHandler(func)
+
   _singleValue: (s, p) ->
+    @_autoDeps.askedFor(s, p, null, null)
     quads = @graph.findByIRI(s, p)
     switch quads.length
       when 0
@@ -174,12 +231,36 @@ class window.SyncedGraph
     @_singleValue(s, p)
 
   objects: (s, p) ->
+    @_autoDeps.askedFor(s, p, null, null)
     quads = @graph.findByIRI(s, p)
     return (q.object for q in quads)
 
   subjects: (p, o) ->
+    @_autoDeps.askedFor(null, p, o, null)
+    quads = @graph.findByIRI(null, p, o)
+    return (q.subject for q in quads)
 
   items: (list) ->
+    out = []
+    current = list
+    while true
+      if current == RDF + 'nil'
+        break
+        
+      firsts = @graph.findByIRI(current, RDF + 'first', null)
+      rests = @graph.findByIRI(current, RDF + 'rest', null)
+      if firsts.length != 1
+        throw new Error("list node #{current} has #{firsts.length} rdf:first edges")
+      out.push(firsts[0].object)
+
+      if rests.length != 1
+        throw new Error("list node #{current} has #{rests.length} rdf:rest edges")
+      current = rests[0].object
+    
+    return out
 
   contains: (s, p, o) ->
+    @_autoDeps.askedFor(s, p, o, null)
+    return @graph.findByIRI(s, p, o).length > 0
+
 

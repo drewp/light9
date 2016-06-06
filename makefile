@@ -17,6 +17,10 @@ test_js:
 	coffee -c light9/web/*.coffee
 	node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register --globals window,N3 light9/web/graph_test.coffee
 
+test_js_watch:
+	# have coffee continuously running
+	watch -c node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register --globals window,N3 light9/web/graph_test.coffee --colors
+
 # needed packages: python-gtk2 python-imaging
 
 binexec:
