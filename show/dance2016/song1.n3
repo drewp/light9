@@ -1,31 +1,65 @@
-@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix : <http://light9.bigasterisk.com/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix song: <http://light9.bigasterisk.com/show/dance2016/song1/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016/song1> ns1:note <http://light9.bigasterisk.com/show/dance2016/song1/n1> .
+:a01 :effectAttr :chaseOffset ;
+    :value 0.12 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1> a ns1:Note ;
-    ns1:curve <http://light9.bigasterisk.com/show/dance2016/song1/n1c1> ;
-    ns1:originTime 29.932 .
+<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n1,
+        song:n2 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1> a ns1:Curve ;
-    ns1:attr ns1:strength ;
-    ns1:point <http://light9.bigasterisk.com/show/dance2016/song1/n1c1p0>,
-        <http://light9.bigasterisk.com/show/dance2016/song1/n1c1p1>,
-        <http://light9.bigasterisk.com/show/dance2016/song1/n1c1p2>,
-        <http://light9.bigasterisk.com/show/dance2016/song1/n1c1p3> .
+:ao0 :effectAttr :chaseTempo ;
+    :value 100 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p0> ns1:time 0.00 ;
-    ns1:value 0 .
+song:n1 a :Note ;
+    :attrOverride :ao0,
+        :ao1 ;
+    :curve song:n1c1 ;
+    :effectClass :usa ;
+    :originTime 25.656 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p1> ns1:time 12.08 ;
-    ns1:value 1 .
+song:n1c1 a :Curve ;
+    :attr :strength ;
+    :point song:n1c1p0,
+        song:n1c1p1,
+        song:n1c1p2,
+        song:n1c1p3 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p2> ns1:time 15.10 ;
-    ns1:value 1 .
+song:n1c1p0 :time 0.00 ;
+    :value 0 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p3> ns1:time 23.65 ;
-    ns1:value 0 .
+song:n1c1p1 :time 12.08 ;
+    :value 1 .
+
+song:n1c1p2 :time 15.10 ;
+    :value 1 .
+
+song:n1c1p3 :time 23.65 ;
+    :value 0 .
+
+song:n2 a :Note ;
+    :curve song:n2c1 ;
+    :originTime 65.792 .
+
+song:n2c1 a :Curve ;
+    :attr :strength ;
+    :point song:n2c1p0,
+        song:n2c1p1,
+        song:n2c1p2,
+        song:n2c1p3 .
+
+song:n2c1p0 :time 0.00 ;
+    :value 0 .
+
+song:n2c1p1 :time 12.08 ;
+    :value 1 .
+
+song:n2c1p2 :time 15.10 ;
+    :value 1 .
+
+song:n2c1p3 :time 23.65 ;
+    :value 0 .
 
