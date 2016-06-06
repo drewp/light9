@@ -56,7 +56,7 @@ Polymer
                          @fullZoomX, @zoomInX, @viewState.cursor)
       )
 
-    @adjs = @makeZoomAdjs().concat(@persistDemo())
+    @adjs = @makeZoomAdjs()
 
     @trackMouse()
     @bindKeys()
@@ -129,31 +129,6 @@ Polymer
         newCenter = @songTime + margin
         @animatedZoom(newCenter - visSeconds / 2,
                       newCenter + visSeconds / 2, zoomAnimSec)
-
-  persistDemo: ->
-    ctx = @graph.Uri(@song)
-    adjs = []
-    for n in [0..7]
-      subj = @graph.Uri(':demoResource'+n)
-      adjs.push(new AdjustableFloatObject({
-        graph: @graph
-        subj: subj
-        pred: @graph.Uri(':startTime')
-        ctx: ctx
-        getTargetTransform: (value) => $V([@zoomInX(value), 600])
-        getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
-        getSuggestedTargetOffset: () => $V([0, -80])
-      }))
-      adjs.push(new AdjustableFloatObject({
-        graph: @graph
-        subj: subj
-        pred: @graph.Uri(':endTime')
-        ctx: ctx
-        getTargetTransform: (value) => $V([@zoomInX(value), 600])
-        getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
-        getSuggestedTargetOffset: () => $V([0, -80])
-      }))
-    return adjs
 
   makeZoomAdjs: ->
     yMid = @$.audio.offsetTop + @$.audio.offsetHeight / 2
@@ -231,14 +206,12 @@ Polymer
   ready: ->
 
   onUri: ->
-    @graph.subscribe(@uri, null, null, @update.bind(@))
+    @graph.runHandler(@update.bind(@))
     
   update: ->
     # update our note DOM and SVG elements based on the graph
     U = (x) -> @graph.Uri(x)
-    return if !@zoomInX
     try
-
       worldPts = [] # (song time, value)
 
       originTime = @graph.floatValue(@uri, U(':originTime'))
@@ -264,8 +237,32 @@ Polymer
 Polymer
   is: "light9-timeline-adjusters"
   properties:
-    adjs: { type: Array },
+    adjs: { type: Array }, # our computed list
+    parentAdjs: { type: Array }, # incoming requests
+    graph: { type: Object, notify: true }
+    song: { type: String, notify: true }
+    zoomInX: { type: Object, notify: true }
     dia: { type: Object }
+  observers: [
+    'update(parentAdjs, graph, song, dia)'
+    'onGraph(graph, song)'
+    ]
+  onGraph: (graph, song, zoomInX) ->
+    graph.runHandler(@update.bind(@))
+  update: (parentAdjs, graph, song, dia) ->
+    U = (x) -> @graph.Uri(x)
+    @adjs = @parentAdjs.slice()
+    for note in @graph.objects(@song, U(':note'))
+      @push('adjs', new AdjustableFloatObject({
+        graph: @graph
+        subj: note
+        pred: @graph.Uri(':originTime')
+        ctx: @graph.Uri(@song)
+        getTargetTransform: (value) => $V([@zoomInX(value), 600])
+        getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
+        getSuggestedTargetOffset: () => $V([0, -80])
+      }))
+    
   updateAllCoords: ->
     for elem in @querySelectorAll('light9-timeline-adjuster')
       elem.updateDisplay()

@@ -4,35 +4,11 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-ns1:demoResource0 ns1:endTime 120.3 ;
-    ns1:startTime 3.421 .
-
-ns1:demoResource1 ns1:endTime 16 ;
-    ns1:startTime 6.791 .
-
-ns1:demoResource2 ns1:endTime 60 ;
-    ns1:startTime 38 .
-
-ns1:demoResource3 ns1:endTime 62.149 ;
-    ns1:startTime 56 .
-
-ns1:demoResource4 ns1:endTime 78.599 ;
-    ns1:startTime 73 .
-
-ns1:demoResource5 ns1:endTime 105 ;
-    ns1:startTime 87.573 .
-
-ns1:demoResource6 ns1:endTime 113.942 ;
-    ns1:startTime 109.328 .
-
-ns1:demoResource7 ns1:endTime 140.711 ;
-    ns1:startTime 130.447 .
-
 <http://light9.bigasterisk.com/show/dance2016/song1> ns1:note <http://light9.bigasterisk.com/show/dance2016/song1/n1> .
 
 <http://light9.bigasterisk.com/show/dance2016/song1/n1> a ns1:Note ;
     ns1:curve <http://light9.bigasterisk.com/show/dance2016/song1/n1c1> ;
-    ns1:originTime 5 .
+    ns1:originTime 29.932 .
 
 <http://light9.bigasterisk.com/show/dance2016/song1/n1c1> a ns1:Curve ;
     ns1:attr ns1:strength ;
@@ -44,12 +20,12 @@ ns1:demoResource7 ns1:endTime 140.711 ;
 <http://light9.bigasterisk.com/show/dance2016/song1/n1c1p0> ns1:time 0.00 ;
     ns1:value 0 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p1> ns1:time 0.02 ;
+<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p1> ns1:time 12.08 ;
     ns1:value 1 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p2> ns1:time 0.10 ;
+<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p2> ns1:time 15.10 ;
     ns1:value 1 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p3> ns1:time 0.65 ;
+<http://light9.bigasterisk.com/show/dance2016/song1/n1c1p3> ns1:time 23.65 ;
     ns1:value 0 .
 
