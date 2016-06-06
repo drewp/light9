@@ -26,6 +26,8 @@ class GraphFile(object):
 
         self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
 
+        self.namespaces = {}
+        
         if not os.path.exists(path):
             # can't start notify until file exists
             try:
@@ -126,6 +128,7 @@ class GraphFile(object):
                 return
 
             new.parse(location=self.path, format='n3')
+            self.namespaces.update(dict(new.namespaces()))
         except SyntaxError as e:
             print e
             traceback.print_exc()
@@ -177,6 +180,8 @@ class GraphFile(object):
         tmpOut = self.path + ".rdfdb-temp"
         f = open(tmpOut, 'w')
         t1 = time.time()
+        for p, n in self.namespaces.items():
+            self.graphToWrite.bind(p, n)
         self.graphToWrite.serialize(destination=f, format='n3')
         serializeTime = time.time() - t1
         f.close()
