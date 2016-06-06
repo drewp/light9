@@ -30,37 +30,39 @@
    Polymer({
        is: "light9-timeline-audio",
        properties: {
-           graph: {type: Object, notify: true, observer: '_imgSrc'},
-           show: {type: String, notify: true, observer: '_imgSrc'},
-           song: {type: String, notify: true, observer: '_imgSrc'}, // song
+           graph: {type: Object, notify: true},
+           show: {type: String, notify: true},
+           song: {type: String, notify: true},
            zoom: {type: Object, notify: true},
            imgSrc: { type: String, notify: true},
            imgWidth: { computed: '_imgWidth(zoom)' },
            imgLeft: { computed: '_imgLeft(zoom)' },
        },
+       observers: [
+           'setImgSrc(graph, show, song)'
+       ],
        ready: function() {
            this.zoom = {duration: 0};
-       },
-       
-       _imgSrc: function() {
-           try {
-               // Should be subscriptions to root and filename
-               // that get replaced when the song changes.
-               if (this.graph && this.show && !this.subscribed) {
-                   this.subscribed = true;
-                   this.graph.subscribe(this.graph.Uri(this.show), null, null,
-                                        this._imgSrc.bind(this));
+       },       
+       setImgSrc: function() {
+           graph.runHandler(function() {
+               try {
+                   var root = this.graph.stringValue(
+                       this.graph.Uri(this.show),
+                       this.graph.Uri(':spectrogramUrlRoot'));
+               } catch(e) {
+                   return;
                }
                
-               var root = this.graph.stringValue(
-                   this.graph.Uri(this.show),
-                   this.graph.Uri(':spectrogramUrlRoot'));
-               var filename = this.graph.stringValue(
-                   this.song, this.graph.Uri(':songFilename'));
+               try {
+                   var filename = this.graph.stringValue(
+                       this.song, this.graph.Uri(':songFilename'));
+               } catch(e) {
+                   return;
+               }
+               
                this.imgSrc = root + '/' + filename.replace('.wav', '.png');
-           } catch(e) {
-               log(e)
-           }
+           }.bind(this));
        },
        _imgWidth: function(zoom) {
            if (!zoom.duration) {

@@ -96,7 +96,9 @@
       </light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
         <light9-timeline-graph-row graph="{{graph}}"
-                                   zoom-in-x="{{zoomInX}}">
+                                   zoom-in-x="{{zoomInX}}"
+                                   row-index="{{item}}"
+        >
         </light9-timeline-graph-row>
       </template>
     </div>

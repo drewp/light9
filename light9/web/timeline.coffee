@@ -187,9 +187,18 @@ Polymer
     graph: { type: Object, notify: true }
     zoomInX: { type: Object, notify: true }
     noteUris: { type: Array, notify: true }
-  ready: ->
+    rowIndex: { type: Object, notify: true }
+  observers: [
+    'onGraph(graph, zoomInX)'
+    ]
+  onGraph: ->
+    @graph.runHandler(@update.bind(@))
+  update: ->
+    U = (x) -> @graph.Uri(x)
+
     @noteUris = []
-    @push('noteUris', 'http://light9.bigasterisk.com/show/dance2016/song1/n1')
+    for note in @graph.objects(@song, U(':note'))
+      @push('noteUris', note)
   
 
 Polymer
@@ -199,9 +208,10 @@ Polymer
   properties:
     graph: { type: Object, notify: true }
     uri: { type: String, notify: true }
-    zoomInX: { type: Object, notify: true, observer: 'update' }
+    zoomInX: { type: Object, notify: true }
   observers: [
     'onUri(graph, uri)'
+    'update(graph, uri, zoomInX)'
     ]
   ready: ->
 
@@ -232,7 +242,7 @@ Polymer
       setNote(@uri, (screenPos(pt) for pt in worldPts))
 
     catch e
-      log('during resize, ', e)
+      log("during resize of #{@uri}: #{@e}")
 
 Polymer
   is: "light9-timeline-adjusters"
@@ -251,7 +261,7 @@ Polymer
     graph.runHandler(@update.bind(@))
   update: (parentAdjs, graph, song, dia) ->
     U = (x) -> @graph.Uri(x)
-    @adjs = @parentAdjs.slice()
+    @adjs = (@parentAdjs || []).slice()
     for note in @graph.objects(@song, U(':note'))
       @push('adjs', new AdjustableFloatObject({
         graph: @graph
