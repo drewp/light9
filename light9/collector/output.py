@@ -1,6 +1,7 @@
 from __future__ import division
 from rdflib import URIRef
 import sys
+import time
 import usb.core
 import logging
 from twisted.internet import task
@@ -71,11 +72,15 @@ class EnttecDmx(DmxOutput):
         from dmx import Dmx
         self.dev = Dmx(devicePath)
         self.currentBuffer = ''
+        self.lastLog = 0
         task.LoopingCall(self._loop).start(1 / 50)
 
     @stats.update.time()
     def update(self, values):
-        log.info('enttec %s', ' '.join(map(str, values)))
+        now = time.time()
+        if now > self.lastLog + 1:
+            log.info('enttec %s', ' '.join(map(str, values)))
+            self.lastLog = now
 
         # I was outputting on 76 and it was turning on the light at
         # dmx75. So I added the 0 byte. No notes explaining the footer byte.
@@ -97,6 +102,8 @@ class Udmx(DmxOutput):
         self.dev = Udmx()
         self.currentBuffer = ''
         self.lastSentBuffer = None
+        self.lastLog = 0
+
         # Doesn't actually need to get called repeatedly, but we do
         # need these two things:
         #   1. A throttle so we don't lag behind sending old updates.
@@ -107,7 +114,11 @@ class Udmx(DmxOutput):
 
     @stats.update.time()
     def update(self, values):
-        log.info('udmx %s', ' '.join(map(str, values)))
+        now = time.time()
+        if now > self.lastLog + 1:
+            log.info('udmx %s', ' '.join(map(str, values)))
+            self.lastLog = now
+
         self.currentBuffer = ''.join(map(chr, values))
     
     def _loop(self):
