@@ -11,7 +11,7 @@ class MusicTime(object):
     fetch times from ascoltami in a background thread; return times
     upon request, adjusted to be more precise with the system clock
     """
-    def __init__(self, period=.2, onChange=lambda position: None):
+    def __init__(self, period=.2, onChange=lambda position: None, pollCurvecalc=True):
         """period is the seconds between http time requests.
 
         We call onChange with the time in seconds and the total time
@@ -30,7 +30,8 @@ class MusicTime(object):
         # driven by our pollCurvecalcTime and also by Gui.incomingTime
         self.lastHoverTime = None # None means "no recent value"
         self.pollMusicTime()
-        self.pollCurvecalcTime()
+        if pollCurvecalc:
+            self.pollCurvecalcTime()
 
     def getLatest(self, frameTime=None):
         """

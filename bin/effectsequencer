@@ -1,0 +1,78 @@
+#!bin/python
+"""
+plays back effect notes from the timeline
+"""
+from __future__ import division
+from run_local import log
+from twisted.internet import reactor
+from light9.greplin_cyclone import StatsForCyclone
+from light9.rdfdb.syncedgraph import SyncedGraph
+from light9 import networking, showconfig
+from greplin import scales
+import optparse, sys, logging
+import cyclone.web
+from rdflib import URIRef
+from light9.effect.sequencer import Sequencer
+import treq
+import json
+from light9.rdfdb import clientsession
+
+class App(object):
+    def __init__(self, show, session):
+        self.show = show
+        self.session = session
+
+        self.graph = SyncedGraph(networking.rdfdb.url, "effectSequencer")
+        self.graph.initiallySynced.addCallback(self.launch)
+
+
+        self.stats = scales.collection('/',
+                                       scales.PmfStat('sendLevels'),
+                                       scales.PmfStat('getMusic'),
+                                       scales.PmfStat('evals'),
+                                       scales.PmfStat('sendOutput'),
+                                       scales.IntStat('errors'),
+                                       )
+    def launch(self, *args):
+        print 'launch'
+        def sendToCollector(settings):
+            return treq.put(networking.collector.path('attrs'),
+                            data=json.dumps({'settings': settings,
+                                             'client': 'effectSequencer',
+                                             'clientSession': self.session}))
+
+        seq = Sequencer(self.graph, sendToCollector)
+
+        self.cycloneApp = cyclone.web.Application(handlers=[
+            (r'/stats', StatsForCyclone),
+        ],
+                                                  debug=True,
+                                                  graph=self.graph,
+                                                  stats=self.stats)
+        reactor.listenTCP(networking.effectSequencer.port, self.cycloneApp)
+        log.info("listening on %s" % networking.effectSequencer.port)
+
+
+if __name__ == "__main__":
+    parser = optparse.OptionParser()
+    parser.add_option('--show',
+        help='show URI, like http://light9.bigasterisk.com/show/dance2008',
+                      default=showconfig.showUri())
+    parser.add_option("-v", "--verbose", action="store_true",
+                      help="logging.DEBUG")
+    parser.add_option("--twistedlog", action="store_true",
+                      help="twisted logging")
+    clientsession.add_option(parser)
+    (options, args) = parser.parse_args()
+    log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
+
+    if not options.show:
+        raise ValueError("missing --show http://...")
+        
+    session = clientsession.getUri('effectSequencer', options)
+
+    app = App(URIRef(options.show), session)
+    if options.twistedlog:
+        from twisted.python import log as twlog
+        twlog.startLogging(sys.stderr)
+    reactor.run()
