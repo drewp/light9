@@ -195,3 +195,19 @@ class TestCollector(unittest.TestCase):
 
         self.assertEqual([[0, 255, 0, 215], 'flush'], self.udmx.updates)
         self.assertEqual([[127], 'flush', [255], 'flush', [255], 'flush'], self.dmx0.updates)
+
+    def testRepeatedAttributesInOneRequestGetResolved(self):
+        c = Collector(self.config, outputs=[self.dmx0, self.udmx])
+        
+        c.setAttrs('client1', 'sess1', [
+            (DEV['inst1'], L9['brightness'], .5),
+            (DEV['inst1'], L9['brightness'], .3),
+        ])
+        self.assertEqual([[127], 'flush'], self.dmx0.updates)
+
+        c.setAttrs('client1', 'sess1', [
+            (DEV['inst1'], L9['brightness'], .3),
+            (DEV['inst1'], L9['brightness'], .5),
+        ])
+        self.assertEqual([[127], 'flush', [127], 'flush'], self.dmx0.updates)
+

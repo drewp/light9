@@ -7,6 +7,7 @@ from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 import json
 import logging
 import klein
+import optparse
 from greplin import scales
 from greplin.scales.twistedweb import StatsResource
 
@@ -75,8 +76,11 @@ def launch(graph):
     
     
 def main():
-    log.setLevel(logging.DEBUG)
-
+    parser = optparse.OptionParser()
+    parser.add_option("-v", "--verbose", action="store_true",
+                      help="logging.DEBUG")
+    (options, args) = parser.parse_args()
+    log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
     graph = SyncedGraph(networking.rdfdb.url, "collector")
 

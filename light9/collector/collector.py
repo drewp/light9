@@ -61,6 +61,15 @@ class Collector(object):
         for c in staleClients:
             del self.lastRequest[c]
 
+    def resolvedSettingsDict(self, settingsList):
+        out = {}
+        for d, a, v in settingsList:
+            if (d, a) in out:
+                out[(d, a)] = resolve(d, a, [out[(d, a)], v])
+            else:
+                out[(d, a)] = v
+        return out
+
     def setAttrs(self, client, clientSession, settings):
         """
         settings is a list of (device, attr, value). These attrs are
@@ -80,14 +89,13 @@ class Collector(object):
                 prevClientSettings = {}
         else:
             prevClientSettings = {}
-        for d, a, v in settings:
-            prevClientSettings[(d, a)] = v
+        prevClientSettings.update(self.resolvedSettingsDict(settings))
         self.lastRequest[client] = (clientSession, now, prevClientSettings)
 
 
         deviceAttrs = {} # device: {attr: value}
-        for _, _, settings in self.lastRequest.itervalues():
-            for (device, attr), value in settings.iteritems():
+        for _, _, lastSettings in self.lastRequest.itervalues():
+            for (device, attr), value in lastSettings.iteritems():
                 attrs = deviceAttrs.setdefault(device, {})
                 if attr in attrs:
                     value = resolve(device, attr, [attrs[attr], value])
