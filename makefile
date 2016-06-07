@@ -81,8 +81,8 @@ raspberry_pi_virtualenv:
 	virtualenv --system-site-packages env_pi
 
 raspberry_pi_packages:
-	sudo apt-get install python-picamera python-twisted 
-	env_pi/bin/pip install cyclone coloredlogs
+	sudo apt-get install python-picamera python-dev python-twisted python-virtualenv
+	env_pi/bin/pip install cyclone 'coloredlogs==1.0.1'
 
 darcs_show_checkpoint:
 	darcs add --quiet --recursive ${LIGHT9_SHOW} 

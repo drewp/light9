@@ -46,6 +46,7 @@ class Pipeline(object):
         
     def _startRequest(self, url):
         self._buffer = ''
+        log.info('start request to %r', url)
         d = treq.get(url)
         d.addCallback(treq.collect, self._dataReceived)
         # not sure how to stop this
