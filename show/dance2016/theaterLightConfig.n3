@@ -1,0 +1,53 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix udmx: <http://light9.bigasterisk.com/output/udmx/> .
+@prefix dmx0: <http://light9.bigasterisk.com/output/dmx0/> .
+
+dmx0:c87 :connectedTo dev:colorStripMode .
+dmx0:c88 :connectedTo dev:colorStripRed .
+dmx0:c89 :connectedTo dev:colorStripGreen .
+dmx0:c90 :connectedTo dev:colorStripBlue .
+
+dev:colorStrip a :ChauvetColorStrip, :Device;
+  :mode dev:colorStripMode;
+  :red dev:colorStripRed;
+  :green dev:colorStripGreen;
+  :blue dev:colorStripBlue .
+
+# All these bnodes don't refresh well, but they need to be rewritten
+# as offsets from a single dmx start index, and they need to be
+# inherited with the device type
+dev:moving1 a :Mini15, :Device;
+  :xRotation      [ is :connectedTo of udmx:c5 ];
+  :xFine          [ is :connectedTo of udmx:c6 ];
+  :yRotation      [ is :connectedTo of udmx:c7 ];
+  :yFine          [ is :connectedTo of udmx:c8 ];
+  :rotationSpeed  [ is :connectedTo of udmx:c9 ];
+  :dimmer         [ is :connectedTo of udmx:c10 ];
+  :red            [ is :connectedTo of udmx:c11 ];
+  :green          [ is :connectedTo of udmx:c12 ];
+  :blue           [ is :connectedTo of udmx:c13 ];
+  :colorChange    [ is :connectedTo of udmx:c14 ];
+  :colorSpeed     [ is :connectedTo of udmx:c15 ];
+  :goboShake      [ is :connectedTo of udmx:c16 ];
+  :goboChoose     [ is :connectedTo of udmx:c17 ] .
+
+# [ :name "cyc-right"; :output dmx:c42 ] .
+# [ :name "cyc-mid"; :output dmx:c43 ] .
+# [ :name "cyc-left"; :output dmx:c44 ] .
+# [ :name "oran1"; :output dmx:c21 ] .
+# [ :name "oran2"; :output dmx:c25 ] .
+# [ :name "oran3"; :output dmx:c29 ] .
+# [ :name "oran4"; :output dmx:c33 ] .
+# [ :name "gree1"; :output dmx:c22 ] .
+# [ :name "gree2"; :output dmx:c26 ] .
+# [ :name "gree3"; :output dmx:c30 ] .
+# [ :name "gree4"; :output dmx:c34 ] .
+# [ :name "blue1"; :output dmx:c23 ] .
+# [ :name "blue2"; :output dmx:c27 ] .
+# [ :name "blue3"; :output dmx:c31 ] .
+# [ :name "blue4"; :output dmx:c35 ] .
+# [ :name "red1"; :output dmx:c24 ] .
+# [ :name "red2"; :output dmx:c28 ] .
+# [ :name "red3"; :output dmx:c32 ] .
+# [ :name "red4"; :output dmx:c36 ] .

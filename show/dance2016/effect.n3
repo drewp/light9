@@ -1,0 +1,38 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+
+
+effect:RedStrip a :EffectClass;
+  rdfs:label "red";
+  :publishAttr :strength;
+  :deviceSetting :ds1, :ds2 .
+:ds1 :device dev:colorStrip; :attr :red; :value "strength" .
+:ds2 :device dev:moving1; :attr :red; :value "strength" .
+
+
+effect:BlueStrip a :EffectClass;
+  rdfs:label "blue";
+  :publishAttr :strength;
+  :deviceSetting :ds3 .
+:ds3 :device dev:colorStrip; :attr :blue; :value "strength" .
+
+:strength rdfs:label "strength" .
+
+effect:usa a :EffectClass;
+  rdfs:label "USA";
+  :publishAttr :strength;
+  :code "chase()";
+  :devices dev:colorStrip, dev:moving1;
+  :fadeShape :fadeCurve1;
+  :chaseTempo 120;
+  :chaseOffset 0;
+  :palette "#ff0000", "#ffffff", "#0000ff" .
+
+:fadeCurve1 a :Curve;
+  :point :fc1p0, :fc1p1, :fc1p2, :fc1p3 .
+:fc1p0 :time 0.00; :value 0 .
+:fc1p1 :time 0.02; :value 1 .
+:fc1p2 :time 0.10; :value 1 .
+:fc1p3 :time 0.15; :value 0 .

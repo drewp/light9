@@ -1,0 +1,35 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2016/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+show:dance2016 :musicRoot "show/dance2016/music";
+:spectrogramUrlRoot "/show/dance2016/spectrogram" .
+
+show:dance2016 :playList (
+  sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
+  sh:song6  sh:song7  sh:song8  sh:song9  sh:song10
+  sh:song11 sh:song12 sh:song13 sh:song14 sh:song15
+  sh:song16 sh:song17
+) .
+
+sh:song1 a :Song; rdfs:label  "01 dream";          :songFilename "01-dream.wav" .
+sh:song2 a :Song; rdfs:label  "02 madeforme";      :songFilename "02-madeforme.wav" .
+sh:song3 a :Song; rdfs:label  "03 fun-cut1";       :songFilename "03-fun-cut1.wav" .
+sh:song4 a :Song; rdfs:label  "04 rockette";       :songFilename "04-rockette.wav" .
+sh:song5 a :Song; rdfs:label  "05 browneyed";      :songFilename "05-browneyed.wav" .
+sh:song6 a :Song; rdfs:label  "06 western";        :songFilename "06-western.wav" .
+sh:song7 a :Song; rdfs:label  "07 broadwaymelody"; :songFilename "07-broadwaymelody.wav" .
+sh:song8 a :Song; rdfs:label  "08 mama";           :songFilename "08-mama.wav" .
+sh:song9 a :Song; rdfs:label  "09 barbie";         :songFilename "09-barbie.wav" .
+sh:song10 a :Song; rdfs:label "10 long";           :songFilename "10-long.wav" .
+sh:song11 a :Song; rdfs:label "11 itsthegirl";     :songFilename "11-itsthegirl.wav" .
+sh:song12 a :Song; rdfs:label "12 eleanor";        :songFilename "12-eleanor.wav" .
+sh:song13 a :Song; rdfs:label "13 california";     :songFilename "13-california.wav" .
+sh:song14 a :Song; rdfs:label "14 enjoy";          :songFilename "14-enjoy.wav" .
+sh:song15 a :Song; rdfs:label "15 britney";        :songFilename "15-britney.wav" .
+sh:song16 a :Song; rdfs:label "16 hiphop-cut1";    :songFilename "16-hiphop-cut1.wav" .
+sh:song17 a :Song; rdfs:label "17 fight";          :songFilename "17-fight.wav" .
+
+

@@ -1,4 +1,5 @@
 @prefix : <http://light9.bigasterisk.com/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix song: <http://light9.bigasterisk.com/show/dance2016/song1/> .
@@ -18,8 +19,8 @@ song:n1 a :Note ;
     :attrOverride :ao0,
         :ao1 ;
     :curve song:n1c1 ;
-    :effectClass :usa ;
-    :originTime 25.656 .
+    :effectClass effect:RedStrip ;
+    :originTime 30.824 .
 
 song:n1c1 a :Curve ;
     :attr :strength ;
@@ -31,18 +32,19 @@ song:n1c1 a :Curve ;
 song:n1c1p0 :time 0.00 ;
     :value 0 .
 
-song:n1c1p1 :time 12.08 ;
+song:n1c1p1 :time 1 ;
     :value 1 .
 
-song:n1c1p2 :time 15.10 ;
+song:n1c1p2 :time 2 ;
     :value 1 .
 
-song:n1c1p3 :time 23.65 ;
+song:n1c1p3 :time 3 ;
     :value 0 .
 
 song:n2 a :Note ;
     :curve song:n2c1 ;
-    :originTime 65.792 .
+    :effectClass effect:BlueStrip ;
+    :originTime 33.161 .
 
 song:n2c1 a :Curve ;
     :attr :strength ;
@@ -54,12 +56,12 @@ song:n2c1 a :Curve ;
 song:n2c1p0 :time 0.00 ;
     :value 0 .
 
-song:n2c1p1 :time 12.08 ;
+song:n2c1p1 :time 1 ;
     :value 1 .
 
-song:n2c1p2 :time 15.10 ;
+song:n2c1p2 :time 2 ;
     :value 1 .
 
-song:n2c1p3 :time 23.65 ;
+song:n2c1p3 :time 3 ;
     :value 0 .
 
