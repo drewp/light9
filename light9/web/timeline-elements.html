@@ -1,6 +1,7 @@
 <link rel="import" href="/lib/polymer/polymer.html">
 <link rel="import" href="light9-timeline-audio.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="/lib/iron-ajax/iron-ajax.html">
 <link rel="import" href="rdfdb-synced-graph.html">
 <link rel="import" href="light9-music.html">
 
@@ -42,6 +43,7 @@
       <label><input type="checkbox"> follow player song choice</label>
     </div>
     <div>[[debug]]</div>
+    <iron-ajax id="vidrefTime" url="/vidref/time" method="PUT" content-type="application/json"></iron-ajax>
     <light9-timeline-audio id="audio"
                            graph="{{graph}}"
                            show="{{show}}"

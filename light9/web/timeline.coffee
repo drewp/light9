@@ -77,6 +77,12 @@ Polymer
 
         @$.dia.setMouse(@viewState.mouse.pos())
 
+        now = Date.now()
+        if (!@$.vidrefLastSent? || @$.vidrefLastSent < now - 200) && !@songPlaying
+          @$.vidrefTime.body = {t: @latestMouseTime(), source: 'timeline'}
+          @$.vidrefTime.generateRequest()
+          @$.vidrefLastSent = now
+
   latestMouseTime: ->
     @zoomInX.invert(@viewState.mouse.pos().e(1))
 

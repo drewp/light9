@@ -50,6 +50,16 @@ class Snapshot(cyclone.web.RequestHandler):
 class SnapshotPic(cyclone.web.StaticFileHandler):
     pass
 
+
+class Time(cyclone.web.RequestHandler):
+    def put(self):
+        body = json.loads(self.request.body)
+        t = body['t']
+        source = body['source']
+        self.settings.gui.incomingTime(t, source)
+        self.set_status(202)
+
+
 graph = SyncedGraph(networking.rdfdb.url, "vidref")
 
 gui = Gui(graph)
@@ -60,6 +70,7 @@ reactor.listenTCP(port, cyclone.web.Application(handlers=[
      {'path': 'light9/vidref', 'default_filename': 'vidref.html'}),
     (r'/snapshot', Snapshot),
     (r'/snapshot/(.*)', SnapshotPic, {"path": snapshotDir()}),
+    (r'/time', Time),
     ], debug=True, gui=gui))
 log.info("serving on %s" % port)
 

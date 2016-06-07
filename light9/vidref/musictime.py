@@ -27,6 +27,7 @@ class MusicTime(object):
         self.musicResource = restkit.Resource(networking.musicPlayer.url)
 
         self.position = {}
+        # driven by our pollCurvecalcTime and also by Gui.incomingTime
         self.lastHoverTime = None # None means "no recent value"
         self.pollMusicTime()
         self.pollCurvecalcTime()
@@ -106,7 +107,8 @@ class MusicTime(object):
             reactor.callLater(self.hoverPeriod, self.pollCurvecalcTime)
 
         def eb(err):
-            log.warn("talking to curveCalc: %s", err.getErrorMessage())
+            if self.lastHoverTime:
+                log.warn("talking to curveCalc: %s", err.getErrorMessage())
             self.lastHoverTime = None
             reactor.callLater(2, self.pollCurvecalcTime)
 

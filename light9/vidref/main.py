@@ -106,3 +106,6 @@ class Gui(object):
         it back to music player"""
         if not self.ignoreScaleChanges:
             self.musicTime.sendTime(scaleRange.get_value())
+
+    def incomingTime(self, t, source):
+        self.musicTime.lastHoverTime = t
