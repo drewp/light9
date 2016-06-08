@@ -3,49 +3,48 @@
   <head>
     <title></title>
     <meta charset="utf-8" />
+    <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
     <link rel="stylesheet" href="/style.css">
     <link rel="import" href="/lib/polymer/polymer.html">
   </head>
   <body>
     <dom-module id="service-button-row">
-      <style>
-       div {
-         display: flex;
-         justify-content: space-between;
-         padding: 2px 3px;
-       }
-       div:hover {
-         background: gray;
-         }
-       .left {
-         display: inline-block;
-         margin-right: 3px;
-       }
-      </style>
       <template>
+        <style>
+         div {
+             display: flex;
+             justify-content: space-between;
+             padding: 2px 3px;
+         }
+         div:hover {
+             background: gray;
+         }
+         .left {
+             display: inline-block;
+             margin-right: 3px;
+         }
+        </style>
         <div>
-          <span class="left"><a class="big" href="{{withSlash}}">{{name}}</a></span>
+          <span class="left"><a class="big" href="{{name}}/">{{name}}</a></span>
           <span><button on-click="click">window</button></span>
         </div>
       </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "service-button-row",
+               properties: {
+                   name: String,
+               },
+               click: function() {
+                   window.open(this.name + '/', '_blank',
+                               'scrollbars=1,resizable=1,titlebar=0,location=0');
+               }
+           });
+       });
+      </script>
     </dom-module>
-    <script>
-     Polymer({
-       is: "service-button-row",
-       properties: {
-         name: String,
-         withSlash: { type: String, computed: 'computeWithSlash(name)' },
-       },
-       computeWithSlash: function (name) {
-         return name + '/';
-       },
-       click: function() {
-         window.open(this.withSlash, '_blank',
-                     'scrollbars=1,resizable=1,titlebar=0,location=0');
-       }
-     });
-    </script>
-
+    
     <h1>light9 home page</h1>
 
     <div style="float: left">
@@ -57,6 +56,8 @@
       <service-button-row name="picamserve"></service-button-row>
       <service-button-row name="vidref"></service-button-row>
       <service-button-row name="."></service-button-row>
+      <service-button-row name="live"></service-button-row>
+      <service-button-row name="timeline"></service-button-row>
     </div>
     
   </body>
