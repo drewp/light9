@@ -51,6 +51,7 @@
                            song="{{song}}"></light9-timeline-audio>
     <light9-timeline-time-zoomed id="zoomed"
                                  graph="{{graph}}"
+                                 dia="{{dia}}"
                                  song="{{song}}"
                                  show="{{show}}"
                                  zoom="{{viewState.zoomSpec}}"
@@ -99,6 +100,8 @@
       </light9-timeline-audio>
       <template is="dom-repeat" items="{{rows}}">
         <light9-timeline-graph-row graph="{{graph}}"
+                                   dia="{{dia}}"
+                                   song="{{song}}"
                                    zoom-in-x="{{zoomInX}}"
                                    row-index="{{item}}"
         >
@@ -106,27 +109,6 @@
       </template>
     </div>
   </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-time-zoomed",
-       behaviors: [
-           Polymer.IronResizableBehavior
-       ],
-       properties: {
-           graph: { type: Object, notify: true },
-           song: { type: String, notify: true },
-           zoomInX: { type: Object, notify: true },
-           rows: {value: [0,1,2]},
-           zoom: {type: Object, notify: true, observer: 'onZoom'},
-           zoomFlattened: {type: Object, notify: true}
-       },
-       onZoom: function() {
-           ko.computed(function() {
-               this.zoomFlattened = ko.toJS(this.zoom);
-           }.bind(this));
-       }
-   });
-  </script>
 </dom-module>
 
 
@@ -204,7 +186,9 @@
     </style>
     <template is="dom-repeat" items="{{noteUris}}">
       <light9-timeline-note graph="{{graph}}"
+                            dia="{{dia}}"
                             uri="{{item}}"
+                            song="{{song}}"
                             zoom-in-x="{{zoomInX}}">
       </light9-timeline-note>
     </template>

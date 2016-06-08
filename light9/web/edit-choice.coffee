@@ -22,7 +22,8 @@ Polymer
       event.preventDefault()
       @uri = event.dataTransfer.getData('text/uri-list')
       @updateLabel()
-      
+      @$.box.classList.remove('over')
+
     gotGraph: ->
       @graph.runHandler(@updateLabel.bind(@))
         

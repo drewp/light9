@@ -44,8 +44,9 @@ Polymer
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
   attached: ->
-
+    @dia = @$.dia
     ko.computed(@zoomOrLayoutChanged.bind(@)).extend({rateLimit: 5})
+    ko.computed(@songTimeChanged.bind(@))
 
     @adjs = @makeZoomAdjs()
 
@@ -64,10 +65,13 @@ Polymer
     @zoomInX = zoomInX
 
     # todo: these run a lot of work purely for a time change    
-    @$.dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
+    @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
     @$.adjusters.updateAllCoords()
 
-    @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
+    @songTimeChanged()
+
+  songTimeChanged: ->
+    @dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                      @$.zoomed.$.time.offsetTop,
                      @$.zoomed.$.time.offsetHeight,
                      @fullZoomX, @zoomInX, @viewState.cursor)
@@ -85,7 +89,7 @@ Polymer
         @root = @getBoundingClientRect()
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
-        @$.dia.setMouse(@viewState.mouse.pos())
+        @dia.setMouse(@viewState.mouse.pos())
         #@sendMouseToVidref()
 
   sendMouseToVidref: ->
@@ -194,6 +198,22 @@ Polymer
     return [left, right, pan]
 
 Polymer
+  is: 'light9-timeline-time-zoomed'
+  behaviors: [ Polymer.IronResizableBehavior ]
+  properties:
+    graph: { type: Object, notify: true }
+    dia: { type: Object, notify: true }
+    song: { type: String, notify: true }
+    zoomInX: { type: Object, notify: true }
+    rows: { value: [0, 1, 2] }
+    zoom: { type: Object, notify: true, observer: 'onZoom' }
+    zoomFlattened: { type: Object, notify: true }
+  onZoom: ->
+    updateZoomFlattened = ->
+      @zoomFlattened = ko.toJS(@zoom)
+    ko.computed(updateZoomFlattened.bind(@))
+
+Polymer
   is: "light9-timeline-time-axis",
   # for now since it's just one line calling dia,
   # light9-timeline-editor does our drawing work.
@@ -203,11 +223,14 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     graph: { type: Object, notify: true }
+    dia: { type: Object, notify: true }
+    song:  { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
     noteUris: { type: Array, notify: true }
     rowIndex: { type: Object, notify: true }
   observers: [
     'onGraph(graph)'
+    'update(song)'
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@))
@@ -217,7 +240,6 @@ Polymer
     @noteUris = []
     for note in @graph.objects(@song, U(':note'))
       @push('noteUris', note)
-  
 
 Polymer
   is: 'light9-timeline-note'
@@ -225,13 +247,17 @@ Polymer
   listeners: 'iron-resize': 'update'
   properties:
     graph: { type: Object, notify: true }
+    dia: { type: Object, notify: true }
     uri: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
   observers: [
-    'onUri(graph, uri)'
-    'update(graph, uri, zoomInX)'
+    'onUri(graph, dia, uri)'
+    'update(graph, dia, uri, zoomInX)'
     ]
   ready: ->
+
+  detached: ->
+    @dia.clearElem(@uri)
 
   onUri: ->
     @graph.runHandler(@update.bind(@))
@@ -257,7 +283,7 @@ Polymer
       screenPos = (pt) =>
         $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
 
-      setNote(@uri, (screenPos(pt) for pt in worldPts))
+      @dia.setNote(@uri, (screenPos(pt) for pt in worldPts))
 
     catch e
       log("during resize of #{@uri}: #{@e}")
@@ -342,6 +368,11 @@ Polymer
       @adj?.continueDrag($V([d3.event.x, d3.event.y]))
     drag.on('end', () => @adj?.endDrag())
 
+    @updateDisplay()
+
+  detached: ->
+    @dia.clearElem(@myId)
+
 
 svgPathFromPoints = (pts) ->
   out = ''
@@ -360,8 +391,6 @@ Polymer
   properties: {}
   ready: ->
     @elemById = {}
-    window.setNote = @setNote.bind(this)
-    window.setMouse = @setMouse.bind(this)
 
   setTimeAxis: (width, yTop, scale) ->
     pxPerTick = 50
@@ -383,6 +412,12 @@ Polymer
       for k,v of attrs
         elem.setAttribute(k, v)
     return elem
+
+  clearElem: (uri) ->
+    elem = @elemById[uri]
+    if elem
+      elem.remove()
+      delete @elemById[uri]
     
   setNote: (uri, curvePts) ->
     elem = @getOrCreateElem(uri, 'notes', 'path', {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})

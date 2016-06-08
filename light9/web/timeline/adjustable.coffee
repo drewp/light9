@@ -58,7 +58,6 @@ class Adjustable
     @root = rootElem.getBoundingClientRect() if rootElem
     offsetParentPos = $V([ev.pageX - @root.left, ev.pageY - @root.top])
 
-    setMouse(offsetParentPos) # for debugging
     return offsetParentPos 
 
 class window.AdjustableFloatObservable extends Adjustable
