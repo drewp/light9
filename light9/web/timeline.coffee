@@ -12,6 +12,8 @@ Polymer
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
     songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}
+    fullZoomX: {type: Object, notify: true}
+    zoomInX: {type: Object, notify: true}
   width: ko.observable(1)
   listeners:
     'iron-resize': '_onIronResize'
@@ -32,29 +34,11 @@ Polymer
         t: ko.observable(20)
       mouse:
         pos: ko.observable($V([0,0]))
-    
+    @fullZoomX = d3.scaleLinear()
+    @zoomInX = d3.scaleLinear()
   attached: ->
-    @dia = @$.dia
 
-    ko.computed =>
-      @debug = ko.toJSON(@viewState)
-
-    ko.computed( =>
-        @fullZoomX = d3.scaleLinear().domain([0, @viewState.zoomSpec.duration()]).range([0, @width()])
-        @zoomInX = d3.scaleLinear().domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]).range([0, @width()])
-        @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
-        @$.adjusters.updateAllCoords()
-      ).extend({rateLimit: 5})
-
-    ko.computed( =>
-        # zoomInX changing doesn't retrigger this, so I'll do it here
-        ko.toJS(@viewState.zoomSpec)
-        
-        @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
-                         @$.zoomed.$.time.offsetTop,
-                         @$.zoomed.$.time.offsetHeight,
-                         @fullZoomX, @zoomInX, @viewState.cursor)
-      )
+    ko.computed(@zoomOrLayoutChanged.bind(@)).extend({rateLimit: 5})
 
     @adjs = @makeZoomAdjs()
 
@@ -62,6 +46,25 @@ Polymer
     @bindKeys()
     @bindWheelZoom()
 
+  zoomOrLayoutChanged: ->
+    @fullZoomX.domain([0, @viewState.zoomSpec.duration()])
+    @fullZoomX.range([0, @width()])
+
+    # had trouble making notes update when this changes
+    zoomInX = d3.scaleLinear()
+    zoomInX.domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()])
+    zoomInX.range([0, @width()])
+    @zoomInX = zoomInX
+
+    # todo: these run a lot of work purely for a time change    
+    @$.dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
+    @$.adjusters.updateAllCoords()
+
+    @$.dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
+                     @$.zoomed.$.time.offsetTop,
+                     @$.zoomed.$.time.offsetHeight,
+                     @fullZoomX, @zoomInX, @viewState.cursor)
+    
   trackMouse: ->
     # not just for show- we use the mouse pos sometimes
     for evName in ['mousemove', 'touchmove']
@@ -76,12 +79,14 @@ Polymer
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
         @$.dia.setMouse(@viewState.mouse.pos())
+        #@sendMouseToVidref()
 
-        now = Date.now()
-        if (!@$.vidrefLastSent? || @$.vidrefLastSent < now - 200) && !@songPlaying
-          @$.vidrefTime.body = {t: @latestMouseTime(), source: 'timeline'}
-          @$.vidrefTime.generateRequest()
-          @$.vidrefLastSent = now
+  sendMouseToVidref: ->
+    now = Date.now()
+    if (!@$.vidrefLastSent? || @$.vidrefLastSent < now - 200) && !@songPlaying
+      @$.vidrefTime.body = {t: @latestMouseTime(), source: 'timeline'}
+      @$.vidrefTime.generateRequest()
+      @$.vidrefLastSent = now
 
   latestMouseTime: ->
     @zoomInX.invert(@viewState.mouse.pos().e(1))
@@ -195,7 +200,7 @@ Polymer
     noteUris: { type: Array, notify: true }
     rowIndex: { type: Object, notify: true }
   observers: [
-    'onGraph(graph, zoomInX)'
+    'onGraph(graph)'
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@))
