@@ -1,0 +1,32 @@
+<link rel="import" href="/lib/polymer/polymer.html">
+
+<!-- see light9/editchoice.py for gtk version -->
+<dom-module id="edit-choice">
+  <template>
+    <style>
+     #box {
+         display: inline-block;
+         background: #141448;
+     }
+     #box.over {
+ background: red;
+         }
+     a {
+         color: #5555e0;
+         padding: 3px;
+         display: inline-block;
+     }
+     
+    </style>
+    <div id="box"
+         on-dragenter="dragover"
+         on-dragover="dragover"
+         on-dragend="dragleave"
+         on-dragleave="dragleave"
+         on-drop="drop">
+      <a href="{{uri}}"><!-- type icon goes here -->{{label}}</a>
+      <!-- <button on-click="unlink">Unlink</button>  -->
+    </div>
+  </template>
+  <script src="edit-choice.js"></script>
+</dom-module>
