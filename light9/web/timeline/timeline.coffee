@@ -7,6 +7,8 @@ Polymer
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
+    playerSong: {type: String, notify: true}
+    followPlayerSong: {type: Boolean, notify: true, value: true}
     song: {type: String, notify: true}
     show: {value: 'http://light9.bigasterisk.com/show/dance2016'}
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
@@ -17,12 +19,17 @@ Polymer
   width: ko.observable(1)
   listeners:
     'iron-resize': '_onIronResize'
+  observers: [
+    'setSong(playerSong, followPlayerSong)'
+    ]
   _onIronResize: ->
     @width(@offsetWidth)
   _onSongTime: (t) ->
     @viewState.cursor.t(t)
   _onSongDuration: (d) ->
     @viewState.zoomSpec.duration(d)
+  setSong: (s) ->
+    @song = @playerSong if @followPlayerSong
 
   ready: ->
     @viewState =

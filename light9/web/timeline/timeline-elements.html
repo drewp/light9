@@ -4,6 +4,7 @@
 <link rel="import" href="light9-timeline-audio.html">
 <link rel="import" href="../rdfdb-synced-graph.html">
 <link rel="import" href="../light9-music.html">
+<link rel="import" href="../edit-choice.html">
 
 
 <!-- Whole editor- include this on your page.
@@ -35,12 +36,12 @@
     <div>
       <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
       <light9-music id="music"
-                    song="{{song}}"
+                    song="{{playerSong}}"
                     t="{{songTime}}"
                     playing="{{songPlaying}}"
                     duration="{{songDuration}}"></light9-music>
-      timeline editor: song [{{song}}] <button>unlink</button>
-      <label><input type="checkbox"> follow player song choice</label>
+      timeline editor: song <edit-choice graph="{{graph}}" uri="{{song}}"></edit-choice>
+      <label><input type="checkbox" checked="{{followPlayerSong::change}}" > follow player song choice</label>
     </div>
     <div>[[debug]]</div>
     <iron-ajax id="vidrefTime" url="/vidref/time" method="PUT" content-type="application/json"></iron-ajax>
