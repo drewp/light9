@@ -82,6 +82,9 @@
          flex-direction: column;
          height: 100%;
      }
+     #rows.dragging {
+background: rgba(126, 52, 245, 0.0784313725490196);
+         }
      light9-timeline-audio {
          width: 100%;
          height: 100px;
@@ -90,7 +93,7 @@
          flex-grow: 1;
      }
     </style>
-    <div>
+    <div id="top">
       <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
       <light9-timeline-audio id="audio"
                              graph="{{graph}}"
@@ -98,15 +101,17 @@
                              show="{{show}}"
                              zoom="{{zoomFlattened}}">
       </light9-timeline-audio>
-      <template is="dom-repeat" items="{{rows}}">
-        <light9-timeline-graph-row graph="{{graph}}"
-                                   dia="{{dia}}"
-                                   song="{{song}}"
-                                   zoom-in-x="{{zoomInX}}"
-                                   row-index="{{item}}"
-        >
-        </light9-timeline-graph-row>
-      </template>
+      <div id="rows">
+        <template is="dom-repeat" items="{{rows}}">
+          <light9-timeline-graph-row graph="{{graph}}"
+                                     dia="{{dia}}"
+                                     song="{{song}}"
+                                     zoom-in-x="{{zoomInX}}"
+                                     row-index="{{item}}"
+          >
+          </light9-timeline-graph-row>
+        </template>
+      </div>
     </div>
   </template>
 </dom-module>

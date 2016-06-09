@@ -8,9 +8,9 @@
          display: inline-block;
          background: #141448;
      }
-     #box.over {
- background: red;
-         }
+     #box.dragging {
+         background: rgba(126, 52, 245, 0.0784313725490196);
+     }
      a {
          color: #5555e0;
          padding: 3px;
@@ -18,12 +18,7 @@
      }
      
     </style>
-    <div id="box"
-         on-dragenter="dragover"
-         on-dragover="dragover"
-         on-dragend="dragleave"
-         on-dragleave="dragleave"
-         on-drop="drop">
+    <div id="box">
       <a href="{{uri}}"><!-- type icon goes here -->{{label}}</a>
       <!-- <button on-click="unlink">Unlink</button>  -->
     </div>

@@ -1,4 +1,5 @@
 log = console.log
+RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
 Polymer
   is: 'light9-timeline-editor'
@@ -197,6 +198,8 @@ Polymer
       
     return [left, right, pan]
 
+
+
 Polymer
   is: 'light9-timeline-time-zoomed'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -212,6 +215,62 @@ Polymer
     updateZoomFlattened = ->
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
+  ready: ->
+
+  attached: ->
+    root = @closest('light9-timeline-editor')
+    setupDrop @, @$.rows, root, (effect, pos) =>
+
+      if not @graph.contains(effect, RDF + 'type', @graph.Uri(':Effect'))
+        log("drop #{effect} is not an effect")
+        return
+      
+      dropTime = @zoomInX.invert(pos.e(1))
+      
+      U = (x) -> @graph.Uri(x)
+
+      nextNumberedResources = (graph, base, howMany) ->
+        results = []
+        # we could cache [base,lastSerial]
+        for serial in [0..1000]
+          uri = graph.Uri("#{base}#{serial}")
+          if not graph.contains(uri, null, null)
+            results.push(uri)
+            if results.length >= howMany
+              return results
+        throw new Error("can't make sequential uri with base #{base}")
+
+      nextNumberedResource = (graph, base) ->
+        nextNumberedResources(graph, base, 1)[0]       
+      
+      newNote = nextNumberedResource(graph, "#{@song}/n")
+      newCurve = nextNumberedResource(graph, "#{newNote}c")
+      points = nextNumberedResources(graph, "#{newCurve}p", 4)
+      
+      quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
+
+      curveQuads = [
+          quad(@song, U(':note'), newNote)
+          quad(newNote, RDF + 'type', U(':Note'))
+          quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
+          quad(newNote, U(':curve'), newCurve)
+          quad(newCurve, RDF + 'type', U(':Curve'))
+          quad(newCurve, U(':attr'), U(':strength'))
+        ]        
+      pointQuads = []
+      for i in [0...4]
+        pt = points[i]
+        pointQuads.push(quad(newCurve, U(':point'), pt))
+        pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i)))
+        pointQuads.push(quad(pt, U(':value'), @graph.LiteralRoundedFloat(i == 1 or i == 2)))
+      
+      patch = {
+        delQuads: []
+        addQuads: curveQuads.concat(pointQuads)
+        }
+      @graph.applyAndSendPatch(patch)
+      log('land', effect, dropTime, newNote)
+      
 
 Polymer
   is: "light9-timeline-time-axis",
@@ -346,13 +405,14 @@ Polymer
     @adj.subscribe(@updateDisplay.bind(this))
 
   updateDisplay: () ->
-      @spanClass = if @adj.config.emptyBox then 'empty' else ''
-      @displayValue = @adj.getDisplayValue()
-      center = @adj.getCenter()
-      target = @adj.getTarget()
-      return if isNaN(center.e(1))
-      @centerStyle = {x: center.e(1), y: center.e(2)}
-      @dia?.setAdjusterConnector(@myId, center, target)
+    window.adjDragUpdates++ if window.adjDragUpdates?
+    @spanClass = if @adj.config.emptyBox then 'empty' else ''
+    @displayValue = @adj.getDisplayValue()
+    center = @adj.getCenter()
+    target = @adj.getTarget()
+    return if isNaN(center.e(1))
+    @centerStyle = {x: center.e(1), y: center.e(2)}
+    @dia?.setAdjusterConnector(@myId, center, target)
         
   attached: ->
     @myId = 'adjuster-' + _adjusterSerial
