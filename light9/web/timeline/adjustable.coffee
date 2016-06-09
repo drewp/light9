@@ -93,6 +93,11 @@ class window.AdjustableFloatObject extends Adjustable
     #   getValueForPos
 
     super(@config)
+    @config.graph.runHandler(@_syncValue.bind(@))
+
+  _syncValue: () ->
+    @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)
+    @_onChange() if @_onChange
     
   _getValue: () ->
     # this is a big speedup- callers use _getValue about 4x as much as
@@ -103,9 +108,10 @@ class window.AdjustableFloatObject extends Adjustable
     @config.getTargetTransform(@_getValue())
     
   subscribe: (onChange) ->
-    @config.graph.subscribe @config.subj, @config.pred, null, (patch) =>
-      @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)
-      onChange()
+    # only works on one subscription at a time
+    throw new Error('multi subscribe not implemented') if @_onChange
+    @_onChange = onChange
+
     
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
