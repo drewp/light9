@@ -93,7 +93,7 @@ class window.AdjustableFloatObject extends Adjustable
     #   getValueForPos
 
     super(@config)
-    @config.graph.runHandler(@_syncValue.bind(@))
+    @config.graph.runHandler(@_syncValue.bind(@), "adj sync #{@config.subj}")
 
   _syncValue: () ->
     @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)
@@ -117,6 +117,7 @@ class window.AdjustableFloatObject extends Adjustable
     # pos is vec2 of pixels relative to the drag start
     
     newValue = @config.getValueForPos(@_editorCoordinates())
+    
     @config.graph.patchObject(@config.subj, @config.pred,
                               @config.graph.LiteralRoundedFloat(newValue),
                               @config.ctx)

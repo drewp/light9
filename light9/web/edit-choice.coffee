@@ -56,7 +56,7 @@ Polymer
         @updateLabel()
 
     gotGraph: ->
-      @graph.runHandler(@updateLabel.bind(@))
+      @graph.runHandler(@updateLabel.bind(@), "edit-choice #{@uri}")
         
     updateLabel: ->
       @label = try

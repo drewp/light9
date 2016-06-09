@@ -62,7 +62,7 @@
                }
                
                this.imgSrc = root + '/' + filename.replace('.wav', '.png');
-           }.bind(this));
+           }.bind(this), "timeline-audio " + this.song);
        },
        _imgWidth: function(zoom) {
            if (!zoom.duration) {

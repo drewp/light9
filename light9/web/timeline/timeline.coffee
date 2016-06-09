@@ -292,7 +292,7 @@ Polymer
     'update(song)'
     ]
   onGraph: ->
-    @graph.runHandler(@update.bind(@))
+    @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: ->
     U = (x) -> @graph.Uri(x)
 
@@ -319,7 +319,7 @@ Polymer
     @dia.clearElem(@uri)
 
   onUri: ->
-    @graph.runHandler(@update.bind(@))
+    @graph.runHandler(@update.bind(@), "note updates #{@uri}")
     
   update: ->
     # update our note DOM and SVG elements based on the graph
@@ -361,7 +361,7 @@ Polymer
     'onGraph(graph, song)'
     ]
   onGraph: (graph, song, zoomInX) ->
-    graph.runHandler(@update.bind(@))
+    graph.runHandler(@update.bind(@), "adjuster update")
   update: (parentAdjs, graph, song, dia) ->
     U = (x) -> @graph.Uri(x)
     @adjs = (@parentAdjs || []).slice()
@@ -402,10 +402,12 @@ Polymer
       value: ''
 
   onAdj: (adj) ->
+    # currently I think this subscription never gets to matter since
+    # we might be rebuilding all adj elements on every update
     @adj.subscribe(@updateDisplay.bind(this))
+    @updateDisplay()
 
   updateDisplay: () ->
-    window.adjDragUpdates++ if window.adjDragUpdates?
     @spanClass = if @adj.config.emptyBox then 'empty' else ''
     @displayValue = @adj.getDisplayValue()
     center = @adj.getCenter()

@@ -59,19 +59,20 @@ class GraphWatchers # throw this one away; use AutoDependencies
 
 class Handler
   # a function and the quad patterns it cared about
-  constructor: (@func) ->
-    patterns = [] # s,p,o,g quads that should trigger the next run
+  constructor: (@func, @label) ->
+    @patterns = [] # s,p,o,g quads that should trigger the next run
+    @innerHandlers = [] # Handlers requested while this one was running
   
 class AutoDependencies
   constructor: () ->
-    @handlers = [] # all known Handlers (at least those with non-empty patterns)
-    @handlerStack = [] # currently running
+    @handlers = new Handler(null) # tree of all known Handlers (at least those with non-empty patterns). Top node is not a handler.
+    @handlerStack = [@handlers] # currently running
     
-  runHandler: (func) ->
+  runHandler: (func, label) ->
     # what if we have this func already? duplicate is safe?
-    
-    h = new Handler(func)
-    @handlers.push(h)
+
+    h = new Handler(func, label)
+    @handlerStack[@handlerStack.length - 1].innerHandlers.push(h)
     @_rerunHandler(h)
     
   _rerunHandler: (handler) ->
@@ -90,14 +91,19 @@ class AutoDependencies
     
   graphChanged: (patch) ->
     # SyncedGraph is telling us this patch just got applied to the graph.
-    for h in @handlers
-      @_rerunHandler(h)
+
+    rerunInners = (cur) =>
+      toRun = cur.innerHandlers.slice()
+      for child in toRun
+        child.innerHandlers = [] # let all children get called again
+        @_rerunHandler(child)
+    rerunInners(@handlers)
 
   askedFor: (s, p, o, g) ->
     # SyncedGraph is telling us someone did a query that depended on
     # quads in the given pattern.
     current = @handlerStack[@handlerStack.length - 1]
-    if current?
+    if current? and current != @handlers
       current.patterns.push([s, p, o, g])
       #log('push', s,p,o,g)
 
@@ -193,6 +199,7 @@ class window.SyncedGraph
   
 
   subscribe: (s, p, o, onChange) -> # return subscription handle
+    throw
     # onChange is called with a patch that's limited to the quads
     # that match your request.
     # We call you immediately on existing triples.
@@ -205,11 +212,11 @@ class window.SyncedGraph
   unsubscribe: (subscription) ->
     @_watchers.unsubscribe(subscription)
 
-  runHandler: (func) ->
+  runHandler: (func, label) ->
     # runs your func once, tracking graph calls. if a future patch
     # matches what you queried, we runHandler your func again (and
     # forget your queries from the first time).
-    @_autoDeps.runHandler(func)
+    @_autoDeps.runHandler(func, label)
 
   _singleValue: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
