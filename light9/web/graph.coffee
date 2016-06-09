@@ -272,4 +272,17 @@ class window.SyncedGraph
     @_autoDeps.askedFor(s, p, o, null)
     return @graph.findByIRI(s, p, o).length > 0
 
+  nextNumberedResources: (base, howMany) ->
+    results = []
+    # we could cache [base,lastSerial]
+    for serial in [0..1000]
+      uri = @Uri("#{base}#{serial}")
+      if not @contains(uri, null, null)
+        results.push(uri)
+        if results.length >= howMany
+          return results
+    throw new Error("can't make sequential uri with base #{base}")
+
+  nextNumberedResource: (base) ->
+    @nextNumberedResources(base, 1)[0]       
 

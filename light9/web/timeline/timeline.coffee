@@ -221,38 +221,27 @@ Polymer
     root = @closest('light9-timeline-editor')
     setupDrop @, @$.rows, root, (effect, pos) =>
 
-      if not @graph.contains(effect, RDF + 'type', @graph.Uri(':Effect'))
+      U = (x) -> @graph.Uri(x)
+      quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
+
+      # we could probably accept some initial overrides right on the
+      # effect uri, maybe as query params
+      
+      if not @graph.contains(effect, RDF + 'type', U(':Effect'))
         log("drop #{effect} is not an effect")
         return
       
       dropTime = @zoomInX.invert(pos.e(1))
       
-      U = (x) -> @graph.Uri(x)
-
-      nextNumberedResources = (graph, base, howMany) ->
-        results = []
-        # we could cache [base,lastSerial]
-        for serial in [0..1000]
-          uri = graph.Uri("#{base}#{serial}")
-          if not graph.contains(uri, null, null)
-            results.push(uri)
-            if results.length >= howMany
-              return results
-        throw new Error("can't make sequential uri with base #{base}")
-
-      nextNumberedResource = (graph, base) ->
-        nextNumberedResources(graph, base, 1)[0]       
+      newNote = graph.nextNumberedResource("#{@song}/n")
+      newCurve = graph.nextNumberedResource("#{newNote}c")
+      points = graph.nextNumberedResources("#{newCurve}p", 4)
       
-      newNote = nextNumberedResource(graph, "#{@song}/n")
-      newCurve = nextNumberedResource(graph, "#{newNote}c")
-      points = nextNumberedResources(graph, "#{newCurve}p", 4)
-      
-      quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
-
       curveQuads = [
           quad(@song, U(':note'), newNote)
           quad(newNote, RDF + 'type', U(':Note'))
           quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
+          quad(newNote, U(':effectClass'), effect)
           quad(newNote, U(':curve'), newCurve)
           quad(newCurve, RDF + 'type', U(':Curve'))
           quad(newCurve, U(':attr'), U(':strength'))
@@ -269,7 +258,6 @@ Polymer
         addQuads: curveQuads.concat(pointQuads)
         }
       @graph.applyAndSendPatch(patch)
-      log('land', effect, dropTime, newNote)
       
 
 Polymer
