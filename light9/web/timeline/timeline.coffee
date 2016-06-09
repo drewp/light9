@@ -330,7 +330,8 @@ Polymer
       screenPos = (pt) =>
         $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
 
-      @dia.setNote(@uri, (screenPos(pt) for pt in worldPts))
+      @dia.setNote(@uri, (screenPos(pt) for pt in worldPts),
+                   @graph.uriValue(@uri, U(':effectClass')))
 
     catch e
       log("during resize of #{@uri}: #{@e}")
@@ -469,9 +470,14 @@ Polymer
       elem.remove()
       delete @elemById[uri]
     
-  setNote: (uri, curvePts) ->
+  setNote: (uri, curvePts, effectLabel) ->
     elem = @getOrCreateElem(uri, 'notes', 'path', {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
     elem.setAttribute('d', svgPathFromPoints(curvePts))
+
+    elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
+    elem.setAttribute('x', curvePts[0].e(1)+20)
+    elem.setAttribute('y', curvePts[0].e(2)-10)
+    elem.innerHTML = effectLabel;
 
   setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
     @cursorPath =
