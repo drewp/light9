@@ -2,12 +2,62 @@ import logging, traceback, os, time
 from twisted.python.filepath import FilePath
 from twisted.internet import reactor
 from twisted.internet.inotify import humanReadableMask
-from rdflib import Graph
+from rdflib import Graph, RDF
 from light9.rdfdb.patch import Patch
 from light9.rdfdb.rdflibpatch import inContext
 
 log = logging.getLogger('graphfile')
 iolog = logging.getLogger('io')
+
+def patchN3SerializerToUseLessWhitespace():
+    # todo: make a n3serializer subclass with whitespace settings
+    from rdflib.plugins.serializers.turtle import TurtleSerializer, OBJECT
+    originalWrite = TurtleSerializer.write
+    def write(self, s):
+        lines = s.split('\n')
+        if len(lines) > 1:
+            self._column = len(lines[-1])
+        else:
+            self._column += len(lines[0])
+        return originalWrite(self, s)
+    TurtleSerializer.write = write
+    def predicateList(self, subject, newline=False):
+        properties = self.buildPredicateHash(subject)
+        propList = self.sortProperties(properties)
+        if len(propList) == 0:
+            return
+        self.verb(propList[0], newline=newline)
+        self.objectList(properties[propList[0]])
+        for predicate in propList[1:]:
+            self.write(';')
+            # can't do proper wrapping since we don't know how much is coming
+            if self._column > 50:
+                self.write('\n' + self.indent(1))
+            self.verb(predicate, newline=False)
+            self.objectList(properties[predicate])
+    def objectList(self, objects):
+        count = len(objects)
+        if count == 0:
+            return
+        depthmod = (count == 1) and 0 or 1
+        self.depth += depthmod
+        self.path(objects[0], OBJECT)
+        for obj in objects[1:]:
+            self.write(', ')
+            self.path(obj, OBJECT, newline=True)
+        self.depth -= depthmod
+
+    originalStatement = TurtleSerializer.statement
+    def statement(self, subject):
+        if list(self.store.triples((subject, RDF.type, None))):
+            self.write('\n')
+        originalStatement(self, subject)
+        return False         #  suppress blank line for 'minor' statements
+    TurtleSerializer.statement = statement
+    TurtleSerializer.predicateList = predicateList
+    TurtleSerializer.objectList = objectList
+
+patchN3SerializerToUseLessWhitespace()
 
 class GraphFile(object):
     """
