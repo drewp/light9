@@ -5,19 +5,29 @@ copies from effectloop.py, which this should replace
 from __future__ import division
 from rdflib import URIRef, Literal
 from twisted.internet import reactor
-from twisted.internet.defer import inlineCallbacks, returnValue, succeed
-from webcolors import hex_to_rgb, rgb_to_hex
-import time, json, logging, traceback, bisect
+from webcolors import rgb_to_hex
+import json, logging, bisect
+import treq
+from light9 import networking
 
-from light9.namespaces import L9, RDF, RDFS
+from light9.namespaces import L9, RDF
+
 from light9.vidref.musictime import MusicTime
 
 log = logging.getLogger('sequencer')
+
+def sendToCollector(client, session, settings):
+    return treq.put(networking.collector.path('attrs'),
+                    data=json.dumps({'settings': settings,
+                                     'client': client,
+                                     'clientSession': session}))
+
 
 class Note(object):
     def __init__(self, graph, uri):
         g = self.graph = graph
         self.uri = uri
+        self.effectEval = EffectEval(graph, g.value(uri, L9['effectClass']))
         floatVal = lambda s, p: float(g.value(s, p).toPython())
         originTime = floatVal(uri, L9['originTime'])
         self.points = []
@@ -29,9 +39,6 @@ class Note(object):
                     originTime + floatVal(point, L9['time']),
                     floatVal(point, L9['value'])))
             self.points.sort()
-
-        for ds in g.objects(g.value(uri, L9['effectClass']), L9['deviceSetting']):
-            self.setting = (g.value(ds, L9['device']), g.value(ds, L9['attr']))
         
     def activeAt(self, t):
         return self.points[0][0] <= t <= self.points[-1][0]
@@ -52,21 +59,52 @@ class Note(object):
         return y
         
     def outputSettings(self, t):
+        """
+        list of (device, attr, value)
+        """
+        effectSettings = [(L9['strength'], self.evalCurve(t))]
+        return self.effectEval.outputFromEffect(self.effect, effectSettings)
+                
 
-        c = int(255 * self.evalCurve(t))
-        color = [0, 0, 0]
-        if self.setting[1] == L9['red']: # throwaway
-            color[0] = c
-        elif self.setting[1] == L9['blue']:
-            color[2] = c
+class EffectEval(object):
+    """
+    runs one effect's code to turn effect attr settings into output
+    device settings
+    """
+    def __init__(self, graph, effect):
+        self.graph = graph
+        self.effect = effect
         
+        #for ds in g.objects(g.value(uri, L9['effectClass']), L9['deviceSetting']):
+        #    self.setting = (g.value(ds, L9['device']), g.value(ds, L9['attr']))
+
+    def outputFromEffect(self, effectSettings):
+        """
+        From effect attr settings, like strength=0.75, to output device
+        settings like light1/bright=0.72;light2/bright=0.78. This runs
+        the effect code.
+        """
+        attr, value = effectSettings[0]
+        value = float(value)
+        assert attr == L9['strength']
+        c = int(255 * value)
+        color = [0, 0, 0]
+        if self.effect == L9['RedStrip']: # throwaway
+            color[0] = c
+        elif self.effect == L9['BlueStrip']:
+            color[2] = c
+        elif self.effect == URIRef('http://light9.bigasterisk.com/effect/WorkLight'):
+            color[1] = c
+        elif self.effect == URIRef('http://light9.bigasterisk.com/effect/Curtain'):
+            color[0] = color[2] = 70/255 * c
+
         return [
             # device, attr, lev
-            (self.setting[0],
+            (URIRef('http://light9.bigasterisk.com/device/colorStrip'),
              URIRef("http://light9.bigasterisk.com/color"),
              Literal(rgb_to_hex(color)))
             ]
-            
+        
 class Sequencer(object):
     def __init__(self, graph, sendToCollector):
         self.graph = graph
@@ -89,7 +127,7 @@ class Sequencer(object):
         reactor.callLater(1/30, self.update)
 
         musicState = self.music.getLatest()
-        song = URIRef(musicState['song']) if 'song' in musicState else None
+        song = URIRef(musicState['song']) if musicState.get('song') else None
         if 't' not in musicState:
             return
         t = musicState['t']

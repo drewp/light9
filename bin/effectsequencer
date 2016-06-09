@@ -12,9 +12,7 @@ from greplin import scales
 import optparse, sys, logging
 import cyclone.web
 from rdflib import URIRef
-from light9.effect.sequencer import Sequencer
-import treq
-import json
+from light9.effect.sequencer import Sequencer, sendToCollector
 from light9.rdfdb import clientsession
 
 class App(object):
@@ -35,13 +33,10 @@ class App(object):
                                        )
     def launch(self, *args):
         print 'launch'
-        def sendToCollector(settings):
-            return treq.put(networking.collector.path('attrs'),
-                            data=json.dumps({'settings': settings,
-                                             'client': 'effectSequencer',
-                                             'clientSession': self.session}))
-
-        seq = Sequencer(self.graph, sendToCollector)
+        self.seq = Sequencer(
+            self.graph,
+            lambda settings: sendToCollector('effectSequencer', self.session,
+                                             settings))
 
         self.cycloneApp = cyclone.web.Application(handlers=[
             (r'/stats', StatsForCyclone),

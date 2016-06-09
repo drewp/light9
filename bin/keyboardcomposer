@@ -7,13 +7,11 @@ from optparse import OptionParser
 import webcolors, colorsys
 from louie import dispatcher
 from twisted.internet import reactor, tksupport
-from twisted.web import server, resource
+from twisted.web import resource
 from rdflib import URIRef, Literal
 import Tix as tk
 
 from light9.Fadable import Fadable
-from light9.Submaster import Submasters, sub_maxes, PersistentSubmaster
-from light9.Patch import get_channel_uri
 from light9.subclient import SubClient
 from light9 import showconfig, networking, prof
 from light9.uihelpers import toplevelat
@@ -21,6 +19,7 @@ from light9.namespaces import L9
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.effect.sequencer import EffectEval
 
 from bcf2000 import BCF2000
 
@@ -61,24 +60,25 @@ class SubmasterBox(tk.Frame):
     this object owns the level of the submaster (the rdf graph is the
     real authority)
     """
-    def __init__(self, master, sub, session, col, row):
+    def __init__(self, master, graph, sub, session, col, row):
+        self.graph = graph
         self.sub = sub
         self.session = session
         self.col, self.row = col, row
-        bg = sub.graph.value(sub.uri, L9.color, default='#000000')
+        bg = self.graph.value(sub, L9.color, default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
         darkBg = webcolors.rgb_to_hex(tuple([x * 255 for x in colorsys.hsv_to_rgb(
             hsv[0], hsv[1], .2)]))
         tk.Frame.__init__(self, master, bd=1, relief='raised', bg=bg)
-        self.name = sub.name
+        self.name = self.graph.label(sub)
         self.slider_var = tk.DoubleVar()
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
 
         self.namelabel = tk.Label(self, font="Arial 7", bg=darkBg,
             fg='white', pady=0)
-        self.sub.graph.addHandler(self.updateName)
+        self.graph.addHandler(self.updateName)
 
         self.namelabel.pack(side=tk.TOP)
         levellabel = tk.Label(self, textvariable=self.slider_var, font="Arial 6",
@@ -87,11 +87,11 @@ class SubmasterBox(tk.Frame):
         self.scale.pack(side=tk.BOTTOM, expand=1, fill=tk.BOTH)
 
         for w in [self, self.namelabel, levellabel]:
-            dragSourceRegister(w, 'copy', 'text/uri-list', sub.uri)
+            dragSourceRegister(w, 'copy', 'text/uri-list', sub)
 
         self._slider_var_trace = self.slider_var.trace('w', self.slider_changed)
 
-        sub.graph.addHandler(self.updateLevelFromGraph)
+        self.graph.addHandler(self.updateLevelFromGraph)
 
         # initial position
         # stil need? dispatcher.send("send_to_hw", sub=sub.uri, hwCol=col + 1)
@@ -104,10 +104,10 @@ class SubmasterBox(tk.Frame):
 
         if self.pauseTrace:
             return
-        self.updateGraphWithLevel(self.sub.uri, self.slider_var.get())
+        self.updateGraphWithLevel(self.sub, self.slider_var.get())
 
         # needs fixing: plan is to use dispatcher or a method call to tell a hardware-mapping object who changed, and then it can make io if that's a current hw slider
-        dispatcher.send("send_to_hw", sub=self.sub.uri, hwCol=self.col + 1,
+        dispatcher.send("send_to_hw", sub=self.sub, hwCol=self.col + 1,
                         boxRow=self.row)
 
     def updateGraphWithLevel(self, uri, level):
@@ -117,20 +117,20 @@ class SubmasterBox(tk.Frame):
         """
         # move to syncedgraph patchMapping
 
-        self.sub.graph.patchMapping(context=self.session,
-                                    subject=self.session,
-                                    predicate=L9['subSetting'],
-                                    nodeClass=L9['SubSetting'],
-                                    keyPred=L9['sub'], newKey=uri,
-                                    valuePred=L9['level'], newValue=Literal(level))
+        self.graph.patchMapping(context=self.session,
+                                subject=self.session,
+                                predicate=L9['subSetting'],
+                                nodeClass=L9['SubSetting'],
+                                keyPred=L9['sub'], newKey=uri,
+                                valuePred=L9['level'], newValue=Literal(level))
 
     def updateLevelFromGraph(self):
         """read rdf level, write it to subbox.slider_var"""
         # move this to syncedgraph readMapping
-        graph = self.sub.graph
+        graph = self.graph
 
         for setting in graph.objects(self.session, L9['subSetting']):
-            if graph.value(setting, L9['sub']) == self.sub.uri:
+            if graph.value(setting, L9['sub']) == self.sub:
                 self.pauseTrace = True # don't bounce this update back to server
                 try:
                     self.slider_var.set(graph.value(setting, L9['level']))
@@ -140,7 +140,7 @@ class SubmasterBox(tk.Frame):
     def updateName(self):
         def shortUri(u):
             return '.../' + u.split('/')[-1]
-        self.namelabel.config(text=self.sub.graph.label(self.sub.uri) or shortUri(self.sub.uri))
+        self.namelabel.config(text=self.graph.label(self.sub) or shortUri(self.sub))
 
 class KeyboardComposer(tk.Frame, SubClient):
     def __init__(self, root, graph, session,
@@ -149,7 +149,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         SubClient.__init__(self)
         self.graph = graph
         self.session = session
-        self.submasters = Submasters(graph)
+
         self.subbox = {} # sub uri : SubmasterBox
         self.slider_table = {} # coords : SubmasterBox
         self.rows = [] # this holds Tk Frames for each row
@@ -208,38 +208,35 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         self.tk_focusFollowsMouse()
 
-        self.submasters.findSubs() # trigger graph load, but we read
-                                   # from get_all_subs, below
-        
         rowcount = -1
         col = 0
         last_group = None
 
-        # there are unlikely to be any subs at startup because we
-        # probably haven't been called back with the graph data yet
+        withgroups = []
+        for effect in self.graph.objects(L9['live'], L9['controls']):
+            withgroups.append((
+                self.graph.value(effect, L9['group']),
+                self.graph.value(effect, L9['order']),
+                self.graph.label(effect),
+                effect))
+        withgroups.sort()
 
-        withgroups = sorted(
-            (self.graph.value(sub.uri, L9['group']),
-             self.graph.value(sub.uri, L9['order']),
-             self.graph.label(sub), # todo: split numbers into ints so they sort right
-             sub.uri, 
-             sub)
-            for sub in self.submasters.get_all_subs())
         log.info("withgroups %s", withgroups)
 
-        for group, order, sortLabel, _sortUri, sub in withgroups:
-            group = self.graph.value(sub.uri, L9['group'])
-
+        self.effectEval = {}
+        for group, order, sortLabel, effect in withgroups:
             if col == 0 or group != last_group:
                 row = self.make_row(group)
                 rowcount += 1
                 col = 0
 
-            subbox = SubmasterBox(row, sub, self.session, col, rowcount)
+            subbox = SubmasterBox(row, self.graph, effect, self.session, col, rowcount)
             subbox.place(relx=col / 8, rely=0, relwidth=1 / 8, relheight=1)
-            self.subbox[sub.uri] = self.slider_table[(rowcount, col)] = subbox
+            self.subbox[effect] = self.slider_table[(rowcount, col)] = subbox
 
             self.setup_key_nudgers(subbox.scale)
+
+            self.effectEval[effect] = EffectEval(self.graph, effect)
 
             col = (col + 1) % 8
             last_group = group
@@ -350,7 +347,7 @@ class KeyboardComposer(tk.Frame, SubClient):
                 self.sliders.valueOut("button-upper%d" % col, False)
                 self.sliders.valueOut("slider%d" % col, 0)
                 continue
-            self.send_to_hw(sub=subbox.sub.uri, hwCol=col,
+            self.send_to_hw(sub=subbox.sub, hwCol=col,
                             boxRow=self.current_row)
 
     def got_nudger(self, number, direction, full=0):
@@ -434,15 +431,6 @@ class KeyboardComposer(tk.Frame, SubClient):
             context=self.session,
             subject=sub, predicate=L9['group'], newObject=group)
 
-    def subs_in_row(self, row):
-        """uris of the submasters displayed in this row. untested"""
-        rowNum = self.rows.index(row) + 1
-        ret = set()
-        for coords, subbox in self.slider_table.items():
-            if coords[0] == rowNum:
-                ret.add(subbox.sub.uri)
-        return ret
-            
     def highlight_row(self, row):
         row = self.rows[row]
         row['bg'] = 'red'
@@ -455,29 +443,19 @@ class KeyboardComposer(tk.Frame, SubClient):
         return dict([(uri, box.slider_var.get())
             for uri, box in self.subbox.items()])
 
-    def get_levels_as_sub(self, graph=None):
-        """this has to depend on the graph to get called back enough"""
-        if graph is None:
-            graph = self.graph
-        # but it was using all synced values accidentally
+    def get_output_settings(self):
+        outputSettings = []
         for setting in graph.objects(self.session, L9['subSetting']):
-            level = graph.value(setting, L9['level'])
-            if level != 0:
-                sub = graph.value(setting, L9['sub'])
-                for ll in graph.objects(sub, L9['lightLevel']):
-                    graph.value(ll, L9['channel'])
-                    graph.value(ll, L9['level'])
+            effect = graph.value(setting, L9['sub'])
+            strength = graph.value(setting, L9['level'])
+            outputSettings.extend(
+                self.effectEval[effect].outputFromEffect(
+                    [(L9['strength'], strength)]))
 
-        # this is the older code, which uses some local objects
-        # that are (supposedly) synced to the graph. It's a waste,
-        # since I think the previous graph code just fetched all this
-        # same data
-        scaledsubs = [self.submasters.get_sub_by_uri(sub) * level
-            for sub, level in self.get_levels().items() if level > 0.0]
-        maxes = sub_maxes(*scaledsubs)
-        return maxes
+        return outputSettings
 
     def save_current_stage(self, subname):
+        raise NotImplementedError
         log.info("saving current levels as %s", subname)
         with self.graph.currentState() as current:
             sub = self.get_levels_as_sub(graph=current)
@@ -617,15 +595,6 @@ if __name__ == "__main__":
 
     graph.initiallySynced.addCallback(
         lambda _: launch(opts, root, graph, session))
-
-    if 0: # needs fixing, or maybe it's obsolete because other progs can just patch the rdf graph
-        import twisted.internet
-        try:
-            reactor.listenTCP(networking.keyboardComposer.port,
-                              server.Site(LevelServerHttp(kc.name_to_subbox)))
-        except twisted.internet.error.CannotListenError, e:
-            log.warn("Can't (and won't!) start level server:")
-            log.warn(e)
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
 

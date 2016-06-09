@@ -1,4 +1,4 @@
-from light9 import dmxclient
+from light9.effect.sequencer import sendToCollector
 
 class SubClient:
     def __init__(self):
@@ -19,6 +19,6 @@ class SubClient:
         self.after(delay, self.send_levels_loop, delay)
 
     def _send_sub(self):
-        maxes = self.get_levels_as_sub()
-        levels = maxes.get_dmx_list()
-        dmxclient.outputlevels(levels)
+        outputSettings = self.get_output_settings()
+        print outputSettings
+        sendToCollector('subclient', self.session, outputSettings)
