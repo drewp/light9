@@ -4,7 +4,7 @@
 @prefix dev: <http://light9.bigasterisk.com/device/> .
 
 
-effect:RedStrip a :EffectClass;
+effect:RedStrip a :Effect;
   rdfs:label "red";
   :publishAttr :strength;
   :deviceSetting :ds1, :ds2 .
@@ -12,7 +12,7 @@ effect:RedStrip a :EffectClass;
 :ds2 :device dev:moving1; :attr :red; :value "strength" .
 
 
-effect:BlueStrip a :EffectClass;
+effect:BlueStrip a :Effect;
   rdfs:label "blue";
   :publishAttr :strength;
   :deviceSetting :ds3 .
@@ -20,7 +20,7 @@ effect:BlueStrip a :EffectClass;
 
 :strength rdfs:label "strength" .
 
-effect:usa a :EffectClass;
+effect:usa a :Effect;
   rdfs:label "USA";
   :publishAttr :strength;
   :code "chase()";

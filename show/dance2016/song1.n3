@@ -6,62 +6,208 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-:a01 :effectAttr :chaseOffset ;
-    :value 0.12 .
+:a01 :effectAttr :chaseOffset; :value 0.12 .
+<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n0, song:n1, song:n10, song:n11, song:n12, song:n13, song:n14, song:n15, song:n16, song:n17, song:n18, song:n19, song:n2, song:n20, song:n21, song:n22, song:n23, song:n24, song:n3, song:n4, song:n5, song:n6, song:n7, song:n8, song:n9 .
+:ao0 :effectAttr :chaseTempo; :value 100 .
 
-<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n1,
-        song:n2 .
+song:n0 a :Note; :curve song:n0c0; :originTime 68.902 .
 
-:ao0 :effectAttr :chaseTempo ;
-    :value 100 .
+song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
+song:n0c0p0 :time 0.000; :value 0.000 .
+song:n0c0p1 :time 1.000; :value 1.000 .
+song:n0c0p2 :time 2.000; :value 1.000 .
+song:n0c0p3 :time 3.000; :value 0.000 .
 
-song:n1 a :Note ;
-    :attrOverride :ao0,
-        :ao1 ;
-    :curve song:n1c1 ;
-    :effectClass effect:RedStrip ;
-    :originTime 30.824 .
+song:n1 a :Note; :attrOverride :ao0, :ao1; :curve song:n1c1;
+     :effectClass effect:RedStrip; :originTime 37.123 .
 
-song:n1c1 a :Curve ;
-    :attr :strength ;
-    :point song:n1c1p0,
-        song:n1c1p1,
-        song:n1c1p2,
-        song:n1c1p3 .
+song:n10 a :Note; :curve song:n10c0; :originTime 86.880 .
 
-song:n1c1p0 :time 0.00 ;
-    :value 0 .
+song:n10c0 a :Curve; :attr :strength; :point song:n10c0p0, song:n10c0p1, song:n10c0p2, song:n10c0p3 .
+song:n10c0p0 :time 0.000; :value 0.000 .
+song:n10c0p1 :time 1.000; :value 1.000 .
+song:n10c0p2 :time 2.000; :value 1.000 .
+song:n10c0p3 :time 3.000; :value 0.000 .
 
-song:n1c1p1 :time 1 ;
-    :value 1 .
+song:n11 a :Note; :curve song:n11c0; :originTime 77.357 .
 
-song:n1c1p2 :time 2 ;
-    :value 1 .
+song:n11c0 a :Curve; :attr :strength; :point song:n11c0p0, song:n11c0p1, song:n11c0p2, song:n11c0p3 .
+song:n11c0p0 :time 0.000; :value 0.000 .
+song:n11c0p1 :time 1.000; :value 1.000 .
+song:n11c0p2 :time 2.000; :value 1.000 .
+song:n11c0p3 :time 3.000; :value 0.000 .
 
-song:n1c1p3 :time 3 ;
-    :value 0 .
+song:n12 a :Note; :curve song:n12c0; :originTime 82.410 .
 
-song:n2 a :Note ;
-    :curve song:n2c1 ;
-    :effectClass effect:BlueStrip ;
-    :originTime 33.161 .
+song:n12c0 a :Curve; :attr :strength; :point song:n12c0p0, song:n12c0p1, song:n12c0p2, song:n12c0p3 .
+song:n12c0p0 :time 0.000; :value 0.000 .
+song:n12c0p1 :time 1.000; :value 1.000 .
+song:n12c0p2 :time 2.000; :value 1.000 .
+song:n12c0p3 :time 3.000; :value 0.000 .
 
-song:n2c1 a :Curve ;
-    :attr :strength ;
-    :point song:n2c1p0,
-        song:n2c1p1,
-        song:n2c1p2,
-        song:n2c1p3 .
+song:n13 a :Note; :curve song:n13c0; :originTime 83.576 .
 
-song:n2c1p0 :time 0.00 ;
-    :value 0 .
+song:n13c0 a :Curve; :attr :strength; :point song:n13c0p0, song:n13c0p1, song:n13c0p2, song:n13c0p3 .
+song:n13c0p0 :time 0.000; :value 0.000 .
+song:n13c0p1 :time 1.000; :value 1.000 .
+song:n13c0p2 :time 2.000; :value 1.000 .
+song:n13c0p3 :time 3.000; :value 0.000 .
 
-song:n2c1p1 :time 1 ;
-    :value 1 .
+song:n14 a :Note; :curve song:n14c0; :originTime 82.410 .
 
-song:n2c1p2 :time 2 ;
-    :value 1 .
+song:n14c0 a :Curve; :attr :strength; :point song:n14c0p0, song:n14c0p1, song:n14c0p2, song:n14c0p3 .
+song:n14c0p0 :time 0.000; :value 0.000 .
+song:n14c0p1 :time 1.000; :value 1.000 .
+song:n14c0p2 :time 2.000; :value 1.000 .
+song:n14c0p3 :time 3.000; :value 0.000 .
 
-song:n2c1p3 :time 3 ;
-    :value 0 .
+song:n15 a :Note; :curve song:n15c0; :originTime 75.976 .
 
+song:n15c0 a :Curve; :attr :strength; :point song:n15c0p0, song:n15c0p1, song:n15c0p2, song:n15c0p3 .
+song:n15c0p0 :time 0.000; :value 0.000 .
+song:n15c0p1 :time 1.000; :value 1.000 .
+song:n15c0p2 :time 2.000; :value 1.000 .
+song:n15c0p3 :time 3.000; :value 0.000 .
+
+song:n16 a :Note; :curve song:n16c0; :originTime 86.297 .
+
+song:n16c0 a :Curve; :attr :strength; :point song:n16c0p0, song:n16c0p1, song:n16c0p2, song:n16c0p3 .
+song:n16c0p0 :time 0.000; :value 0.000 .
+song:n16c0p1 :time 1.000; :value 1.000 .
+song:n16c0p2 :time 2.000; :value 1.000 .
+song:n16c0p3 :time 3.000; :value 0.000 .
+
+song:n17 a :Note; :curve song:n17c0; :originTime 84.982 .
+
+song:n17c0 a :Curve; :attr :strength; :point song:n17c0p0, song:n17c0p1, song:n17c0p2, song:n17c0p3 .
+song:n17c0p0 :time 0.000; :value 0.000 .
+song:n17c0p1 :time 1.000; :value 1.000 .
+song:n17c0p2 :time 2.000; :value 1.000 .
+song:n17c0p3 :time 3.000; :value 0.000 .
+
+song:n18 a :Note; :curve song:n18c0; :originTime 85.682 .
+
+song:n18c0 a :Curve; :attr :strength; :point song:n18c0p0, song:n18c0p1, song:n18c0p2, song:n18c0p3 .
+song:n18c0p0 :time 0.000; :value 0.000 .
+song:n18c0p1 :time 1.000; :value 1.000 .
+song:n18c0p2 :time 2.000; :value 1.000 .
+song:n18c0p3 :time 3.000; :value 0.000 .
+
+song:n19 a :Note; :curve song:n19c0; :originTime 86.096 .
+
+song:n19c0 a :Curve; :attr :strength; :point song:n19c0p0, song:n19c0p1, song:n19c0p2, song:n19c0p3 .
+song:n19c0p0 :time 0.000; :value 0.000 .
+song:n19c0p1 :time 1.000; :value 1.000 .
+song:n19c0p2 :time 2.000; :value 1.000 .
+song:n19c0p3 :time 3.000; :value 0.000 .
+
+song:n1c1 a :Curve; :attr :strength; :point song:n1c1p0, song:n1c1p1, song:n1c1p2, song:n1c1p3 .
+song:n1c1p0 :time 0.00; :value 0 .
+song:n1c1p1 :time 1; :value 1 .
+song:n1c1p2 :time 2; :value 1 .
+song:n1c1p3 :time 3; :value 0 .
+
+song:n2 a :Note; :curve song:n2c1; :effectClass effect:BlueStrip;
+     :originTime 49.174 .
+
+song:n20 a :Note; :curve song:n20c0; :originTime 86.459 .
+
+song:n20c0 a :Curve; :attr :strength; :point song:n20c0p0, song:n20c0p1, song:n20c0p2, song:n20c0p3 .
+song:n20c0p0 :time 0.000; :value 0.000 .
+song:n20c0p1 :time 1.000; :value 1.000 .
+song:n20c0p2 :time 2.000; :value 1.000 .
+song:n20c0p3 :time 3.000; :value 0.000 .
+
+song:n21 a :Note; :curve song:n21c0; :originTime 84.749 .
+
+song:n21c0 a :Curve; :attr :strength; :point song:n21c0p0, song:n21c0p1, song:n21c0p2, song:n21c0p3 .
+song:n21c0p0 :time 0.000; :value 0.000 .
+song:n21c0p1 :time 1.000; :value 1.000 .
+song:n21c0p2 :time 2.000; :value 1.000 .
+song:n21c0p3 :time 3.000; :value 0.000 .
+
+song:n22 a :Note; :curve song:n22c0; :originTime 85.319 .
+
+song:n22c0 a :Curve; :attr :strength; :point song:n22c0p0, song:n22c0p1, song:n22c0p2, song:n22c0p3 .
+song:n22c0p0 :time 0.000; :value 0.000 .
+song:n22c0p1 :time 1.000; :value 1.000 .
+song:n22c0p2 :time 2.000; :value 1.000 .
+song:n22c0p3 :time 3.000; :value 0.000 .
+
+song:n23 a :Note; :curve song:n23c0; :originTime 85.034 .
+
+song:n23c0 a :Curve; :attr :strength; :point song:n23c0p0, song:n23c0p1, song:n23c0p2, song:n23c0p3 .
+song:n23c0p0 :time 0.000; :value 0.000 .
+song:n23c0p1 :time 1.000; :value 1.000 .
+song:n23c0p2 :time 2.000; :value 1.000 .
+song:n23c0p3 :time 3.000; :value 0.000 .
+
+song:n24 a :Note; :curve song:n24c0; :originTime 85.241 .
+
+song:n24c0 a :Curve; :attr :strength; :point song:n24c0p0, song:n24c0p1, song:n24c0p2, song:n24c0p3 .
+song:n24c0p0 :time 0.000; :value 0.000 .
+song:n24c0p1 :time 1.000; :value 1.000 .
+song:n24c0p2 :time 2.000; :value 1.000 .
+song:n24c0p3 :time 3.000; :value 0.000 .
+
+song:n2c1 a :Curve; :attr :strength; :point song:n2c1p0, song:n2c1p1, song:n2c1p2, song:n2c1p3 .
+song:n2c1p0 :time 0.00; :value 0 .
+song:n2c1p1 :time 1; :value 1 .
+song:n2c1p2 :time 2; :value 1 .
+song:n2c1p3 :time 3; :value 0 .
+
+song:n3 a :Note; :curve song:n3c0; :originTime 80.665 .
+
+song:n3c0 a :Curve; :attr :strength; :point song:n3c0p0, song:n3c0p1, song:n3c0p2, song:n3c0p3 .
+song:n3c0p0 :time 0.000; :value 0.000 .
+song:n3c0p1 :time 1.000; :value 1.000 .
+song:n3c0p2 :time 2.000; :value 1.000 .
+song:n3c0p3 :time 3.000; :value 0.000 .
+
+song:n4 a :Note; :curve song:n4c0; :originTime 60.155 .
+
+song:n4c0 a :Curve; :attr :strength; :point song:n4c0p0, song:n4c0p1, song:n4c0p2, song:n4c0p3 .
+song:n4c0p0 :time 0.000; :value 0.000 .
+song:n4c0p1 :time 1.000; :value 1.000 .
+song:n4c0p2 :time 2.000; :value 1.000 .
+song:n4c0p3 :time 3.000; :value 0.000 .
+
+song:n5 a :Note; :curve song:n5c0; :originTime 20.505 .
+
+song:n5c0 a :Curve; :attr :strength; :point song:n5c0p0, song:n5c0p1, song:n5c0p2, song:n5c0p3 .
+song:n5c0p0 :time 0.000; :value 0.000 .
+song:n5c0p1 :time 1.000; :value 1.000 .
+song:n5c0p2 :time 2.000; :value 1.000 .
+song:n5c0p3 :time 3.000; :value 0.000 .
+
+song:n6 a :Note; :curve song:n6c0; :originTime 26.628 .
+
+song:n6c0 a :Curve; :attr :strength; :point song:n6c0p0, song:n6c0p1, song:n6c0p2, song:n6c0p3 .
+song:n6c0p0 :time 0.000; :value 0.000 .
+song:n6c0p1 :time 1.000; :value 1.000 .
+song:n6c0p2 :time 2.000; :value 1.000 .
+song:n6c0p3 :time 3.000; :value 0.000 .
+
+song:n7 a :Note; :curve song:n7c0; :originTime 31.584 .
+
+song:n7c0 a :Curve; :attr :strength; :point song:n7c0p0, song:n7c0p1, song:n7c0p2, song:n7c0p3 .
+song:n7c0p0 :time 0.000; :value 0.000 .
+song:n7c0p1 :time 1.000; :value 1.000 .
+song:n7c0p2 :time 2.000; :value 1.000 .
+song:n7c0p3 :time 3.000; :value 0.000 .
+
+song:n8 a :Note; :curve song:n8c0; :originTime 40.039 .
+
+song:n8c0 a :Curve; :attr :strength; :point song:n8c0p0, song:n8c0p1, song:n8c0p2, song:n8c0p3 .
+song:n8c0p0 :time 0.000; :value 0.000 .
+song:n8c0p1 :time 1.000; :value 1.000 .
+song:n8c0p2 :time 2.000; :value 1.000 .
+song:n8c0p3 :time 3.000; :value 0.000 .
+
+song:n9 a :Note; :curve song:n9c0; :originTime 45.967 .
+
+song:n9c0 a :Curve; :attr :strength; :point song:n9c0p0, song:n9c0p1, song:n9c0p2, song:n9c0p3 .
+song:n9c0p0 :time 0.000; :value 0.000 .
+song:n9c0p1 :time 1.000; :value 1.000 .
+song:n9c0p2 :time 2.000; :value 1.000 .
+song:n9c0p3 :time 3.000; :value 0.000 .

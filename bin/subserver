@@ -50,7 +50,7 @@ class EffectsUpdates(cyclone.websocket.WebSocketHandler):
             return
         graph = self.settings.graph
         classes = []
-        for e in graph.subjects(RDF.type, L9['EffectClass']):
+        for e in graph.subjects(RDF.type, L9['Effect']):
             classes.append({'uri': e,
                             'label': graph.label(e),
                             'code': graph.value(e, L9['code'])})
