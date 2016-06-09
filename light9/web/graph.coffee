@@ -162,6 +162,8 @@ class window.SyncedGraph
     [q.subject, q.predicate, q.object, q.graph] for q in @graph.find()
 
   applyAndSendPatch: (patch) ->
+    if !Array.isArray(patch.addQuads) || !Array.isArray(patch.delQuads)
+      throw new Error("corrupt patch: #{patch}")
     @_applyPatch(patch)
     @_client.sendPatch(patch) if @_client
 
