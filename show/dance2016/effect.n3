@@ -36,3 +36,18 @@ effect:usa a :Effect;
 :fc1p1 :time 0.02; :value 1 .
 :fc1p2 :time 0.10; :value 1 .
 :fc1p3 :time 0.15; :value 0 .
+
+
+effect:WorkLight a :Effect;
+  rdfs:label "work light";
+  :publishAttr :strength;
+  :deviceSetting :ds4 .
+:ds4 :device dev:colorStrip; :attr :color; :value "#00ff00" .
+
+effect:Curtain a :Effect; rdfs:label "curtain"; :publishAttr :strength;
+  :deviceSetting :ds5 .
+:ds5 :device dev:colorStrip; :attr :color; :value "#300030" .
+
+:live :controls effect:WorkLight, effect:Curtain .
+effect:WorkLight :group "main"; :order 1 .
+effect:Curtain :group "main"; :order 2 .
