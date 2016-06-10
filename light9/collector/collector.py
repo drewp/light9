@@ -30,7 +30,11 @@ def outputMap(graph, outputs):
                 raise ValueError('multiple output ports (%r) :connectedTo %r' %
                                  (outputPorts, connectedTo))
             else:
-                output, index = outIndex[outputPorts[0]]
+                try:
+                    output, index = outIndex[outputPorts[0]]
+                except KeyError:
+                    log.warn('skipping %r', outputPorts[0])
+                    continue
             ret[(dev, attr)] = output, index
             log.debug('outputMap (%r, %r) -> %r, %r', dev, attr, output, index)
     
