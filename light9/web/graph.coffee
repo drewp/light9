@@ -95,8 +95,10 @@ class AutoDependencies
     rerunInners = (cur) =>
       toRun = cur.innerHandlers.slice()
       for child in toRun
-        child.innerHandlers = [] # let all children get called again
+
+        #child.innerHandlers = [] # let all children get called again
         @_rerunHandler(child)
+        rerunInners(child)
     rerunInners(@handlers)
 
   askedFor: (s, p, o, g) ->

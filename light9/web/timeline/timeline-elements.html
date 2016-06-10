@@ -52,6 +52,7 @@
     <light9-timeline-time-zoomed id="zoomed"
                                  graph="{{graph}}"
                                  dia="{{dia}}"
+                                 set-adjuster="{{setAdjuster}}"
                                  song="{{song}}"
                                  show="{{show}}"
                                  zoom="{{viewState.zoomSpec}}"
@@ -62,7 +63,7 @@
                                dia="{{dia}}"
                                graph="{{graph}}"
                                song="{{song}}"
-                               parent-adjs="{{adjs}}"
+                               set-adjuster="{{setAdjuster}}"
                                zoom-in-x="{{zoomInX}}">
     </light9-timeline-adjusters>
   </template>
@@ -105,6 +106,7 @@ background: rgba(126, 52, 245, 0.0784313725490196);
         <template is="dom-repeat" items="{{rows}}">
           <light9-timeline-graph-row graph="{{graph}}"
                                      dia="{{dia}}"
+                                     set-adjuster="{{setAdjuster}}"
                                      song="{{song}}"
                                      zoom-in-x="{{zoomInX}}"
                                      row-index="{{item}}"
@@ -194,6 +196,7 @@ background: rgba(126, 52, 245, 0.0784313725490196);
       <light9-timeline-note graph="{{graph}}"
                             dia="{{dia}}"
                             uri="{{item}}"
+                            set-adjuster="{{setAdjuster}}"
                             song="{{song}}"
                             zoom-in-x="{{zoomInX}}">
       </light9-timeline-note>
@@ -232,10 +235,8 @@ background: rgba(126, 52, 245, 0.0784313725490196);
      }
 
     </style>
-    <template is="dom-repeat" items="{{adjs}}">
-      <light9-timeline-adjuster dia="{{dia}}"
-                                adj="{{item}}"></light9-timeline-adjuster>
-    </template>
+    <div id="all">
+    </div>
   </template>
 </dom-module>
 

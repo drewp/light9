@@ -15,13 +15,19 @@ class Adjustable
     #   getTarget -> vec2 of current target position
     #   getSuggestedTargetOffset -> vec2 pixel offset from target
     #   emptyBox -> true if you want no value display
+    
+    # updated later by layout algoritm
+    @centerOffset = $V([0, 0])
 
   getDisplayValue: () ->
     return '' if @config.emptyBox
     d3.format(".4g")(@_getValue())
 
-  getCenter: () -> # vec2 of pixels
+  getSuggestedCenter: () ->
     @getTarget().add(@config.getSuggestedTargetOffset())
+
+  getCenter: () -> # vec2 of pixels
+    @getTarget().add(@centerOffset)
 
   getTarget: () -> # vec2 of pixels
     @config.getTarget()
@@ -32,17 +38,17 @@ class Adjustable
     throw new Error('not implemented')
 
   startDrag: () ->
-    # override
+    @initialTarget = @getTarget()
 
   continueDrag: (pos) ->
-    # pos is vec2 of pixels relative to the drag start
-
-    # override
+    ## pos is vec2 of pixels relative to the drag start
+    @targetDraggedTo = pos.add(@initialTarget)
     
   endDrag: () ->
     # override
 
   _editorCoordinates: () -> # vec2 of mouse relative to <l9-t-editor>
+    return @targetDraggedTo
     ev = d3.event.sourceEvent
 
     if ev.target.tagName == "LIGHT9-TIMELINE-EDITOR"
@@ -66,13 +72,14 @@ class window.AdjustableFloatObservable extends Adjustable
     #   observable -> ko.observable we will read and write
     #   getValueForPos(pos) -> what should we set to if the user
     #                          moves target to this coord?
+    super(@config)
 
   _getValue: () ->
     @config.observable()
     
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start.
-
+    super(pos)
     epos = @_editorCoordinates()
     newValue = @config.getValueForPos(epos)
     @config.observable(newValue)
@@ -89,7 +96,7 @@ class window.AdjustableFloatObject extends Adjustable
     #   subj
     #   pred
     #   ctx
-    #   getTargetTransform(value) -> getTarget result for value
+    #   getTargetPosForValue(value) -> getTarget result for value
     #   getValueForPos
 
     super(@config)
@@ -105,7 +112,7 @@ class window.AdjustableFloatObject extends Adjustable
     @_currentValue
 
   getTarget: () ->
-    @config.getTargetTransform(@_getValue())
+    @config.getTargetPosForValue(@_getValue())
     
   subscribe: (onChange) ->
     # only works on one subscription at a time
@@ -115,7 +122,7 @@ class window.AdjustableFloatObject extends Adjustable
     
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
-    
+    super(pos)
     newValue = @config.getValueForPos(@_editorCoordinates())
     
     @config.graph.patchObject(@config.subj, @config.pred,

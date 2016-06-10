@@ -8,6 +8,7 @@ Polymer
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
+    setAdjuster: {type: Function, notify: true}
     playerSong: {type: String, notify: true}
     followPlayerSong: {type: Boolean, notify: true, value: true}
     song: {type: String, notify: true}
@@ -44,16 +45,18 @@ Polymer
         pos: ko.observable($V([0,0]))
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
+    @setAdjuster = @$.adjusters.setAdjuster.bind(@$.adjusters)
+    
   attached: ->
     @dia = @$.dia
     ko.computed(@zoomOrLayoutChanged.bind(@)).extend({rateLimit: 5})
     ko.computed(@songTimeChanged.bind(@))
 
-    @adjs = @makeZoomAdjs()
-
     @trackMouse()
     @bindKeys()
     @bindWheelZoom()
+
+    @makeZoomAdjs()
 
   zoomOrLayoutChanged: ->
     @fullZoomX.domain([0, @viewState.zoomSpec.duration()])
@@ -154,27 +157,28 @@ Polymer
                       newCenter + visSeconds / 2, zoomAnimSec)
 
   makeZoomAdjs: ->
+    log('makeZoomAdjs', @adjs)
     yMid = @$.audio.offsetTop + @$.audio.offsetHeight / 2
     dur = @viewState.zoomSpec.duration
     
     valForPos = (pos) =>
         x = pos.e(1)
         t = @fullZoomX.invert(x)
-    left = new AdjustableFloatObservable({
+    @setAdjuster('zoom-left', new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
         $V([@fullZoomX(@viewState.zoomSpec.t1()), yMid])
       getSuggestedTargetOffset: () => $V([-50, 0])
       getValueForPos: valForPos
-    })
+    }))
 
-    right = new AdjustableFloatObservable({
+    @setAdjuster('zoom-right', new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
         $V([@fullZoomX(@viewState.zoomSpec.t2()), yMid])
       getSuggestedTargetOffset: () => $V([50, 0])
       getValueForPos: valForPos
-    })
+    }))
 
     panObs = ko.pureComputed({
         read: () =>
@@ -186,7 +190,7 @@ Polymer
           zs.t2(value + span / 2)
       })
 
-    pan = new AdjustableFloatObservable({
+    @setAdjuster('zoom-pan', new AdjustableFloatObservable({
       observable: panObs
       emptyBox: true
       # fullzoom is not right- the sides shouldn't be able to go
@@ -194,11 +198,8 @@ Polymer
       getTarget: () => $V([@fullZoomX(panObs()), yMid])
       getSuggestedTargetOffset: () => $V([0, 0])
       getValueForPos: valForPos
-      })
+      }))
       
-    return [left, right, pan]
-
-
 
 Polymer
   is: 'light9-timeline-time-zoomed'
@@ -288,6 +289,17 @@ Polymer
     for note in @graph.objects(@song, U(':note'))
       @push('noteUris', note)
 
+
+getCurvePoints = (graph, curve, xOffset) ->
+  worldPts = []
+  for pt in graph.objects(curve, graph.Uri(':point'))
+    v = $V([xOffset + graph.floatValue(pt, graph.Uri(':time')),
+            graph.floatValue(pt, graph.Uri(':value'))])
+    v.uri = pt
+    worldPts.push(v)
+  worldPts.sort((a,b) -> a.e(1) > b.e(1))
+  return worldPts
+
 Polymer
   is: 'light9-timeline-note'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -297,9 +309,10 @@ Polymer
     dia: { type: Object, notify: true }
     uri: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
+    setAdjuster: {type: Function, notify: true}
   observers: [
     'onUri(graph, dia, uri)'
-    'update(graph, dia, uri, zoomInX)'
+    'update(graph, dia, uri, zoomInX, setAdjuster)'
     ]
   ready: ->
 
@@ -318,15 +331,32 @@ Polymer
       originTime = @graph.floatValue(@uri, U(':originTime'))
       for curve in @graph.objects(@uri, U(':curve'))
         if @graph.uriValue(curve, U(':attr')) == U(':strength')
+          worldPts = getCurvePoints(@graph, curve, originTime)
+          @setAdjuster(@uri+'/offset', new AdjustableFloatObject({
+            graph: @graph
+            subj: @uri
+            pred: @graph.Uri(':originTime')
+            ctx: @graph.Uri(@song)
+            getTargetPosForValue: (value) => $V([@zoomInX(value), 600])
+            getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
+            getSuggestedTargetOffset: () => $V([0, -80])
+          }))
+         
+          @setAdjuster(@uri+'/p3', adj = new AdjustableFloatObject({
+            graph: @graph
+            subj: worldPts[3].uri
+            pred: @graph.Uri(':time')
+            ctx: @graph.Uri(@song)
+            getTargetPosForValue: (value) => $V([@zoomInX(value), 600])
+            getValueForPos: (pos) => (@zoomInX.invert(pos.e(1)) - originTime)
+            getSuggestedTargetOffset: () => $V([0, -80])
+          }))
+          adj._getValue = (=>
+            # note: don't use originTime from the closure- we need the
+            # graph dependency
+            adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+            )
           
-          for pt in @graph.objects(curve, U(':point'))
-
-            worldPts.push($V([
-              originTime + @graph.floatValue(pt, U(':time')),
-              @graph.floatValue(pt, U(':value'))
-              ]))
-      worldPts.sort((a,b) -> a.e(1) > b.e(1))
-
       screenPos = (pt) =>
         $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
 
@@ -339,76 +369,106 @@ Polymer
 Polymer
   is: "light9-timeline-adjusters"
   properties:
-    adjs: { type: Array }, # our computed list
-    parentAdjs: { type: Array }, # incoming requests
-    graph: { type: Object, notify: true }
-    song: { type: String, notify: true }
-    zoomInX: { type: Object, notify: true }
+    adjs: { type: Object, notify: true }, # adjId: Adjustable
     dia: { type: Object }
-  observers: [
-    'update(parentAdjs, graph, song, dia)'
-    'onGraph(graph, song)'
-    ]
-  onGraph: (graph, song, zoomInX) ->
-    graph.runHandler(@update.bind(@), "adjuster update")
-  update: (parentAdjs, graph, song, dia) ->
-    U = (x) -> @graph.Uri(x)
-    @adjs = (@parentAdjs || []).slice()
-    for note in @graph.objects(@song, U(':note'))
-      @push('adjs', new AdjustableFloatObject({
-        graph: @graph
-        subj: note
-        pred: @graph.Uri(':originTime')
-        ctx: @graph.Uri(@song)
-        getTargetTransform: (value) => $V([@zoomInX(value), 600])
-        getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
-        getSuggestedTargetOffset: () => $V([0, -80])
-      }))
+
+  ready: ->
+    @adjs = {}
     
+  setAdjuster: (adjId, adjustable) ->
+    # callers register/unregister the Adjustables they want us
+    # to make adjuster elements for. Caller invents adjId.
+    adjustable.id = adjId
+    if not @adjs[adjId] or not adjustable?
+      @adjs[adjId] = adjustable
+      @debounce('adjsChanged', @adjsChanged.bind(@), 1)
+    
+  adjsChanged: ->
+
+    added = removed = 0
+    newIds = Object.keys(@adjs)
+
+    parent = @$.all
+    haveIds = []
+    for c in parent.children
+      id = c.getAttribute('id')
+      if newIds.indexOf(id) == -1
+        c.remove()
+        removed++
+        # ...?
+      else
+        haveIds.push(id)
+
+    for id, adj of @adjs
+      if haveIds.indexOf(id) == -1
+        log('need new one for', id)
+        child = document.createElement('light9-timeline-adjuster')
+        child.dia = @dia
+        child.graph = @graph
+        child.setAttribute('id', id)
+        child.adj = adj # set this  last
+        parent.appendChild(child)
+        added++
+    log("adjsChanged removed #{removed} added #{added}") if added or removed
+
+  layoutCenters: ->
+    # push Adjustable centers around to avoid overlaps
+    qt = d3.quadtree()
+    qt.extent([[0,0], [8000,8000]])
+    for _, adj of @adjs
+      desired = adj.getSuggestedCenter()
+      output = desired
+      for tries in [0...2]
+        nearest = qt.find(output.e(1), output.e(2))
+        if nearest
+          dist = output.distanceFrom(nearest)
+          if dist < 60
+            away = output.subtract(nearest).toUnitVector()
+            toScreenCenter = $V([500,200]).subtract(output).toUnitVector()
+            output = output.add(away.x(60).add(toScreenCenter.x(10)))
+
+      if -50 < output.e(1) < 20 # mostly for zoom-left
+        output.setElements([
+          Math.max(20, output.e(1)),
+          output.e(2)])
+        
+      adj.centerOffset = output.subtract(adj.getTarget())
+      qt.add(output.elements)
+
   updateAllCoords: ->
+    @layoutCenters()
+    
     for elem in @querySelectorAll('light9-timeline-adjuster')
       elem.updateDisplay()
     
 
-_adjusterSerial = 0
-
 Polymer
   is: 'light9-timeline-adjuster'
   properties:
-    adj:
-      type: Object
-      notify: true
-      observer: 'onAdj'
-    target:
-      type: Object
-      notify: true
-    displayValue:
-      type: String
-    centerStyle:
-      type: Object
-    spanClass:
-      type: String
-      value: ''
+    graph: { type: Object, notify: true }
+    adj: { type: Object, notify: true, observer: 'onAdj' }
+    target: { type: Object, notify: true }
+    displayValue: { type: String }
+    centerStyle: { type: Object }
+    spanClass: { type: String, value: '' }
 
   onAdj: (adj) ->
-    # currently I think this subscription never gets to matter since
-    # we might be rebuilding all adj elements on every update
+    log('onAdj', @id)
     @adj.subscribe(@updateDisplay.bind(this))
-    @updateDisplay()
+    @graph.runHandler(@updateDisplay.bind(@))
 
   updateDisplay: () ->
+    log('updateDisplay', @id)
     @spanClass = if @adj.config.emptyBox then 'empty' else ''
     @displayValue = @adj.getDisplayValue()
     center = @adj.getCenter()
     target = @adj.getTarget()
+    log('ct', center.elements, target.elements)
     return if isNaN(center.e(1))
     @centerStyle = {x: center.e(1), y: center.e(2)}
-    @dia?.setAdjusterConnector(@myId, center, target)
+    @dia?.setAdjusterConnector(@adj.id + '/conn', center, target)
         
   attached: ->
-    @myId = 'adjuster-' + _adjusterSerial
-    _adjusterSerial += 1
-    
     drag = d3.drag()
     sel = d3.select(@$.label)
     sel.call(drag)
@@ -422,7 +482,7 @@ Polymer
     @updateDisplay()
 
   detached: ->
-    @dia.clearElem(@myId)
+    @dia.clearElem(@adj.id + '/conn')
 
 
 svgPathFromPoints = (pts) ->
