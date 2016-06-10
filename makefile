@@ -46,6 +46,9 @@ link_to_sys_packages:
 	ln -sf $(DP)/pygst.py $(SP)/
 	ln -sf $(DP)/gst-0.10 $(SP)/
 	ln -sf $(DP)/goocanvasmodule.so $(SP)/
+	ln -sf $(DP)/cv2.x86_64-linux-gnu.so $(SP)/
+	ln -sf $(DP)/cv.py $(SP)/
+	ln -sf $(DP)/numpy $(SP)/
 
 PYTHON=/usr/bin/pypy
 PYTHON=/usr/bin/python
@@ -69,7 +72,7 @@ gst_packages:
 	sudo aptitude install python-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio 
 
 packages:
-	sudo aptitude install coffeescript freemind normalize-audio audacity python-pygoocanvas python-pygame gir1.2-goocanvas-2.0-9 libffi-dev tix libzmq3 python-dev libssl-dev
+	sudo aptitude install coffeescript freemind normalize-audio audacity python-pygoocanvas python-pygame gir1.2-goocanvas-2.0-9 libffi-dev tix libzmq3 python-dev libssl-dev python-opencv
 
 bower:
 	cd light9/web/lib; bower install

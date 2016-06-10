@@ -15,7 +15,8 @@
     "rdfstore": "https://github.com/antoniogarrote/rdfstore-js.git#b3f7c0c9c1da9b26261af0d4858722fa982411bb",
     "N3.js": "https://github.com/RubenVerborgh/N3.js.git#04f4e21f4ccb351587dc00a3f26340b28d4bb10f",
     "shortcut": "http://www.openjs.com/scripts/events/keyboard_shortcuts/shortcut.js",
-    "async": "https://github.com/caolan/async.git#^1.5.2"
+    "async": "https://github.com/caolan/async.git#^1.5.2",
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.3"
   },
   "resolutions": {
     "paper-styles": "^1.1.4",

@@ -33,4 +33,4 @@ http {
 }
 EOF
 head -1 /tmp/light9_nginx_routes.conf
-exec nginx -c $CONF
+exec /usr/sbin/nginx -c $CONF
