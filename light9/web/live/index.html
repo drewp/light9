@@ -8,51 +8,16 @@
     <link rel="import" href="/lib/polymer/polymer.html">
     <link rel="import" href="/lib/paper-slider/paper-slider.html">
     <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+    <link rel="import" href="../light9-collector-client.html">
+
+    <script src="/lib/d3/build/d3.min.js"></script>
+    <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
+    <script src="/lib/async/dist/async.js"></script>
+    
+    <link rel="import" href="../rdfdb-synced-graph.html">
   </head>
   <body>
     
-    <dom-module id="light9-collector-client">
-      <template>
-        <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
-        <span>{{status}}</span>
-      </template>
-      <script>
-       HTMLImports.whenReady(function () {
-           Polymer({
-               is: "light9-collector-client",
-               properties: {
-                   status: {type: String, value: 'init'},
-                   clientSession: {value: ""+Date.now()},
-                   self: {type: Object, notify: true}
-               },
-               ready: function() {
-                   this.self = this;
-                   var self = this;
-                   
-                   self.$.put.addEventListener(
-                       'error', function() { self.status = 'err'; });
-                   self.$.put.addEventListener(
-                       'request', function() { self.status = 'send'; });
-                   self.$.put.addEventListener(
-                       'response', function() { self.status = 'ok'; });
-                   // collector gives up on clients after 10sec
-                   setInterval(self.ping.bind(self), 9000);
-                   self.status = 'ready';
-               },               
-               ping: function() {
-                   this.send([]);
-               },
-               send: function(settings) {
-                   this.$.put.body = JSON.stringify({
-                       "settings": settings,
-                       "client": window.location.href,
-                       "clientSession": this.clientSession});
-                   this.$.put.generateRequest();
-               }
-           });
-       });
-      </script>
-    </dom-module>
        
     <dom-module id="light9-live-control">
       <template>
@@ -75,43 +40,15 @@
                  value="{{pickedColor}}">
         </template>
       </template>
-      <script>
-       HTMLImports.whenReady(function () {
-           Polymer({
-               is: "light9-live-control",
-               properties: {
-                   client: {type: Object},
-                   device: {type: String},
-                   attr: {type: String},
-                   max: {type: Number, value: 1},
-                   immediateSlider: {notify: true, observer: "onChange"},
-                   useSlider: {type: Boolean, computed: '_useSlider(attr)'},
-                   useColor: {type: Boolean, computed: '_useColor(attr)'},
-                   pickedColor: {observer: 'onPickedColor'},
-               },
-               ready: function() {
-               },
-               onPickedColor: function(ev) {
-                   this.onChange(ev.target.value);
-               },
-               onChange: function(lev) {
-                   this.client.send([[this.device, this.attr, lev]]);
-               },
-               _useSlider: function(attr) {
-                   return attr != 'http://light9.bigasterisk.com/color';
-               },
-               _useColor: function(attr) {
-                   return attr == 'http://light9.bigasterisk.com/color';
-               },
-           });
-       });
-      </script>
+     
     </dom-module>
     
     <dom-module id="light9-live-controls">
       <template>
         <style>
         </style>
+        <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
+
         <light9-collector-client self="{{client}}"></light9-collector-client>
         <h1>live</h1>
 
@@ -148,18 +85,13 @@
        HTMLImports.whenReady(function () {
            Polymer({
                is: "light9-live-controls",
-               properties: {
-
-               },
-               ready: function() {
-
-               },
            });
        });
       </script>
     </dom-module>
     
     <light9-live-controls></light9-live-controls>    
-    
+
+    <script src="live.js"></script>   
   </body>
 </html>

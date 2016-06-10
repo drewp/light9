@@ -1,0 +1,43 @@
+<link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+
+<dom-module id="light9-collector-client">
+  <template>
+    <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
+    <span>{{status}}</span>
+  </template>
+  <script>
+   Polymer({
+       is: "light9-collector-client",
+       properties: {
+           status: {type: String, value: 'init'},
+           clientSession: {value: ""+Date.now()},
+           self: {type: Object, notify: true}
+       },
+       ready: function() {
+           this.self = this;
+           var self = this;
+           
+           self.$.put.addEventListener(
+               'error', function() { self.status = 'err'; });
+           self.$.put.addEventListener(
+               'request', function() { self.status = 'send'; });
+           self.$.put.addEventListener(
+               'response', function() { self.status = 'ok'; });
+           // collector gives up on clients after 10sec
+           setInterval(self.ping.bind(self), 9000);
+           self.status = 'ready';
+       },               
+       ping: function() {
+           this.send([]);
+       },
+       send: function(settings) {
+           this.$.put.body = JSON.stringify({
+               "settings": settings,
+               "client": window.location.href,
+               "clientSession": this.clientSession});
+           this.$.put.generateRequest();
+       }
+   });
+  </script>
+</dom-module>
