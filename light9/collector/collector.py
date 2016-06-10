@@ -9,35 +9,25 @@ log = logging.getLogger('collector')
 
 def outputMap(graph, outputs):
     """From rdf config graph, compute a map of
-       (device, attr) : (output, index)
+       (device, outputattr) : (output, index)
     that explains which output index to set for any device update.
     """
     ret = {}
 
-    outIndex = {} # port : (output, index)
+    outputByUri = {}  # universeUri : output
     for out in outputs:
-        for index, uri in out.allConnections():
-            outIndex[uri] = (out, index)
+        outputByUri[out.uri] = out
 
-    for dev in graph.subjects(RDF.type, L9['Device']):
-        for attr, connectedTo in graph.predicate_objects(dev):
-            if attr == RDF.type:
-                continue
-            outputPorts = list(graph.subjects(L9['connectedTo'], connectedTo))
-            if len(outputPorts) == 0:
-                raise ValueError('no output port :connectedTo %r' % connectedTo)
-            elif len(outputPorts) > 1:
-                raise ValueError('multiple output ports (%r) :connectedTo %r' %
-                                 (outputPorts, connectedTo))
-            else:
-                try:
-                    output, index = outIndex[outputPorts[0]]
-                except KeyError:
-                    log.warn('skipping %r', outputPorts[0])
-                    continue
-            ret[(dev, attr)] = output, index
-            log.debug('outputMap (%r, %r) -> %r, %r', dev, attr, output, index)
-    
+    for dc in graph.subjects(RDF.type, L9['DeviceClass']):
+        for dev in graph.subjects(RDF.type, dc):
+            output = outputByUri[graph.value(dev, L9['dmxUniverse'])]
+            dmxBase = int(graph.value(dev, L9['dmxBase']).toPython())
+            for row in graph.objects(dc, L9['attr']):
+                outputAttr = graph.value(row, L9['outputAttr'])
+                offset = int(graph.value(row, L9['dmxOffset']).toPython())
+                index = dmxBase + offset - 1
+                ret[(dev, outputAttr)] = (output, index)
+                log.info('map %s,%s to %s,%s', dev, outputAttr, output, index)
     return ret
         
 class Collector(object):
@@ -52,10 +42,9 @@ class Collector(object):
     def rebuildOutputMap(self):
         self.outputMap = outputMap(self.graph, self.outputs) # (device, attr) : (output, index)
         self.deviceType = {} # uri: type that's a subclass of Device
-        for dev in self.graph.subjects(RDF.type, L9['Device']):
-            for t in self.graph.objects(dev, RDF.type):
-                if t != L9['Device']:
-                    self.deviceType[dev] = t
+        for dc in self.graph.subjects(RDF.type, L9['DeviceClass']):
+            for dev in self.graph.subjects(RDF.type, dc):
+                self.deviceType[dev] = dc
 
     def _forgetStaleClients(self, now):
         staleClients = []
@@ -97,27 +86,33 @@ class Collector(object):
         self.lastRequest[client] = (clientSession, now, prevClientSettings)
 
 
-        deviceAttrs = {} # device: {attr: value}
+        deviceAttrs = {} # device: {deviceAttr: value}
         for _, _, lastSettings in self.lastRequest.itervalues():
-            for (device, attr), value in lastSettings.iteritems():
+            for (device, deviceAttr), value in lastSettings.iteritems():
                 attrs = deviceAttrs.setdefault(device, {})
-                if attr in attrs:
-                    value = resolve(device, attr, [attrs[attr], value])
-                attrs[attr] = value
+                if deviceAttr in attrs:
+                    value = resolve(device, deviceAttr, [attrs[deviceAttr],
+                                                         value])
+                attrs[deviceAttr] = value
 
-        outputAttrs = {} # device: {attr: value}
+        outputAttrs = {} # device: {outputAttr: value}
         for d in deviceAttrs:
-            outputAttrs[d] = toOutputAttrs(self.deviceType[d], deviceAttrs[d])
+            try:
+                devType = self.deviceType[d]
+            except KeyError:
+                log.warn("request for output to unconfigured device %s" % d)
+                continue
+            outputAttrs[d] = toOutputAttrs(devType, deviceAttrs[d])
         
         pendingOut = {} # output : values
         for device, attrs in outputAttrs.iteritems():
-            for attr, value in attrs.iteritems():
-                self.setAttr(device, attr, value, pendingOut)
+            for outputAttr, value in attrs.iteritems():
+                self.setAttr(device, outputAttr, value, pendingOut)
 
         self.flush(pendingOut)
 
-    def setAttr(self, device, attr, value, pendingOut):
-        output, index = self.outputMap[(device, attr)]
+    def setAttr(self, device, outputAttr, value, pendingOut):
+        output, index = self.outputMap[(device, outputAttr)]
         outList = pendingOut.setdefault(output, [])
         setListElem(outList, index, value, combine=max)
 

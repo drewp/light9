@@ -48,13 +48,8 @@ class Output(object):
 
 
 class DmxOutput(Output):
-    def __init__(self, baseUri, channels):
-        self.baseUri = baseUri
-        self.channels = channels
-
-    def allConnections(self):
-        return ((i, URIRef('%sc%s' % (self.baseUri, i + 1)))
-                for i in range(self.channels))
+    def __init__(self, uri):
+        self.uri = uri
 
     def flush(self):
         pass
@@ -65,8 +60,8 @@ class EnttecDmx(DmxOutput):
                               scales.PmfStat('write'),
                               scales.PmfStat('update'))
 
-    def __init__(self, baseUri, channels, devicePath='/dev/dmx0'):
-        DmxOutput.__init__(self, baseUri, channels)
+    def __init__(self, uri, devicePath='/dev/dmx0'):
+        DmxOutput.__init__(self, uri)
 
         sys.path.append("dmx_usb_module")
         from dmx import Dmx
@@ -95,8 +90,8 @@ class Udmx(DmxOutput):
                               scales.PmfStat('update'),
                               scales.PmfStat('write'),
                               scales.IntStat('usbErrors'))
-    def __init__(self, baseUri, channels):
-        DmxOutput.__init__(self, baseUri, channels)
+    def __init__(self, uri):
+        DmxOutput.__init__(self, uri)
         
         from light9.io.udmx import Udmx
         self.dev = Udmx()

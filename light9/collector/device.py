@@ -47,9 +47,9 @@ def resolve(deviceType, deviceAttr, values):
     
 def toOutputAttrs(deviceType, deviceAttrSettings):
     """
-    Given settings like {L9['color']: Literal('#ff0000')}, return a
-    similar dict where the keys are output attrs and the values are
-    suitable for Collector.setAttr
+    Given device attr settings like {L9['color']: Literal('#ff0000')},
+    return a similar dict where the keys are output attrs (like
+    L9['red']) and the values are suitable for Collector.setAttr
     """
     if deviceType == L9['ChauvetColorStrip']:
         color = deviceAttrSettings.get(L9['color'], '#000000')
