@@ -28,6 +28,7 @@
         <div>
           <span class="left"><a class="big" href="{{name}}/">{{name}}</a></span>
           <span><button on-click="click">window</button></span>
+          <span><a href="{{name}}/stats">stats</a></span>
         </div>
       </template>
       <script>
@@ -49,16 +50,17 @@
     <h1>light9 home page</h1>
 
     <div style="float: left">
+      <service-button-row name="."></service-button-row>
       <service-button-row name="rdfdb"></service-button-row>
-      <service-button-row name="effectEval"></service-button-row>
+      <service-button-row name="collector"></service-button-row>
+      <service-button-row name="effectSequencer"></service-button-row>
       <service-button-row name="ascoltami"></service-button-row>
-      <service-button-row name="subComposer"></service-button-row>
       <service-button-row name="subServer"></service-button-row>
       <service-button-row name="picamserve"></service-button-row>
       <service-button-row name="vidref"></service-button-row>
-      <service-button-row name="."></service-button-row>
       <service-button-row name="live"></service-button-row>
       <service-button-row name="timeline"></service-button-row>
+      <service-button-row name="subComposer"></service-button-row>
     </div>
     
   </body>

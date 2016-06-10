@@ -32,7 +32,6 @@ class App(object):
                                        scales.IntStat('errors'),
                                        )
     def launch(self, *args):
-        print 'launch'
         self.seq = Sequencer(
             self.graph,
             lambda settings: sendToCollector('effectSequencer', self.session,

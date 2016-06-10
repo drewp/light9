@@ -7,8 +7,17 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 :a01 :effectAttr :chaseOffset; :value 0.12 .
-<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n1, song:n25, song:n26, song:n27, song:n28 .
+<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n0, song:n1, song:n2, song:n25, song:n26, song:n27, song:n28 .
 :ao0 :effectAttr :chaseTempo; :value 100 .
+
+song:n0 a :Note; :curve song:n0c0; :effectClass effect:WorkLight;
+     :originTime 161.162 .
+
+song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
+song:n0c0p0 :time 0.000; :value 0.000 .
+song:n0c0p1 :time 1.000; :value 1.000 .
+song:n0c0p2 :time 2.000; :value 1.000 .
+song:n0c0p3 :time 3.000; :value 0.000 .
 
 song:n1 a :Note; :attrOverride :ao0, :ao1; :curve song:n1c1;
      :effectClass effect:RedStrip; :originTime 41.011 .
@@ -18,6 +27,9 @@ song:n1c1p0 :time 0.00; :value 0 .
 song:n1c1p1 :time 1; :value 1 .
 song:n1c1p2 :time 2; :value 1 .
 song:n1c1p3 :time 3; :value 0 .
+
+song:n2 a :Note; :curve song:n2c0; :effectClass effect:Strobe;
+     :originTime 47.087 .
 
 song:n25 a :Note; :curve song:n25c0; :effectClass effect:BlueStrip;
      :originTime 71.234 .
@@ -54,3 +66,9 @@ song:n28c0p0 :time 0.000; :value 0.000 .
 song:n28c0p1 :time 1.000; :value 1.000 .
 song:n28c0p2 :time 2.000; :value 1.000 .
 song:n28c0p3 :time 3.000; :value 0.000 .
+
+song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
+song:n2c0p0 :time 0.000; :value 0.000 .
+song:n2c0p1 :time 1.000; :value 1.000 .
+song:n2c0p2 :time 2.000; :value 1.000 .
+song:n2c0p3 :time 3.000; :value 0.000 .

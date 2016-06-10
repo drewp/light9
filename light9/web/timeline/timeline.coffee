@@ -469,9 +469,22 @@ Polymer
     if elem
       elem.remove()
       delete @elemById[uri]
+
+  anyPointsInView: (pts) ->
+    for pt in pts
+      if pt.e(1) > -100 && pt.e(1) < 2500
+        return true
+    return false
     
   setNote: (uri, curvePts, effectLabel) ->
-    elem = @getOrCreateElem(uri, 'notes', 'path', {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
+    areaId = uri + '/area'
+    labelId = uri + '/label'
+    if not @anyPointsInView(curvePts)
+      @clearElem(areaId)
+      @clearElem(labelId)
+      return
+    elem = @getOrCreateElem(areaId, 'notes', 'path',
+      {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
     elem.setAttribute('d', svgPathFromPoints(curvePts))
 
     elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
@@ -504,5 +517,9 @@ Polymer
     ])
 
   setAdjusterConnector: (uri, center, target) ->
+    id = uri + '/adj'
+    if not @anyPointsInView([center, target])
+      @clearElem(uri)
+      return
     elem = @getOrCreateElem(uri, 'connectors', 'path', {style: "fill:none;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;"})
     elem.setAttribute('d', svgPathFromPoints([center, target]))

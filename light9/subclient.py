@@ -20,5 +20,4 @@ class SubClient:
 
     def _send_sub(self):
         outputSettings = self.get_output_settings()
-        print outputSettings
         sendToCollector('subclient', self.session, outputSettings)

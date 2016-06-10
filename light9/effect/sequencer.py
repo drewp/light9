@@ -9,13 +9,22 @@ from webcolors import rgb_to_hex
 import json, logging, bisect
 import treq
 import math
+import time
+from twisted.internet.inotify import INotify
+from twisted.python.filepath import FilePath
 
 from light9 import networking
 from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
+from light9.effect import effecteval
+from greplin import scales
 
 log = logging.getLogger('sequencer')
+stats = scales.collection('/sequencer/',
+                                       scales.PmfStat('update'),
+                          scales.DoubleStat('recentFps'),
 
+                                       )
 def sendToCollector(client, session, settings):
     return treq.put(networking.collector.path('attrs'),
                     data=json.dumps({'settings': settings,
@@ -24,10 +33,11 @@ def sendToCollector(client, session, settings):
 
 
 class Note(object):
-    def __init__(self, graph, uri):
+    def __init__(self, graph, uri, effectevalModule):
         g = self.graph = graph
         self.uri = uri
-        self.effectEval = EffectEval(graph, g.value(uri, L9['effectClass']))
+        self.effectEval = effectevalModule.EffectEval(
+            graph, g.value(uri, L9['effectClass']))
         floatVal = lambda s, p: float(g.value(s, p).toPython())
         originTime = floatVal(uri, L9['originTime'])
         self.points = []
@@ -66,81 +76,56 @@ class Note(object):
         return self.effectEval.outputFromEffect(effectSettings, t)
                 
 
-class EffectEval(object):
-    """
-    runs one effect's code to turn effect attr settings into output
-    device settings
-    """
-    def __init__(self, graph, effect):
-        self.graph = graph
-        self.effect = effect
-        
-        #for ds in g.objects(g.value(uri, L9['effectClass']), L9['deviceSetting']):
-        #    self.setting = (g.value(ds, L9['device']), g.value(ds, L9['attr']))
-
-    def outputFromEffect(self, effectSettings, songTime):
-        """
-        From effect attr settings, like strength=0.75, to output device
-        settings like light1/bright=0.72;light2/bright=0.78. This runs
-        the effect code.
-        """
-        attr, value = effectSettings[0]
-        value = float(value)
-        assert attr == L9['strength']
-        c = int(255 * value)
-        color = [0, 0, 0]
-        if self.effect == L9['effect/RedStrip']: # throwaway
-
-            mov = URIRef('http://light9.bigasterisk.com/device/moving1')
-            col = [
-                    (songTime + .1) % 1.0,
-                    (songTime + .4) % 1.0,
-                    (songTime + .8) % 1.0,
-                ]
-            print 'col', col
-            return [
-                # device, attr, lev
-                
-                (mov, L9['color'], Literal(rgb_to_hex([value*x*255 for x in col]))),
-                (mov, L9['rx'], Literal(100 + 70 * math.sin(songTime*2))),
-            ]
-
-        elif self.effect == L9['effect/BlueStrip']:
-            color[2] = c
-        elif self.effect == L9['effect/WorkLight']:
-            color[1] = c
-        elif self.effect == L9['effect/Curtain']:
-            color[0] = color[2] = 70/255 * c
-        else:
-            color[0] = color[1] = color[2] = c
-
-        return [
-            # device, attr, lev
-            (URIRef('http://light9.bigasterisk.com/device/moving1'),
-             URIRef("http://light9.bigasterisk.com/color"),
-             Literal(rgb_to_hex(color)))
-            ]
-        
 class Sequencer(object):
     def __init__(self, graph, sendToCollector):
         self.graph = graph
         self.sendToCollector = sendToCollector
         self.music = MusicTime(period=.2, pollCurvecalc=False)
 
+        self.recentUpdateTimes = []
+        self.lastStatLog = 0
         self.notes = {} # song: [notes]
         self.graph.addHandler(self.compileGraph)
         self.update()
 
+        self.watchCode()
+
+    def watchCode(self):
+        self.notifier = INotify()
+        self.notifier.startReading()
+        self.notifier.watch(
+            FilePath(effecteval.__file__.replace('.pyc', '.py')),
+            callbacks=[self.codeChange])
+
+    def codeChange(self, watch, path, mask):
+        def go():
+            reload(effecteval)
+            self.graph.addHandler(self.compileGraph)
+        # in case we got an event at the start of the write
+        reactor.callLater(.1, go) 
+
     def compileGraph(self):
         """rebuild our data from the graph"""
         g = self.graph
+
+        log.info("compileGraph")
+        reload(effecteval)
+        
         for song in g.subjects(RDF.type, L9['Song']):
             self.notes[song] = []
             for note in g.objects(song, L9['note']):
-                self.notes[song].append(Note(g, note))
-        
+                self.notes[song].append(Note(g, note, effecteval))
+
+    @stats.update.time()
     def update(self):
-        reactor.callLater(1/30, self.update)
+        now = time.time()
+        self.recentUpdateTimes = self.recentUpdateTimes[-20:] + [now]
+        stats.recentFps = len(self.recentUpdateTimes) / (self.recentUpdateTimes[-1] - self.recentUpdateTimes[0] + .0001)
+        if now > self.lastStatLog + 10:
+            log.info("%.2f fps", stats.recentFps)
+            self.lastStatLog = now
+        
+        reactor.callLater(1/50, self.update)
 
         musicState = self.music.getLatest()
         song = URIRef(musicState['song']) if musicState.get('song') else None
@@ -155,6 +140,6 @@ class Sequencer(object):
             # away. might be better for collector not to merge our
             # past requests, and then we can omit zeroed notes?
             outs = note.outputSettings(t)
-            print 'out', outs
+            #print 'out', outs
             settings.extend(outs)
         self.sendToCollector(settings)

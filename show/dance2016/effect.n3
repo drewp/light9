@@ -38,6 +38,10 @@ effect:usa a :Effect;
 :fc1p3 :time 0.15; :value 0 .
 
 
+effect:Strobe a :Effect;  rdfs:label "strobe";
+  :publishAttr :strength, :rate, :offset, :duty .
+
+
 effect:WorkLight a :Effect;
   rdfs:label "work light";
   :publishAttr :strength;
