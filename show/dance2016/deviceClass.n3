@@ -1,0 +1,110 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:color a :DeviceAttr; :dataType :color .
+:rx a :DeviceAttr; :dataType :angle .
+:ry a :DeviceAttr; :dataType :angle .
+:uv a :DeviceAttr; :dataType :scalar .
+:brightness a :DeviceAttr; :dataType :scalar .
+
+:SimpleDimmer a :DeviceClass;
+  :deviceAttr :brightness;
+  :attr
+    [ :outputAttr :level; :dmxOffset 0 ] .
+
+:ChauvetColorStrip a :DeviceClass;
+  :deviceAttr :color;
+  :attr
+    [ :outputAttr :mode;  :dmxOffset 0 ],
+    [ :outputAttr :red;   :dmxOffset 1 ],
+    [ :outputAttr :green; :dmxOffset 2 ],
+    [ :outputAttr :blue;  :dmxOffset 3 ] .
+
+:Mini15 a :DeviceClass;
+  :deviceAttr :color, :rx, :ry;
+  :attr
+    [ :outputAttr :xRotation;     :dmxOffset 0 ],
+    [ :outputAttr :xFine;         :dmxOffset 1 ],
+    [ :outputAttr :yRotation;     :dmxOffset 2 ],
+    [ :outputAttr :yFine;         :dmxOffset 3 ],
+    [ :outputAttr :rotationSpeed; :dmxOffset 4 ],
+    [ :outputAttr :dimmer;        :dmxOffset 5 ],
+    [ :outputAttr :red;           :dmxOffset 6 ],
+    [ :outputAttr :green;         :dmxOffset 7 ],
+    [ :outputAttr :blue;          :dmxOffset 8 ],
+    [ :outputAttr :colorChange;   :dmxOffset 9 ],
+    [ :outputAttr :colorSpeed;    :dmxOffset 10 ],
+    [ :outputAttr :goboShake;     :dmxOffset 11 ],
+    [ :outputAttr :goboChoose;    :dmxOffset 12 ] .
+
+:ChauvetHex12 a :DeviceClass;
+  :deviceAttr :color, :uv;
+  :docs <https://www.chauvetprofessional.com/wp-content/uploads/2015/06/COLORdash_Par-Hex_12_QRG_Rev4_ML4_WO.pdf>;
+  :attr
+    [ :outputAttr :red; :dmxOffset 0 ],
+    [ :outputAttr :green; :dmxOffset 1 ],
+    [ :outputAttr :blue; :dmxOffset 2 ],
+    [ :outputAttr :amber; :dmxOffset 3 ],
+    [ :outputAttr :white; :dmxOffset 4 ],
+    [ :outputAttr :uv; :dmxOffset 5 ] .
+
+:MacAura a :DeviceClass;
+  :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/UM_MACAura_EN_B.pdf>;
+  rdfs:comment "note- manual counts dmx from 1; :dmxOffset is from 0";
+  :attr
+    [ :dmxOffset 0 ; :outputAttr :shutter ], # use 22
+    [ :dmxOffset 1 ; :outputAttr :dimmer ],
+    [ :dmxOffset 2 ; :outputAttr :zoom ],
+    [ :dmxOffset 3 ; :outputAttr :pan ],
+    [ :dmxOffset 4 ; :outputAttr :panFine ],
+    [ :dmxOffset 5 ; :outputAttr :tilt ],
+    [ :dmxOffset 6 ; :outputAttr :tiltFine ],
+    [ :dmxOffset 7 ; :outputAttr :fixtureControl ], # use 0
+    [ :dmxOffset 8 ; :outputAttr :colorWheel ], # use 0
+    [ :dmxOffset 9 ; :outputAttr :red ],
+    [ :dmxOffset 10 ; :outputAttr :green ],
+    [ :dmxOffset 11 ; :outputAttr :blue ],
+    [ :dmxOffset 12 ; :outputAttr :white ],
+    [ :dmxOffset 13 ; :outputAttr :colorTemperature ],
+    [ :dmxOffset 14 ; :outputAttr :fx1Select ],
+    [ :dmxOffset 15 ; :outputAttr :fx1Adjust ],
+    [ :dmxOffset 16 ; :outputAttr :fx2Select ],
+    [ :dmxOffset 17 ; :outputAttr :fx2Adjust ],
+    [ :dmxOffset 18 ; :outputAttr :fxSync ],
+    [ :dmxOffset 19 ; :outputAttr :auraShutter ], # use 22
+    [ :dmxOffset 20 ; :outputAttr :auraDimmer ],
+    [ :dmxOffset 21 ; :outputAttr :auraColorWheel ],
+    [ :dmxOffset 22 ; :outputAttr :auraRed ],
+    [ :dmxOffset 23 ; :outputAttr :auraGreen ],
+    [ :dmxOffset 24 ; :outputAttr :auraBlue ] .
+
+:MacQuantum a :DeviceClass; 
+  :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/35000279b%20UM_MACQuantumProfile_EN_B.pdf>;
+  :attr
+    [ :dmxOffset 0; :outputAttr :shutter ; rdfs:comment "use 30" ],
+    [ :dmxOffset 1; :outputAttr :dimmerFadeHi ],
+    [ :dmxOffset 2; :outputAttr :dimmerFadeLo ],
+    [ :dmxOffset 3; :outputAttr :cyan ],
+    [ :dmxOffset 4; :outputAttr :magenta ],
+    [ :dmxOffset 5; :outputAttr :yellow ],
+    [ :dmxOffset 6; :outputAttr :colorWheel ; rdfs:comment "use 0" ],
+    [ :dmxOffset 7; :outputAttr :goboChoice ],
+    [ :dmxOffset 8; :outputAttr :goboSpeedHi ],
+    [ :dmxOffset 9; :outputAttr :goboSpeedLo ],
+    [ :dmxOffset 10; :outputAttr :goboStaticRotate ],
+    [ :dmxOffset 11; :outputAttr :prismRotation ],
+    [ :dmxOffset 12; :outputAttr :iris ],
+    [ :dmxOffset 13; :outputAttr :zoomHi ],
+    [ :dmxOffset 14; :outputAttr :zoomLo ],
+    [ :dmxOffset 15; :outputAttr :focusHi ],
+    [ :dmxOffset 16; :outputAttr :focusLo ],
+    [ :dmxOffset 17; :outputAttr :panHi ],
+    [ :dmxOffset 18; :outputAttr :panLo ],
+    [ :dmxOffset 19; :outputAttr :tiltHi ],
+    [ :dmxOffset 20; :outputAttr :tiltLo ],
+    [ :dmxOffset 21; :outputAttr :fixtureControl ; rdfs:comment "use 0" ],
+    [ :dmxOffset 22; :outputAttr :fx1Select ],
+    [ :dmxOffset 23; :outputAttr :fx1Adjust ],
+    [ :dmxOffset 24; :outputAttr :fx2Select ],
+    [ :dmxOffset 25; :outputAttr :fx2Adjust ],
+    [ :dmxOffset 26; :outputAttr :fxSync ] .

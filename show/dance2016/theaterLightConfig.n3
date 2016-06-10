@@ -1,32 +1,14 @@
 @prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dev: <http://light9.bigasterisk.com/device/> .
 @prefix udmx: <http://light9.bigasterisk.com/output/udmx/> .
 @prefix dmx0: <http://light9.bigasterisk.com/output/dmx0/> .
 
-:ChauvetColorStrip a :DeviceClass .
-:ChauvetColorStrip :attr :ccsa0 . :ccsa0 :outputAttr :mode;  :dmxOffset 0 .
-:ChauvetColorStrip :attr :ccsa1 . :ccsa1 :outputAttr :red;   :dmxOffset 1 .
-:ChauvetColorStrip :attr :ccsa2 . :ccsa2 :outputAttr :green; :dmxOffset 2 .
-:ChauvetColorStrip :attr :ccsa3 . :ccsa3 :outputAttr :blue;  :dmxOffset 3 .
-
-:Mini15 a :DeviceClass .
-:Mini15 :attr :Mini15a0 .  :Mini15a0  :outputAttr :xRotation;     :dmxOffset 0 .
-:Mini15 :attr :Mini15a1 .  :Mini15a1  :outputAttr :xFine;         :dmxOffset 1 .
-:Mini15 :attr :Mini15a2 .  :Mini15a2  :outputAttr :yRotation;     :dmxOffset 2 .
-:Mini15 :attr :Mini15a3 .  :Mini15a3  :outputAttr :yFine;         :dmxOffset 3 .
-:Mini15 :attr :Mini15a4 .  :Mini15a4  :outputAttr :rotationSpeed; :dmxOffset 4 .
-:Mini15 :attr :Mini15a5 .  :Mini15a5  :outputAttr :dimmer;        :dmxOffset 5 .
-:Mini15 :attr :Mini15a6 .  :Mini15a6  :outputAttr :red;           :dmxOffset 6 .
-:Mini15 :attr :Mini15a7 .  :Mini15a7  :outputAttr :green;         :dmxOffset 7 .
-:Mini15 :attr :Mini15a8 .  :Mini15a8  :outputAttr :blue;          :dmxOffset 8 .
-:Mini15 :attr :Mini15a9 .  :Mini15a9  :outputAttr :colorChange;   :dmxOffset 9 .
-:Mini15 :attr :Mini15a10 . :Mini15a10 :outputAttr :colorSpeed;    :dmxOffset 10 .
-:Mini15 :attr :Mini15a11 . :Mini15a11 :outputAttr :goboShake;     :dmxOffset 11 .
-:Mini15 :attr :Mini15a12 . :Mini15a12 :outputAttr :goboChoose;    :dmxOffset 12 .
-
 dev:colorStrip a :ChauvetColorStrip; :dmxUniverse dmx0:; :dmxBase 87 .
 
-dev:moving1 a :Mini15; :dmxUniverse udmx:; :dmxBase 1 .
+dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse udmx:; :dmxBase 5 .
+
+dev:cyc a :SimpleDimmer; rdfs:label "cyc"; :dmxUniverse udmx:; :dmxBase 40 .
 
 # [ :name "cyc-right"; :output dmx:c42 ] .
 # [ :name "cyc-mid"; :output dmx:c43 ] .

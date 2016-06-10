@@ -25,6 +25,8 @@
        ready: function() {
            this.graph = new SyncedGraph('/rdfdb/syncedGraph', {
                '': 'http://light9.bigasterisk.com/',
+               'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+               'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
                'xsd': 'http://www.w3.org/2001/XMLSchema#',
            }, function(s) { this.status = s; }.bind(this));
            window.graph = this.graph;

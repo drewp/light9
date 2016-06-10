@@ -83,7 +83,8 @@ class window.RdfDbClient
     @_continueSending()           
 
   _newConnection: ->
-    fullUrl = 'ws://' + window.location.host + @patchSenderUrl
+    wsOrWss = window.location.protocol.replace('http', 'ws')
+    fullUrl = wsOrWss + '//' + window.location.host + @patchSenderUrl
     @ws.close() if @ws?
     @ws = new WebSocket(fullUrl)
 

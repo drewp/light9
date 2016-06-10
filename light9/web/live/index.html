@@ -13,7 +13,7 @@
     <script src="/lib/d3/build/d3.min.js"></script>
     <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
     <script src="/lib/async/dist/async.js"></script>
-    
+    <script src="/lib/underscore/underscore-min.js"></script>
     <link rel="import" href="../rdfdb-synced-graph.html">
   </head>
   <body>
@@ -25,15 +25,15 @@
          paper-slider { width: 100%; }
         </style>
 
-        <template is="dom-if" if="{{useSlider}}">
+        <template is="dom-if" if="{{deviceAttr.useSlider}}">
           <paper-slider min="0"
-                        max="{{max}}"
+                        max="{{deviceAttr.max}}"
                         step=".01"
                         editable
                         content-type="application/json"
                         immediate-value="{{immediateSlider}}"></paper-slider>
         </template>
-        <template is="dom-if" if="{{useColor}}">
+        <template is="dom-if" if="{{deviceAttr.useColor}}">
           <input type="color"
                  id="col"
                  on-input="onPickedColor"
@@ -46,21 +46,48 @@
     <dom-module id="light9-live-controls">
       <template>
         <style>
+         .device {
+             border: 2px solid gray;
+             border: 2px solid gray;
+             margin: 9px;
+             padding: 5px;
+             background: #171717;
+         }
+         .deviceAttr {
+             border-top: 1px solid #ffffff26;
+             margin-top: 6px;
+             padding-top: 4px;
+         }
+         h2 {
+             font-size: 122%;
+             padding: 4px;
+             background: #1f1f1f;
+         }
         </style>
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
         <light9-collector-client self="{{client}}"></light9-collector-client>
         <h1>live</h1>
 
+        <template is="dom-repeat" items="{{devices}}" as="device">
+          <div class="device">
+            <h2><a href="{{device.uri}}">{{device.label}}</a></h2>
+            device is
+            <a href="{{device.deviceClass}}">{{device.deviceClass}}</a>
+            <template is="dom-repeat" items="{{device.deviceAttrs}}" as="dattr">
+              <div class="deviceAttr">
+                attr <a href="{{dattr.uri}}">{{dattr.uri}}</a>
+                <light9-live-control
+                    client="{{client}}"
+                    device="{{device.uri}}"
+                    device-attr="{{dattr}}"></light9-live-control>
+              </div>
+            </template>
+          </div>
+        </template>
+        
         <ul>
-          <li>
-            <h2>colorstrip</h2>
-            <light9-live-control
-                client="{{client}}"
-                device="http://light9.bigasterisk.com/device/colorStrip"
-                attr="http://light9.bigasterisk.com/color"
-            ></light9-live-control>
-          </li>
+        
           <li>
             <h2>moving</h2>
             rx <light9-live-control
@@ -73,21 +100,10 @@
                    device="http://light9.bigasterisk.com/device/moving1"
                    attr="http://light9.bigasterisk.com/ry" max="240"
                ></light9-live-control>
-            color <light9-live-control
-                      client="{{client}}"
-                      device="http://light9.bigasterisk.com/device/moving1"
-                      attr="http://light9.bigasterisk.com/color"
-                  ></light9-live-control>
+          
           </li>
         </ul>
       </template>
-      <script>
-       HTMLImports.whenReady(function () {
-           Polymer({
-               is: "light9-live-controls",
-           });
-       });
-      </script>
     </dom-module>
     
     <light9-live-controls></light9-live-controls>    

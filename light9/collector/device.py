@@ -2,6 +2,7 @@ from __future__ import division
 import logging
 import math
 from light9.namespaces import L9, RDF, DEV
+from rdflib import Literal
 from webcolors import hex_to_rgb, rgb_to_hex
 
 log = logging.getLogger('device')
@@ -28,9 +29,13 @@ class Mini15(Device):
         goboShake
         imageAim (configured with a file of calibration data)
     """
-
+def clamp255(x):
+    return min(255, max(0, x))
+    
 def _8bit(f):
-    return min(255, max(0, int(f * 255)))
+    if not isinstance(f, float):
+        raise TypeError(repr(f))
+    return clamp255(int(f * 255))
 
 def resolve(deviceType, deviceAttr, values):
     """
@@ -51,6 +56,12 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
     return a similar dict where the keys are output attrs (like
     L9['red']) and the values are suitable for Collector.setAttr
     """
+    def floatAttr(attr, default=0):
+        out = deviceAttrSettings.get(attr)
+        if out is None:
+            return default
+        return float(out.toPython())
+        
     if deviceType == L9['ChauvetColorStrip']:
         color = deviceAttrSettings.get(L9['color'], '#000000')
         r, g, b = hex_to_rgb(color)
@@ -60,9 +71,8 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['green']: g,
             L9['blue']: b
             }
-    elif deviceType == L9['Dimmer']:
-        return {L9['brightness']:
-                _8bit(deviceAttrSettings.get(L9['brightness'], 0))}
+    elif deviceType == L9['SimpleDimmer']:
+        return {L9['level']: _8bit(floatAttr(L9['brightness']))}
     elif deviceType == L9['Mini15']:
         inp = deviceAttrSettings
         rx8 = float(inp.get(L9['rx'], 0)) / 540 * 255
@@ -70,10 +80,10 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         r, g, b = hex_to_rgb(inp.get(L9['color'], '#000000'))
 
         return {
-            L9['xRotation']: int(math.floor(rx8)),
+            L9['xRotation']: clamp255(int(math.floor(rx8))),
             # didn't find docs on this, but from tests it looks like 64 fine steps takes you to the next coarse step
             L9['xFine']: _8bit(1 - (rx8 % 1.0)),
-            L9['yRotation']: int(math.floor(ry8)),
+            L9['yRotation']: clamp255(int(math.floor(ry8))),
             L9['yFine']: _8bit((ry8 % 1.0) / 4),
             L9['rotationSpeed']: 0,
             L9['dimmer']: 255,
