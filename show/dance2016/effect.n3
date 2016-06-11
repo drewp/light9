@@ -20,7 +20,7 @@ effect:BlueStrip a :Effect;
 
 :strength rdfs:label "strength" .
 
-effect:usa a :Effect;
+effect:usa a :mockupEffect;
   rdfs:label "USA";
   :publishAttr :strength;
   :code "chase()";
@@ -62,6 +62,7 @@ effect:Curtain a :Effect; rdfs:label "curtain"; :publishAttr :strength;
   :deviceSetting :ds5 .
 :ds5 :device dev:colorStrip; :attr :color; :value "#300030" .
 
-:live :controls effect:WorkLight, effect:Curtain .
+:live :controls effect:WorkLight, effect:Curtain, effect:centerSpot .
 effect:WorkLight :group "main"; :order 1 .
 effect:Curtain :group "main"; :order 2 .
+effect:centerSpot :group "main"; :order 3 .

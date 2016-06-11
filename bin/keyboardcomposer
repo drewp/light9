@@ -449,9 +449,10 @@ class KeyboardComposer(tk.Frame, SubClient):
         for setting in graph.objects(self.session, L9['subSetting']):
             effect = graph.value(setting, L9['sub'])
             strength = graph.value(setting, L9['level'])
-            outputSettings.extend(
-                self.effectEval[effect].outputFromEffect(
-                    [(L9['strength'], strength)], songTime=time.time()))
+            if strength:
+                outputSettings.extend(
+                    self.effectEval[effect].outputFromEffect(
+                        [(L9['strength'], strength)], songTime=time.time()))
 
         return outputSettings
 

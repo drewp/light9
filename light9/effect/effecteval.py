@@ -1,12 +1,21 @@
 from __future__ import division
 from rdflib import URIRef, Literal
 from light9.namespaces import L9, RDF
-from webcolors import rgb_to_hex
+from webcolors import rgb_to_hex, hex_to_rgb
 import math
 
 def literalColor(rnorm, gnorm, bnorm):
     return Literal(rgb_to_hex([rnorm * 255, gnorm * 255, bnorm * 255]))
 
+def scale(value, strength):
+    if isinstance(value, Literal):
+        value = value.toPython()
+    if isinstance(value, basestring):
+        if value[0] == '#':
+            r,g,b = hex_to_rgb(value)
+            return rgb_to_hex([r * strength, g * strength, b * strength])
+    raise NotImplementedError(repr(value))
+    
 class EffectEval(object):
     """
     runs one effect's code to turn effect attr settings into output
@@ -15,6 +24,9 @@ class EffectEval(object):
     def __init__(self, graph, effect):
         self.graph = graph
         self.effect = effect
+
+        # effect : [(dev, attr, value, isScaled)]
+        self.effectOutputs = {}
         
         #for ds in g.objects(g.value(uri, L9['effectClass']), L9['deviceSetting']):
         #    self.setting = (g.value(ds, L9['device']), g.value(ds, L9['attr']))
@@ -22,9 +34,23 @@ class EffectEval(object):
         self.graph.addHandler(self.updateEffectsFromGraph)
 
     def updateEffectsFromGraph(self):
+        self.effectOutputs = {}
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
             print "found fx", effect
-            # stash known effects
+            settings = []
+            for setting in self.graph.objects(effect, L9['setting']):
+                d = self.graph.value(setting, L9['device'])
+                a = self.graph.value(setting, L9['deviceAttr'])
+                v = self.graph.value(setting, L9['value'])
+                sv = self.graph.value(setting, L9['scaledValue'])
+                if not (bool(v) ^ bool(sv)):
+                    raise NotImplementedError
+
+                settings.append((d, a, v if v is not None else sv, bool(sv)))
+
+            if settings:
+                self.effectOutputs[effect] = settings
+                print settings
         
     def outputFromEffect(self, effectSettings, songTime):
         """
@@ -32,35 +58,33 @@ class EffectEval(object):
         settings like light1/bright=0.72;light2/bright=0.78. This runs
         the effect code.
         """
-        attr, value = effectSettings[0]
-        value = float(value)
+        attr, strength = effectSettings[0]
+        strength = float(strength)
         assert attr == L9['strength']
-        c = int(255 * value)
-        color = [0, 0, 0]
-        # if it's a known effect, do the scaling thing. :strength is an effectSetting.
-        if self.effect == L9['effect/RedStrip']: # throwaway
 
+        out = []
+        for dev, attr, value, isScaled in self.effectOutputs.get(self.effect, []):
+            if isScaled:
+                value = scale(value, strength)
+            out.append((dev, attr, value))
+            
+        if self.effect == L9['effect/RedStripzzz']: # throwaway
             mov = URIRef('http://light9.bigasterisk.com/device/moving1')
             col = [
-                    (songTime + .0) % 1.0,
-                    (songTime + .4) % 1.0,
-                    (songTime + .8) % 1.0,
+                    ((songTime + .0) % 1.0),
+                    ((songTime + .4) % 1.0),
+                    ((songTime + .8) % 1.0),
                 ]
-            return [
+            out.extend([
                 # device, attr, lev
                 
-                (mov, L9['color'], Literal(rgb_to_hex([value*x*255 for x in col]))),
+                (mov, L9['color'], Literal(rgb_to_hex([strength*x*255 for x in col]))),
                 (mov, L9['rx'], Literal(100 + 70 * math.sin(songTime*2))),
-            ] * (value>0)
-
-        elif self.effect == L9['effect/BlueStrip']:
-            color[2] = c
-        elif self.effect == L9['effect/WorkLight']:
-            color[1] = c
+            ] * (strength>0))
         elif self.effect == L9['effect/Curtain']:
-            return [
-                (L9['device/lowPattern%s' % n], L9['color'], literalColor(0*value, value, value)) for n in range(301,308+1)
-                ]
+            out.extend([
+                (L9['device/lowPattern%s' % n], L9['color'], literalColor(0*strength, strength, strength)) for n in range(301,308+1)
+                ])
 
         elif self.effect == L9['effect/Strobe']:
             attr, value = effectSettings[0]
@@ -75,15 +99,8 @@ class EffectEval(object):
             return [
                 (L9['device/colorStrip'], L9['color'], Literal(col)),
             ]
-        else:
-            color[0] = color[1] = color[2] = c
 
-        return [
-            # device, attr, lev
-            (URIRef('http://light9.bigasterisk.com/device/moving1'),
-             URIRef("http://light9.bigasterisk.com/color"),
-             Literal(rgb_to_hex(color)))
-            ]
+        return out
         
 
 
