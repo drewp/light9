@@ -366,8 +366,8 @@ Polymer
       screenPos = (pt) =>
         $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
 
-      @dia.setNote(@uri, (screenPos(pt) for pt in worldPts),
-                   @graph.uriValue(@uri, U(':effectClass')))
+      label = @graph.uriValue(@uri, U(':effectClass')).replace(/.*\//, '')
+      @dia.setNote(@uri, (screenPos(pt) for pt in worldPts), label)
 
     catch e
       log("during resize of #{@uri}: #{@e}")
