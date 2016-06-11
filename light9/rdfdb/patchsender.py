@@ -103,10 +103,14 @@ def sendPatch(putUri, patch, **kw):
     if len(body) > 200:
         intro = intro + "..."
     log.debug("send body (rendered %.1fkB in %.1fms): %s", len(body) / 1024, jsonTime * 1000, intro)
+    sendTime = time.time()
     def putDone(done):
         if not str(done.code).startswith('2'):
-            raise ValueError("sendPatch request failed %s: %s" % (done.code, done.body))
-        log.debug("sendPatch finished, response: %r" % done.body)
+            raise ValueError("sendPatch request failed %s: %s" %
+                             (done.code, done.body))
+        dt = 1000 * (time.time() - sendTime)
+        log.debug("sendPatch to %s took %sms, response: %r" %
+                  (putUri, dt, done.body))
         return done
 
     return cyclone.httpclient.fetch(
