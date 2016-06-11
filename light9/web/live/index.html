@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
   <head>
-    <title></title>
+    <title>device control</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="/style.css">
     <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
@@ -22,13 +22,13 @@
     <dom-module id="light9-live-control">
       <template>
         <style>
-         paper-slider { width: 100%; }
+         paper-slider { width: 100%; margin: -19px 0; }
         </style>
 
         <template is="dom-if" if="{{deviceAttr.useSlider}}">
           <paper-slider min="0"
                         max="{{deviceAttr.max}}"
-                        step=".01"
+                        step=".001"
                         editable
                         content-type="application/json"
                         immediate-value="{{immediateSlider}}"></paper-slider>
@@ -38,7 +38,13 @@
                  id="col"
                  on-input="onPickedColor"
                  value="{{pickedColor}}">
+          <button on-click="goWhite">white</button>
+          <button on-click="goBlack">black</button>
         </template>
+        <template is="dom-if" if="{{deviceAttr.useChoices}}">
+          choices go here
+        </template>
+
       </template>
      
     </dom-module>
@@ -57,26 +63,36 @@
              border-top: 1px solid #ffffff26;
              margin-top: 6px;
              padding-top: 4px;
+             display: flex;
+         }
+         .deviceAttr > span {
+
+         }
+         .deviceAttr > light9-live-control {
+             flex-grow: 1;
          }
          h2 {
-             font-size: 122%;
+             font-size: 110%;
              padding: 4px;
              background: #1f1f1f;
+         }
+         #mainLabel {
+             font-size: 120%; 
+             color: #9ab8fd;
+             text-decoration: initial;
          }
         </style>
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
         <light9-collector-client self="{{client}}"></light9-collector-client>
-        <h1>live</h1>
+        <h1>device control <button on-click="resendAll">resend all</button></h1>
 
         <template is="dom-repeat" items="{{devices}}" as="device">
           <div class="device">
-            <h2><a href="{{device.uri}}">{{device.label}}</a></h2>
-            device is
-            <a href="{{device.deviceClass}}">{{device.deviceClass}}</a>
+            <h2><a id="mainLabel" href="{{device.uri}}">{{device.label}}</a> (device class <a href="{{device.deviceClass}}">{{device.deviceClass}}</a>)</h2>
             <template is="dom-repeat" items="{{device.deviceAttrs}}" as="dattr">
               <div class="deviceAttr">
-                attr <a href="{{dattr.uri}}">{{dattr.uri}}</a>
+                <span>attr <a href="{{dattr.uri}}">{{dattr.uri}}</a></span>
                 <light9-live-control
                     client="{{client}}"
                     device="{{device.uri}}"
@@ -86,23 +102,6 @@
           </div>
         </template>
         
-        <ul>
-        
-          <li>
-            <h2>moving</h2>
-            rx <light9-live-control
-                   client="{{client}}"
-                   device="http://light9.bigasterisk.com/device/moving1"
-                   attr="http://light9.bigasterisk.com/rx" max="540"
-               ></light9-live-control>
-            ry <light9-live-control
-                   client="{{client}}"
-                   device="http://light9.bigasterisk.com/device/moving1"
-                   attr="http://light9.bigasterisk.com/ry" max="240"
-               ></light9-live-control>
-          
-          </li>
-        </ul>
       </template>
     </dom-module>
     

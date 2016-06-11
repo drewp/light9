@@ -12,8 +12,13 @@ Polymer
   ready: ->
   onPickedColor: (ev) ->
     @onChange ev.target.value
+  goWhite: -> @onChange("#ffffff")
+  goBlack: -> @onChange("#000000")
   onChange: (lev) ->
-    @client.send([[@device, @deviceAttr.uri, lev]])
+    @lastSent = [[@device, @deviceAttr.uri, lev]]
+    @resend()
+  resend: ->
+    @client.send(@lastSent)
   
 Polymer
   is: "light9-live-controls"
@@ -25,6 +30,9 @@ Polymer
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@))
+  resendAll: ->
+    for llc in @getElementsByTagName("light9-live-control")
+      llc.resend()
   update: ->
     U = (x) -> @graph.Uri(x)
 
@@ -36,7 +44,9 @@ Polymer
         row = {uri: dev, label: (try
             @graph.stringValue(dev, U('rdfs:label'))
           catch
-            dev), deviceClass: dc}
+            words = dev.split('/')
+            words[words.length-1]
+            ), deviceClass: dc}
         row.deviceAttrs = []
         for da in _.sortBy(@graph.objects(dc, U(':deviceAttr')))
           dataType = @graph.uriValue(da, U(':dataType'))
@@ -45,16 +55,19 @@ Polymer
             dataType: dataType
             showColorPicker: dataType == U(':color')
             }
-          if da == 'http://light9.bigasterisk.com/color'
+          if dataType == 'http://light9.bigasterisk.com/color'
             daRow.useColor = true
-            daRow.useSlider = false
+
+          else if dataType == U(':choice')
+            daRow.useChoice = true
+            daRow.choices = @graph.objects(da, U(':choice'))
           else
-            daRow.useColor = false
+
             daRow.useSlider = true
             daRow.max = 1
             if dataType == U(':angle')
               # varies
-              daRow.max = 360
+              daRow.max = 1
           
           row.deviceAttrs.push(daRow)
         
