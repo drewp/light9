@@ -50,16 +50,20 @@ Polymer
     @effectPreview = JSON.stringify({})
     window.gather = (sent) =>
       [dev, devAttr, value] = sent[0]
-      return if value == 0
-      @currentSettings[dev + " " + devAttr] = [dev, devAttr, value]
+      key = dev + " " + devAttr
+      if value == 0 or value == '#000000'
+        delete @currentSettings[key]
+      else
+        @currentSettings[key] = [dev, devAttr, value]
       @effectPreview = JSON.stringify(v for k,v of @currentSettings)
   saveNewEffect: ->
-    return if not @newEffectName.length
+    uriName = @newEffectName.replace(/[^a-zA-Z0-9_]/g, '')
+    return if not uriName.length
 
     U = (x) -> @graph.Uri(x)
 
-    effectUri = U(":effect") + "/#{@newEffectName}"
-    ctx = U('http://light9.bigasterisk.com/show/dance2016/effect')
+    effectUri = U(":effect") + "/#{uriName}"
+    ctx = U("http://light9.bigasterisk.com/show/dance2016/effect/#{uriName}")
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: ctx}
 
     addQuads = [
@@ -69,6 +73,8 @@ Polymer
       ]
     settings = @graph.nextNumberedResources(effectUri + '_set', Object.keys(@currentSettings).length)
     for _, row of @currentSettings
+      if row[2] == 0 or row[2] == '#000000'
+        continue
       setting = settings.shift()
       addQuads.push(quad(effectUri, U(':setting'), setting))
       addQuads.push(quad(setting, U(':device'), row[0]))
