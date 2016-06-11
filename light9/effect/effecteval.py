@@ -2,6 +2,7 @@ from __future__ import division
 from rdflib import URIRef, Literal
 from light9.namespaces import L9, RDF
 from webcolors import rgb_to_hex, hex_to_rgb
+from decimal import Decimal
 import math
 
 def literalColor(rnorm, gnorm, bnorm):
@@ -10,11 +11,18 @@ def literalColor(rnorm, gnorm, bnorm):
 def scale(value, strength):
     if isinstance(value, Literal):
         value = value.toPython()
+
+    if isinstance(value, Decimal):
+        value = float(value)
+        
     if isinstance(value, basestring):
         if value[0] == '#':
             r,g,b = hex_to_rgb(value)
             return rgb_to_hex([r * strength, g * strength, b * strength])
-    raise NotImplementedError(repr(value))
+    elif isinstance(value, (int, float)):
+        return value * strength
+    else:
+        raise NotImplementedError(repr(value))
     
 class EffectEval(object):
     """
