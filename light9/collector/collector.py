@@ -109,9 +109,11 @@ class Collector(object):
             for outputAttr, value in attrs.iteritems():
                 self.setAttr(device, outputAttr, value, pendingOut)
 
-        print "%.1fms for client math" % (1000 * (time.time() - now))
+        dt1 = 1000 * (time.time() - now)
         self.flush(pendingOut)
-        print "%.1fms including flush" % (1000 * (time.time() - now))
+        dt2 = 1000 * (time.time() - now)
+        if dt1 > 10:
+            print "slow setAttrs: %.1fms -> flush -> %.1fms" % (dt1, dt2)
 
     def setAttr(self, device, outputAttr, value, pendingOut):
         output, index = self.outputMap[(device, outputAttr)]
