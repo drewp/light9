@@ -15,7 +15,7 @@ from light9.Fadable import Fadable
 from light9.subclient import SubClient
 from light9 import showconfig, networking, prof
 from light9.uihelpers import toplevelat
-from light9.namespaces import L9
+from light9.namespaces import L9, RDF
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
@@ -213,7 +213,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         last_group = None
 
         withgroups = []
-        for effect in self.graph.objects(L9['live'], L9['controls']):
+        for effect in self.graph.subjects(RDF.type, L9['Effect']):
             withgroups.append((
                 self.graph.value(effect, L9['group']),
                 self.graph.value(effect, L9['order']),
