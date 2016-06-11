@@ -44,11 +44,11 @@ log.addHandler(CSH(show_hostname=False, show_name=True))
 
 
 def setTerminalTitle(s):
-    if os.environ.get('TERM', '') in ['xterm', 'rxvt']:
+    if os.environ.get('TERM', '') in ['xterm', 'rxvt', 'rxvt-unicode-256color']:
         print "\033]0;%s\007" % s # not escaped/protected correctly
 
 if 'listsongs' not in sys.argv[0] and 'homepageConfig' not in sys.argv[0]:
-    setTerminalTitle('[%s] %s' % (socket.gethostname(), ' '.join(sys.argv)))
+    setTerminalTitle('[%s] %s' % (socket.gethostname(), ' '.join(sys.argv).replace('bin/', '')))
 
 # see http://www.youtube.com/watch?v=3cIOT9kM--g for commands that make
 # profiles and set background images
