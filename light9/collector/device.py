@@ -58,6 +58,8 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
     Given device attr settings like {L9['color']: Literal('#ff0000')},
     return a similar dict where the keys are output attrs (like
     L9['red']) and the values are suitable for Collector.setAttr
+
+    :outputAttrRange happens before we get here.
     """
     def floatAttr(attr, default=0):
         out = deviceAttrSettings.get(attr)

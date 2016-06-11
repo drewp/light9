@@ -1,6 +1,7 @@
 from __future__ import division
 import time
 import logging
+from rdflib import Literal
 from light9.namespaces import L9, RDF, DEV
 from light9.collector.output import setListElem
 from light9.collector.device import toOutputAttrs, resolve
@@ -42,9 +43,16 @@ class Collector(object):
     def rebuildOutputMap(self):
         self.outputMap = outputMap(self.graph, self.outputs) # (device, attr) : (output, index)
         self.deviceType = {} # uri: type that's a subclass of Device
+        self.remapOut = {} # (device, deviceAttr) : (start, end)
         for dc in self.graph.subjects(RDF.type, L9['DeviceClass']):
             for dev in self.graph.subjects(RDF.type, dc):
                 self.deviceType[dev] = dc
+
+                for remap in self.graph.objects(dev, L9['outputAttrRange']):
+                    attr = self.graph.value(remap, L9['outputAttr'])
+                    start = float(self.graph.value(remap, L9['start']))
+                    end = float(self.graph.value(remap, L9['end']))
+                    self.remapOut[(dev, attr)] = start, end
 
     def _forgetStaleClients(self, now):
         staleClients = []
@@ -90,7 +98,9 @@ class Collector(object):
         prevClientSettings.update(self.resolvedSettingsDict(settings))
         self.lastRequest[client] = (clientSession, now, prevClientSettings)
 
-
+        # inputs that are omitted, implying a zero, should be added
+        # back here if they would remap to something nonzero.
+        
         deviceAttrs = {} # device: {deviceAttr: value}
         for _, _, lastSettings in self.lastRequest.itervalues():
             for (device, deviceAttr), value in lastSettings.iteritems():
@@ -98,6 +108,9 @@ class Collector(object):
                 if deviceAttr in attrs:
                     value = resolve(device, deviceAttr, [attrs[deviceAttr],
                                                          value])
+                if (device, deviceAttr) in self.remapOut:
+                    start, end = self.remapOut[(device, deviceAttr)]
+                    value = Literal(start + float(value) * (end - start))
                 attrs[deviceAttr] = value
 
         outputAttrs = {} # device: {outputAttr: value}
