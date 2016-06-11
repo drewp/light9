@@ -105,6 +105,8 @@ class Collector(object):
             outputAttrs[d] = toOutputAttrs(devType, deviceAttrs[d])
         
         pendingOut = {} # output : values
+        for out in self.outputs:
+            pendingOut[out] = [0] * out.numChannels
         for device, attrs in outputAttrs.iteritems():
             for outputAttr, value in attrs.iteritems():
                 self.setAttr(device, outputAttr, value, pendingOut)
@@ -117,7 +119,7 @@ class Collector(object):
 
     def setAttr(self, device, outputAttr, value, pendingOut):
         output, index = self.outputMap[(device, outputAttr)]
-        outList = pendingOut.setdefault(output, [])
+        outList = pendingOut[output]
         setListElem(outList, index, value, combine=max)
 
     def flush(self, pendingOut):

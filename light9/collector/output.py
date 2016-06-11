@@ -8,6 +8,7 @@ from twisted.internet import task, threads, reactor
 from greplin import scales
 log = logging.getLogger('output')
 
+# eliminate this: lists are always padded now
 def setListElem(outList, index, value, fill=0, combine=lambda old, new: new):
     if len(outList) < index:
         outList.extend([fill] * (index - len(outList)))
@@ -48,8 +49,9 @@ class Output(object):
 
 
 class DmxOutput(Output):
-    def __init__(self, uri):
+    def __init__(self, uri, numChannels):
         self.uri = uri
+        self.numChannels = numChannels
 
     def flush(self):
         pass
@@ -74,8 +76,8 @@ class EnttecDmx(DmxOutput):
                               scales.PmfStat('write'),
                               scales.PmfStat('update'))
 
-    def __init__(self, uri, devicePath='/dev/dmx0'):
-        DmxOutput.__init__(self, uri)
+    def __init__(self, uri, devicePath='/dev/dmx0', numChannels=80):
+        DmxOutput.__init__(self, uri, numChannels)
 
         sys.path.append("dmx_usb_module")
         from dmx import Dmx
@@ -108,8 +110,8 @@ class Udmx(DmxOutput):
                               scales.PmfStat('update'),
                               scales.PmfStat('write'),
                               scales.IntStat('usbErrors'))
-    def __init__(self, uri):
-        DmxOutput.__init__(self, uri)
+    def __init__(self, uri, numChannels):
+        DmxOutput.__init__(self, uri, numChannels)
         
         from light9.io.udmx import Udmx
         self.dev = Udmx()

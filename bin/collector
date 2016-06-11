@@ -62,8 +62,8 @@ def launch(graph):
 
     # todo: drive outputs with config files
     outputs = [
-        EnttecDmx(L9['output/dmx0/'], '/dev/dmx3'),
-        Udmx(L9['output/udmx/']),
+        EnttecDmx(L9['output/dmx0/'], '/dev/dmx3', 80),
+        Udmx(L9['output/udmx/'], 510),
     ]
     c = Collector(graph, outputs)
 
