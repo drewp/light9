@@ -36,7 +36,6 @@ class EffectEval(object):
     def updateEffectsFromGraph(self):
         self.effectOutputs = {}
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
-            print "found fx", effect
             settings = []
             for setting in self.graph.objects(effect, L9['setting']):
                 d = self.graph.value(setting, L9['device'])
@@ -50,7 +49,6 @@ class EffectEval(object):
 
             if settings:
                 self.effectOutputs[effect] = settings
-                print settings
         
     def outputFromEffect(self, effectSettings, songTime):
         """

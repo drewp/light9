@@ -103,13 +103,12 @@ def toggle_slider(s):
 
 # for lambda callbacks
 def printout(t):
-    print t
+    print 'printout', t
 
 def printevent(ev):
     for k in dir(ev):
         if not k.startswith('__'):
-            print k,getattr(ev,k)
-    print ""
+            print 'ev', k, getattr(ev,k)
 
 def eventtoparent(ev,sequence):
     "passes an event to the parent, screws up TixComboBoxes"

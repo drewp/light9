@@ -379,7 +379,7 @@ def get_sub_by_name(name, submasters=None):
 if __name__ == "__main__":
     reload_data()
     s = Submasters()
-    print s.get_all_subs()
+    print 'subs', s.get_all_subs()
     if 0: # turn this on to normalize all subs
         for sub in s.get_all_subs():
             print "before", sub

@@ -109,8 +109,7 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         # Rerequest the full state from the server, try the patch
         # again after that, then give up.
         debugKey = '[id=%s]' % (id(p) % 1000)
-        print ''
-        log.debug("apply local patch %s %s", debugKey, p)
+        log.debug("\napply local patch %s %s", debugKey, p)
         try:
             patchQuads(self._graph,
                        deleteQuads=p.delQuads,
