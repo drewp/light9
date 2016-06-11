@@ -8,10 +8,10 @@
 
 :a01 :effectAttr :chaseOffset; :value 0.12 .
 :ao0 :effectAttr :chaseTempo; :value 100 .
-<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n0, song:n1, song:n2, song:n3 .
+<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n0, song:n3 .
 
-song:n0 a :Note; :curve song:n0c0; :effectClass effect:Curtain;
-     :originTime 35.653 .
+song:n0 a :Note; :curve song:n0c0; :effectClass effect:centerSpot;
+     :originTime 30.398 .
 
 song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
 song:n0c0p0 :time 0.000; :value 0.000 .
@@ -19,29 +19,11 @@ song:n0c0p1 :time 1.000; :value 1.000 .
 song:n0c0p2 :time 2.000; :value 1.000 .
 song:n0c0p3 :time 3.000; :value 0.000 .
 
-song:n1 a :Note; :curve song:n1c0; :effectClass effect:Curtain;
-     :originTime 39.152 .
-
-song:n1c0 a :Curve; :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
-song:n1c0p0 :time 0.000; :value 0.000 .
-song:n1c0p1 :time 1.000; :value 1.000 .
-song:n1c0p2 :time 2.000; :value 1.000 .
-song:n1c0p3 :time 3.000; :value 0.000 .
-
-song:n2 a :Note; :curve song:n2c0; :effectClass effect:Curtain;
-     :originTime 43.806 .
-
-song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
-song:n2c0p0 :time 0.000; :value 0.000 .
-song:n2c0p1 :time 1.000; :value 1.000 .
-song:n2c0p2 :time 2.000; :value 1.000 .
-song:n2c0p3 :time 3.000; :value 0.000 .
-
 song:n3 a :Note; :curve song:n3c0; :effectClass effect:Curtain;
      :originTime 32.297 .
 
 song:n3c0 a :Curve; :attr :strength; :point song:n3c0p0, song:n3c0p1, song:n3c0p2, song:n3c0p3 .
-song:n3c0p0 :time 0.000; :value 0.000 .
+song:n3c0p0 :time 0.153; :value 0.000 .
 song:n3c0p1 :time 1.000; :value 1.000 .
 song:n3c0p2 :time 2.000; :value 1.000 .
 song:n3c0p3 :time 2.928; :value 0.000 .

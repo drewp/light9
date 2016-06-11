@@ -1,0 +1,20 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+<http://light9.bigasterisk.com/effect/downback> a ns1:Effect;
+     rdfs:label "downback"; ns1:publishAttr ns1:strength;
+     ns1:setting <http://light9.bigasterisk.com/effect/downback_set15>, <http://light9.bigasterisk.com/effect/downback_set16>, <http://light9.bigasterisk.com/effect/downback_set17>, <http://light9.bigasterisk.com/effect/downback_set18>, <http://light9.bigasterisk.com/effect/downback_set19> .
+<http://light9.bigasterisk.com/effect/downback_set15> ns1:device <http://light9.bigasterisk.com/device/backlight1>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#aeaeae" .
+<http://light9.bigasterisk.com/effect/downback_set16> ns1:device <http://light9.bigasterisk.com/device/backlight2>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#ffffff" .
+<http://light9.bigasterisk.com/effect/downback_set17> ns1:device <http://light9.bigasterisk.com/device/backlight3>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#ffffff" .
+<http://light9.bigasterisk.com/effect/downback_set18> ns1:device <http://light9.bigasterisk.com/device/backlight4>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#ffffff" .
+<http://light9.bigasterisk.com/effect/downback_set19> ns1:device <http://light9.bigasterisk.com/device/backlight5>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#a7a7a7" .
