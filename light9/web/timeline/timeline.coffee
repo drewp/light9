@@ -221,9 +221,7 @@ Polymer
   attached: ->
     root = @closest('light9-timeline-editor')
     setupDrop @, @$.rows, root, (effect, pos) =>
-
       U = (x) -> @graph.Uri(x)
-      quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
 
       # we could probably accept some initial overrides right on the
       # effect uri, maybe as query params
@@ -233,33 +231,37 @@ Polymer
         return
       
       dropTime = @zoomInX.invert(pos.e(1))
+      @makeNewNote(effect, dropTime)
       
-      newNote = graph.nextNumberedResource("#{@song}/n")
-      newCurve = graph.nextNumberedResource("#{newNote}c")
-      points = graph.nextNumberedResources("#{newCurve}p", 4)
+  makeNewNote: (effect, dropTime) ->
+    U = (x) -> @graph.Uri(x)
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
       
-      curveQuads = [
-          quad(@song, U(':note'), newNote)
-          quad(newNote, RDF + 'type', U(':Note'))
-          quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
-          quad(newNote, U(':effectClass'), effect)
-          quad(newNote, U(':curve'), newCurve)
-          quad(newCurve, RDF + 'type', U(':Curve'))
-          quad(newCurve, U(':attr'), U(':strength'))
-        ]        
-      pointQuads = []
-      for i in [0...4]
-        pt = points[i]
-        pointQuads.push(quad(newCurve, U(':point'), pt))
-        pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i)))
-        pointQuads.push(quad(pt, U(':value'), @graph.LiteralRoundedFloat(i == 1 or i == 2)))
-      
-      patch = {
-        delQuads: []
-        addQuads: curveQuads.concat(pointQuads)
-        }
-      @graph.applyAndSendPatch(patch)
-      
+    newNote = @graph.nextNumberedResource("#{@song}/n")
+    newCurve = @graph.nextNumberedResource("#{newNote}c")
+    points = @graph.nextNumberedResources("#{newCurve}p", 4)
+
+    curveQuads = [
+        quad(@song, U(':note'), newNote)
+        quad(newNote, RDF + 'type', U(':Note'))
+        quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
+        quad(newNote, U(':effectClass'), effect)
+        quad(newNote, U(':curve'), newCurve)
+        quad(newCurve, RDF + 'type', U(':Curve'))
+        quad(newCurve, U(':attr'), U(':strength'))
+      ]        
+    pointQuads = []
+    for i in [0...4]
+      pt = points[i]
+      pointQuads.push(quad(newCurve, U(':point'), pt))
+      pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i)))
+      pointQuads.push(quad(pt, U(':value'), @graph.LiteralRoundedFloat(i == 1 or i == 2)))
+
+    patch = {
+      delQuads: []
+      addQuads: curveQuads.concat(pointQuads)
+      }
+    @graph.applyAndSendPatch(patch)
 
 Polymer
   is: "light9-timeline-time-axis",
