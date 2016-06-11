@@ -81,12 +81,24 @@
              color: #9ab8fd;
              text-decoration: initial;
          }
+         #preview {
+             width: 100%;
+         }
+         
         </style>
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
         <light9-collector-client self="{{client}}"></light9-collector-client>
-        <h1>device control <button on-click="resendAll">resend all</button></h1>
+        <h1>device control <button on-click="resendAll">resend all</button> <button on-click="clearAll">clear all</button></h1>
 
+        <div id="save">
+          <div>
+            effect name: <input type="input" value="{{newEffectName::change}}">
+            <button on-click="saveNewEffect">save new effect</button>
+          </div>
+          <textarea id="preview" value="{{effectPreview}}"></textarea>
+        </div>
+        
         <template is="dom-repeat" items="{{devices}}" as="device">
           <div class="device">
             <h2><a id="mainLabel" href="{{device.uri}}">{{device.label}}</a> (device class <a href="{{device.deviceClass}}">{{device.deviceClass}}</a>)</h2>
