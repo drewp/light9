@@ -145,6 +145,8 @@
 ^show/dance2013/build
 ^show/dance2014/build/?
 ^show/dance2014/music
+^show/.*/spectrogram
+^show/.*/doc
 ^stagesim/three.js-master
 ^tkdnd
 ^node_modules

@@ -1,5 +1,5 @@
 #!/bin/zsh
 
-for x ($LIGHT9_SHOW/music/*) {
+for x ($LIGHT9_SHOW/music/pad/*) {
   sox $x -n remix 1 rate 3k spectrogram -X 50 -y 100 -z 80 -m -r -o $LIGHT9_SHOW/spectrogram/$x:t:r.png
 }
