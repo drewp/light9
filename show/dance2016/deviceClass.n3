@@ -10,6 +10,7 @@
   rdfs:comment "maybe make this a separate 'wide to narrow' type" .
 :focus              a :DeviceAttr; :dataType :scalar .
 :iris               a :DeviceAttr; :dataType :scalar .
+:prism              a :DeviceAttr; :dataType :scalar .
 :goboSpeed          a :DeviceAttr; :dataType :scalar ;
   rdfs:comment "0=stopped, 1=rotate the fastest".
 :quantumGoboChoice  a :DeviceAttr; :dataType :choice;
@@ -107,7 +108,7 @@
 
 :MacQuantum a :DeviceClass; 
   :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/35000279b%20UM_MACQuantumProfile_EN_B.pdf>;
-  :deviceAttr :color, :rx, :ry, :zoom, :focus, :iris, :quantumGoboChoice, :goboSpeed;
+  :deviceAttr :color, :rx, :ry, :zoom, :focus, :iris, :prism, :quantumGoboChoice, :goboSpeed;
   :attr
     [ :dmxOffset 0; :outputAttr :shutter ; rdfs:comment "use 30" ],
     [ :dmxOffset 1; :outputAttr :dimmerFadeHi ],

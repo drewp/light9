@@ -38,6 +38,16 @@ effect:usa a :Effect;
 :fc1p3 :time 0.15; :value 0 .
 
 
+effect:centerSpot a :Effect; rdfs:label "center spot";
+  :publishAttr :strength;
+  :setting effect:centerSpots0, effect:centerSpots1, effect:centerSpots2, effect:centerSpots3, effect:centerSpots4 .
+effect:centerSpots0 :device dev:q2; :deviceAttr :color; :scaledValue "#f3d4d4" .
+effect:centerSpots1 :device dev:q2; :deviceAttr :focus; :value 0.31 .
+effect:centerSpots2 :device dev:q2; :deviceAttr :rx; :value 0.49 .
+effect:centerSpots3 :device dev:q2; :deviceAttr :ry; :value 0.26 .
+effect:centerSpots4 :device dev:q2; :deviceAttr :zoom; :value 0.42 .
+  
+
 effect:Strobe a :Effect;  rdfs:label "strobe";
   :publishAttr :strength, :rate, :offset, :duty .
 
