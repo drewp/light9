@@ -28,7 +28,7 @@ class Gui(object):
         self.musicScale = wtree.get_object("musicScale")
         self.musicScale.connect("value-changed", self.onMusicScaleValue)
         # tiny race here if onMusicScaleValue tries to use musicTime right away
-        self.musicTime = MusicTime(onChange=self.onMusicTimeChange)
+        self.musicTime = MusicTime(onChange=self.onMusicTimeChange, pollCurvecalc=False)
         self.ignoreScaleChanges = False
         # self.attachLog(wtree.get_object("lastLog")) # disabled due to crashing
 

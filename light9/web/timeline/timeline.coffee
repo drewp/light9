@@ -94,7 +94,7 @@ Polymer
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
         @dia.setMouse(@viewState.mouse.pos())
-        #@sendMouseToVidref()
+        @sendMouseToVidref()
 
   sendMouseToVidref: ->
     now = Date.now()
