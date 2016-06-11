@@ -1,18 +1,72 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix dev: <http://light9.bigasterisk.com/device/> .
-@prefix udmx: <http://light9.bigasterisk.com/output/udmx/> .
-@prefix dmx0: <http://light9.bigasterisk.com/output/dmx0/> .
+@prefix udmxB: <http://light9.bigasterisk.com/output/udmx/> .
+@prefix dmxA: <http://light9.bigasterisk.com/output/dmx0/> .
 
-dev:colorStrip a :ChauvetColorStrip; :dmxUniverse dmx0:; :dmxBase 87 .
+#dev:colorStrip a :ChauvetColorStrip; :dmxUniverse dmxA:; :dmxBase 87 .
+#dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse udmxB:; :dmxBase 5 .
 
-dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse udmx:; :dmxBase 5 .
+dev:houseSide a :SimpleDimmer; rdfs:label "house-side"; :dmxUniverse dmxA:; :dmxBase 68 .
+dev:house1 a :SimpleDimmer; rdfs:label "house1"; :dmxUniverse dmxA:; :dmxBase 69 .
+dev:house4 a :SimpleDimmer; rdfs:label "house4"; :dmxUniverse dmxA:; :dmxBase 70 .
+dev:house3 a :SimpleDimmer; rdfs:label "house3"; :dmxUniverse dmxA:; :dmxBase 71 .
+dev:house2 a :SimpleDimmer; rdfs:label "house2"; :dmxUniverse dmxA:; :dmxBase 72 .
 
-dev:cyc a :SimpleDimmer; rdfs:label "cyc"; :dmxUniverse udmx:; :dmxBase 40 .
+dev:f1 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 4 .
+dev:f2 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 8 .
+dev:f3 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 10 .
 
-# [ :name "cyc-right"; :output dmx:c42 ] .
-# [ :name "cyc-mid"; :output dmx:c43 ] .
-# [ :name "cyc-left"; :output dmx:c44 ] .
+dev:cycR a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 42 .
+dev:cycL a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 44 .
+
+dev:q1 a :MacQuantum; :dmxUniverse udmxB:; :dmxBase 325 .
+dev:q2 a :MacQuantum; :dmxUniverse udmxB:; :dmxBase 352 .
+dev:q3 a :MacQuantum; :dmxUniverse udmxB:; :dmxBase 379 .
+
+dev:aura1 a :MacAura; :dmxUniverse udmxB:; :dmxBase 406 .
+dev:aura2 a :MacAura; :dmxUniverse udmxB:; :dmxBase 420 .
+dev:aura3 a :MacAura; :dmxUniverse udmxB:; :dmxBase 434 .
+dev:aura4 a :MacAura; :dmxUniverse udmxB:; :dmxBase 448 .
+dev:aura5 a :MacAura; :dmxUniverse udmxB:; :dmxBase 462 .
+dev:auraStage a :MacAura; :dmxUniverse udmxB:; :dmxBase 476; rdfs:comment "rx=.5 ry<.45" .
+
+dev:hexBacklight1 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 241 .
+dev:hexBacklight2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 247 .
+dev:hexBacklight3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 253 .
+dev:hexBacklight4 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 259 .
+dev:hexBacklight5 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 265 .
+dev:hexDown2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 157 .
+dev:hexDown3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 193 .
+dev:hexDown4 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 169 .
+dev:hexDown5Edge a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 175 .
+dev:hexLip1 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 121 .
+dev:hexLip2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 127 .
+dev:hexLip3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 133 . 
+dev:hexLip4 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 139 .
+dev:hexLip5 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 145 . 
+dev:hexLow3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 223 .
+dev:hexLow5 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 229 .
+dev:hexLowBacklight1 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 211 .
+dev:hexLowBacklight6 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 235 .
+dev:hexSlant a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 319 .
+dev:hexUpCenter a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 313 .
+dev:hexPostL1 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 289 .
+dev:hexPostL2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 295 .
+dev:hexPostL3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 301 .
+dev:hexPostR1 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 271 .
+dev:hexPostR2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 277 .
+dev:hexPostR3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 283 .
+dev:hexVeryLow1 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 151 .
+dev:hexVeryLow2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 187 .
+dev:hexVeryLow22 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 217 .
+dev:hexVeryLow3 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 163 .
+dev:hexVeryLow4 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 199 .
+dev:hexVeryLow5 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 205 .
+
+
+
+
 # [ :name "oran1"; :output dmx:c21 ] .
 # [ :name "oran2"; :output dmx:c25 ] .
 # [ :name "oran3"; :output dmx:c29 ] .

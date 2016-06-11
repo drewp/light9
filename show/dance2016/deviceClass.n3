@@ -1,11 +1,16 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-:color a :DeviceAttr; :dataType :color .
-:rx a :DeviceAttr; :dataType :angle .
-:ry a :DeviceAttr; :dataType :angle .
-:uv a :DeviceAttr; :dataType :scalar .
-:brightness a :DeviceAttr; :dataType :scalar .
+:color a :DeviceAttr;             :dataType :color .
+:rx a :DeviceAttr;                :dataType :angle .
+:ry a :DeviceAttr;                :dataType :angle .
+:uv a :DeviceAttr;                :dataType :scalar .
+:brightness a :DeviceAttr;        :dataType :scalar .
+:zoom a :DeviceAttr;              :dataType :scalar ; rdfs:comment "maybe a 'wide to narrow' type" .
+:focus a :DeviceAttr;             :dataType :scalar .
+:iris a :DeviceAttr;              :dataType :scalar .
+:quantumGoboChoice a :DeviceAttr; :dataType :choice;
+  :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
 
 :SimpleDimmer a :DeviceClass;
   :deviceAttr :brightness;
@@ -51,6 +56,7 @@
 :MacAura a :DeviceClass;
   :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/UM_MACAura_EN_B.pdf>;
   rdfs:comment "note- manual counts dmx from 1; :dmxOffset is from 0";
+  :deviceAttr :color, :rx, :ry, :zoom;
   :attr
     [ :dmxOffset 0 ; :outputAttr :shutter ], # use 22
     [ :dmxOffset 1 ; :outputAttr :dimmer ],
@@ -80,6 +86,7 @@
 
 :MacQuantum a :DeviceClass; 
   :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/35000279b%20UM_MACQuantumProfile_EN_B.pdf>;
+  :deviceAttr :color, :rx, :ry, :zoom, :focus, :iris, :quantumGoboChoice;
   :attr
     [ :dmxOffset 0; :outputAttr :shutter ; rdfs:comment "use 30" ],
     [ :dmxOffset 1; :outputAttr :dimmerFadeHi ],

@@ -4,6 +4,8 @@ import math
 from light9.namespaces import L9, RDF, DEV
 from rdflib import Literal
 from webcolors import hex_to_rgb, rgb_to_hex
+from colormath.color_objects import sRGBColor, CMYColor
+import colormath.color_conversions
 
 log = logging.getLogger('device')
 
@@ -33,7 +35,7 @@ def clamp255(x):
     return min(255, max(0, x))
     
 def _8bit(f):
-    if not isinstance(f, float):
+    if not isinstance(f, (int, float)):
         raise TypeError(repr(f))
     return clamp255(int(f * 255))
 
@@ -61,10 +63,28 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         if out is None:
             return default
         return float(out.toPython())
+
+    def rgbAttr(attr):
+        color = deviceAttrSettings.get(attr, '#000000')
+        r, g, b = hex_to_rgb(color)
+        return r, g, b
+
+    def cmyAttr(attr):
+        rgb = sRGBColor.new_from_rgb_hex(deviceAttrSettings.get(attr, '#000000'))
+        out = colormath.color_conversions.convert_color(rgb, CMYColor)
+        return (
+            _8bit(out.cmy_c),
+            _8bit(out.cmy_m),
+            _8bit(out.cmy_y))
+
+    def fine16Attr(attr):
+        x = floatAttr(attr)
+        hi = _8bit(x)
+        lo = _8bit((x * 255) % 1.0)
+        return hi, lo
         
     if deviceType == L9['ChauvetColorStrip']:
-        color = deviceAttrSettings.get(L9['color'], '#000000')
-        r, g, b = hex_to_rgb(color)
+        r, g, b = rgbAttr(L9['color'])
         return {
             L9['mode']: 215,
             L9['red']: r,
@@ -95,5 +115,78 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['goboShake']: 0,
             L9['goboChoose']: 0,
         }
+    elif deviceType == L9['ChauvetHex12']:
+        out = {}
+        out[L9['red']], out[L9['green']], out[L9['blue']] = r, g, b = rgbAttr(L9['color'])
+        out[L9['amber']] = 0
+        out[L9['white']] = min(r, g, b)
+        out[L9['uv']] = _8bit(floatAttr(L9['uv']))
+        return out
+    elif deviceType == L9['MacAura']:
+        out = {
+            L9['shutter']: 22,
+            L9['dimmer']: 255,
+            L9['zoom']: _8bit(floatAttr(L9['zoom'])),
+            L9['fixtureControl']: 0,
+            L9['colorWheel']: 0,
+            L9['colorTemperature']: 128,
+            L9['fx1Select']: 0,
+            L9['fx1Adjust']: 0,
+            L9['fx2Select']: 0,
+            L9['fx2Adjust']: 0,
+            L9['fxSync']: 0,
+            L9['auraShutter']: 22,
+            L9['auraDimmer']: 0,
+            L9['auraColorWheel']: 0,
+            L9['auraRed']: 0,
+            L9['auraGreen']: 0,
+            L9['auraBlue']: 0,
+        }
+        out[L9['pan']], out[L9['panFine']] = fine16Attr(L9['rx'])
+        out[L9['tilt']], out[L9['tiltFine']] = fine16Attr(L9['ry'])
+        out[L9['red']], out[L9['green']], out[L9['blue']] = rgbAttr(L9['color'])
+        out[L9['white']] = 0
+
+        return out
+    elif deviceType == L9['MacQuantum']:
+        out = {
+            L9['dimmerFadeLo']: 0,
+            L9['shutter']: 30, # strobe is in here too: slow @ 50 -> fast @ 200
+            L9['fixtureControl']: 0,
+            L9['fx1Select']:  0,
+            L9['fx1Adjust']:  0,
+            L9['fx2Select']:  0,
+            L9['fx2Adjust']:  0,
+            L9['fxSync']:  0,            
+            }
+
+        # note these values are set to 'fade', so they update slowly. Haven't found where to turn that off.
+        out[L9['cyan']], out[L9['magenta']], out[L9['yellow']] = cmyAttr(L9['color'])
+        
+        out[L9['focusHi']], out[L9['focusLo']] = fine16Attr(L9['focus'])
+        out[L9['panHi']], out[L9['panLo']] = fine16Attr(L9['rx'])
+        out[L9['tiltHi']], out[L9['tiltLo']] = fine16Attr(L9['ry'])
+        out[L9['zoomHi']], out[L9['zoomLo']] = fine16Attr(L9['zoom'])
+        out[L9['dimmerFadeHi']] = 0 if deviceAttrSettings.get(L9['color'], '#000000') == '#000000' else 255
+
+        out[L9['goboChoice']] = {
+            L9['open']: 0,
+            L9['spider']: 6,
+            L9['windmill']: 11,
+            L9['limbo']: 16,
+            L9['brush']: 21,
+            L9['whirlpool']: 26,
+            L9['stars']: 31,
+            }[deviceAttrSettings.get(L9['gobo'], L9['open'])]
+        
+        out.update( {
+            L9['colorWheel']: 0,
+            L9['goboSpeedHi']: 0,
+            L9['goboSpeedLo']:  0,
+            L9['goboStaticRotate']: 0,
+            L9['prismRotation']: _8bit(floatAttr(L9['prism'])),
+            L9['iris']: _8bit(floatAttr(L9['iris']) * (200/255)),
+            })
+        return out
     else:
         raise NotImplementedError('device %r' % deviceType)
