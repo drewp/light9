@@ -19,7 +19,7 @@ from light9.namespaces import L9
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
-from light9.effect.sequencer import EffectEval
+import light9.effect.effecteval
 
 from bcf2000 import BCF2000
 
@@ -224,6 +224,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         log.info("withgroups %s", withgroups)
 
         self.effectEval = {}
+        reload(light9.effect.effecteval)
         for group, order, sortLabel, effect in withgroups:
             if col == 0 or group != last_group:
                 row = self.make_row(group)
@@ -236,7 +237,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
             self.setup_key_nudgers(subbox.scale)
 
-            self.effectEval[effect] = EffectEval(self.graph, effect)
+            self.effectEval[effect] = light9.effect.effecteval.EffectEval(self.graph, effect)
 
             col = (col + 1) % 8
             last_group = group
@@ -450,7 +451,7 @@ class KeyboardComposer(tk.Frame, SubClient):
             strength = graph.value(setting, L9['level'])
             outputSettings.extend(
                 self.effectEval[effect].outputFromEffect(
-                    [(L9['strength'], strength)]))
+                    [(L9['strength'], strength)], songTime=time.time()))
 
         return outputSettings
 
