@@ -1,0 +1,42 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+effect:blacklight a :Effect; rdfs:label "blacklight";
+     :publishAttr :strength; :setting effect:blacklight_set0, effect:blacklight_set1, effect:blacklight_set10, effect:blacklight_set11, effect:blacklight_set12, effect:blacklight_set13, effect:blacklight_set14, effect:blacklight_set15, effect:blacklight_set2, effect:blacklight_set3, effect:blacklight_set4, effect:blacklight_set5, effect:blacklight_set6, effect:blacklight_set7, effect:blacklight_set8, effect:blacklight_set9 .
+effect:blacklight_set0 :device dev:down2; :deviceAttr :uv;
+     :scaledValue 0.988 .
+effect:blacklight_set1 :device dev:down3; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set10 :device dev:upCenter; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set11 :device dev:lip1; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set12 :device dev:lip2; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set13 :device dev:lip3; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set14 :device dev:lip4; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set15 :device dev:lip5; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set2 :device dev:down4; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set3 :device dev:down5Edge; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set4 :device dev:backlight1; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set5 :device dev:backlight2; :deviceAttr :uv;
+     :scaledValue 0.999 .
+effect:blacklight_set6 :device dev:backlight3; :deviceAttr :uv;
+     :scaledValue 0.996 .
+effect:blacklight_set7 :device dev:backlight4; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set8 :device dev:backlight5; :deviceAttr :uv;
+     :scaledValue 1.000 .
+effect:blacklight_set9 :device dev:hexLow3; :deviceAttr :uv;
+     :scaledValue 0.008 .

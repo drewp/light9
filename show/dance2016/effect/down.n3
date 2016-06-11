@@ -1,0 +1,16 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+<http://light9.bigasterisk.com/effect/down> a ns1:Effect;
+     rdfs:label "down"; ns1:publishAttr ns1:strength;
+     ns1:setting <http://light9.bigasterisk.com/effect/down_set4>, <http://light9.bigasterisk.com/effect/down_set5>, <http://light9.bigasterisk.com/effect/down_set6> .
+<http://light9.bigasterisk.com/effect/down_set4> ns1:device <http://light9.bigasterisk.com/device/down2>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#ffffff" .
+<http://light9.bigasterisk.com/effect/down_set5> ns1:device <http://light9.bigasterisk.com/device/down3>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#ffffff" .
+<http://light9.bigasterisk.com/effect/down_set6> ns1:device <http://light9.bigasterisk.com/device/down4>;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#ffffff" .
