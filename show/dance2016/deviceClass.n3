@@ -42,6 +42,24 @@
     [ :outputAttr :goboShake;     :dmxOffset 11 ],
     [ :outputAttr :goboChoose;    :dmxOffset 12 ] .
 
+:Source4LedSeries2 a :DeviceClass;
+  :docs <https://www.etcconnect.com/WorkArea/DownloadAsset.aspx?id=10737483869>;
+  :deviceAttr :color;
+  :attr
+    [ :dmxOffset 0; :outputAttr :red ],
+    [ :dmxOffset 1; :outputAttr :green ],
+    [ :dmxOffset 2; :outputAttr :blue ],
+    [ :dmxOffset 4; :outputAttr :strobe ],
+    [ :dmxOffset 7; :outputAttr :fixed255 ],
+    [ :dmxOffset 8; :outputAttr :fixed128_0 ],
+    [ :dmxOffset 9; :outputAttr :fixed128_1 ],
+    [ :dmxOffset 10; :outputAttr :fixed128_2 ],
+    [ :dmxOffset 11; :outputAttr :fixed128_3 ],
+    [ :dmxOffset 12; :outputAttr :fixed128_4 ],
+    [ :dmxOffset 13; :outputAttr :fixed128_5 ],
+    [ :dmxOffset 14; :outputAttr :fixed128_6 ] .
+    
+
 :ChauvetHex12 a :DeviceClass;
   :deviceAttr :color, :uv;
   :docs <https://www.chauvetprofessional.com/wp-content/uploads/2015/06/COLORdash_Par-Hex_12_QRG_Rev4_ML4_WO.pdf>;

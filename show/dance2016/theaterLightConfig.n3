@@ -65,7 +65,14 @@ dev:hexVeryLow4 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 199 .
 dev:hexVeryLow5 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 205 .
 
 
-
+dev:lowPattern301 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 1 .
+dev:lowPattern302 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 16 .
+dev:lowPattern303 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 31 .
+dev:lowPattern304 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 46 .
+dev:lowPattern305 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 61 .
+dev:lowPattern306 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 76 .
+dev:lowPattern307 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 91 .
+dev:lowPattern308 a :Source4LedSeries2; :dmxUniverse udmxB:; :dmxBase 106 .
 
 # [ :name "oran1"; :output dmx:c21 ] .
 # [ :name "oran2"; :output dmx:c25 ] .

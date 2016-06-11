@@ -122,6 +122,14 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         out[L9['white']] = min(r, g, b)
         out[L9['uv']] = _8bit(floatAttr(L9['uv']))
         return out
+    elif deviceType == L9['Source4LedSeries2']:
+        out = {}
+        out[L9['red']], out[L9['green']], out[L9['blue']] = rgbAttr(L9['color'])
+        out[L9['strobe']] = 0
+        out[L9['fixed255']] = 255
+        for num in range(7):
+            out[L9['fixed128_%s' % num]] = 128
+        return out        
     elif deviceType == L9['MacAura']:
         out = {
             L9['shutter']: 22,
