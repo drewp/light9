@@ -9,6 +9,7 @@ import colormath.color_conversions
 
 log = logging.getLogger('device')
 
+
 class Device(object):
     def setAttrs():
         pass

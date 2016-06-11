@@ -68,7 +68,7 @@ class EnttecDmx(DmxOutput):
         self.dev = Dmx(devicePath)
         self.currentBuffer = ''
         self.lastLog = 0
-        task.LoopingCall(self._loop).start(1 / 50)
+        task.LoopingCall(self._loop).start(0.050)
 
     @stats.update.time()
     def update(self, values):
@@ -105,7 +105,7 @@ class Udmx(DmxOutput):
         #   2. Retries if there are usb errors.
         # Copying the LoopingCall logic accomplishes those with a
         # little wasted time if there are no updates.
-        task.LoopingCall(self._loop).start(1 / 50)
+        task.LoopingCall(self._loop).start(0.050)
 
     @stats.update.time()
     def update(self, values):
@@ -117,14 +117,13 @@ class Udmx(DmxOutput):
         self.currentBuffer = ''.join(map(chr, values))
     
     def _loop(self):
-        if self.lastSentBuffer == self.currentBuffer:
-            return
+        #if self.lastSentBuffer == self.currentBuffer:
+        #    return
         with Udmx.stats.write.time():
             # frequently errors with usb.core.USBError
             try:
                 self.dev.SendDMX(self.currentBuffer)
                 self.lastSentBuffer = self.currentBuffer
-                return
             except usb.core.USBError:
                 Udmx.stats.usbErrors += 1
 

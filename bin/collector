@@ -61,8 +61,10 @@ def startZmq(port, collector):
 def launch(graph):
 
     # todo: drive outputs with config files
-    outputs = [EnttecDmx(L9['output/dmx0/'], '/dev/dmx0'),
-               Udmx(L9['output/udmx/'])]
+    outputs = [
+        EnttecDmx(L9['output/dmx0/'], '/dev/dmx0'),
+        Udmx(L9['output/udmx/']),
+    ]
     c = Collector(graph, outputs)
 
     server = WebServer(c)
