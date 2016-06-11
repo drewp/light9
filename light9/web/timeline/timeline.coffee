@@ -209,7 +209,7 @@ Polymer
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
-    rows: { value: [0, 1, 2] }
+    rows: { value: [0] }
     zoom: { type: Object, notify: true, observer: 'onZoom' }
     zoomFlattened: { type: Object, notify: true }
   onZoom: ->
@@ -286,7 +286,7 @@ Polymer
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: ->
     U = (x) -> @graph.Uri(x)
-
+    log("row #{@rowIndex} updating")
     @noteUris = []
     for note in @graph.objects(@song, U(':note'))
       @push('noteUris', note)
