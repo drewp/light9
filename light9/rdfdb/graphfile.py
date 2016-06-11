@@ -76,7 +76,14 @@ class GraphFile(object):
 
         self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
 
-        self.namespaces = {}
+        self.namespaces = {
+            '': 'http://light9.bigasterisk.com/',
+            'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+            'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+            'xsd': 'http://www.w3.org/2001/XMLSchema#',
+            'effect': 'http://light9.bigasterisk.com/effect/',
+            'dev': 'http://light9.bigasterisk.com/device/',
+        }
         
         if not os.path.exists(path):
             # can't start notify until file exists
