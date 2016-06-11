@@ -104,13 +104,13 @@ class Collector(object):
         deviceAttrs = {} # device: {deviceAttr: value}
         for _, _, lastSettings in self.lastRequest.itervalues():
             for (device, deviceAttr), value in lastSettings.iteritems():
-                attrs = deviceAttrs.setdefault(device, {})
-                if deviceAttr in attrs:
-                    value = resolve(device, deviceAttr, [attrs[deviceAttr],
-                                                         value])
                 if (device, deviceAttr) in self.remapOut:
                     start, end = self.remapOut[(device, deviceAttr)]
                     value = Literal(start + float(value) * (end - start))
+
+                attrs = deviceAttrs.setdefault(device, {})
+                if deviceAttr in attrs:
+                    value = resolve(device, deviceAttr, [attrs[deviceAttr], value])
                 attrs[deviceAttr] = value
 
         outputAttrs = {} # device: {outputAttr: value}
