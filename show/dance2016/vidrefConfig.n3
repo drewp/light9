@@ -4,5 +4,4 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016> ns1:vidrefCamRequest <http://10.1.0.103:8208/pic?resize=1080&shutter=25832&exposure_mode=sports&awb_mode=tungsten&brightness=46&redgain=1&bluegain=1&iso=700&exposure_compensation=0&rotation=180&x=0.012037037037037037&y=0.5584255842558425&w=0.3712962962962963&h=0.37761377613776137> .
-
+<http://light9.bigasterisk.com/show/dance2016> ns1:vidrefCamRequest <http://10.2.0.5:8208/pic?resize=1080&shutter=75062&exposure_mode=fixedfps&awb_mode=flash&brightness=51&redgain=1.4&bluegain=1&iso=480&exposure_compensation=-20&rotation=180&x=0&y=0.3025830258302583&w=1&h=0.6> .
