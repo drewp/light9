@@ -3,7 +3,6 @@ log = console.log
 Polymer
   is: 'light9-live-control'
   properties:
-    client: { type: Object }
     device: { type: String }
     deviceAttr: { type: Object }
     max: { type: Number, value: 1 }
@@ -25,7 +24,6 @@ Polymer
     @lastSent = [[@device, @deviceAttr.uri, value]]
     @resend()
   resend: ->
-    @client.send(@lastSent)
     window.gather(@lastSent)
   clear: ->
     if @deviceAttr.useColor
@@ -38,6 +36,7 @@ Polymer
   is: "light9-live-controls"
   properties:
     graph: { type: Object, notify: true }
+    client: { type: Object, notify: true }
     devices: { type: Array, notify: true }
     currentSettings: { type: Object, notify: true } # dev+attr: [dev, attr, value]
     effectPreview: { type: String, notify: true }
@@ -56,6 +55,14 @@ Polymer
       else
         @currentSettings[key] = [dev, devAttr, value]
       @effectPreview = JSON.stringify(v for k,v of @currentSettings)
+
+      @debounce('send', @sendAll.bind(@), 2)
+
+  currentSettingsList: -> (v for k,v of @currentSettings)
+      
+  sendAll: ->
+    @client.send(@currentSettingsList())
+      
   saveNewEffect: ->
     uriName = @newEffectName.replace(/[^a-zA-Z0-9_]/g, '')
     return if not uriName.length
@@ -71,8 +78,8 @@ Polymer
       quad(effectUri, U('rdfs:label'), @graph.Literal(@newEffectName))
       quad(effectUri, U(':publishAttr'), U(':strength'))
       ]
-    settings = @graph.nextNumberedResources(effectUri + '_set', Object.keys(@currentSettings).length)
-    for _, row of @currentSettings
+    settings = @graph.nextNumberedResources(effectUri + '_set', @currentSettingsList().length)
+    for row in @currentSettingsList()
       if row[2] == 0 or row[2] == '#000000'
         continue
       setting = settings.shift()
@@ -90,6 +97,7 @@ Polymer
     patch = {addQuads: addQuads, delQuads: []}
     log('save', patch)
     @graph.applyAndSendPatch(patch)
+    @newEffectName = ''
 
   onGraph: ->
     @graph.runHandler(@update.bind(@))

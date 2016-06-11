@@ -17,6 +17,7 @@
        ready: function() {
            this.self = this;
            var self = this;
+           this.lastSent = [];
            
            self.$.put.addEventListener(
                'error', function() { self.status = 'err'; });
@@ -29,7 +30,7 @@
            self.status = 'ready';
        },               
        ping: function() {
-           this.send([]);
+           this.send(this.lastSent);
        },
        send: function(settings) {
            this.$.put.body = JSON.stringify({
@@ -37,6 +38,7 @@
                "client": window.location.href,
                "clientSession": this.clientSession});
            this.$.put.generateRequest();
+           this.lastSent = settings.slice();
        }
    });
   </script>
