@@ -75,13 +75,18 @@ class Collector(object):
         now = time.time()
 
         self._forgetStaleClients(now)
-        row = self.lastRequest.get(client)
-        if row is not None:
-            sess, _, prevClientSettings = row
-            if sess != clientSession:
+
+        if 0: # client updates their past requests?
+            row = self.lastRequest.get(client)
+            if row is not None:
+                sess, _, prevClientSettings = row
+                if sess != clientSession:
+                    prevClientSettings = {}
+            else:
                 prevClientSettings = {}
-        else:
+        else: # client always provides all the nonzero settings it wants
             prevClientSettings = {}
+            
         prevClientSettings.update(self.resolvedSettingsDict(settings))
         self.lastRequest[client] = (clientSession, now, prevClientSettings)
 
@@ -115,7 +120,9 @@ class Collector(object):
         self.flush(pendingOut)
         dt2 = 1000 * (time.time() - now)
         if dt1 > 10:
-            print "slow setAttrs: %.1fms -> flush -> %.1fms" % (dt1, dt2)
+            print "slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" % (
+                dt1, dt2, len(self.lastRequest), len(deviceAttrs), len(outputAttrs)
+            )
 
     def setAttr(self, device, outputAttr, value, pendingOut):
         output, index = self.outputMap[(device, outputAttr)]
