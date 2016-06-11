@@ -341,21 +341,25 @@ Polymer
             getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
             getSuggestedTargetOffset: () => $V([0, -80])
           }))
-         
-          @setAdjuster(@uri+'/p3', adj = new AdjustableFloatObject({
-            graph: @graph
-            subj: worldPts[3].uri
-            pred: @graph.Uri(':time')
-            ctx: @graph.Uri(@song)
-            getTargetPosForValue: (value) => $V([@zoomInX(value), 600])
-            getValueForPos: (pos) => (@zoomInX.invert(pos.e(1)) - originTime)
-            getSuggestedTargetOffset: () => $V([0, -80])
-          }))
-          adj._getValue = (=>
-            # note: don't use originTime from the closure- we need the
-            # graph dependency
-            adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
-            )
+
+          for pointNum in [0, 2, 3]
+            @setAdjuster(@uri+'/p'+pointNum, adj = new AdjustableFloatObject({
+              graph: @graph
+              subj: worldPts[pointNum].uri
+              pred: @graph.Uri(':time')
+              ctx: @graph.Uri(@song)
+              getTargetPosForValue: (value) => $V([@zoomInX(value), 600])
+              getValueForPos: (pos) =>
+                origin = @graph.floatValue(@uri, U(':originTime'))
+                (@zoomInX.invert(pos.e(1)) - origin)
+              getSuggestedTargetOffset: () => $V([0, -80])
+            }))
+            adj._getValue = (=>
+              # note: don't use originTime from the closure- we need the
+              # graph dependency
+              adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+              )
+            console.log(adj)
           
       screenPos = (pt) =>
         $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
