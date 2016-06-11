@@ -179,18 +179,21 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
 
         out[L9['goboChoice']] = {
             L9['open']: 0,
-            L9['spider']: 6,
-            L9['windmill']: 11,
-            L9['limbo']: 16,
-            L9['brush']: 21,
-            L9['whirlpool']: 26,
-            L9['stars']: 31,
+            L9['spider']: 36,
+            L9['windmill']: 41,
+            L9['limbo']: 46,
+            L9['brush']: 51,
+            L9['whirlpool']: 56,
+            L9['stars']: 61,
             }[deviceAttrSettings.get(L9['gobo'], L9['open'])]
+
+        # my goboSpeed deviceAttr goes 0=stopped to 1=fastest (using one direction only)
+        x = .5 + .5 * floatAttr(L9['goboSpeed'])
+        out[L9['goboSpeedHi']] = _8bit(x)
+        out[L9['goboSpeedLo']] = _8bit((x * 255) % 1.0)
         
         out.update( {
             L9['colorWheel']: 0,
-            L9['goboSpeedHi']: 0,
-            L9['goboSpeedLo']:  0,
             L9['goboStaticRotate']: 0,
             L9['prismRotation']: _8bit(floatAttr(L9['prism'])),
             L9['iris']: _8bit(floatAttr(L9['iris']) * (200/255)),

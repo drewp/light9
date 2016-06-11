@@ -1,15 +1,18 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-:color a :DeviceAttr;             :dataType :color .
-:rx a :DeviceAttr;                :dataType :angle .
-:ry a :DeviceAttr;                :dataType :angle .
-:uv a :DeviceAttr;                :dataType :scalar .
-:brightness a :DeviceAttr;        :dataType :scalar .
-:zoom a :DeviceAttr;              :dataType :scalar ; rdfs:comment "maybe a 'wide to narrow' type" .
-:focus a :DeviceAttr;             :dataType :scalar .
-:iris a :DeviceAttr;              :dataType :scalar .
-:quantumGoboChoice a :DeviceAttr; :dataType :choice;
+:color              a :DeviceAttr; :dataType :color .
+:rx                 a :DeviceAttr; :dataType :angle .
+:ry                 a :DeviceAttr; :dataType :angle .
+:uv                 a :DeviceAttr; :dataType :scalar .
+:brightness         a :DeviceAttr; :dataType :scalar .
+:zoom               a :DeviceAttr; :dataType :scalar ;
+  rdfs:comment "maybe make this a separate 'wide to narrow' type" .
+:focus              a :DeviceAttr; :dataType :scalar .
+:iris               a :DeviceAttr; :dataType :scalar .
+:goboSpeed          a :DeviceAttr; :dataType :scalar ;
+  rdfs:comment "0=stopped, 1=rotate the fastest".
+:quantumGoboChoice  a :DeviceAttr; :dataType :choice;
   :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
 
 :SimpleDimmer a :DeviceClass;
@@ -104,7 +107,7 @@
 
 :MacQuantum a :DeviceClass; 
   :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/35000279b%20UM_MACQuantumProfile_EN_B.pdf>;
-  :deviceAttr :color, :rx, :ry, :zoom, :focus, :iris, :quantumGoboChoice;
+  :deviceAttr :color, :rx, :ry, :zoom, :focus, :iris, :quantumGoboChoice, :goboSpeed;
   :attr
     [ :dmxOffset 0; :outputAttr :shutter ; rdfs:comment "use 30" ],
     [ :dmxOffset 1; :outputAttr :dimmerFadeHi ],
