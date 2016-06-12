@@ -50,6 +50,10 @@ Polymer
     window.gather = (sent) =>
       [dev, devAttr, value] = sent[0]
       key = dev + " " + devAttr
+      # this is a bug for zoom=0, since collector will default it to
+      # stick at the last setting if we don't explicitly send the
+      # 0. rx/ry similar though not the exact same deal because of
+      # their remap.
       if value == 0 or value == '#000000'
         delete @currentSettings[key]
       else

@@ -50,10 +50,21 @@ def resolve(deviceType, deviceAttr, values):
     if deviceAttr == L9['color']:
         rgbs = [hex_to_rgb(v) for v in values]
         return rgb_to_hex([max(*component) for component in zip(*rgbs)])
-    # angles should perhaps use average; gobo choice use the most-open one
+    # incomplete. how-to-resolve should be on the DeviceAttr defs in the graph.
+    if deviceAttr in [L9['rx'], L9['ry'], L9['zoom'], L9['focus'], L9['iris']]:
+        floatVals = []
+        for v in values:
+            if isinstance(v, Literal):
+                floatVals.append(float(v.toPython()))
+            elif isinstance(v, (int, float)):
+                floatVals.append(float(v))
+            else:
+                raise TypeError(repr(v))
+            
+        return Literal(sum(floatVals) / len(floatVals))
     
     return max(values)
-    
+
 def toOutputAttrs(deviceType, deviceAttrSettings):
     """
     Given device attr settings like {L9['color']: Literal('#ff0000')},

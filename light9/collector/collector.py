@@ -38,10 +38,11 @@ class Collector(object):
         self.clientTimeoutSec = clientTimeoutSec
 
         self.graph.addHandler(self.rebuildOutputMap)
-        self.lastRequest = {} # client : (session, time, {(dev,attr): latestValue})
+        self.lastRequest = {} # client : (session, time, {(dev,devattr): latestValue})
+        self.stickyAttrs = {} # (dev, devattr): value to use instead of 0
 
     def rebuildOutputMap(self):
-        self.outputMap = outputMap(self.graph, self.outputs) # (device, attr) : (output, index)
+        self.outputMap = outputMap(self.graph, self.outputs) # (device, outputattr) : (output, index)
         self.deviceType = {} # uri: type that's a subclass of Device
         self.remapOut = {} # (device, deviceAttr) : (start, end)
         for dc in self.graph.subjects(RDF.type, L9['DeviceClass']):
@@ -64,11 +65,11 @@ class Collector(object):
 
     def resolvedSettingsDict(self, settingsList):
         out = {}
-        for d, a, v in settingsList:
-            if (d, a) in out:
-                out[(d, a)] = resolve(d, a, [out[(d, a)], v])
+        for d, da, v in settingsList:
+            if (d, da) in out:
+                out[(d, da)] = resolve(d, da, [out[(d, da)], v])
             else:
-                out[(d, a)] = v
+                out[(d, da)] = v
         return out
 
     def setAttrs(self, client, clientSession, settings):
@@ -84,24 +85,10 @@ class Collector(object):
 
         self._forgetStaleClients(now)
 
-        if 0: # client updates their past requests?
-            row = self.lastRequest.get(client)
-            if row is not None:
-                sess, _, prevClientSettings = row
-                if sess != clientSession:
-                    prevClientSettings = {}
-            else:
-                prevClientSettings = {}
-        else: # client always provides all the nonzero settings it wants
-            prevClientSettings = {}
-            
-        prevClientSettings.update(self.resolvedSettingsDict(settings))
-        self.lastRequest[client] = (clientSession, now, prevClientSettings)
+        uniqueSettings = self.resolvedSettingsDict(settings)
+        self.lastRequest[client] = (clientSession, now, uniqueSettings)
 
-        # inputs that are omitted, implying a zero, should be added
-        # back here if they would remap to something nonzero.
-        
-        deviceAttrs = {} # device: {deviceAttr: value}
+        deviceAttrs = {} # device: {deviceAttr: value}       
         for _, _, lastSettings in self.lastRequest.itervalues():
             for (device, deviceAttr), value in lastSettings.iteritems():
                 if (device, deviceAttr) in self.remapOut:
@@ -112,7 +99,19 @@ class Collector(object):
                 if deviceAttr in attrs:
                     value = resolve(device, deviceAttr, [attrs[deviceAttr], value])
                 attrs[deviceAttr] = value
+                # list should come from the graph. these are attrs
+                # that should default to holding the last position,
+                # not going to 0.
+                if deviceAttr in [L9['rx'], L9['ry'], L9['zoom']]:
+                    self.stickyAttrs[(device, deviceAttr)] = value
 
+        
+        # e.g. don't let an unspecified rotation go to 0
+        for (d, da), v in self.stickyAttrs.iteritems():
+            daDict = deviceAttrs.setdefault(d, {})
+            if da not in daDict:
+                daDict[da] = v
+                    
         outputAttrs = {} # device: {outputAttr: value}
         for d in deviceAttrs:
             try:
