@@ -1,0 +1,51 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song14rainbow a :Effect; rdfs:label "song14rainbow";
+     :publishAttr :strength; :setting effect:song14rainbow_set0, effect:song14rainbow_set1, effect:song14rainbow_set10, effect:song14rainbow_set11, effect:song14rainbow_set12, effect:song14rainbow_set13, effect:song14rainbow_set14, effect:song14rainbow_set15, effect:song14rainbow_set16, effect:song14rainbow_set17, effect:song14rainbow_set18, effect:song14rainbow_set19, effect:song14rainbow_set2, effect:song14rainbow_set3, effect:song14rainbow_set4, effect:song14rainbow_set5, effect:song14rainbow_set6, effect:song14rainbow_set7, effect:song14rainbow_set8, effect:song14rainbow_set9 .
+effect:song14rainbow_set0 :device dev:aura1; :deviceAttr :color;
+     :scaledValue "#00ff5a" .
+effect:song14rainbow_set1 :device dev:aura3; :deviceAttr :color;
+     :scaledValue "#ff0000" .
+effect:song14rainbow_set10 :device dev:aura3; :deviceAttr :ry;
+     :value 0.354 .
+effect:song14rainbow_set11 :device dev:aura4; :deviceAttr :rx;
+     :value 0.589 .
+effect:song14rainbow_set12 :device dev:aura4; :deviceAttr :ry;
+     :value 0.322 .
+effect:song14rainbow_set13 :device dev:aura5; :deviceAttr :rx;
+     :value 0.241 .
+effect:song14rainbow_set14 :device dev:aura5; :deviceAttr :ry;
+     :value 0.576 .
+effect:song14rainbow_set15 :device dev:aura1; :deviceAttr :zoom;
+     :value 0.640 .
+effect:song14rainbow_set16 :device dev:aura2; :deviceAttr :zoom;
+     :value 0.655 .
+effect:song14rainbow_set17 :device dev:aura3; :deviceAttr :zoom;
+     :value 0.403 .
+effect:song14rainbow_set18 :device dev:aura4; :deviceAttr :zoom;
+     :value 0.688 .
+effect:song14rainbow_set19 :device dev:aura5; :deviceAttr :zoom;
+     :value 0.691 .
+effect:song14rainbow_set2 :device dev:aura5; :deviceAttr :color;
+     :scaledValue "#0088ff" .
+effect:song14rainbow_set3 :device dev:aura2; :deviceAttr :color;
+     :scaledValue "#1200ff" .
+effect:song14rainbow_set4 :device dev:aura4; :deviceAttr :color;
+     :scaledValue "#ff04e0" .
+effect:song14rainbow_set5 :device dev:aura1; :deviceAttr :rx;
+     :value 0.740 .
+effect:song14rainbow_set6 :device dev:aura1; :deviceAttr :ry;
+     :value 0.489 .
+effect:song14rainbow_set7 :device dev:aura2; :deviceAttr :rx;
+     :value 0.428 .
+effect:song14rainbow_set8 :device dev:aura2; :deviceAttr :ry;
+     :value 0.251 .
+effect:song14rainbow_set9 :device dev:aura3; :deviceAttr :rx;
+     :value 0.555 .

@@ -35,6 +35,20 @@ dev:aura2 a :MacAura; :dmxUniverse udmxB:; :dmxBase 420 .
 dev:aura3 a :MacAura; :dmxUniverse udmxB:; :dmxBase 434 .
 dev:aura4 a :MacAura; :dmxUniverse udmxB:; :dmxBase 448 .
 dev:aura5 a :MacAura; :dmxUniverse udmxB:; :dmxBase 462 .
+
+dev:aura1 :outputAttrRange dev:aura1rx . dev:aura1rx :outputAttr :rx; :start 0.145; :end 0.275 .
+dev:aura2 :outputAttrRange dev:aura2rx . dev:aura2rx :outputAttr :rx; :start 0.096; :end 0.259 .
+dev:aura3 :outputAttrRange dev:aura3rx . dev:aura3rx :outputAttr :rx; :start 0.068; :end 0.25 .
+dev:aura4 :outputAttrRange dev:aura4rx . dev:aura4rx :outputAttr :rx; :start 0.065; :end 0.21 .
+dev:aura5 :outputAttrRange dev:aura5rx . dev:aura5rx :outputAttr :rx; :start 0.06; :end 0.194 .
+
+dev:aura1 :outputAttrRange dev:aura1ry . dev:aura1ry :outputAttr :ry; :start 0.239; :end 0.153 .
+dev:aura2 :outputAttrRange dev:aura2ry . dev:aura2ry :outputAttr :ry; :start 0.248; :end 0.148 .
+dev:aura3 :outputAttrRange dev:aura3ry . dev:aura3ry :outputAttr :ry; :start 0.260; :end 0.151 .
+dev:aura4 :outputAttrRange dev:aura4ry . dev:aura4ry :outputAttr :ry; :start 0.250; :end 0.153 .
+dev:aura5 :outputAttrRange dev:aura5ry . dev:aura5ry :outputAttr :ry; :start 0.241; :end 0.151 .
+
+
 dev:auraStage a :MacAura; :dmxUniverse udmxB:; :dmxBase 476; rdfs:comment "rx=.5 ry<.45" .
 
 dev:down2 a :ChauvetHex12; :dmxUniverse udmxB:; :dmxBase 157 .

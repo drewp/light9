@@ -48,6 +48,8 @@ effect:usa a :mockupEffect; rdfs:label "USA"; :chaseOffset 0;
 :ds4 :attr :color; :device dev:colorStrip; :value "#00ff00" .
 :ds5 :attr :color; :device dev:colorStrip; :value "#300030" .
 
+effect:house :group "main" .
+
 effect:Curtain a :Effect; rdfs:label "curtain"; :deviceSetting :ds5;
      :group "main"; :order 2; :publishAttr :strength .
 
