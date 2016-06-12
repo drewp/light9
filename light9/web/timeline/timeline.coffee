@@ -34,6 +34,7 @@ Polymer
     @song = @playerSong if @followPlayerSong
 
   ready: ->
+    @debug_zoomOrLayoutChangedCount = 0
     @viewState =
       zoomSpec:
         duration: ko.observable(100)
@@ -46,6 +47,11 @@ Polymer
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
     @setAdjuster = @$.adjusters.setAdjuster.bind(@$.adjusters)
+
+    setInterval(@updateDebugSummary.bind(@), 100)
+
+  updateDebugSummary: ->
+    @debug = "#{@debug_zoomOrLayoutChangedCount} layout change, "
     
   attached: ->
     @dia = @$.dia
@@ -59,6 +65,9 @@ Polymer
     @makeZoomAdjs()
 
   zoomOrLayoutChanged: ->
+    # not for cursor updates
+
+    @debug_zoomOrLayoutChangedCount++
     @fullZoomX.domain([0, @viewState.zoomSpec.duration()])
     @fullZoomX.range([0, @width()])
 
@@ -72,7 +81,8 @@ Polymer
     @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
     @$.adjusters.updateAllCoords()
 
-    @songTimeChanged()
+    # cursor needs update when layout changes, but I don't want zoom/layout to depend on the playback time
+    setTimeout(@songTimeChanged.bind(@), 1)
 
   songTimeChanged: ->
     @dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,

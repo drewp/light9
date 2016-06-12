@@ -32,6 +32,11 @@
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
      }
+     #debug {
+      background: white;
+      font-family: monospace;
+      font-size: 125%;
+     }
     </style>
     <div>
       <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
@@ -43,7 +48,7 @@
       timeline editor: song <edit-choice graph="{{graph}}" uri="{{song}}"></edit-choice>
       <label><input type="checkbox" checked="{{followPlayerSong::change}}" > follow player song choice</label>
     </div>
-    <div>[[debug]]</div>
+    <div id="debug">[[debug]]</div>
     <iron-ajax id="vidrefTime" url="/vidref/time" method="PUT" content-type="application/json"></iron-ajax>
     <light9-timeline-audio id="audio"
                            graph="{{graph}}"
