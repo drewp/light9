@@ -28,7 +28,13 @@ def scale(value, strength):
     if isinstance(value, basestring):
         if value[0] == '#':
             r,g,b = hex_to_rgb(value)
-            return rgb_to_hex([r * strength, g * strength, b * strength])
+            if isinstance(strength, Literal):
+                strength = strength.toPython()
+            if isinstance(strength, basestring):
+                sr, sg, sb = [v/255 for v in hex_to_rgb(strength)]
+            else:
+                sr = sg = sb = strength
+            return rgb_to_hex([int(r * sr), int(g * sg), int(b * sb)])
     elif isinstance(value, (int, float)):
         return value * strength
     else:
@@ -81,7 +87,8 @@ class EffectEval(object):
 
         out = {} # (dev, attr): value
 
-        out.update(self.simpleOutput(strength))
+        out.update(self.simpleOutput(strength,
+                                     effectSettings.get(L9['colorScale'], None)))
 
         if self.effect.startswith(L9['effect/']):
             tail = 'effect_' + self.effect[len(L9['effect/']):]
@@ -98,12 +105,14 @@ class EffectEval(object):
         #import pprint; pprint.pprint(outList, width=170)
         return outList
                             
-    def simpleOutput(self, strength):
+    def simpleOutput(self, strength, colorScale):
         out = {}
-        for dev, attr, value, isScaled in self.effectOutputs.get(self.effect, []):
+        for dev, devAttr, value, isScaled in self.effectOutputs.get(self.effect, []):
             if isScaled:
                 value = scale(value, strength)
-            out[(dev, attr)] = value
+            if colorScale is not None and devAttr == L9['color']:
+                value = scale(value, colorScale)
+            out[(dev, devAttr)] = value
         return out
         
 

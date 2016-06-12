@@ -38,6 +38,11 @@ class Note(object):
         self.uri = uri
         self.effectEval = effectevalModule.EffectEval(
             graph, g.value(uri, L9['effectClass']))
+        self.baseEffectSettings = {}  # {effectAttr: value}
+        for s in g.objects(uri, L9['setting']):
+            ea = g.value(s, L9['effectAttr'])
+            self.baseEffectSettings[ea] = g.value(s, L9['value'])
+            
         floatVal = lambda s, p: float(g.value(s, p).toPython())
         originTime = floatVal(uri, L9['originTime'])
         self.points = []
@@ -72,8 +77,9 @@ class Note(object):
         """
         list of (device, attr, value)
         """
-        effectSettings = [(L9['strength'], self.evalCurve(t))]
-        return self.effectEval.outputFromEffect(effectSettings, t)
+        effectSettings = self.baseEffectSettings.copy()
+        effectSettings[L9['strength']] = self.evalCurve(t)
+        return self.effectEval.outputFromEffect(effectSettings.items(), t)
 
 
 class CodeWatcher(object):
