@@ -102,7 +102,7 @@ class Collector(object):
                 # list should come from the graph. these are attrs
                 # that should default to holding the last position,
                 # not going to 0.
-                if deviceAttr in [L9['rx'], L9['ry'], L9['zoom']]:
+                if deviceAttr in [L9['rx'], L9['ry'], L9['zoom'], L9['focus']]:
                     self.stickyAttrs[(device, deviceAttr)] = value
 
         
