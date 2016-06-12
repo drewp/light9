@@ -27,7 +27,7 @@ Polymer
     window.gather(@lastSent)
   clear: ->
     if @deviceAttr.useColor
-      @value = @pickedColor = '#000000'
+      @value = '#000000'
     else
       @value = @immediateSlider = 0
       
