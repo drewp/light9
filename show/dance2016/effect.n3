@@ -13,7 +13,7 @@
 #     :fadeShape :fadeCurve1; :palette "#0000ff", "#ff0000", "#ffffff";
 #     :publishAttr :strength .
 
-effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate, :strength .
+#effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate, :strength .
 
 
 effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate ; :group "anim".

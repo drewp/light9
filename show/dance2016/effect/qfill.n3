@@ -12,8 +12,8 @@ effect:qfill a :Effect;
      :setting effect:qfill_set0, effect:qfill_set1, effect:qfill_set10, effect:qfill_set11, effect:qfill_set12, effect:qfill_set2, effect:qfill_set3, effect:qfill_set4, effect:qfill_set5, effect:qfill_set6, effect:qfill_set7, effect:qfill_set8, effect:qfill_set9 .
 effect:qfill_set0 :device dev:q1; :deviceAttr :rx; :value 0.248 .
 effect:qfill_set1 :device dev:q1; :deviceAttr :ry; :value 0.475 .
-effect:qfill_set10 :device dev:q3; :deviceAttr :color; :scaledValue "#f3deb7" .
-effect:qfill_set11 :device dev:q2; :deviceAttr :color; :scaledValue "#f3deb7" .
+effect:qfill_set10 :device dev:q3; :deviceAttr :color; :scaledValue "#f2a58f" .
+effect:qfill_set11 :device dev:q2; :deviceAttr :color; :scaledValue "#f2a58f" .
 effect:qfill_set12 :device dev:q2; :deviceAttr :focus; :value 0.971 .
 effect:qfill_set2 :device dev:q2; :deviceAttr :rx; :value 0.513 .
 effect:qfill_set3 :device dev:q2; :deviceAttr :ry; :value 0.482 .
@@ -22,4 +22,4 @@ effect:qfill_set5 :device dev:q3; :deviceAttr :rx; :value 0.738 .
 effect:qfill_set6 :device dev:q3; :deviceAttr :ry; :value 0.032 .
 effect:qfill_set7 :device dev:q3; :deviceAttr :zoom; :value 0.395 .
 effect:qfill_set8 :device dev:q1; :deviceAttr :zoom; :value 0.319 .
-effect:qfill_set9 :device dev:q1; :deviceAttr :color; :scaledValue "#f3deb7" .
+effect:qfill_set9 :device dev:q1; :deviceAttr :color; :scaledValue "#f2a58f" .
