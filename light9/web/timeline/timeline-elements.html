@@ -215,7 +215,12 @@ background: rgba(126, 52, 245, 0.0784313725490196);
          /* outline: 2px solid red; */
      }
     </style>
-    <light9-timeline-note-inline-attrs></light9-timeline-note-inline-attrs>
+    <light9-timeline-note-inline-attrs rect="{{inlineRect}}"
+                                       graph="{{graph}}"
+                                       song="{{song}}"
+                                       uri="{{uri}}"
+    >
+    </light9-timeline-note-inline-attrs>
   </template>
 </dom-module>
 
@@ -302,15 +307,24 @@ background: rgba(126, 52, 245, 0.0784313725490196);
 <!-- sometimes we draw attrs within the shape of a note. -->
 <dom-module id="light9-timeline-note-inline-attrs">
   <template>
-
+    <style>
+     #top {
+         position: absolute;
+         overflow: hidden;
+         background: #7b7b7b;
+         border-radius: 6px;
+         box-shadow: 0 0 5px black;
+         padding: 3px;
+     }
+    </style>
+    <div id="top" style$="left: [[rect.left]]px; top: [[rect.top]]px; width: [[rect.width]]px; height: [[rect.height]]px; display: [[rect.display]]">
+      <div>note [[noteLabel]] <button on-click="onDel">del</button></div>
+      <table>
+        <tr><th>effect:</th><td><edit-choice uri="{{effect}}" label="{{effectLabel}}"></edit-choice></td></tr>
+        <!-- <tr><th>color:</th><td>[[color]]</td></tr> -->
+      </table>
+    </div>
   </template>
-  <script>
-   Polymer({
-       is: "light9-timeline-note-inline-attrs",
-       properties: {
-       }
-   });
-  </script>
 </dom-module>
 
 <script src="/lib/sylvester/sylvester.js"></script>

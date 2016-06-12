@@ -371,17 +371,22 @@ Polymer
     dia: { type: Object, notify: true }
     uri: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
-    setAdjuster: {type: Function, notify: true}
+    setAdjuster: {type: Function, notify: true }
+    inlineRect: { type: Object, notify: true }
   observers: [
     'onUri(graph, dia, uri, zoomInX, setAdjuster)'
     'update(graph, dia, uri, zoomInX, setAdjuster)'
     ]
   ready: ->
     @adjusterIds = {}
+
   detached: ->
     log('detatch', @uri)
     @dia.clearElem(@uri, ['/area', '/label'])
     @isDetached = true
+    @clearAdjusters()
+
+  clearAdjusters: ->
     for i in Object.keys(@adjusterIds)
       @setAdjuster(i, null)
 
@@ -394,62 +399,111 @@ Polymer
       return 
     # update our note DOM and SVG elements based on the graph
     U = (x) -> @graph.Uri(x)
-    worldPts = [] # (song time, value)
 
     yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
 
     originTime = @graph.floatValue(@uri, U(':originTime'))
     for curve in @graph.objects(@uri, U(':curve'))
       if @graph.uriValue(curve, U(':attr')) == U(':strength')
-        worldPts = getCurvePoints(@graph, curve, originTime)
+        @updateStrengthCurveEtc(originTime, curve, yForV)
+        
+  updateStrengthCurveEtc: (originTime, curve, yForV) ->
+    U = (x) -> @graph.Uri(x)
+    worldPts = getCurvePoints(@graph, curve, originTime) # (song time, value)
 
-        curveWidth = =>
-          tMin = @graph.floatValue(worldPts[0].uri, U(':time'))
-          tMax = @graph.floatValue(worldPts[3].uri, U(':time'))
-          tMax - tMin            
+    curveWidth = =>
+      tMin = @graph.floatValue(worldPts[0].uri, U(':time'))
+      tMax = @graph.floatValue(worldPts[3].uri, U(':time'))
+      tMax - tMin            
 
-        @adjusterIds[@uri+'/offset'] = true
-        @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
-          graph: @graph
-          subj: @uri
-          pred: @graph.Uri(':originTime')
-          ctx: @graph.Uri(@song)
-          getDisplayValue: (v, dv) => "o=#{dv}"
-          getTargetPosForValue: (value) =>
-            # display bug: should be working from pt[0].t, not from origin
-            $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
-          getValueForPos: (pos) =>
-            @zoomInX.invert(pos.e(1)) - curveWidth() / 2
-          getSuggestedTargetOffset: () => $V([-10, 0])
-        }))
+    screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in worldPts)
+    @dia.setNote(@uri, screenPts, label)
 
-        for pointNum in [0, 1, 2, 3]
-          @adjusterIds[@uri+'/p'+pointNum] = true
-          @setAdjuster(@uri+'/p'+pointNum, =>
-              adj = new AdjustableFloatObject({
-                graph: @graph
-                subj: worldPts[pointNum].uri
-                pred: @graph.Uri(':time')
-                ctx: @graph.Uri(@song)
-                getTargetPosForValue: (value) => $V([@zoomInX(value), yForV(0)])
-                getValueForPos: (pos) =>
-                  origin = @graph.floatValue(@uri, U(':originTime'))
-                  (@zoomInX.invert(pos.e(1)) - origin)
-                getSuggestedTargetOffset: () => $V([0, -80])
-              })
-              adj._getValue = (=>
-                # note: don't use originTime from the closure- we need the
-                # graph dependency
-                adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
-                )
-              adj
-            )
+    leftX = screenPts[1].e(1) + 5
+    rightX = screenPts[2].e(1) - 5
+    w = 120
+    h = 45
+    @inlineRect = {
+      left: leftX,
+      top: @offsetTop + @offsetHeight - h - 5,
+      width: w,
+      height: h,
+      display: if rightX - leftX > w then 'block' else 'none'
+      }
 
-    screenPos = (pt) =>
-      $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
+    if screenPts[3].e(1) - screenPts[0].e(1) < 100
+      @clearAdjusters()
+      return
 
-    label = @graph.uriValue(@uri, U(':effectClass')).replace(/.*\//, '')
-    @dia.setNote(@uri, (screenPos(pt) for pt in worldPts), label)
+    @adjusterIds[@uri+'/offset'] = true
+    @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
+      graph: @graph
+      subj: @uri
+      pred: @graph.Uri(':originTime')
+      ctx: @graph.Uri(@song)
+      getDisplayValue: (v, dv) => "o=#{dv}"
+      getTargetPosForValue: (value) =>
+        # display bug: should be working from pt[0].t, not from origin
+        $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
+      getValueForPos: (pos) =>
+        @zoomInX.invert(pos.e(1)) - curveWidth() / 2
+      getSuggestedTargetOffset: () => $V([-10, 0])
+    }))
+
+    for pointNum in [0, 1, 2, 3]
+      do (pointNum) =>
+        @adjusterIds[@uri+'/p'+pointNum] = true
+        @setAdjuster(@uri+'/p'+pointNum, =>
+            adj = new AdjustableFloatObject({
+              graph: @graph
+              subj: worldPts[pointNum].uri
+              pred: @graph.Uri(':time')
+              ctx: @graph.Uri(@song)
+              getTargetPosForValue: (value) =>
+                $V([@zoomInX(value),
+                    yForV(worldPts[pointNum].e(2))])
+              getValueForPos: (pos) =>
+                origin = @graph.floatValue(@uri, U(':originTime'))
+                (@zoomInX.invert(pos.e(1)) - origin)
+              getSuggestedTargetOffset: () => $V([0, (if worldPts[pointNum].e(2) > .5 then 30 else -30)])
+            })
+            adj._getValue = (=>
+              # note: don't use originTime from the closure- we need the
+              # graph dependency
+              adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+              )
+            adj
+          )
+
+    
+    
+
+Polymer
+  is: "light9-timeline-note-inline-attrs"
+  properties:
+    graph: { type: Object, notify: true }
+    song: { type: String, notify: true }
+    uri: { type: String, notify: true }
+    rect: { type: Object, notify: true }
+    effect: { type: String, notify: true }
+    effectLabel: { type: String, notify: true }
+    color: { type: String, notify: true }
+    noteLabel: { type: String, notify: true }
+  observers: [
+    'addHandler(graph, uri)'
+    ]
+  addHandler: ->
+    @graph.runHandler(@update.bind(@))
+  update: ->
+    U = (x) -> @graph.Uri(x)
+    @effect = @graph.uriValue(@uri, U(':effectClass'))
+    @effectLabel = @effect.replace(/.*\//, '')
+    @noteLabel = @uri.replace(/.*\//, '')
+    @color = '#ff0000'
+  onDel: ->
+    patch = {delQuads: [{subject: @song, predicate: @graph.Uri(':note'), object: @uri, graph: @song}], addQuads: []}
+    @graph.applyAndSendPatch(patch)
+
 
 Polymer
   is: "light9-timeline-adjusters"
@@ -488,6 +542,7 @@ Polymer
       child.graph = @graph
       child.uri = newUri
       child.id = newUri
+      child.visible = true
       child.adj = @adjs[newUri]
       return child
     @updateAllCoords()
@@ -529,13 +584,14 @@ Polymer
     graph: { type: Object, notify: true }
     adj: { type: Object, notify: true }
     id: { type: String, notify: true }
+    visible: { type: Boolean, notify: true }
     
     displayValue: { type: String }
     centerStyle: { type: Object }
     spanClass: { type: String, value: '' }
 
   observer: [
-    'onAdj(graph, adj, dia, id)'
+    'onAdj(graph, adj, dia, id, visible)'
     ]
   onAdj:  ->
     log('onAdj', @id)
@@ -544,6 +600,9 @@ Polymer
 
   updateDisplay: () ->
     go = =>
+      if !@visible
+        @clearElements()
+        return
       window.debug_adjUpdateDisplay++
       @spanClass = if @adj.config.emptyBox then 'empty' else ''
       @displayValue = @adj.getDisplayValue()
@@ -568,7 +627,8 @@ Polymer
 
     @updateDisplay()
 
-  detached: ->
+  detached: -> @clearElements()
+  clearElements: ->
     @dia.clearElem(@adj.id, ['/conn'])
 
 
@@ -624,20 +684,22 @@ Polymer
         return true
     return false
     
-  setNote: (uri, curvePts, effectLabel) ->
+  setNote: (uri, curvePts) ->
     areaId = uri + '/area'
     labelId = uri + '/label'
     if not @anyPointsInView(curvePts)
       @clearElem(uri, ['/area', '/label'])
       return
+    # for now these need to be pretty transparent since they're
+    # drawing on top of the inline-attrs widget :(
     elem = @getOrCreateElem(areaId, 'notes', 'path',
-      {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
+      {style:"fill:#53774b50; stroke:#000000; stroke-width:1.5;"})
     elem.setAttribute('d', svgPathFromPoints(curvePts))
 
-    elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
-    elem.setAttribute('x', curvePts[0].e(1)+20)
-    elem.setAttribute('y', curvePts[0].e(2)-10)
-    elem.innerHTML = effectLabel;
+    #elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
+    #elem.setAttribute('x', curvePts[0].e(1)+20)
+    #elem.setAttribute('y', curvePts[0].e(2)-10)
+    #elem.innerHTML = effectLabel;
 
   setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
     @cursorPath =
