@@ -16,25 +16,8 @@ effect:RedStrip a :Effect; rdfs:label "red"; :deviceSetting :ds1, :ds2;
 effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate, :strength .
 
 
-effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate;
+effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate .
 
-     :setting effect:animRainbow_set1, effect:animRainbow_set10, effect:animRainbow_set11, effect:animRainbow_set12, effect:animRainbow_set13, effect:animRainbow_set14, effect:animRainbow_set15, effect:animRainbow_set16, effect:animRainbow_set17, effect:animRainbow_set18, effect:animRainbow_set19, effect:animRainbow_set6, effect:animRainbow_set7, effect:animRainbow_set8, effect:animRainbow_set9 .
-
-effect:animRainbow_set1 :device dev:aura1; :deviceAttr :zoom; :value 0.465 .
-effect:animRainbow_set10 :device dev:aura3; :deviceAttr :zoom; :value 0.477 .
-effect:animRainbow_set11 :device dev:aura4; :deviceAttr :zoom; :value 0.524 .
-effect:animRainbow_set12 :device dev:aura5; :deviceAttr :zoom; :value 0.519 .
-effect:animRainbow_set13 :device dev:aura5; :deviceAttr :ry; :value 0.509 .
-effect:animRainbow_set14 :device dev:aura4; :deviceAttr :ry; :value 0.542 .
-effect:animRainbow_set15 :device dev:aura3; :deviceAttr :ry; :value 0.485 .
-effect:animRainbow_set16 :device dev:aura2; :deviceAttr :ry; :value 0.494 .
-effect:animRainbow_set17 :device dev:aura1; :deviceAttr :ry; :value 0.463 .
-effect:animRainbow_set18 :device dev:aura1; :deviceAttr :rx; :value 0.272 .
-effect:animRainbow_set19 :device dev:aura2; :deviceAttr :rx; :value 0.310 .
-effect:animRainbow_set6 :device dev:aura3; :deviceAttr :rx; :value 0.463 .
-effect:animRainbow_set7 :device dev:aura4; :deviceAttr :rx; :value 0.672 .
-effect:animRainbow_set8 :device dev:aura5; :deviceAttr :rx; :value 0.700 .
-effect:animRainbow_set9 :device dev:aura2; :deviceAttr :zoom; :value 0.4779 .
 
 
 effect:usa a :mockupEffect; rdfs:label "USA"; :chaseOffset 0;

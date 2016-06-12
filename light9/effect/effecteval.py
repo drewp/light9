@@ -8,6 +8,13 @@ import math
 def literalColor(rnorm, gnorm, bnorm):
     return Literal(rgb_to_hex([rnorm * 255, gnorm * 255, bnorm * 255]))
 
+def nsin(x): return (math.sin(x * (2 * math.pi)) + 1) / 2
+def ncos(x): return (math.cos(x * (2 * math.pi)) + 1) / 2
+def nsquare(t, on=.5):
+    return (t % 1.0) < on
+def lerp(a, b, t):
+    return a + (b - a) * t
+
 def scale(value, strength):
     if isinstance(value, Literal):
         value = value.toPython()
@@ -89,16 +96,24 @@ class EffectEval(object):
             ] * (strength>0))
         elif self.effect == L9['effect/Curtain']:
             out.extend([
-                (L9['device/lowPattern%s' % n], L9['color'], literalColor(0*strength, strength, strength)) for n in range(301,308+1)
+                (L9['device/lowPattern%s' % n], L9['color'],
+                 literalColor(0*strength, strength, strength))
+                for n in range(301,308+1)
                 ])
         elif self.effect == L9['effect/animRainbow']:
             for n in range(1, 5+1):
+                scl = strength * nsin(songTime + n * .3)**3
                 col = literalColor(
-                        strength * (.5 + .5 * math.sin(songTime*6+n)),
-                        strength * (.5 + .5 * math.sin(songTime*6+2+n)),
-                        strength * (.5 + .5 * math.sin(songTime*6+4+n)))
-                out.append((L9['device/aura%s' % n], L9['color'], col))
-                
+                        scl * nsin(songTime + n * .2),
+                        scl * nsin(songTime + n * .2 + .3),
+                        scl * nsin(songTime + n * .3 + .6))
+                col = literalColor(scl * .6, scl * 0, scl * 1)
+                dev = L9['device/aura%s' % n]
+                out.append((dev, L9['color'], col))
+                out.append((dev, L9['zoom'], .9))
+                ang = songTime * 4
+                out.append((dev, L9['rx'], lerp(.27, .7, (n-1)/4) + .2 * math.sin(ang+n)))
+                out.append((dev, L9['ry'], lerp(.46, .52, (n-1)/4) + .5 * math.cos(ang+n)))
                     
         elif self.effect == L9['effect/Strobe']:
             attr, value = effectSettings[0]
