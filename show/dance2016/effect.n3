@@ -7,11 +7,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:BlueStrip a :Effect; rdfs:label "blue"; :deviceSetting :ds3;
-     :publishAttr :strength .
-
-effect:RedStrip a :Effect; rdfs:label "red"; :deviceSetting :ds1, :ds2;
-     :publishAttr :strength .
 
 effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate, :strength .
 
@@ -25,19 +20,8 @@ effect:usa a :mockupEffect; rdfs:label "USA"; :chaseOffset 0;
      :fadeShape :fadeCurve1; :palette "#0000ff", "#ff0000", "#ffffff";
      :publishAttr :strength .
 
-:ds1 :attr :red; :device dev:colorStrip; :value "strength" .
-:ds2 :attr :red; :device dev:moving1; :value "strength" .
-:ds3 :attr :blue; :device dev:colorStrip; :value "strength" .
-:ds4 :attr :color; :device dev:colorStrip; :value "#00ff00" .
-:ds5 :attr :color; :device dev:colorStrip; :value "#300030" .
-
 effect:house :group "main" .
-
-effect:Curtain a :Effect; rdfs:label "curtain"; :deviceSetting :ds5;
-     :group "main"; :order 2; :publishAttr :strength .
-
-effect:WorkLight a :Effect; rdfs:label "work light";
-     :deviceSetting :ds4; :group "main"; :order 1; :publishAttr :strength .
+effect:cyc :group "main" .
 
 effect:centerSpot a :Effect; rdfs:label "center spot";
      :group "main"; :order 3; :publishAttr :strength;

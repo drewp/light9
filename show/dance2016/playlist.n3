@@ -11,9 +11,10 @@ show:dance2016 :playList (
   sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
   sh:song6  sh:song7  sh:song8  sh:song9  sh:song10
   sh:song11 sh:song12 sh:song13 sh:song14 sh:song15
-  sh:song16 sh:song17
+  sh:song16 sh:song17 sh:song18
 ) .
 
+sh:song18 a :Song; rdfs:label  "18 cheer";          :songFilename "cheer.wav" .
 sh:song1 a :Song; rdfs:label  "01 dream";          :songFilename "01-dream.wav" .
 sh:song2 a :Song; rdfs:label  "02 madeforme";      :songFilename "02-madeforme.wav" .
 sh:song3 a :Song; rdfs:label  "03 fun-cut1";       :songFilename "03-fun-cut1.wav" .
