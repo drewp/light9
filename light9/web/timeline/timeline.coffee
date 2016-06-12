@@ -90,7 +90,8 @@ Polymer
     @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
     @$.adjusters.updateAllCoords()
 
-    # cursor needs update when layout changes, but I don't want zoom/layout to depend on the playback time
+    # cursor needs update when layout changes, but I don't want
+    # zoom/layout to depend on the playback time
     setTimeout(@songTimeChanged.bind(@), 1)
 
   songTimeChanged: ->
@@ -175,11 +176,10 @@ Polymer
         @animatedZoom(newCenter - visSeconds / 2,
                       newCenter + visSeconds / 2, zoomAnimSec)
     shortcut.add "L", =>
-      @$.adjusters.layoutCenters()
+      @$.adjusters.updateAllCoords()
 
   makeZoomAdjs: ->
-    log('makeZoomAdjs', @adjs)
-    yMid = @$.audio.offsetTop + @$.audio.offsetHeight / 2
+    yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
     dur = @viewState.zoomSpec.duration
     
     valForPos = (pos) =>
@@ -188,7 +188,7 @@ Polymer
     @setAdjuster('zoom-left', => new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
-        $V([@fullZoomX(@viewState.zoomSpec.t1()), yMid])
+        $V([@fullZoomX(@viewState.zoomSpec.t1()), yMid()])
       getSuggestedTargetOffset: () => $V([-50, 0])
       getValueForPos: valForPos
     }))
@@ -196,7 +196,7 @@ Polymer
     @setAdjuster('zoom-right', => new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
-        $V([@fullZoomX(@viewState.zoomSpec.t2()), yMid])
+        $V([@fullZoomX(@viewState.zoomSpec.t2()), yMid()])
       getSuggestedTargetOffset: () => $V([50, 0])
       getValueForPos: valForPos
     }))
@@ -216,7 +216,7 @@ Polymer
       emptyBox: true
       # fullzoom is not right- the sides shouldn't be able to go
       # offscreen
-      getTarget: () => $V([@fullZoomX(panObs()), yMid])
+      getTarget: () => $V([@fullZoomX(panObs()), yMid()])
       getSuggestedTargetOffset: () => $V([0, 0])
       getValueForPos: valForPos
       }))
