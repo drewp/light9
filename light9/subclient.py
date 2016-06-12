@@ -1,4 +1,5 @@
 from light9.effect.sequencer import sendToCollector
+from twisted.internet import reactor, task
 
 class SubClient:
     def __init__(self):
@@ -13,10 +14,7 @@ class SubClient:
         self.graph.addHandler(self._send_sub)
 
     def send_levels_loop(self, delay=1000):
-        """This function assumes that we are an instance of a Tk object
-        (or at least that we have an 'after' method)"""
-        self.graph.addHandler(self.send_levels)
-        self.after(delay, self.send_levels_loop, delay)
+        task.LoopingCall(lambda: self.graph.addHandler(self.send_levels)).start(delay)
 
     def _send_sub(self):
         outputSettings = self.get_output_settings()

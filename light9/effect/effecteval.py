@@ -91,7 +91,15 @@ class EffectEval(object):
             out.extend([
                 (L9['device/lowPattern%s' % n], L9['color'], literalColor(0*strength, strength, strength)) for n in range(301,308+1)
                 ])
-
+        elif self.effect == L9['effect/animRainbow']:
+            for n in range(1, 5+1):
+                col = literalColor(
+                        strength * (.5 + .5 * math.sin(songTime*6+n)),
+                        strength * (.5 + .5 * math.sin(songTime*6+2+n)),
+                        strength * (.5 + .5 * math.sin(songTime*6+4+n)))
+                out.append((L9['device/aura%s' % n], L9['color'], col))
+                
+                    
         elif self.effect == L9['effect/Strobe']:
             attr, value = effectSettings[0]
             assert attr == L9['strength']
@@ -102,9 +110,9 @@ class EffectEval(object):
             f = (((songTime + offset) * rate) % 1.0)
             c = (f < duty) * strength
             col = rgb_to_hex([c * 255, c * 255, c * 255])
-            return [
+            out.extend([
                 (L9['device/colorStrip'], L9['color'], Literal(col)),
-            ]
+            ])
 
         return out
         
