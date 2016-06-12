@@ -34,7 +34,9 @@ Polymer
     @song = @playerSong if @followPlayerSong
 
   ready: ->
-    @debug_zoomOrLayoutChangedCount = 0
+    window.debug_zoomOrLayoutChangedCount = 0
+    window.debug_adjUpdateDisplay = 0
+    
     @viewState =
       zoomSpec:
         duration: ko.observable(100)
@@ -51,7 +53,14 @@ Polymer
     setInterval(@updateDebugSummary.bind(@), 100)
 
   updateDebugSummary: ->
-    @debug = "#{@debug_zoomOrLayoutChangedCount} layout change, "
+    elemCount = (tag) -> document.getElementsByTagName(tag).length
+    @debug = "#{window.debug_zoomOrLayoutChangedCount} layout change,
+     #{elemCount('light9-timeline-note')} notes,
+     #{elemCount('light9-timeline-adjuster')} adjusters,
+     #{elemCount('light9-timeline-graph-row')} rows,
+     #{window.debug_adjsCount} adjuster items registered,
+     #{window.debug_adjUpdateDisplay} adjuster updateDisplay calls,
+    "
     
   attached: ->
     @dia = @$.dia
@@ -67,7 +76,7 @@ Polymer
   zoomOrLayoutChanged: ->
     # not for cursor updates
 
-    @debug_zoomOrLayoutChangedCount++
+    window.debug_zoomOrLayoutChangedCount++
     @fullZoomX.domain([0, @viewState.zoomSpec.duration()])
     @fullZoomX.range([0, @width()])
 
@@ -165,6 +174,8 @@ Polymer
         newCenter = @songTime + margin
         @animatedZoom(newCenter - visSeconds / 2,
                       newCenter + visSeconds / 2, zoomAnimSec)
+    shortcut.add "L", =>
+      @$.adjusters.layoutCenters()
 
   makeZoomAdjs: ->
     log('makeZoomAdjs', @adjs)
@@ -174,7 +185,7 @@ Polymer
     valForPos = (pos) =>
         x = pos.e(1)
         t = @fullZoomX.invert(x)
-    @setAdjuster('zoom-left', new AdjustableFloatObservable({
+    @setAdjuster('zoom-left', => new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
         $V([@fullZoomX(@viewState.zoomSpec.t1()), yMid])
@@ -182,7 +193,7 @@ Polymer
       getValueForPos: valForPos
     }))
 
-    @setAdjuster('zoom-right', new AdjustableFloatObservable({
+    @setAdjuster('zoom-right', => new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
         $V([@fullZoomX(@viewState.zoomSpec.t2()), yMid])
@@ -200,7 +211,7 @@ Polymer
           zs.t2(value + span / 2)
       })
 
-    @setAdjuster('zoom-pan', new AdjustableFloatObservable({
+    @setAdjuster('zoom-pan', => new AdjustableFloatObservable({
       observable: panObs
       emptyBox: true
       # fullzoom is not right- the sides shouldn't be able to go
@@ -261,10 +272,14 @@ Polymer
         quad(newCurve, U(':attr'), U(':strength'))
       ]        
     pointQuads = []
+
+    desiredWidthX = @offsetWidth * .1
+    desiredWidthT = @zoomInX.invert(desiredWidthX) - @zoomInX.invert(0)
+    
     for i in [0...4]
       pt = points[i]
       pointQuads.push(quad(newCurve, U(':point'), pt))
-      pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i)))
+      pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i/3 * desiredWidthT)))
       pointQuads.push(quad(pt, U(':value'), @graph.LiteralRoundedFloat(i == 1 or i == 2)))
 
     patch = {
@@ -327,9 +342,11 @@ Polymer
     'update(graph, dia, uri, zoomInX, setAdjuster)'
     ]
   ready: ->
-
+    @adjusterIds = []
   detached: ->
     @dia.clearElem(@uri)
+    for i in @adjusterIds
+      @setAdjuster(i, null)
 
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
@@ -340,39 +357,54 @@ Polymer
     try
       worldPts = [] # (song time, value)
 
+      yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
+
       originTime = @graph.floatValue(@uri, U(':originTime'))
       for curve in @graph.objects(@uri, U(':curve'))
         if @graph.uriValue(curve, U(':attr')) == U(':strength')
           worldPts = getCurvePoints(@graph, curve, originTime)
-          @setAdjuster(@uri+'/offset', new AdjustableFloatObject({
+
+          curveWidth = =>
+            tMin = @graph.floatValue(worldPts[0].uri, U(':time'))
+            tMax = @graph.floatValue(worldPts[3].uri, U(':time'))
+            tMax - tMin            
+          
+          @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
             graph: @graph
             subj: @uri
             pred: @graph.Uri(':originTime')
             ctx: @graph.Uri(@song)
-            getTargetPosForValue: (value) => $V([@zoomInX(value), 600])
-            getValueForPos: (pos) => @zoomInX.invert(pos.e(1))
-            getSuggestedTargetOffset: () => $V([0, -80])
+            getDisplayValue: (v, dv) => "o=#{dv}"
+            getTargetPosForValue: (value) =>
+              # display bug: should be working from pt[0].t, not from origin
+              $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
+            getValueForPos: (pos) =>
+              @zoomInX.invert(pos.e(1)) - curveWidth() / 2
+            getSuggestedTargetOffset: () => $V([-10, 0])
           }))
 
-          for pointNum in [0, 2, 3]
-            @setAdjuster(@uri+'/p'+pointNum, adj = new AdjustableFloatObject({
-              graph: @graph
-              subj: worldPts[pointNum].uri
-              pred: @graph.Uri(':time')
-              ctx: @graph.Uri(@song)
-              getTargetPosForValue: (value) => $V([@zoomInX(value), 600])
-              getValueForPos: (pos) =>
-                origin = @graph.floatValue(@uri, U(':originTime'))
-                (@zoomInX.invert(pos.e(1)) - origin)
-              getSuggestedTargetOffset: () => $V([0, -80])
-            }))
-            adj._getValue = (=>
-              # note: don't use originTime from the closure- we need the
-              # graph dependency
-              adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+          for pointNum in [0, 1, 2, 3]
+            @setAdjuster(@uri+'/p'+pointNum, =>
+                adj = new AdjustableFloatObject({
+                  graph: @graph
+                  subj: worldPts[pointNum].uri
+                  pred: @graph.Uri(':time')
+                  ctx: @graph.Uri(@song)
+                  getTargetPosForValue: (value) => $V([@zoomInX(value), yForV(0)])
+                  getValueForPos: (pos) =>
+                    origin = @graph.floatValue(@uri, U(':originTime'))
+                    (@zoomInX.invert(pos.e(1)) - origin)
+                  getSuggestedTargetOffset: () => $V([0, -80])
+                })
+                adj._getValue = (=>
+                  # note: don't use originTime from the closure- we need the
+                  # graph dependency
+                  adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+                  )
+                log('note made this point adj', adj)
+                adj
               )
-            console.log(adj)
-          
+            
       screenPos = (pt) =>
         $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
 
@@ -391,13 +423,23 @@ Polymer
   ready: ->
     @adjs = {}
     
-  setAdjuster: (adjId, adjustable) ->
-    # callers register/unregister the Adjustables they want us
-    # to make adjuster elements for. Caller invents adjId.
-    adjustable.id = adjId
-    if not @adjs[adjId] or not adjustable?
-      @adjs[adjId] = adjustable
+  setAdjuster: (adjId, makeAdjustable) ->
+    # callers register/unregister the Adjustables they want us to make
+    # adjuster elements for. Caller invents adjId.  makeAdjustable is
+    # a function returning the Adjustable or it is null to clear any
+    # adjusters with this id.
+
+    
+    
+    if not @adjs[adjId] or not makeAdjustable?
+      if not makeAdjustable?
+        delete @adjs[adjId]
+      else
+        adj = makeAdjustable()
+        @adjs[adjId] = adj
+        adj.id = adjId
       @debounce('adjsChanged', @adjsChanged.bind(@), 1)
+    window.debug_adjsCount = Object.keys(@adjs).length
     
   adjsChanged: ->
 
@@ -474,12 +516,12 @@ Polymer
     @graph.runHandler(@updateDisplay.bind(@))
 
   updateDisplay: () ->
-    log('updateDisplay', @id)
+    window.debug_adjUpdateDisplay++
     @spanClass = if @adj.config.emptyBox then 'empty' else ''
     @displayValue = @adj.getDisplayValue()
     center = @adj.getCenter()
     target = @adj.getTarget()
-    log('ct', center.elements, target.elements)
+    #log("adj updateDisplay center #{center.elements} target #{target.elements}")
     return if isNaN(center.e(1))
     @centerStyle = {x: center.e(1), y: center.e(2)}
     @dia?.setAdjusterConnector(@adj.id + '/conn', center, target)

@@ -21,7 +21,10 @@ class Adjustable
 
   getDisplayValue: () ->
     return '' if @config.emptyBox
-    d3.format(".4g")(@_getValue())
+    defaultFormat = d3.format(".4g")(@_getValue())
+    if @config.getDisplayValue?
+      return @config.getDisplayValue(@_getValue(), defaultFormat) 
+    defaultFormat
 
   getSuggestedCenter: () ->
     @getTarget().add(@config.getSuggestedTargetOffset())
