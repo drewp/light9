@@ -1,6 +1,7 @@
 log = console.log
 RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
+ROW_COUNT = 4
 
 # polymer dom-repeat is happy to shuffle children by swapping their
 # attribute values, and it's hard to correctly setup/teardown your
@@ -250,7 +251,7 @@ Polymer
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
-    rows: { value: [0] }
+    rows: { value: [0...ROW_COUNT] }
     zoom: { type: Object, notify: true, observer: 'onZoom' }
     zoomFlattened: { type: Object, notify: true }
   onZoom: ->
@@ -326,7 +327,7 @@ Polymer
     rowIndex: { type: Object, notify: true }
   observers: [
     'onGraph(graph, dia, setAdjuster, song, zoomInX)'
-    'update(song)'
+    'update(song, rowIndex)'
     'onZoom(zoomInX)'
     ]
   onGraph: ->
@@ -335,7 +336,13 @@ Polymer
     U = (x) -> @graph.Uri(x)
     log("row #{@rowIndex} updating")
 
-    notesForThisRow = @graph.objects(@song, U(':note'))
+    notesForThisRow = []
+    i = 0
+    for n in _.sortBy(@graph.objects(@song, U(':note')))
+      if (i % ROW_COUNT) == @rowIndex
+        notesForThisRow.push(n)
+      i++
+    log("row #{@rowIndex} gets", notesForThisRow)
 
     updateChildren @, notesForThisRow, (newUri) =>
       child = document.createElement('light9-timeline-note')
@@ -420,7 +427,7 @@ Polymer
     screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in worldPts)
     @dia.setNote(@uri, screenPts, label)
 
-    leftX = screenPts[1].e(1) + 5
+    leftX = Math.max(2, screenPts[1].e(1) + 5)
     rightX = screenPts[2].e(1) - 5
     w = 120
     h = 45

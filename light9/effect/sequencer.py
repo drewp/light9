@@ -140,9 +140,6 @@ class Sequencer(object):
         settings = []
         
         for note in self.notes.get(song, []):
-            # we have to send zeros to make past settings go
-            # away. might be better for collector not to merge our
-            # past requests, and then we can omit zeroed notes?
             outs = note.outputSettings(t)
             #print 'out', outs
             settings.extend(outs)

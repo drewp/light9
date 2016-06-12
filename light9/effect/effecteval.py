@@ -46,9 +46,6 @@ class EffectEval(object):
         # effect : [(dev, attr, value, isScaled)]
         self.effectOutputs = {}
         
-        #for ds in g.objects(g.value(uri, L9['effectClass']), L9['deviceSetting']):
-        #    self.setting = (g.value(ds, L9['device']), g.value(ds, L9['attr']))
-
         self.graph.addHandler(self.updateEffectsFromGraph)
 
     def updateEffectsFromGraph(self):
@@ -67,6 +64,7 @@ class EffectEval(object):
 
             if settings:
                 self.effectOutputs[effect] = settings
+            # also have to read eff :effectAttr [ :tint x; :tintStrength y ]
         
     def outputFromEffect(self, effectSettings, songTime):
         """
@@ -74,66 +72,82 @@ class EffectEval(object):
         settings like light1/bright=0.72;light2/bright=0.78. This runs
         the effect code.
         """
-        attr, strength = effectSettings[0]
-        strength = float(strength)
-        assert attr == L9['strength']
+        # both callers need to apply note overrides
+        effectSettings = dict(effectSettings) # we should make everything into nice float and Color objects too
 
-        out = []
+        strength = float(effectSettings[L9['strength']])
+        if strength <= 0:
+            return []
+
+        out = {} # (dev, attr): value
+
+        out.update(self.simpleOutput(strength))
+
+        if self.effect.startswith(L9['effect/']):
+            tail = 'effect_' + self.effect[len(L9['effect/']):]
+            try:
+                func = globals()[tail]
+            except KeyError:
+                pass
+            else:
+                out.update(func(effectSettings, strength, songTime))
+
+        # todo: callers should prefer the dict form too
+        outList = [(d, a, v) for (d, a), v in out.iteritems()]
+        outList.sort()
+        #import pprint; pprint.pprint(outList, width=170)
+        return outList
+                            
+    def simpleOutput(self, strength):
+        out = {}
         for dev, attr, value, isScaled in self.effectOutputs.get(self.effect, []):
             if isScaled:
                 value = scale(value, strength)
-            out.append((dev, attr, value))
-            
-        if self.effect == L9['effect/RedStripzzz']: # throwaway
-            mov = URIRef('http://light9.bigasterisk.com/device/moving1')
-            col = [
-                    ((songTime + .0) % 1.0),
-                    ((songTime + .4) % 1.0),
-                    ((songTime + .8) % 1.0),
-                ]
-            out.extend([
-                # device, attr, lev
-                
-                (mov, L9['color'], Literal(rgb_to_hex([strength*x*255 for x in col]))),
-                (mov, L9['rx'], Literal(100 + 70 * math.sin(songTime*2))),
-            ] * (strength>0))
-        elif self.effect == L9['effect/Curtain']:
-            out.extend([
-                (L9['device/lowPattern%s' % n], L9['color'],
-                 literalColor(0*strength, strength, strength))
-                for n in range(301,308+1)
-                ])
-        elif self.effect == L9['effect/animRainbow']:
-            for n in range(1, 5+1):
-                scl = strength * nsin(songTime + n * .3)**3
-                col = literalColor(
-                        scl * nsin(songTime + n * .2),
-                        scl * nsin(songTime + n * .2 + .3),
-                        scl * nsin(songTime + n * .3 + .6))
-                col = literalColor(scl * .6, scl * 0, scl * 1)
-                dev = L9['device/aura%s' % n]
-                out.append((dev, L9['color'], col))
-                out.append((dev, L9['zoom'], .9))
-                ang = songTime * 4
-                out.append((dev, L9['rx'], lerp(.27, .7, (n-1)/4) + .2 * math.sin(ang+n)))
-                out.append((dev, L9['ry'], lerp(.46, .52, (n-1)/4) + .5 * math.cos(ang+n)))
-                    
-        elif self.effect == L9['effect/Strobe']:
-            attr, value = effectSettings[0]
-            assert attr == L9['strength']
-            strength = float(value)
-            rate = 2
-            duty = .3
-            offset = 0
-            f = (((songTime + offset) * rate) % 1.0)
-            c = (f < duty) * strength
-            col = rgb_to_hex([c * 255, c * 255, c * 255])
-            out.extend([
-                (L9['device/colorStrip'], L9['color'], Literal(col)),
-            ])
-
+            out[(dev, attr)] = value
         return out
         
 
 
     
+
+def effect_Curtain(effectSettings, strength, songTime):
+    return {
+        (L9['device/lowPattern%s' % n], L9['color']):
+        literalColor(0*strength, strength, strength)
+        for n in range(301,308+1)
+        }
+    
+def effect_animRainbow(effectSettings, strength, songTime):
+    out = {}
+    tint = effectSettings.get(L9['tint'], '#ffffff')
+    tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
+    print tint, tintStrength
+    tr, tg, tb = hex_to_rgb(tint)
+    for n in range(1, 5+1):
+        scl = strength * nsin(songTime + n * .3)**3
+        col = literalColor(
+            scl * lerp(nsin(songTime + n * .2), tr/255, tintStrength),
+            scl * lerp(nsin(songTime + n * .2 + .3), tg/255, tintStrength),
+            scl * lerp(nsin(songTime + n * .3 + .6), tb/255, tintStrength))
+
+        dev = L9['device/aura%s' % n]
+        out.update({
+            (dev, L9['color']): col,
+            (dev, L9['zoom']): .9,
+            })
+        ang = songTime * 4
+        out.update({
+        (dev, L9['rx']): lerp(.27, .7, (n-1)/4) + .2 * math.sin(ang+n),
+        (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .5 * math.cos(ang+n),
+            })
+    return out
+
+def effect_Strobe(effectSettings, strength, songTime):
+    rate = 2
+    duty = .3
+    offset = 0
+    f = (((songTime + offset) * rate) % 1.0)
+    c = (f < duty) * strength
+    col = rgb_to_hex([c * 255, c * 255, c * 255])
+    return {(L9['device/colorStrip'], L9['color']): Literal(col)}
+
