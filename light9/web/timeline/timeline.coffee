@@ -1,6 +1,25 @@
 log = console.log
 RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
+
+# polymer dom-repeat is happy to shuffle children by swapping their
+# attribute values, and it's hard to correctly setup/teardown your
+# side effects if your attributes are changing before the detach
+# call. This alternative to dom-repeat never reassigns
+# attributes. But, it can't set up property bindings.
+updateChildren = (parent, newUris, makeChild) ->
+  childUris = []
+  childByUri = {}
+  for e in parent.children
+    childUris.push(e.uri)
+    childByUri[e.uri] = e
+
+  for uri in _.difference(childUris, newUris)
+    childByUri[uri].remove()
+  for uri in _.difference(newUris, childUris)
+    parent.appendChild(makeChild(uri))
+
+
 Polymer
   is: 'light9-timeline-editor'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -293,6 +312,7 @@ Polymer
   # for now since it's just one line calling dia,
   # light9-timeline-editor does our drawing work.
 
+
 Polymer
   is: 'light9-timeline-graph-row'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -304,17 +324,32 @@ Polymer
     noteUris: { type: Array, notify: true }
     rowIndex: { type: Object, notify: true }
   observers: [
-    'onGraph(graph)'
+    'onGraph(graph, dia, setAdjuster, song, zoomInX)'
     'update(song)'
+    'onZoom(zoomInX)'
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: ->
     U = (x) -> @graph.Uri(x)
     log("row #{@rowIndex} updating")
-    @noteUris = []
-    for note in @graph.objects(@song, U(':note'))
-      @push('noteUris', note)
+
+    notesForThisRow = @graph.objects(@song, U(':note'))
+
+    updateChildren @, notesForThisRow, (newUri) =>
+      child = document.createElement('light9-timeline-note')
+      child.graph = @graph
+      child.dia = @dia
+      child.uri = newUri
+      child.setAdjuster = @setAdjuster
+      child.song = @song # could change, but all the notes will be rebuilt
+      child.zoomInX = @zoomInX # missing binding; see onZoom
+      return child      
+
+  onZoom: ->
+    log('row onzoom')
+    for e in @children
+      e.zoomInX = @zoomInX
 
 
 getCurvePoints = (graph, curve, xOffset) ->
@@ -338,81 +373,83 @@ Polymer
     zoomInX: { type: Object, notify: true }
     setAdjuster: {type: Function, notify: true}
   observers: [
-    'onUri(graph, dia, uri)'
+    'onUri(graph, dia, uri, zoomInX, setAdjuster)'
     'update(graph, dia, uri, zoomInX, setAdjuster)'
     ]
   ready: ->
-    @adjusterIds = []
+    @adjusterIds = {}
   detached: ->
-    @dia.clearElem(@uri)
-    for i in @adjusterIds
+    log('detatch', @uri)
+    @dia.clearElem(@uri, ['/area', '/label'])
+    @isDetached = true
+    for i in Object.keys(@adjusterIds)
       @setAdjuster(i, null)
 
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
     
   update: ->
+    if @isDetached?
+      log('skipping update', @uri)
+      return 
     # update our note DOM and SVG elements based on the graph
     U = (x) -> @graph.Uri(x)
-    try
-      worldPts = [] # (song time, value)
+    worldPts = [] # (song time, value)
 
-      yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
+    yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
 
-      originTime = @graph.floatValue(@uri, U(':originTime'))
-      for curve in @graph.objects(@uri, U(':curve'))
-        if @graph.uriValue(curve, U(':attr')) == U(':strength')
-          worldPts = getCurvePoints(@graph, curve, originTime)
+    originTime = @graph.floatValue(@uri, U(':originTime'))
+    for curve in @graph.objects(@uri, U(':curve'))
+      if @graph.uriValue(curve, U(':attr')) == U(':strength')
+        worldPts = getCurvePoints(@graph, curve, originTime)
 
-          curveWidth = =>
-            tMin = @graph.floatValue(worldPts[0].uri, U(':time'))
-            tMax = @graph.floatValue(worldPts[3].uri, U(':time'))
-            tMax - tMin            
-          
-          @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
-            graph: @graph
-            subj: @uri
-            pred: @graph.Uri(':originTime')
-            ctx: @graph.Uri(@song)
-            getDisplayValue: (v, dv) => "o=#{dv}"
-            getTargetPosForValue: (value) =>
-              # display bug: should be working from pt[0].t, not from origin
-              $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
-            getValueForPos: (pos) =>
-              @zoomInX.invert(pos.e(1)) - curveWidth() / 2
-            getSuggestedTargetOffset: () => $V([-10, 0])
-          }))
+        curveWidth = =>
+          tMin = @graph.floatValue(worldPts[0].uri, U(':time'))
+          tMax = @graph.floatValue(worldPts[3].uri, U(':time'))
+          tMax - tMin            
 
-          for pointNum in [0, 1, 2, 3]
-            @setAdjuster(@uri+'/p'+pointNum, =>
-                adj = new AdjustableFloatObject({
-                  graph: @graph
-                  subj: worldPts[pointNum].uri
-                  pred: @graph.Uri(':time')
-                  ctx: @graph.Uri(@song)
-                  getTargetPosForValue: (value) => $V([@zoomInX(value), yForV(0)])
-                  getValueForPos: (pos) =>
-                    origin = @graph.floatValue(@uri, U(':originTime'))
-                    (@zoomInX.invert(pos.e(1)) - origin)
-                  getSuggestedTargetOffset: () => $V([0, -80])
-                })
-                adj._getValue = (=>
-                  # note: don't use originTime from the closure- we need the
-                  # graph dependency
-                  adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
-                  )
-                log('note made this point adj', adj)
-                adj
-              )
-            
-      screenPos = (pt) =>
-        $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
+        @adjusterIds[@uri+'/offset'] = true
+        @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
+          graph: @graph
+          subj: @uri
+          pred: @graph.Uri(':originTime')
+          ctx: @graph.Uri(@song)
+          getDisplayValue: (v, dv) => "o=#{dv}"
+          getTargetPosForValue: (value) =>
+            # display bug: should be working from pt[0].t, not from origin
+            $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
+          getValueForPos: (pos) =>
+            @zoomInX.invert(pos.e(1)) - curveWidth() / 2
+          getSuggestedTargetOffset: () => $V([-10, 0])
+        }))
 
-      label = @graph.uriValue(@uri, U(':effectClass')).replace(/.*\//, '')
-      @dia.setNote(@uri, (screenPos(pt) for pt in worldPts), label)
+        for pointNum in [0, 1, 2, 3]
+          @adjusterIds[@uri+'/p'+pointNum] = true
+          @setAdjuster(@uri+'/p'+pointNum, =>
+              adj = new AdjustableFloatObject({
+                graph: @graph
+                subj: worldPts[pointNum].uri
+                pred: @graph.Uri(':time')
+                ctx: @graph.Uri(@song)
+                getTargetPosForValue: (value) => $V([@zoomInX(value), yForV(0)])
+                getValueForPos: (pos) =>
+                  origin = @graph.floatValue(@uri, U(':originTime'))
+                  (@zoomInX.invert(pos.e(1)) - origin)
+                getSuggestedTargetOffset: () => $V([0, -80])
+              })
+              adj._getValue = (=>
+                # note: don't use originTime from the closure- we need the
+                # graph dependency
+                adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+                )
+              adj
+            )
 
-    catch e
-      log("during resize of #{@uri}: #{@e}")
+    screenPos = (pt) =>
+      $V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight])
+
+    label = @graph.uriValue(@uri, U(':effectClass')).replace(/.*\//, '')
+    @dia.setNote(@uri, (screenPos(pt) for pt in worldPts), label)
 
 Polymer
   is: "light9-timeline-adjusters"
@@ -429,8 +466,6 @@ Polymer
     # a function returning the Adjustable or it is null to clear any
     # adjusters with this id.
 
-    
-    
     if not @adjs[adjId] or not makeAdjustable?
       if not makeAdjustable?
         delete @adjs[adjId]
@@ -439,35 +474,23 @@ Polymer
         @adjs[adjId] = adj
         adj.id = adjId
       @debounce('adjsChanged', @adjsChanged.bind(@), 1)
+    else
+      for e in @$.all.children
+        if e.id == adjId
+          e.updateDisplay()
+
     window.debug_adjsCount = Object.keys(@adjs).length
     
   adjsChanged: ->
-
-    added = removed = 0
-    newIds = Object.keys(@adjs)
-
-    parent = @$.all
-    haveIds = []
-    for c in parent.children
-      id = c.getAttribute('id')
-      if newIds.indexOf(id) == -1
-        c.remove()
-        removed++
-        # ...?
-      else
-        haveIds.push(id)
-
-    for id, adj of @adjs
-      if haveIds.indexOf(id) == -1
-        log('need new one for', id)
-        child = document.createElement('light9-timeline-adjuster')
-        child.dia = @dia
-        child.graph = @graph
-        child.setAttribute('id', id)
-        child.adj = adj # set this  last
-        parent.appendChild(child)
-        added++
-    log("adjsChanged removed #{removed} added #{added}") if added or removed
+    updateChildren @$.all, Object.keys(@adjs), (newUri) =>
+      child = document.createElement('light9-timeline-adjuster')
+      child.dia = @dia
+      child.graph = @graph
+      child.uri = newUri
+      child.id = newUri
+      child.adj = @adjs[newUri]
+      return child
+    @updateAllCoords()
 
   layoutCenters: ->
     # push Adjustable centers around to avoid overlaps
@@ -504,27 +527,33 @@ Polymer
   is: 'light9-timeline-adjuster'
   properties:
     graph: { type: Object, notify: true }
-    adj: { type: Object, notify: true, observer: 'onAdj' }
-    target: { type: Object, notify: true }
+    adj: { type: Object, notify: true }
+    id: { type: String, notify: true }
+    
     displayValue: { type: String }
     centerStyle: { type: Object }
     spanClass: { type: String, value: '' }
 
-  onAdj: (adj) ->
+  observer: [
+    'onAdj(graph, adj, dia, id)'
+    ]
+  onAdj:  ->
     log('onAdj', @id)
     @adj.subscribe(@updateDisplay.bind(this))
     @graph.runHandler(@updateDisplay.bind(@))
 
   updateDisplay: () ->
-    window.debug_adjUpdateDisplay++
-    @spanClass = if @adj.config.emptyBox then 'empty' else ''
-    @displayValue = @adj.getDisplayValue()
-    center = @adj.getCenter()
-    target = @adj.getTarget()
-    #log("adj updateDisplay center #{center.elements} target #{target.elements}")
-    return if isNaN(center.e(1))
-    @centerStyle = {x: center.e(1), y: center.e(2)}
-    @dia?.setAdjusterConnector(@adj.id + '/conn', center, target)
+    go = =>
+      window.debug_adjUpdateDisplay++
+      @spanClass = if @adj.config.emptyBox then 'empty' else ''
+      @displayValue = @adj.getDisplayValue()
+      center = @adj.getCenter()
+      target = @adj.getTarget()
+      #log("adj updateDisplay center #{center.elements} target #{target.elements}")
+      return if isNaN(center.e(1))
+      @centerStyle = {x: center.e(1), y: center.e(2)}
+      @dia.setAdjusterConnector(@adj.id + '/conn', center, target)
+    @debounce('updateDisplay', go, 1)
         
   attached: ->
     drag = d3.drag()
@@ -540,7 +569,7 @@ Polymer
     @updateDisplay()
 
   detached: ->
-    @dia.clearElem(@adj.id + '/conn')
+    @dia.clearElem(@adj.id, ['/conn'])
 
 
 svgPathFromPoints = (pts) ->
@@ -582,11 +611,12 @@ Polymer
         elem.setAttribute(k, v)
     return elem
 
-  clearElem: (uri) ->
-    elem = @elemById[uri]
-    if elem
-      elem.remove()
-      delete @elemById[uri]
+  clearElem: (uri, suffixes) -> # todo: caller shouldn't have to know suffixes!
+    for suff in suffixes
+      elem = @elemById[uri+suff]
+      if elem
+        elem.remove()
+        delete @elemById[uri+suff]
 
   anyPointsInView: (pts) ->
     for pt in pts
@@ -598,8 +628,7 @@ Polymer
     areaId = uri + '/area'
     labelId = uri + '/label'
     if not @anyPointsInView(curvePts)
-      @clearElem(areaId)
-      @clearElem(labelId)
+      @clearElem(uri, ['/area', '/label'])
       return
     elem = @getOrCreateElem(areaId, 'notes', 'path',
       {style:"fill:#53774b; stroke:#000000; stroke-width:1.5;"})
@@ -637,7 +666,7 @@ Polymer
   setAdjusterConnector: (uri, center, target) ->
     id = uri + '/adj'
     if not @anyPointsInView([center, target])
-      @clearElem(uri)
+      @clearElem(id, [''])
       return
     elem = @getOrCreateElem(uri, 'connectors', 'path', {style: "fill:none;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;"})
     elem.setAttribute('d', svgPathFromPoints([center, target]))

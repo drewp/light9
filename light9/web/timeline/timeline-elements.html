@@ -198,15 +198,7 @@ background: rgba(126, 52, 245, 0.0784313725490196);
          display: flex;
      }
     </style>
-    <template is="dom-repeat" items="{{noteUris}}">
-      <light9-timeline-note graph="{{graph}}"
-                            dia="{{dia}}"
-                            uri="{{item}}"
-                            set-adjuster="{{setAdjuster}}"
-                            song="{{song}}"
-                            zoom-in-x="{{zoomInX}}">
-      </light9-timeline-note>
-    </template>
+    <!-- light9-timeline-note repeated here -->
   </template>
 </dom-module>
 
@@ -242,6 +234,7 @@ background: rgba(126, 52, 245, 0.0784313725490196);
 
     </style>
     <div id="all">
+      <!-- light9-timeline-adjuster repeated here  -->
     </div>
   </template>
 </dom-module>
@@ -331,5 +324,6 @@ background: rgba(126, 52, 245, 0.0784313725490196);
 <script src="/lib/knockout/dist/knockout.debug.js"></script>
 <script src="/lib/shortcut/index.js"></script>
 <script src="/lib/async/dist/async.js"></script>
+<script src="/lib/underscore/underscore-min.js"></script>
 <script src="adjustable.js"></script>
 <script src="timeline.js"></script>
