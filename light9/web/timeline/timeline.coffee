@@ -15,6 +15,7 @@ updateChildren = (parent, newUris, makeChild) ->
     childByUri[e.uri] = e
 
   for uri in _.difference(childUris, newUris)
+    childByUri[uri].detached()
     childByUri[uri].remove()
   for uri in _.difference(newUris, childUris)
     parent.appendChild(makeChild(uri))
@@ -433,14 +434,20 @@ Polymer
 
     if screenPts[3].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
+      # also kill their connectors
       return
 
+    @makeCurveAdjusters(curveWidth, yForV, worldPts)
+    
+  makeCurveAdjusters: (curveWidth, yForV, worldPts) ->
+    U = (x) -> @graph.Uri(x)
+    
     @adjusterIds[@uri+'/offset'] = true
     @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
       graph: @graph
       subj: @uri
-      pred: @graph.Uri(':originTime')
-      ctx: @graph.Uri(@song)
+      pred: U(':originTime')
+      ctx: U(@song)
       getDisplayValue: (v, dv) => "o=#{dv}"
       getTargetPosForValue: (value) =>
         # display bug: should be working from pt[0].t, not from origin
@@ -457,8 +464,8 @@ Polymer
             adj = new AdjustableFloatObject({
               graph: @graph
               subj: worldPts[pointNum].uri
-              pred: @graph.Uri(':time')
-              ctx: @graph.Uri(@song)
+              pred: U(':time')
+              ctx: U(@song)
               getTargetPosForValue: (value) =>
                 $V([@zoomInX(value),
                     yForV(worldPts[pointNum].e(2))])
