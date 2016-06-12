@@ -74,7 +74,27 @@ class Note(object):
         """
         effectSettings = [(L9['strength'], self.evalCurve(t))]
         return self.effectEval.outputFromEffect(effectSettings, t)
-                
+
+
+class CodeWatcher(object):
+    def __init__(self, onChange):
+        self.onChange = onChange
+
+        self.notifier = INotify()
+        self.notifier.startReading()
+        self.notifier.watch(
+            FilePath(effecteval.__file__.replace('.pyc', '.py')),
+            callbacks=[self.codeChange])
+
+    def codeChange(self, watch, path, mask):
+        def go():
+            log.info("reload effecteval")
+            reload(effecteval)
+            self.onChange()
+        # in case we got an event at the start of the write
+        reactor.callLater(.1, go) 
+    
+        
 
 class Sequencer(object):
     def __init__(self, graph, sendToCollector):
@@ -88,29 +108,13 @@ class Sequencer(object):
         self.graph.addHandler(self.compileGraph)
         self.update()
 
-        self.watchCode()
-
-    def watchCode(self):
-        self.notifier = INotify()
-        self.notifier.startReading()
-        self.notifier.watch(
-            FilePath(effecteval.__file__.replace('.pyc', '.py')),
-            callbacks=[self.codeChange])
-
-    def codeChange(self, watch, path, mask):
-        def go():
-            reload(effecteval)
-            self.graph.addHandler(self.compileGraph)
-        # in case we got an event at the start of the write
-        reactor.callLater(.1, go) 
+        self.codeWatcher = CodeWatcher(
+            onChange=lambda: self.graph.addHandler(self.compileGraph))
 
     def compileGraph(self):
         """rebuild our data from the graph"""
         g = self.graph
 
-        log.info("compileGraph")
-        reload(effecteval)
-        
         for song in g.subjects(RDF.type, L9['Song']):
             self.notes[song] = []
             for note in g.objects(song, L9['note']):

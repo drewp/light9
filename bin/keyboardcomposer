@@ -19,6 +19,7 @@ from light9.namespaces import L9, RDF
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
+from light9.effect.sequencer import CodeWatcher
 import light9.effect.effecteval
 
 from bcf2000 import BCF2000
@@ -163,7 +164,11 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.make_buttons()
 
         self.graph.addHandler(self.redraw_sliders)
-        self.send_levels_loop()
+
+        self.codeWatcher = CodeWatcher(
+            onChange=lambda: self.graph.addHandler(self.redraw_sliders))
+        
+        self.send_levels_loop(delay=.05)
         self.graph.addHandler(self.rowFromGraph)
 
     def make_buttons(self):

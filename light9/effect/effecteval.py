@@ -31,7 +31,7 @@ class EffectEval(object):
     """
     def __init__(self, graph, effect):
         self.graph = graph
-        self.effect = effect
+        self.effect = effect 
 
         # effect : [(dev, attr, value, isScaled)]
         self.effectOutputs = {}

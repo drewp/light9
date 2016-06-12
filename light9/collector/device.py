@@ -51,6 +51,7 @@ def resolve(deviceType, deviceAttr, values):
         rgbs = [hex_to_rgb(v) for v in values]
         return rgb_to_hex([max(*component) for component in zip(*rgbs)])
     # angles should perhaps use average; gobo choice use the most-open one
+    
     return max(values)
     
 def toOutputAttrs(deviceType, deviceAttrSettings):
