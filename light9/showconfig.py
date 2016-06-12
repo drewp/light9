@@ -28,9 +28,13 @@ def root():
             "LIGHT9_SHOW env variable has not been set to the show root")
     return r
 
+_showUri = None
 def showUri():
     """Return the show URI associated with $LIGHT9_SHOW."""
-    return URIRef(file(path.join(root(), 'URI')).read().strip())
+    global _showUri
+    if _showUri is None:
+        _showUri = URIRef(file(path.join(root(), 'URI')).read().strip())
+    return _showUri
 
 def songOnDisk(song):
     """given a song URI, where's the on-disk file that mpd would read?"""
