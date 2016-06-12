@@ -182,3 +182,20 @@ def effect_Strobe(effectSettings, strength, songTime):
     col = rgb_to_hex([c * 255, c * 255, c * 255])
     return {(L9['device/colorStrip'], L9['color']): Literal(col)}
 
+def effect_lightning(effectSettings, strength, songTime):
+    devs = [L9['device/veryLow1'], L9['device/veryLow2'],
+            L9['device/veryLow3'], L9['device/veryLow4'],
+            L9['device/veryLow5'], L9['device/backlight1'],
+            L9['device/backlight2'], L9['device/backlight3'],
+            L9['device/backlight4'], L9['device/backlight5'],
+            L9['device/down2'], L9['device/down3'],
+            L9['device/down4'], L9['device/hexLow3'],
+            L9['device/hexLow5'], L9['device/lip1 5'],
+            L9['device/postL1'], L9['device/postR1']]
+    out = {}
+    col = rgb_to_hex([255 * strength] * 3)
+    for i, dev in enumerate(devs):
+        n = noise((songTime * 8 + i * 6.543) % 100.0)
+        if n > .4:
+            out[(dev, L9['color'])] = col
+    return out

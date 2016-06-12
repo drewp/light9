@@ -19,6 +19,7 @@ effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate
 effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate ; :group "anim".
 
 effect:orangeSearch a :Effect; :publishAttr :strength ; :group "anim".
+effect:lightning a :Effect; :publishAttr :strength ; :group "anim".
 
 effect:house :group "main" .
 effect:cyc :group "main" .
