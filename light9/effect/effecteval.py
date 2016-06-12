@@ -4,6 +4,7 @@ from light9.namespaces import L9, RDF
 from webcolors import rgb_to_hex, hex_to_rgb
 from decimal import Decimal
 import math
+from noise import pnoise1
 
 def literalColor(rnorm, gnorm, bnorm):
     return Literal(rgb_to_hex([rnorm * 255, gnorm * 255, bnorm * 255]))
@@ -14,6 +15,8 @@ def nsquare(t, on=.5):
     return (t % 1.0) < on
 def lerp(a, b, t):
     return a + (b - a) * t
+def noise(t):
+    return pnoise1(t, 2)
 
 def scale(value, strength):
     if isinstance(value, Literal):

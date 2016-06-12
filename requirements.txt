@@ -33,3 +33,4 @@ coverage==4.1
 klein==15.3.1
 git+http://github.com/drewp/scales.git@448d59fb491b7631877528e7695a93553bfaaa93#egg=scales
 colormath==2.1.1
+noise==1.2.2
