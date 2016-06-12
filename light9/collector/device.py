@@ -174,7 +174,6 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
     elif deviceType == L9['MacQuantum']:
         out = {
             L9['dimmerFadeLo']: 0,
-            L9['shutter']: 30, # strobe is in here too: slow @ 50 -> fast @ 200
             L9['fixtureControl']: 0,
             L9['fx1Select']:  0,
             L9['fx1Adjust']:  0,
@@ -206,6 +205,12 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         x = .5 + .5 * floatAttr(L9['goboSpeed'])
         out[L9['goboSpeedHi']] = _8bit(x)
         out[L9['goboSpeedLo']] = _8bit((x * 255) % 1.0)
+
+        strobe = floatAttr(L9['strobe'])
+        if strobe < .1:
+            out[L9['shutter']] = 30
+        else:
+            out[L9['shutter']] = 50 + int(150 * (strobe - .1) / .9)
         
         out.update( {
             L9['colorWheel']: 0,
