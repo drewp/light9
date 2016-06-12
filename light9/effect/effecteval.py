@@ -113,12 +113,43 @@ class EffectEval(object):
 def effect_Curtain(effectSettings, strength, songTime):
     return {
         (L9['device/lowPattern%s' % n], L9['color']):
-        literalColor(0*strength, strength, strength)
+        literalColor(strength, strength, strength)
         for n in range(301,308+1)
         }
     
 def effect_animRainbow(effectSettings, strength, songTime):
     out = {}
+    tint = effectSettings.get(L9['tint'], '#ffffff')
+    tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
+    print tint, tintStrength
+    tr, tg, tb = hex_to_rgb(tint)
+    for n in range(1, 5+1):
+        scl = strength * nsin(songTime + n * .3)**3
+        col = literalColor(
+            scl * lerp(nsin(songTime + n * .2), tr/255, tintStrength),
+            scl * lerp(nsin(songTime + n * .2 + .3), tg/255, tintStrength),
+            scl * lerp(nsin(songTime + n * .3 + .6), tb/255, tintStrength))
+
+        dev = L9['device/aura%s' % n]
+        out.update({
+            (dev, L9['color']): col,
+            (dev, L9['zoom']): .9,
+            })
+        ang = songTime * 4
+        out.update({
+        (dev, L9['rx']): lerp(.27, .7, (n-1)/4) + .2 * math.sin(ang+n),
+        (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .5 * math.cos(ang+n),
+            })
+    return out
+
+def effect_orangeSearch(effectSettings, strength, songTime):
+    dev = L9['device/auraStage']
+    return {(dev, L9['color']): '#c1905d',
+            (dev, L9['rx']): lerp(.31, .68, nsquare(songTime / 2.0)),
+            (dev, L9['ry']): lerp(.32, .4,  nsin(songTime / 5)),
+            (dev, L9['zoom']): .88,
+            }
+    
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
     print tint, tintStrength

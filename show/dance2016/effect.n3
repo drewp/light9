@@ -8,17 +8,17 @@
 
 
 
+#effect:usa a :mockupEffect; rdfs:label "USA"; :chaseOffset 0;
+#     :chaseTempo 120; :code "chase()"; :devices dev:colorStrip, dev:moving1;
+#     :fadeShape :fadeCurve1; :palette "#0000ff", "#ff0000", "#ffffff";
+#     :publishAttr :strength .
+
 effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate, :strength .
 
 
-effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate .
+effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate ; :group "anim".
 
-
-
-effect:usa a :mockupEffect; rdfs:label "USA"; :chaseOffset 0;
-     :chaseTempo 120; :code "chase()"; :devices dev:colorStrip, dev:moving1;
-     :fadeShape :fadeCurve1; :palette "#0000ff", "#ff0000", "#ffffff";
-     :publishAttr :strength .
+effect:orangeSearch a :Effect; :publishAttr :strength ; :group "anim".
 
 effect:house :group "main" .
 effect:cyc :group "main" .
