@@ -71,8 +71,8 @@ class window.RdfDbClient
 
     ping = if @_lastPingMs > 0 then @_lastPingMs else '...'
     @setStatus("#{ws};
-      #{@_patchesReceived} recv
-      #{@_patchesSent} sent
+      #{@_patchesReceived} recv;
+      #{@_patchesSent} sent;
       #{@_patchesToSend.length} pending;
       #{ping}ms")
  
