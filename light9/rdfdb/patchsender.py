@@ -109,8 +109,7 @@ def sendPatch(putUri, patch, **kw):
             raise ValueError("sendPatch request failed %s: %s" %
                              (done.code, done.body))
         dt = 1000 * (time.time() - sendTime)
-        log.debug("sendPatch to %s took %sms, response: %r" %
-                  (putUri, dt, done.body))
+        log.debug("sendPatch to %s took %.1fms" % (putUri, dt))
         return done
 
     return cyclone.httpclient.fetch(
