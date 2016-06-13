@@ -445,7 +445,7 @@ Polymer
 
     leftX = Math.max(2, screenPts[1].e(1) + 5)
     rightX = screenPts[2].e(1) - 5
-    w = 170
+    w = 114
     h = 80
     @inlineRect = {
       left: leftX,
