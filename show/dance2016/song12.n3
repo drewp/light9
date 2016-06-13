@@ -69,9 +69,9 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song12/n3c0p1> :time 8.295;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p2> :time 40.478;
+<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p2> :time 104.419;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p3> :time 60.717;
+<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p3> :time 106.791;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song12/n3set0> :effectAttr :colorScale;
      :value "#2922bc" .

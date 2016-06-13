@@ -67,9 +67,9 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song6/n3c0p1> :time 2.671;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song6/n3c0p2> :time 399.956;
+<http://light9.bigasterisk.com/show/dance2016/song6/n3c0p2> :time 426.167;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song6/n3c0p3> :time 416.979;
+<http://light9.bigasterisk.com/show/dance2016/song6/n3c0p3> :time 427.598;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song6/n3set0> :effectAttr :colorScale;
      :value "#fb0081" .
@@ -85,9 +85,9 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song6/n4c0p1> :time 18.586;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song6/n4c0p2> :time 115.249;
+<http://light9.bigasterisk.com/show/dance2016/song6/n4c0p2> :time 165.615;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song6/n4c0p3> :time 154.962;
+<http://light9.bigasterisk.com/show/dance2016/song6/n4c0p3> :time 168.574;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song6/n4set0> :effectAttr :colorScale;
      :value "#938585" .

@@ -1,1 +1,28 @@
 #18 ~26sec for party. try animRainbow with literalColor(scl * .6, scl * 0, scl * 1)
+
+#1 low on lip
+
+TL isn't getting duration of paused song. it also needs to resize to the extent of the new song
+
+#4 exit not fast enough
+
+need to see autostop!
+
+TL zoomout cursors seem misaligned
+
+6 no ending
+
+8 started at t<0
+
+middle zoom slider doesn't update zoomed audio
+
+main spot fadeout curve is bad
+
+11 end bad
+
+12 blue is unfinished
+
+13 end broken, girls downstage too
+
+14 too fast to wwhite, loses it before stop
+
