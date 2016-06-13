@@ -445,21 +445,22 @@ Polymer
     
   makeCurveAdjusters: (curveWidth, yForV, worldPts) ->
     U = (x) -> @graph.Uri(x)
-    
-    @adjusterIds[@uri+'/offset'] = true
-    @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
-      graph: @graph
-      subj: @uri
-      pred: U(':originTime')
-      ctx: U(@song)
-      getDisplayValue: (v, dv) => "o=#{dv}"
-      getTargetPosForValue: (value) =>
-        # display bug: should be working from pt[0].t, not from origin
-        $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
-      getValueForPos: (pos) =>
-        @zoomInX.invert(pos.e(1)) - curveWidth() / 2
-      getSuggestedTargetOffset: () => $V([-10, 0])
-    }))
+
+    if 0
+      @adjusterIds[@uri+'/offset'] = true
+      @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
+        graph: @graph
+        subj: @uri
+        pred: U(':originTime')
+        ctx: U(@song)
+        getDisplayValue: (v, dv) => "o=#{dv}"
+        getTargetPosForValue: (value) =>
+          # display bug: should be working from pt[0].t, not from origin
+          $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
+        getValueForPos: (pos) =>
+          @zoomInX.invert(pos.e(1)) - curveWidth() / 2
+        getSuggestedTargetOffset: () => $V([-10, 0])
+      }))
 
     for pointNum in [0, 1, 2, 3]
       do (pointNum) =>
