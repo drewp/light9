@@ -154,20 +154,14 @@ def effect_animRainbow(effectSettings, strength, songTime):
             })
     return out
 
-def effect_orangeSearch(effectSettings, strength, songTime):
-    dev = L9['device/auraStage']
-    return {(dev, L9['color']): '#c1905d',
-            (dev, L9['rx']): lerp(.31, .68, nsquare(songTime / 2.0)),
-            (dev, L9['ry']): lerp(.32, .4,  nsin(songTime / 5)),
-            (dev, L9['zoom']): .88,
-            }
-    
+def effect_pulseRainbow(effectSettings, strength, songTime):
+    out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
     print tint, tintStrength
     tr, tg, tb = hex_to_rgb(tint)
     for n in range(1, 5+1):
-        scl = strength * nsin(songTime + n * .3)**3
+        scl = strength 
         col = literalColor(
             scl * lerp(nsin(songTime + n * .2), tr/255, tintStrength),
             scl * lerp(nsin(songTime + n * .2 + .3), tg/255, tintStrength),
@@ -176,15 +170,22 @@ def effect_orangeSearch(effectSettings, strength, songTime):
         dev = L9['device/aura%s' % n]
         out.update({
             (dev, L9['color']): col,
-            (dev, L9['zoom']): .9,
+            (dev, L9['zoom']): .5,
             })
-        ang = songTime * 4
         out.update({
-        (dev, L9['rx']): lerp(.27, .7, (n-1)/4) + .2 * math.sin(ang+n),
-        (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .5 * math.cos(ang+n),
+        (dev, L9['rx']): lerp(.27, .7, (n-1)/4),
+        (dev, L9['ry']): lerp(.46, .52, (n-1)/4),
             })
     return out
 
+def effect_orangeSearch(effectSettings, strength, songTime):
+    dev = L9['device/auraStage']
+    return {(dev, L9['color']): '#c1905d',
+            (dev, L9['rx']): lerp(.31, .68, nsquare(songTime / 2.0)),
+            (dev, L9['ry']): lerp(.32, .4,  nsin(songTime / 5)),
+            (dev, L9['zoom']): .88,
+            }
+    
 def effect_Strobe(effectSettings, strength, songTime):
     rate = 2
     duty = .3
