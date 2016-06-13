@@ -3,37 +3,43 @@
 @prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix song: <http://light9.bigasterisk.com/show/dance2016/song7/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
-@prefix song: <http://light9.bigasterisk.com/show/dance2016/song7/> .
 
-<http://light9.bigasterisk.com/show/dance2016/song7> :note song:n2 .
+<http://light9.bigasterisk.com/show/dance2016/song7> :note song:n0, song:n1, song:n2 .
 
-song:n1c0 a :Curve;
-     :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
-song:n1c0p0 :time -0.420;
-     :value 0.000 .
-song:n1c0p1 :time 12.472;
-     :value 1.000 .
-song:n1c0p2 :time 24.944;
-     :value 1.000 .
-song:n1c0p3 :time 37.416;
-     :value 0.000 .
+song:n1c0 a :Curve; :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
 
-song:n2 a :Note;
-     :curve song:n2c0;
-     :effectClass effect:qfill; :originTime 3.389 ; :setting song:n2set0 .
-song:n2set0  :effectAttr :colorScale; :value "#aa0000".
+song:n0 a :Note; :curve song:n0c0; :effectClass effect:down;
+     :originTime 3.415; :setting song:n0set0 .
 
+song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
+song:n0c0p0 :time 0.000; :value 0.000 .
+song:n0c0p1 :time 2.702; :value 1.000 .
+song:n0c0p2 :time 219.002; :value 1.000 .
+song:n0c0p3 :time 222.379; :value 0.000 .
+song:n0set0 :effectAttr :colorScale; :value "#b1ad3f" .
 
+song:n1 a :Note; :curve song:n1c1; :effectClass effect:qfill;
+     :originTime 185.498 .
+song:n1c0p0 :time -0.420; :value 0.000 .
+song:n1c0p1 :time 12.472; :value 1.000 .
+song:n1c0p2 :time 24.944; :value 1.000 .
+song:n1c0p3 :time 37.416; :value 0.000 .
 
-song:n2c0 a :Curve;
-     :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
-song:n2c0p0 :time -1.861;
-     :value 0.000 .
-song:n2c0p1 :time 2.312;
-     :value 1.000 .
-song:n2c0p2 :time 218.894;
-     :value 1.000 .
-song:n2c0p3 :time 224.995;
-     :value 0.000 .
+song:n1c1 a :Curve; :attr :strength; :point song:n1c1p0, song:n1c1p1, song:n1c1p2, song:n1c1p3 .
+song:n1c1p0 :time -12.985; :value 0.000 .
+song:n1c1p1 :time -5.396; :value 1.000 .
+song:n1c1p2 :time 36.677; :value 1.000 .
+song:n1c1p3 :time 40.277; :value 0.000 .
+
+song:n2 a :Note; :curve song:n2c0; :effectClass effect:qfill;
+     :originTime 3.389; :setting song:n2set0 .
+
+song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
+song:n2c0p0 :time -1.861; :value 0.000 .
+song:n2c0p1 :time 2.312; :value 1.000 .
+song:n2c0p2 :time 218.894; :value 1.000 .
+song:n2c0p3 :time 222.454; :value 0.000 .
+song:n2set0 :effectAttr :colorScale; :value "#e37474" .

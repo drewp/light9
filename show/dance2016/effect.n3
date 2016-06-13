@@ -17,26 +17,30 @@
 
 
 effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate ; :group "anim".
+effect:pulseRainbow a :Effect; rdfs:label "pulseRainbow"; :publishAttr :strength, :rate ; :group "main"; :order 6.
 
 effect:orangeSearch a :Effect; :publishAttr :strength ; :group "anim".
-effect:lightning a :Effect; :publishAttr :strength ; :group "anim".
+effect:lightning a :Effect; :publishAttr :strength ; :group "main"; :order 7.
 
 effect:strobewarm :group "anim".
 
-effect:house :group "main" .
-effect:cyc :group "main" .
+effect:house :group "main"; :order 3 .
+effect:houseside :group "main"; :order 4 .
+effect:cyc :group "main"; :order 3 .
+effect:qwidecenter :group "main"; rdfs:label "qwidecenter [18]"; :order 5 .
+effect:curtain2  :group "main"; :order 2 .
 
 effect:centerSpot a :Effect; rdfs:label "center spot";
-     :group "main"; :order 3; :publishAttr :strength;
+     :group "main"; :order 1; :publishAttr :strength;
      :setting effect:centerSpots0, effect:centerSpots1, effect:centerSpots2, effect:centerSpots3, effect:centerSpots4 .
 effect:centerSpots0 :device dev:q2; :deviceAttr :color;
-     :scaledValue "#ffffff" .
+     :scaledValue "#ffefdf" .
 effect:centerSpots1 :device dev:q2; :deviceAttr :focus;
      :value 0.31 .
 effect:centerSpots2 :device dev:q2; :deviceAttr :rx;
      :value 0.50 .
 effect:centerSpots3 :device dev:q2; :deviceAttr :ry;
-     :value 0.26 .
+     :value 0.01 .
 effect:centerSpots4 :device dev:q2; :deviceAttr :zoom;
      :value 0.42 .
 
