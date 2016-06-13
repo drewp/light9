@@ -436,7 +436,7 @@ Polymer
       display: if rightX - leftX > w then 'block' else 'none'
       }
 
-    if screenPts[3].e(1) - screenPts[0].e(1) < 100
+    if screenPts[3].e(1) - screenPts[0].e(1) < 50
       @clearAdjusters()
       # also kill their connectors
       return
