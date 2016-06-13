@@ -73,6 +73,10 @@ Polymer
 
     setInterval(@updateDebugSummary.bind(@), 100)
 
+    #if anchor == loadtest
+    #  add note and delete it repeatedly
+    #  disconnect the graph, make many notes, drag a point over many steps, measure lag somewhere
+
   updateDebugSummary: ->
     elemCount = (tag) -> document.getElementsByTagName(tag).length
     @debug = "#{window.debug_zoomOrLayoutChangedCount} layout change,
@@ -332,7 +336,7 @@ Polymer
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
-  update: ->
+  update: (patch) ->
     U = (x) -> @graph.Uri(x)
 
     notesForThisRow = []
@@ -397,8 +401,23 @@ Polymer
 
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
-    
-  update: ->
+
+  patchCouldAffectMe: (patch) ->
+    if patch and patch.addQuads # sometimes patch is a polymer-sent value. @update is used as a listener too
+      if patch.addQuads.length == patch.delQuads.length == 1
+        add = patch.addQuads[0]
+        del = patch.delQuads[0]
+        if add.predicate == del.predicate == @graph.Uri(':time')
+          if add.subject != @uri and del.subject != @uri
+            log("i'm #{@uri}, cant be affected by #{ko.toJSON(patch)}")
+            return false
+    return true
+      
+            
+  update: (patch) ->
+    # not working yet
+    #if @patchCouldAffectMe(patch)
+    #  return
     if @isDetached?
       log('skipping update', @uri)
       return 

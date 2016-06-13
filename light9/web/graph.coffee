@@ -73,13 +73,13 @@ class AutoDependencies
 
     h = new Handler(func, label)
     @handlerStack[@handlerStack.length - 1].innerHandlers.push(h)
-    @_rerunHandler(h)
+    @_rerunHandler(h, null)
     
-  _rerunHandler: (handler) ->
+  _rerunHandler: (handler, patch) ->
     handler.patterns = []
     @handlerStack.push(handler)
     try
-      handler.func()
+      handler.func(patch)
     catch e
       log('error running handler: ', e)
       # assuming here it didn't get to do all its queries, we could
@@ -97,7 +97,7 @@ class AutoDependencies
       for child in toRun
 
         #child.innerHandlers = [] # let all children get called again
-        @_rerunHandler(child)
+        @_rerunHandler(child, patch)
         rerunInners(child)
     rerunInners(@handlers)
 
