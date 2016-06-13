@@ -294,7 +294,7 @@ Polymer
       ]        
     pointQuads = []
 
-    desiredWidthX = @offsetWidth * .1
+    desiredWidthX = @offsetWidth * .3
     desiredWidthT = @zoomInX.invert(desiredWidthX) - @zoomInX.invert(0)
     
     for i in [0...4]
