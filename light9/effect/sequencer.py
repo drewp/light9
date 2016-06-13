@@ -33,11 +33,11 @@ def sendToCollector(client, session, settings):
 
 
 class Note(object):
-    def __init__(self, graph, uri, effectevalModule):
+    def __init__(self, graph, uri, effectevalModule, sharedEffectOutputs):
         g = self.graph = graph
         self.uri = uri
         self.effectEval = effectevalModule.EffectEval(
-            graph, g.value(uri, L9['effectClass']))
+            graph, g.value(uri, L9['effectClass']), sharedEffectOutputs)
         self.baseEffectSettings = {}  # {effectAttr: value}
         for s in g.objects(uri, L9['setting']):
             ea = g.value(s, L9['effectAttr'])
@@ -110,6 +110,7 @@ class Sequencer(object):
 
         self.recentUpdateTimes = []
         self.lastStatLog = 0
+        self._compileGraphCall = None
         self.notes = {} # song: [notes]
         self.graph.addHandler(self.compileGraph)
         self.update()
@@ -118,13 +119,30 @@ class Sequencer(object):
             onChange=lambda: self.graph.addHandler(self.compileGraph))
 
     def compileGraph(self):
+        log.info('compileGraph request')
+        self._compileGraphRun()
+        return
+
+        # may not help
+        if self._compileGraphCall:
+            self._compileGraphCall.cancel()
+        self._compileGraphCall = reactor.callLater(
+            .5,
+            self.graph.addHandler, self._compileGraphRun)
+
+    def _compileGraphRun(self):
         """rebuild our data from the graph"""
+        self._compileGraphCall = None
+        log.info('compileGraph start')
         g = self.graph
 
+        sharedEffectOutputs = {}
+        
         for song in g.subjects(RDF.type, L9['Song']):
             self.notes[song] = []
             for note in g.objects(song, L9['note']):
-                self.notes[song].append(Note(g, note, effecteval))
+                self.notes[song].append(Note(g, note, effecteval, sharedEffectOutputs))
+        log.info('compileGraph done')
 
     @stats.update.time()
     def update(self):

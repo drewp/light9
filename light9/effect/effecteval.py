@@ -5,6 +5,9 @@ from webcolors import rgb_to_hex, hex_to_rgb
 from decimal import Decimal
 import math
 from noise import pnoise1
+import logging
+
+log = logging.getLogger('effecteval')
 
 def literalColor(rnorm, gnorm, bnorm):
     return Literal(rgb_to_hex([rnorm * 255, gnorm * 255, bnorm * 255]))
@@ -45,17 +48,22 @@ class EffectEval(object):
     runs one effect's code to turn effect attr settings into output
     device settings. No state; suitable for reload().
     """
-    def __init__(self, graph, effect):
+    def __init__(self, graph, effect, sharedEffectOutputs):
         self.graph = graph
         self.effect = effect 
 
         # effect : [(dev, attr, value, isScaled)]
-        self.effectOutputs = {}
-        
-        self.graph.addHandler(self.updateEffectsFromGraph)
+        self.effectOutputs = sharedEffectOutputs
+
+        if not self.effectOutputs:
+            self.graph.addHandler(self.updateEffectsFromGraph)
 
     def updateEffectsFromGraph(self):
-        self.effectOutputs = {}
+        # let this cache while i'm working on note timing
+        if self.effectOutputs:
+            log.warn('keeping %s effectOutputs, no reload', len(self.effectOutputs))
+            return
+            
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
             settings = []
             for setting in self.graph.objects(effect, L9['setting']):

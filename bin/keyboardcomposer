@@ -242,7 +242,8 @@ class KeyboardComposer(tk.Frame, SubClient):
 
             self.setup_key_nudgers(subbox.scale)
 
-            self.effectEval[effect] = light9.effect.effecteval.EffectEval(self.graph, effect)
+            sharedEffectOutputs = {}
+            self.effectEval[effect] = light9.effect.effecteval.EffectEval(self.graph, effect, sharedEffectOutputs)
 
             col = (col + 1) % 8
             last_group = group
