@@ -59,11 +59,6 @@ class EffectEval(object):
             self.graph.addHandler(self.updateEffectsFromGraph)
 
     def updateEffectsFromGraph(self):
-        # let this cache while i'm working on note timing
-        if self.effectOutputs:
-            log.warn('keeping %s effectOutputs, no reload', len(self.effectOutputs))
-            return
-            
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
             settings = []
             for setting in self.graph.objects(effect, L9['setting']):
