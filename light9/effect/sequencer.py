@@ -29,7 +29,9 @@ def sendToCollector(client, session, settings):
     return treq.put(networking.collector.path('attrs'),
                     data=json.dumps({'settings': settings,
                                      'client': client,
-                                     'clientSession': session}))
+                                     'clientSession': session,
+                                     'sendTime': time.time(),
+                                 }))
 
 
 class Note(object):

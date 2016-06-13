@@ -59,7 +59,7 @@ def startZmq(port, collector):
             collector.setAttrs()
     s.onPull = onPull
 
-def launch(graph):
+def launch(graph, doLoadTest=False):
 
     # todo: drive outputs with config files
     outputs = [
@@ -76,18 +76,42 @@ def launch(graph):
                       interface='::')
     log.info('serving http on %s, zmq on %s', networking.collector.port,
              networking.collectorZmq.port)
-    
+    if doLoadTest:
+        loadTest()
+
+
+def loadTest():
+    from light9.effect.sequencer import sendToCollector
+    import time
+    session = "loadtest%s" % time.time()
+    offset = 0
+    for i in range(2000):
+        reactor.callLater(offset, sendToCollector, "http://dash:8200/live/", session,
+                    [["http://light9.bigasterisk.com/device/backlight1","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/backlight2","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/backlight3","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/backlight4","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/backlight5","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/down2","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/down3","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/down4","http://light9.bigasterisk.com/color","#ffffff"],
+                     ["http://light9.bigasterisk.com/device/backlight5","http://light9.bigasterisk.com/uv",0.011]])
+        offset += .005
+
+    reactor.callLater(offset, reactor.stop)
     
 def main():
     parser = optparse.OptionParser()
     parser.add_option("-v", "--verbose", action="store_true",
                       help="logging.DEBUG")
+    parser.add_option("--loadtest", action="store_true",
+                      help="call myself with some synthetic load then exit")
     (options, args) = parser.parse_args()
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
     graph = SyncedGraph(networking.rdfdb.url, "collector")
 
-    graph.initiallySynced.addCallback(lambda _: launch(graph))
+    graph.initiallySynced.addCallback(lambda _: launch(graph, options.loadtest))
     reactor.run()
 
 if __name__ == '__main__':
