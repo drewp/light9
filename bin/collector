@@ -1,7 +1,7 @@
 #!bin/python
 from __future__ import division
 from rdflib import Graph, URIRef, Literal
-from twisted.internet import reactor
+from twisted.internet import reactor, utils
 from twisted.web.server import Site
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
 import json
@@ -80,28 +80,17 @@ def launch(graph, doLoadTest=False):
     log.info('serving http on %s, zmq on %s', networking.collector.port,
              networking.collectorZmq.port)
     if doLoadTest:
-        loadTest()
-
-
-def loadTest():
-    from light9.effect.sequencer import sendToCollector
-    import time
-    session = "loadtest%s" % time.time()
-    offset = 0
-    for i in range(2000):
-        reactor.callLater(offset, sendToCollector, "http://dash:8200/live/", session,
-                    [["http://light9.bigasterisk.com/device/backlight1","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/backlight2","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/backlight3","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/backlight4","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/backlight5","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/down2","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/down3","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/down4","http://light9.bigasterisk.com/color","#ffffff"],
-                     ["http://light9.bigasterisk.com/device/backlight5","http://light9.bigasterisk.com/uv",0.011]])
-        offset += .005
-
-    reactor.callLater(offset, reactor.stop)
+        # in a subprocess since we don't want this client to be
+        # cooperating with the main event loop and only sending
+        # requests when there's free time
+        def afterWarmup():
+            log.info('running collector_loadtest')
+            d = utils.getProcessValue('bin/python', ['bin/collector_loadtest.py'])
+            def done(*a):
+                log.info('loadtest done')
+                reactor.stop()
+            d.addCallback(done)
+        reactor.callLater(2, afterWarmup)
     
 def main():
     parser = optparse.OptionParser()
