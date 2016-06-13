@@ -82,7 +82,10 @@ class Collector(object):
         Call with settings=[] to ping us that your session isn't dead.
         """
         now = time.time()
-        print now - sendTime
+        requestLag = now - sendTime
+        if requestLag > .1:
+            log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
+                     client, requestLag * 1000)
 
         self._forgetStaleClients(now)
 

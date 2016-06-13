@@ -4,7 +4,7 @@ copies from effectloop.py, which this should replace
 
 from __future__ import division
 from rdflib import URIRef, Literal
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from webcolors import rgb_to_hex
 import json, logging, bisect
 import treq
@@ -18,20 +18,59 @@ from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
 from light9.effect import effecteval
 from greplin import scales
+from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 
 log = logging.getLogger('sequencer')
 stats = scales.collection('/sequencer/',
-                                       scales.PmfStat('update'),
+                          scales.PmfStat('update'),
                           scales.DoubleStat('recentFps'),
+)
 
-                                       )
-def sendToCollector(client, session, settings):
-    return treq.put(networking.collector.path('attrs'),
-                    data=json.dumps({'settings': settings,
-                                     'client': client,
-                                     'clientSession': session,
-                                     'sendTime': time.time(),
-                                 }))
+_zmqClient=None
+class TwistedZmqClient(object):
+    def __init__(self, service):
+        zf = ZmqFactory()
+        e = ZmqEndpoint('connect', 'tcp://%s:%s' % (service.host, service.port))
+        self.conn = ZmqPushConnection(zf, e)
+        
+    def send(self, msg):
+        self.conn.push(msg)
+
+
+def toCollectorJson(client, session, settings):
+    return json.dumps({'settings': settings,
+                       'client': client,
+                       'clientSession': session,
+                       'sendTime': time.time(),
+                  })
+        
+def sendToCollectorZmq(msg):
+    global _zmqClient
+    if _zmqClient is None:
+        _zmqClient = TwistedZmqClient(networking.collectorZmq)
+    _zmqClient.send(msg)
+    return defer.succeed(0)
+        
+def sendToCollector(client, session, settings, useZmq=True):
+    """deferred to the time in seconds it took to get a response from collector"""
+    sendTime = time.time()
+    msg = toCollectorJson(client, session, settings)
+
+    if useZmq:
+        d = sendToCollectorZmq(msg)
+    else:
+        d = treq.put(networking.collector.path('attrs'), data=msg)
+    
+    def onDone(result):
+        dt = time.time() - sendTime
+        if dt > .1:
+            log.warn('sendToCollector request took %.1fms', dt * 1000)
+        return dt
+    d.addCallback(onDone)
+    def onErr(err):
+        log.warn('sendToCollector failed: %r', err)
+    d.addErrback(onErr)
+    return d
 
 
 class Note(object):
