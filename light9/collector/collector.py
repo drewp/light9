@@ -72,7 +72,7 @@ class Collector(object):
                 out[(d, da)] = v
         return out
 
-    def setAttrs(self, client, clientSession, settings):
+    def setAttrs(self, client, clientSession, settings, sendTime):
         """
         settings is a list of (device, attr, value). These attrs are
         device attrs. We resolve conflicting values, process them into
@@ -82,6 +82,7 @@ class Collector(object):
         Call with settings=[] to ping us that your session isn't dead.
         """
         now = time.time()
+        print now - sendTime
 
         self._forgetStaleClients(now)
 

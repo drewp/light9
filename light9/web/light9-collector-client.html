@@ -36,7 +36,9 @@
            this.$.put.body = JSON.stringify({
                "settings": settings,
                "client": window.location.href,
-               "clientSession": this.clientSession});
+               "clientSession": this.clientSession,
+               "sendTime": Date.now() / 1000
+           });
            this.$.put.generateRequest();
            this.lastSent = settings.slice();
        }

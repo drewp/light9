@@ -35,7 +35,8 @@ class WebServer(object):
                 settings.append((URIRef(device), URIRef(attr), Literal(value)))
             self.collector.setAttrs(body['client'],
                                     body['clientSession'],
-                                    settings)
+                                    settings,
+                                    body['sendTime'])
             request.setResponseCode(202)
 
     @app.route('/stats', methods=['GET'])
