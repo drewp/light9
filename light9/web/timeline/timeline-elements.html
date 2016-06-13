@@ -321,7 +321,11 @@ background: rgba(126, 52, 245, 0.0784313725490196);
       <div>note [[noteLabel]] <button on-click="onDel">del</button></div>
       <table>
         <tr><th>effect:</th><td><edit-choice uri="{{effect}}" label="{{effectLabel}}"></edit-choice></td></tr>
-        <!-- <tr><th>color:</th><td>[[color]]</td></tr> -->
+        <tr><th>colorScale:</th><td>
+          <!-- this could share with live/index.html's
+          light9-live-control, but that one is currently junky -->
+          <span><input type="color" value="{{colorScale::input}}"> [[colorScale]]</span>
+        </td></tr>
       </table>
     </div>
   </template>

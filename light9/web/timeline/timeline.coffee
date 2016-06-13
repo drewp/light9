@@ -334,7 +334,6 @@ Polymer
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: ->
     U = (x) -> @graph.Uri(x)
-    log("row #{@rowIndex} updating")
 
     notesForThisRow = []
     i = 0
@@ -342,7 +341,6 @@ Polymer
       if (i % ROW_COUNT) == @rowIndex
         notesForThisRow.push(n)
       i++
-    log("row #{@rowIndex} gets", notesForThisRow)
 
     updateChildren @, notesForThisRow, (newUri) =>
       child = document.createElement('light9-timeline-note')
@@ -355,7 +353,6 @@ Polymer
       return child      
 
   onZoom: ->
-    log('row onzoom')
     for e in @children
       e.zoomInX = @zoomInX
 
@@ -429,8 +426,8 @@ Polymer
 
     leftX = Math.max(2, screenPts[1].e(1) + 5)
     rightX = screenPts[2].e(1) - 5
-    w = 120
-    h = 45
+    w = 170
+    h = 80
     @inlineRect = {
       left: leftX,
       top: @offsetTop + @offsetHeight - h - 5,
@@ -497,15 +494,36 @@ Polymer
   properties:
     graph: { type: Object, notify: true }
     song: { type: String, notify: true }
-    uri: { type: String, notify: true }
+    uri: { type: String, notify: true }  # the Note
     rect: { type: Object, notify: true }
     effect: { type: String, notify: true }
     effectLabel: { type: String, notify: true }
-    color: { type: String, notify: true }
+    colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
   observers: [
     'addHandler(graph, uri)'
+    'onColorScale(graph, uri, colorScale)'
     ]
+  onColorScale: ->
+    U = (x) -> @graph.Uri(x)
+    log('onColorScale', @colorScale, @colorScaleFromGraph, @existingColorScaleSetting)
+    if @colorScale == @colorScaleFromGraph
+      return
+      
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
+
+    settingValue = @graph.Literal(@colorScale)
+    if @existingColorScaleSetting
+      @graph.patchObject(@existingColorScaleSetting, U(':value'), settingValue, @song)
+    else
+      setting = @graph.nextNumberedResource(@uri + 'set')
+      patch = {delQuads: [], addQuads: [
+        quad(@uri, U(':setting'), setting)
+        quad(setting, U(':effectAttr'), U(':colorScale'))
+        quad(setting, U(':value'), settingValue)
+        ]}
+      @graph.applyAndSendPatch(patch)
+    
   addHandler: ->
     @graph.runHandler(@update.bind(@))
   update: ->
@@ -513,7 +531,20 @@ Polymer
     @effect = @graph.uriValue(@uri, U(':effectClass'))
     @effectLabel = @effect.replace(/.*\//, '')
     @noteLabel = @uri.replace(/.*\//, '')
-    @color = '#ff0000'
+
+    @existingColorScaleSetting = null
+    for setting in @graph.objects(@uri, U(':setting'))
+      ea = @graph.uriValue(setting, U(':effectAttr'))
+      value = @graph.stringValue(setting, U(':value'))
+      if ea == U(':colorScale')
+        @colorScaleFromGraph = value
+        @colorScale = value
+        @existingColorScaleSetting = setting
+    if @existingColorScaleSetting == null
+      @colorScaleFromGraph = '#ffffff'
+      @colorScale = '#ffffff'
+
+
   onDel: ->
     patch = {delQuads: [{subject: @song, predicate: @graph.Uri(':note'), object: @uri, graph: @song}], addQuads: []}
     @graph.applyAndSendPatch(patch)
