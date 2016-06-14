@@ -28,7 +28,7 @@ ok 12 blue is unfinished
 
 ok 13 end broken, girls downstage too
 
-14 too fast to wwhite, loses it before stop
+ok 14 too fast to wwhite, loses it before stop
 
 16 t=90 needs whiite ctr. also 260
 360-470
@@ -36,7 +36,7 @@ fix 377 strobe blackout
 409 & 411, 442 & 444 accent hands up
 425 decorate & 457
 
-17 missing houseside
+ok 17 missing houseside
 
 ok- houseside sub isn't done
 
@@ -49,3 +49,6 @@ it would be nice to see the light brightness and rotation lags in the timeline, 
 
 
 
+------------------
+
+slider didnt go to 0
