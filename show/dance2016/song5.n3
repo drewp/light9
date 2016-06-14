@@ -6,7 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016/song5> :note <http://light9.bigasterisk.com/show/dance2016/song5/n0>, <http://light9.bigasterisk.com/show/dance2016/song5/n1> .
+<http://light9.bigasterisk.com/show/dance2016/song5> :note <http://light9.bigasterisk.com/show/dance2016/song5/n0>, <http://light9.bigasterisk.com/show/dance2016/song5/n1>, <http://light9.bigasterisk.com/show/dance2016/song5/n2> .
 
 <http://light9.bigasterisk.com/show/dance2016/song5/n0> a :Note;
      :curve <http://light9.bigasterisk.com/show/dance2016/song5/n0c0>;
@@ -18,9 +18,9 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song5/n0c0p1> :time -57.926;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song5/n0c0p2> :time 128.740;
+<http://light9.bigasterisk.com/show/dance2016/song5/n0c0p2> :time 127.749;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song5/n0c0p3> :time 131.268;
+<http://light9.bigasterisk.com/show/dance2016/song5/n0c0p3> :time 130.317;
      :value 0.000 .
 
 <http://light9.bigasterisk.com/show/dance2016/song5/n1> a :Note;
@@ -33,7 +33,22 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song5/n1c0p1> :time -47.023;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song5/n1c0p2> :time 138.883;
+<http://light9.bigasterisk.com/show/dance2016/song5/n1c0p2> :time 138.240;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song5/n1c0p3> :time 141.089;
+<http://light9.bigasterisk.com/show/dance2016/song5/n1c0p3> :time 140.727;
+     :value 0.000 .
+
+<http://light9.bigasterisk.com/show/dance2016/song5/n2> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song5/n2c0>;
+     :effectClass effect:down; :originTime 168.923 .
+
+<http://light9.bigasterisk.com/show/dance2016/song5/n2c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song5/n2c0p0>, <http://light9.bigasterisk.com/show/dance2016/song5/n2c0p1>, <http://light9.bigasterisk.com/show/dance2016/song5/n2c0p2>, <http://light9.bigasterisk.com/show/dance2016/song5/n2c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song5/n2c0p0> :time 2.357;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song5/n2c0p1> :time 11.808;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song5/n2c0p2> :time 21.759;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song5/n2c0p3> :time 24.845;
      :value 0.000 .

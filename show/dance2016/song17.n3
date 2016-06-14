@@ -6,7 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016/song17> :note <http://light9.bigasterisk.com/show/dance2016/song17/n0>, <http://light9.bigasterisk.com/show/dance2016/song17/n1>, <http://light9.bigasterisk.com/show/dance2016/song17/n2>, <http://light9.bigasterisk.com/show/dance2016/song17/n3>, <http://light9.bigasterisk.com/show/dance2016/song17/n4>, <http://light9.bigasterisk.com/show/dance2016/song17/n5> .
+<http://light9.bigasterisk.com/show/dance2016/song17> :note <http://light9.bigasterisk.com/show/dance2016/song17/n0>, <http://light9.bigasterisk.com/show/dance2016/song17/n1>, <http://light9.bigasterisk.com/show/dance2016/song17/n2>, <http://light9.bigasterisk.com/show/dance2016/song17/n3>, <http://light9.bigasterisk.com/show/dance2016/song17/n4>, <http://light9.bigasterisk.com/show/dance2016/song17/n5>, <http://light9.bigasterisk.com/show/dance2016/song17/n6>, <http://light9.bigasterisk.com/show/dance2016/song17/n7>, <http://light9.bigasterisk.com/show/dance2016/song17/n8>, <http://light9.bigasterisk.com/show/dance2016/song17/n9> .
 
 <http://light9.bigasterisk.com/show/dance2016/song17/n0> a :Note;
      :curve <http://light9.bigasterisk.com/show/dance2016/song17/n0c0>;
@@ -102,4 +102,64 @@
 <http://light9.bigasterisk.com/show/dance2016/song17/n5c0p2> :time 35.394;
      :value 1.000 .
 <http://light9.bigasterisk.com/show/dance2016/song17/n5c0p3> :time 36.555;
+     :value 0.000 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n6> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song17/n6c0>;
+     :effectClass effect:houseside; :originTime 101.988 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n6c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song17/n6c0p0>, <http://light9.bigasterisk.com/show/dance2016/song17/n6c0p1>, <http://light9.bigasterisk.com/show/dance2016/song17/n6c0p2>, <http://light9.bigasterisk.com/show/dance2016/song17/n6c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song17/n6c0p0> :time 0.000;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n6c0p1> :time 5.376;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n6c0p2> :time 108.994;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n6c0p3> :time 109.338;
+     :value 0.000 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n7> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song17/n7c0>;
+     :effectClass effect:down; :originTime 207.284 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n7c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song17/n7c0p0>, <http://light9.bigasterisk.com/show/dance2016/song17/n7c0p1>, <http://light9.bigasterisk.com/show/dance2016/song17/n7c0p2>, <http://light9.bigasterisk.com/show/dance2016/song17/n7c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song17/n7c0p0> :time -27.381;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n7c0p1> :time -18.363;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n7c0p2> :time 3.885;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n7c0p3> :time 5.319;
+     :value 0.000 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n8> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song17/n8c0>;
+     :effectClass effect:posts; :originTime 191.291 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n8c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song17/n8c0p0>, <http://light9.bigasterisk.com/show/dance2016/song17/n8c0p1>, <http://light9.bigasterisk.com/show/dance2016/song17/n8c0p2>, <http://light9.bigasterisk.com/show/dance2016/song17/n8c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song17/n8c0p0> :time 0.000;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n8c0p1> :time 5.881;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n8c0p2> :time 19.699;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n8c0p3> :time 21.137;
+     :value 0.000 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n9> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song17/n9c0>;
+     :effectClass effect:aurasuperwide; :originTime 222.597 .
+
+<http://light9.bigasterisk.com/show/dance2016/song17/n9c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song17/n9c0p0>, <http://light9.bigasterisk.com/show/dance2016/song17/n9c0p1>, <http://light9.bigasterisk.com/show/dance2016/song17/n9c0p2>, <http://light9.bigasterisk.com/show/dance2016/song17/n9c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song17/n9c0p0> :time -18.127;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n9c0p1> :time -15.649;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n9c0p2> :time -11.000;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song17/n9c0p3> :time -10.257;
      :value 0.000 .

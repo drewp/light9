@@ -7,7 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016/song2> ns1:note <http://light9.bigasterisk.com/show/dance2016/song2/n1>, <http://light9.bigasterisk.com/show/dance2016/song2/n2> .
+<http://light9.bigasterisk.com/show/dance2016/song2> ns1:note <http://light9.bigasterisk.com/show/dance2016/song2/n1>, <http://light9.bigasterisk.com/show/dance2016/song2/n2>, <http://light9.bigasterisk.com/show/dance2016/song2/n3> .
 
 <http://light9.bigasterisk.com/show/dance2016/song2/n0> a ns1:Note;
      ns1:curve <http://light9.bigasterisk.com/show/dance2016/song2/n0c0>;
@@ -55,7 +55,25 @@
      ns1:value 1.000 .
 <http://light9.bigasterisk.com/show/dance2016/song2/n2c0p2> ns1:time 154.624;
      ns1:value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song2/n2c0p3> ns1:time 157.514;
+<http://light9.bigasterisk.com/show/dance2016/song2/n2c0p3> ns1:time 157.534;
      ns1:value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song2/n2set0> ns1:effectAttr ns1:colorScale;
      ns1:value "#f3c8c8" .
+
+<http://light9.bigasterisk.com/show/dance2016/song2/n3> a ns1:Note;
+     ns1:curve <http://light9.bigasterisk.com/show/dance2016/song2/n3c0>;
+     ns1:effectClass effect:aurafill; ns1:originTime 86.267;
+     ns1:setting <http://light9.bigasterisk.com/show/dance2016/song2/n3set0> .
+
+<http://light9.bigasterisk.com/show/dance2016/song2/n3c0> a ns1:Curve;
+     ns1:attr ns1:strength; ns1:point <http://light9.bigasterisk.com/show/dance2016/song2/n3c0p0>, <http://light9.bigasterisk.com/show/dance2016/song2/n3c0p1>, <http://light9.bigasterisk.com/show/dance2016/song2/n3c0p2>, <http://light9.bigasterisk.com/show/dance2016/song2/n3c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song2/n3c0p0> ns1:time -85.407;
+     ns1:value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song2/n3c0p1> ns1:time -69.853;
+     ns1:value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song2/n3c0p2> ns1:time 86.679;
+     ns1:value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song2/n3c0p3> ns1:time 89.792;
+     ns1:value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song2/n3set0> ns1:effectAttr ns1:colorScale;
+     ns1:value "#201a1a" .

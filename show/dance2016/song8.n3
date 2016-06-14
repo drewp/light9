@@ -6,7 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016/song8> :note <http://light9.bigasterisk.com/show/dance2016/song8/n0> .
+<http://light9.bigasterisk.com/show/dance2016/song8> :note <http://light9.bigasterisk.com/show/dance2016/song8/n0>, <http://light9.bigasterisk.com/show/dance2016/song8/n1> .
 
 <http://light9.bigasterisk.com/show/dance2016/song8/n0> a :Note;
      :curve <http://light9.bigasterisk.com/show/dance2016/song8/n0c0>;
@@ -15,7 +15,7 @@
 
 <http://light9.bigasterisk.com/show/dance2016/song8/n0c0> a :Curve;
      :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song8/n0c0p0>, <http://light9.bigasterisk.com/show/dance2016/song8/n0c0p1>, <http://light9.bigasterisk.com/show/dance2016/song8/n0c0p2>, <http://light9.bigasterisk.com/show/dance2016/song8/n0c0p3> .
-<http://light9.bigasterisk.com/show/dance2016/song8/n0c0p0> :time -26.054;
+<http://light9.bigasterisk.com/show/dance2016/song8/n0c0p0> :time -23.929;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song8/n0c0p1> :time -21.924;
      :value 1.000 .
@@ -25,3 +25,21 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song8/n0set0> :effectAttr :colorScale;
      :value "#fbe3e3" .
+
+<http://light9.bigasterisk.com/show/dance2016/song8/n1> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song8/n1c0>;
+     :effectClass effect:chase; :originTime 160.082;
+     :setting <http://light9.bigasterisk.com/show/dance2016/song8/n1set0> .
+
+<http://light9.bigasterisk.com/show/dance2016/song8/n1c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song8/n1c0p0>, <http://light9.bigasterisk.com/show/dance2016/song8/n1c0p1>, <http://light9.bigasterisk.com/show/dance2016/song8/n1c0p2>, <http://light9.bigasterisk.com/show/dance2016/song8/n1c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song8/n1c0p0> :time -8.467;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song8/n1c0p1> :time 18.503;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song8/n1c0p2> :time 37.570;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song8/n1c0p3> :time 38.309;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song8/n1set0> :effectAttr :colorScale;
+     :value "#df5858" .

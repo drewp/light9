@@ -13,9 +13,9 @@ song:n0 a :Note; :curve song:n0c0; :effectClass effect:qfill;
      :originTime 272.735 .
 
 song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
-song:n0c0p0 :time 0.000; :value 0.000 .
-song:n0c0p1 :time 1.000; :value 1.000 .
-song:n0c0p2 :time 16.949; :value 1.000 .
+song:n0c0p0 :time 6.270; :value 0.000 .
+song:n0c0p1 :time 9.376; :value 1.000 .
+song:n0c0p2 :time 18.507; :value 1.000 .
 song:n0c0p3 :time 21.021; :value 0.000 .
 
 song:n1 a :Note; :curve song:n1c0; :effectClass effect:song14rainbow;
@@ -24,7 +24,7 @@ song:n1 a :Note; :curve song:n1c0; :effectClass effect:song14rainbow;
 song:n1c0 a :Curve; :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
 song:n1c0p0 :time -5.104; :value 0.000 .
 song:n1c0p1 :time -1.760; :value 1.000 .
-song:n1c0p2 :time 283.916; :value 1.000 .
+song:n1c0p2 :time 286.063; :value 1.000 .
 song:n1c0p3 :time 287.594; :value 0.000 .
 
 song:n2 a :Note; :curve song:n2c0; :effectClass effect:qfill;
@@ -33,6 +33,6 @@ song:n2 a :Note; :curve song:n2c0; :effectClass effect:qfill;
 song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
 song:n2c0p0 :time 0.000; :value 0.000 .
 song:n2c0p1 :time 28.810; :value 1.000 .
-song:n2c0p2 :time 133.393; :value 1.000 .
-song:n2c0p3 :time 140.267; :value 0.000 .
+song:n2c0p2 :time 146.740; :value 1.000 .
+song:n2c0p3 :time 149.088; :value 0.000 .
 song:n2set0 :effectAttr :colorScale; :value "#a19e9e" .

@@ -24,7 +24,7 @@
      :value 1.000 .
 <http://light9.bigasterisk.com/show/dance2016/song4/n0c0p2> :time 239.494;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song4/n0c0p3> :time 252.415;
+<http://light9.bigasterisk.com/show/dance2016/song4/n0c0p3> :time 241.625;
      :value 0.000 .
 
 <http://light9.bigasterisk.com/show/dance2016/song4/n1c0> a :Curve;
@@ -50,5 +50,5 @@
      :value 1.000 .
 <http://light9.bigasterisk.com/show/dance2016/song4/n2c0p2> :time 11.120;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song4/n2c0p3> :time 19.089;
+<http://light9.bigasterisk.com/show/dance2016/song4/n2c0p3> :time 13.994;
      :value 0.000 .

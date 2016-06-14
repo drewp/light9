@@ -19,7 +19,7 @@ song:n0c0p0 :time 0.000; :value 0.000 .
 song:n0c0p1 :time 2.702; :value 1.000 .
 song:n0c0p2 :time 219.002; :value 1.000 .
 song:n0c0p3 :time 222.379; :value 0.000 .
-song:n0set0 :effectAttr :colorScale; :value "#b1ad3f" .
+song:n0set0 :effectAttr :colorScale; :value "#e8e365" .
 
 song:n1 a :Note; :curve song:n1c1; :effectClass effect:qfill;
      :originTime 185.498 .
@@ -42,4 +42,4 @@ song:n2c0p0 :time -1.861; :value 0.000 .
 song:n2c0p1 :time 2.312; :value 1.000 .
 song:n2c0p2 :time 218.894; :value 1.000 .
 song:n2c0p3 :time 222.454; :value 0.000 .
-song:n2set0 :effectAttr :colorScale; :value "#e37474" .
+song:n2set0 :effectAttr :colorScale; :value "#f38080" .

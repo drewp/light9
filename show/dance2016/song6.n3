@@ -6,7 +6,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2016/song6> :note <http://light9.bigasterisk.com/show/dance2016/song6/n0>, <http://light9.bigasterisk.com/show/dance2016/song6/n1>, <http://light9.bigasterisk.com/show/dance2016/song6/n2>, <http://light9.bigasterisk.com/show/dance2016/song6/n3>, <http://light9.bigasterisk.com/show/dance2016/song6/n4> .
+<http://light9.bigasterisk.com/show/dance2016/song6> :note <http://light9.bigasterisk.com/show/dance2016/song6/n0>, <http://light9.bigasterisk.com/show/dance2016/song6/n1>, <http://light9.bigasterisk.com/show/dance2016/song6/n2>, <http://light9.bigasterisk.com/show/dance2016/song6/n3>, <http://light9.bigasterisk.com/show/dance2016/song6/n4>, <http://light9.bigasterisk.com/show/dance2016/song6/n5> .
 
 <http://light9.bigasterisk.com/show/dance2016/song6/n0> a :Note;
      :curve <http://light9.bigasterisk.com/show/dance2016/song6/n0c0>;
@@ -91,3 +91,18 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song6/n4set0> :effectAttr :colorScale;
      :value "#938585" .
+
+<http://light9.bigasterisk.com/show/dance2016/song6/n5> a :Note;
+     :curve <http://light9.bigasterisk.com/show/dance2016/song6/n5c0>;
+     :effectClass effect:qfill; :originTime 523.264 .
+
+<http://light9.bigasterisk.com/show/dance2016/song6/n5c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song6/n5c0p0>, <http://light9.bigasterisk.com/show/dance2016/song6/n5c0p1>, <http://light9.bigasterisk.com/show/dance2016/song6/n5c0p2>, <http://light9.bigasterisk.com/show/dance2016/song6/n5c0p3> .
+<http://light9.bigasterisk.com/show/dance2016/song6/n5c0p0> :time 21.619;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2016/song6/n5c0p1> :time 25.342;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song6/n5c0p2> :time 32.431;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2016/song6/n5c0p3> :time 34.939;
+     :value 0.000 .

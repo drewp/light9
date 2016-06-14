@@ -21,7 +21,7 @@
      :value 1.000 .
 <http://light9.bigasterisk.com/show/dance2016/song11/n0c0p2> :time 292.421;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song11/n0c0p3> :time 296.818;
+<http://light9.bigasterisk.com/show/dance2016/song11/n0c0p3> :time 294.694;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song11/n0set0> :effectAttr :colorScale;
      :value "#760e0e" .
@@ -37,9 +37,9 @@
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song11/n1c0p1> :time -13.532;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song11/n1c0p2> :time 283.732;
+<http://light9.bigasterisk.com/show/dance2016/song11/n1c0p2> :time 283.483;
      :value 1.000 .
-<http://light9.bigasterisk.com/show/dance2016/song11/n1c0p3> :time 287.866;
+<http://light9.bigasterisk.com/show/dance2016/song11/n1c0p3> :time 285.604;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2016/song11/n1set0> :effectAttr :colorScale;
      :value "#f3cba4" .

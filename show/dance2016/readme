@@ -1,28 +1,51 @@
-#18 ~26sec for party. try animRainbow with literalColor(scl * .6, scl * 0, scl * 1)
-
-#1 low on lip
-
-TL isn't getting duration of paused song. it also needs to resize to the extent of the new song
-
-#4 exit not fast enough
 
 need to see autostop!
 
-TL zoomout cursors seem misaligned
-
-6 no ending
-
-8 started at t<0
-
-middle zoom slider doesn't update zoomed audio
 
 main spot fadeout curve is bad
 
-11 end bad
+TL zoomout cursors seem misaligned
 
-12 blue is unfinished
+middle zoom slider doesn't update zoomed audio
 
-13 end broken, girls downstage too
+ok- TL isn't getting duration of paused song. it also needs to resize to the extent of the new song
+
+---
+
+#18 ~26sec for party. try animRainbow with literalColor(scl * .6, scl * 0, scl * 1)
+
+ok #1 low on lip
+
+ok #4 exit not fast enough
+
+ok 6 no ending
+
+ok 8 started at t<0
+
+ok 11 end bad
+
+ok 12 blue is unfinished
+
+ok 13 end broken, girls downstage too
 
 14 too fast to wwhite, loses it before stop
+
+16 t=90 needs whiite ctr. also 260
+360-470
+fix 377 strobe blackout
+409 & 411, 442 & 444 accent hands up
+425 decorate & 457
+
+17 missing houseside
+
+ok- houseside sub isn't done
+
+10 t=232 dress flip, look busier. strong color
+
+
+need a way to make it brighter, maybe by grabbing every zoom
+
+it would be nice to see the light brightness and rotation lags in the timeline, so i can align their end with some event
+
+
 

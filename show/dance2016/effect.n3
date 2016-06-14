@@ -17,9 +17,13 @@
 
 
 effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate ; :group "anim".
+effect:aurawash a :Effect; :publishAttr :strength ; :group "anim".
 effect:pulseRainbow a :Effect; rdfs:label "pulseRainbow"; :publishAttr :strength, :rate ; :group "main"; :order 6.
 
 effect:orangeSearch a :Effect; :publishAttr :strength ; :group "anim".
+effect:qsweep a :Effect; :publishAttr :strength ; :group "anim".
+effect:chase1 a :Effect; :publishAttr :strength ; :group "anim".
+
 effect:lightning a :Effect; :publishAttr :strength ; :group "main"; :order 7.
 
 effect:strobewarm :group "anim".

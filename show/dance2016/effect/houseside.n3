@@ -8,4 +8,6 @@
 
 
 effect:houseside a :Effect; rdfs:label "houseside";
-     :publishAttr :strength .
+     :publishAttr :strength; :setting effect:houseside_set0 .
+effect:houseside_set0 :device dev:houseSide; :deviceAttr :brightness;
+     :scaledValue 1.000 .

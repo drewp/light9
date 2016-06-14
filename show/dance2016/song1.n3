@@ -9,7 +9,7 @@
 
 :a01 :effectAttr :chaseOffset; :value 0.12 .
 :ao0 :effectAttr :chaseTempo; :value 100 .
-<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n1, song:n2 .
+<http://light9.bigasterisk.com/show/dance2016/song1> :note song:n1, song:n2, song:n4, song:n5, song:n6, song:n7 .
 
 song:n0 a :Note; :curve song:n0c0; :effectClass effect:centerSpot;
      :originTime 30.836 .
@@ -27,8 +27,8 @@ song:n1 a :Note; :curve song:n1c0; :effectClass effect:qfill;
      :originTime 4.168 .
 
 song:n1c0 a :Curve; :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
-song:n1c0p0 :time -1.018; :value 0.000 .
-song:n1c0p1 :time 0.294; :value 1.000 .
+song:n1c0p0 :time 7.033; :value 0.000 .
+song:n1c0p1 :time 12.480; :value 1.000 .
 song:n1c0p2 :time 202.106; :value 1.000 .
 song:n1c0p3 :time 204.953; :value 0.000 .
 
@@ -46,3 +46,40 @@ song:n3c0p0 :time 0.153; :value 0.000 .
 song:n3c0p1 :time 1.000; :value 1.000 .
 song:n3c0p2 :time 2.000; :value 1.000 .
 song:n3c0p3 :time 3.236; :value 0.000 .
+
+song:n4 a :Note; :curve song:n4c0; :effectClass effect:aurafill;
+     :originTime 10.840 .
+
+song:n4c0 a :Curve; :attr :strength; :point song:n4c0p0, song:n4c0p1, song:n4c0p2, song:n4c0p3 .
+song:n4c0p0 :time -7.277; :value 0.000 .
+song:n4c0p1 :time -1.266; :value 1.000 .
+song:n4c0p2 :time 195.788; :value 1.000 .
+song:n4c0p3 :time 198.719; :value 0.000 .
+
+song:n5 a :Note; :curve song:n5c0; :effectClass effect:qfill;
+     :originTime 2.900; :setting song:n5set0 .
+
+song:n5c0 a :Curve; :attr :strength; :point song:n5c0p0, song:n5c0p1, song:n5c0p2, song:n5c0p3 .
+song:n5c0p0 :time 0.000; :value 0.000 .
+song:n5c0p1 :time 1.056; :value 1.000 .
+song:n5c0p2 :time 40.887; :value 1.000 .
+song:n5c0p3 :time 66.065; :value 0.000 .
+song:n5set0 :effectAttr :colorScale; :value "#ea09f0" .
+
+song:n6 a :Note; :curve song:n6c0; :effectClass effect:lip;
+     :originTime 82.956 .
+
+song:n6c0 a :Curve; :attr :strength; :point song:n6c0p0, song:n6c0p1, song:n6c0p2, song:n6c0p3 .
+song:n6c0p0 :time 1.750; :value 0.000 .
+song:n6c0p1 :time 10.370; :value 1.000 .
+song:n6c0p2 :time 123.242; :value 1.000 .
+song:n6c0p3 :time 126.248; :value 0.000 .
+
+song:n7 a :Note; :curve song:n7c0; :effectClass effect:centerSpot;
+     :originTime 123.871 .
+
+song:n7c0 a :Curve; :attr :strength; :point song:n7c0p0, song:n7c0p1, song:n7c0p2, song:n7c0p3 .
+song:n7c0p0 :time 9.125; :value 0.000 .
+song:n7c0p1 :time 9.307; :value 1.000 .
+song:n7c0p2 :time 47.304; :value 1.000 .
+song:n7c0p3 :time 50.532; :value 0.000 .

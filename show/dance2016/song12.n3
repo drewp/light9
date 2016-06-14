@@ -65,9 +65,9 @@
 
 <http://light9.bigasterisk.com/show/dance2016/song12/n3c0> a :Curve;
      :attr :strength; :point <http://light9.bigasterisk.com/show/dance2016/song12/n3c0p0>, <http://light9.bigasterisk.com/show/dance2016/song12/n3c0p1>, <http://light9.bigasterisk.com/show/dance2016/song12/n3c0p2>, <http://light9.bigasterisk.com/show/dance2016/song12/n3c0p3> .
-<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p0> :time 0.000;
+<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p0> :time -32.926;
      :value 0.000 .
-<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p1> :time 8.295;
+<http://light9.bigasterisk.com/show/dance2016/song12/n3c0p1> :time -23.296;
      :value 1.000 .
 <http://light9.bigasterisk.com/show/dance2016/song12/n3c0p2> :time 104.419;
      :value 1.000 .

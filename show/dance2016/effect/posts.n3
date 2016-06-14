@@ -1,0 +1,23 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:posts a :Effect; rdfs:label "posts"; :publishAttr :strength;
+     :setting effect:posts_set0, effect:posts_set1, effect:posts_set2, effect:posts_set3, effect:posts_set4, effect:posts_set5 .
+effect:posts_set0 :device dev:postL1; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:posts_set1 :device dev:postL2; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:posts_set2 :device dev:postL3; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:posts_set3 :device dev:postR1; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:posts_set4 :device dev:postR2; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:posts_set5 :device dev:postR3; :deviceAttr :color;
+     :scaledValue "#ffffff" .
