@@ -1,7 +1,7 @@
 log = console.log
 RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 
-ROW_COUNT = 4
+ROW_COUNT = 7
 
 # polymer dom-repeat is happy to shuffle children by swapping their
 # attribute values, and it's hard to correctly setup/teardown your
@@ -50,6 +50,7 @@ Polymer
   _onSongTime: (t) ->
     @viewState.cursor.t(t)
   _onSongDuration: (d) ->
+    d = 700 if d < 1 # bug is that asco isn't giving duration, but 0 makes the scale corrupt
     @viewState.zoomSpec.duration(d)
   setSong: (s) ->
     @song = @playerSong if @followPlayerSong
@@ -427,11 +428,12 @@ Polymer
     yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
 
     originTime = @graph.floatValue(@uri, U(':originTime'))
+    effect = @graph.uriValue(@uri, U(':effectClass'))
     for curve in @graph.objects(@uri, U(':curve'))
       if @graph.uriValue(curve, U(':attr')) == U(':strength')
-        @updateStrengthCurveEtc(originTime, curve, yForV)
+        @updateStrengthCurveEtc(originTime, curve, yForV, effect)
         
-  updateStrengthCurveEtc: (originTime, curve, yForV) ->
+  updateStrengthCurveEtc: (originTime, curve, yForV, effect) ->
     U = (x) -> @graph.Uri(x)
     worldPts = getCurvePoints(@graph, curve, originTime) # (song time, value)
 
@@ -455,7 +457,7 @@ Polymer
       display: if rightX - leftX > w then 'block' else 'none'
       }
 
-    if screenPts[3].e(1) - screenPts[0].e(1) < 50
+    if screenPts[3].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
       # also kill their connectors
       return
@@ -749,7 +751,7 @@ Polymer
         return true
     return false
     
-  setNote: (uri, curvePts) ->
+  setNote: (uri, curvePts, effect) ->
     areaId = uri + '/area'
     labelId = uri + '/label'
     if not @anyPointsInView(curvePts)
@@ -757,8 +759,20 @@ Polymer
       return
     # for now these need to be pretty transparent since they're
     # drawing on top of the inline-attrs widget :(
+
+    if effect in ['http://light9.bigasterisk.com/effect/blacklight',
+      'http://light9.bigasterisk.com/effect/strobewarm']
+      hue = 0
+      sat = 100
+    else        
+      hash = 0
+      for i in [(effect.length-10)...effect.length]
+        hash += effect.charCodeAt(i)
+      hue = (hash * 8) % 360
+      sat = 40 + (hash % 20) # don't conceal colorscale too much
+    
     elem = @getOrCreateElem(areaId, 'notes', 'path',
-      {style:"fill:#53774b50; stroke:#000000; stroke-width:1.5;"})
+      {style:"fill:hsla(#{hue}, #{sat}%, 58%, 0.313); stroke:#000000; stroke-width:1.5;"})
     elem.setAttribute('d', svgPathFromPoints(curvePts))
 
     #elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
