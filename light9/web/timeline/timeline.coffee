@@ -364,13 +364,14 @@ Polymer
 
 getCurvePoints = (graph, curve, xOffset) ->
   worldPts = []
-  for pt in graph.objects(curve, graph.Uri(':point'))
+  uris = graph.objects(curve, graph.Uri(':point'))
+  for pt in uris
     v = $V([xOffset + graph.floatValue(pt, graph.Uri(':time')),
             graph.floatValue(pt, graph.Uri(':value'))])
     v.uri = pt
     worldPts.push(v)
   worldPts.sort((a,b) -> a.e(1) > b.e(1))
-  return worldPts
+  return [uris, worldPts]
 
 Polymer
   is: 'light9-timeline-note'
@@ -408,19 +409,22 @@ Polymer
       if patch.addQuads.length == patch.delQuads.length == 1
         add = patch.addQuads[0]
         del = patch.delQuads[0]
-        if add.predicate == del.predicate == @graph.Uri(':time')
-          if add.subject != @uri and del.subject != @uri
-            log("i'm #{@uri}, cant be affected by #{ko.toJSON(patch)}")
+        if (add.predicate == del.predicate == @graph.Uri(':time') and
+            add.subject == del.subject)
+          timeEditFor = add.subject
+          if @worldPts and timeEditFor not in @pointUris
             return false
     return true
       
             
   update: (patch) ->
-    # not working yet
-    #if @patchCouldAffectMe(patch)
-    #  return
+    if not @patchCouldAffectMe(patch)
+      # as autodep still fires all handlers on all patches, we just
+      # need any single dep to cause another callback. (without this,
+      # we would no longer be registered at all)
+      @graph.subjects(@uri, @uri, @uri)
+      return
     if @isDetached?
-      log('skipping update', @uri)
       return 
     # update our note DOM and SVG elements based on the graph
     U = (x) -> @graph.Uri(x)
@@ -435,15 +439,15 @@ Polymer
         
   updateStrengthCurveEtc: (originTime, curve, yForV, effect) ->
     U = (x) -> @graph.Uri(x)
-    worldPts = getCurvePoints(@graph, curve, originTime) # (song time, value)
+    [@pointUris, @worldPts] = getCurvePoints(@graph, curve, originTime) # (song time, value)
 
     curveWidth = =>
-      tMin = @graph.floatValue(worldPts[0].uri, U(':time'))
-      tMax = @graph.floatValue(worldPts[3].uri, U(':time'))
+      tMin = @graph.floatValue(@worldPts[0].uri, U(':time'))
+      tMax = @graph.floatValue(@worldPts[3].uri, U(':time'))
       tMax - tMin            
 
-    screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in worldPts)
-    @dia.setNote(@uri, screenPts, label)
+    screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
+    @dia.setNote(@uri, screenPts, effect)
 
     leftX = Math.max(2, screenPts[1].e(1) + 5)
     rightX = screenPts[2].e(1) - 5
@@ -462,7 +466,7 @@ Polymer
       # also kill their connectors
       return
 
-    @makeCurveAdjusters(curveWidth, yForV, worldPts)
+    @makeCurveAdjusters(curveWidth, yForV, @worldPts)
     
   makeCurveAdjusters: (curveWidth, yForV, worldPts) ->
     U = (x) -> @graph.Uri(x)
@@ -528,7 +532,6 @@ Polymer
     ]
   onColorScale: ->
     U = (x) -> @graph.Uri(x)
-    log('onColorScale', @colorScale, @colorScaleFromGraph, @existingColorScaleSetting)
     if @colorScale == @colorScaleFromGraph
       return
       
@@ -747,6 +750,7 @@ Polymer
 
   anyPointsInView: (pts) ->
     for pt in pts
+      # wrong:
       if pt.e(1) > -100 && pt.e(1) < 2500
         return true
     return false
