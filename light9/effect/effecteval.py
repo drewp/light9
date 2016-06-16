@@ -75,7 +75,7 @@ class EffectEval(object):
                 self.effectOutputs[effect] = settings
             # also have to read eff :effectAttr [ :tint x; :tintStrength y ]
         
-    def outputFromEffect(self, effectSettings, songTime):
+    def outputFromEffect(self, effectSettings, songTime, noteTime):
         """
         From effect attr settings, like strength=0.75, to output device
         settings like light1/bright=0.72;light2/bright=0.78. This runs
@@ -100,7 +100,7 @@ class EffectEval(object):
             except KeyError:
                 pass
             else:
-                out.update(func(effectSettings, strength, songTime))
+                out.update(func(effectSettings, strength, songTime, noteTime))
 
         # todo: callers should prefer the dict form too
         outList = [(d, a, v) for (d, a), v in out.iteritems()]
@@ -122,14 +122,14 @@ class EffectEval(object):
 
     
 
-def effect_Curtain(effectSettings, strength, songTime):
+def effect_Curtain(effectSettings, strength, songTime, noteTime):
     return {
         (L9['device/lowPattern%s' % n], L9['color']):
         literalColor(strength, strength, strength)
         for n in range(301,308+1)
         }
     
-def effect_animRainbow(effectSettings, strength, songTime):
+def effect_animRainbow(effectSettings, strength, songTime, noteTime):
     out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
@@ -154,7 +154,7 @@ def effect_animRainbow(effectSettings, strength, songTime):
             })
     return out
 
-def effect_pulseRainbow(effectSettings, strength, songTime):
+def effect_pulseRainbow(effectSettings, strength, songTime, noteTime):
     out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
@@ -178,7 +178,96 @@ def effect_pulseRainbow(effectSettings, strength, songTime):
             })
     return out
 
-def effect_orangeSearch(effectSettings, strength, songTime):
+
+def effect_aurawash(effectSettings, strength, songTime, noteTime):
+    out = {}
+    scl = strength
+    period = float(effectSettings.get(L9['period'], 125/60/4))
+    if period < .05:
+        quantTime = songTime
+    else:
+        quantTime = int(songTime / period) * period
+    noisePos = quantTime * 6.3456
+    
+    col = literalColorHsv(noise(noisePos), 1, scl)
+    col = scale(col, effectSettings.get(L9['colorScale']) or '#ffffff')
+                
+    print songTime, quantTime, col
+
+    for n in range(1, 5+1):
+        dev = L9['device/aura%s' % n]
+        out.update({
+            (dev, L9['color']): col,
+            (dev, L9['zoom']): .5,
+            })
+        out.update({
+        (dev, L9['rx']): lerp(.27, .7, (n-1)/4),
+        (dev, L9['ry']): lerp(.46, .52, (n-1)/4),
+            })
+    return out
+
+def effect_qsweep(effectSettings, strength, songTime, noteTime):
+    out = {}
+    period = float(effectSettings.get(L9['period'], 2))
+
+    col = effectSettings.get(L9['colorScale'], '#ffffff')
+    col = scale(col, effectSettings.get(L9['strength'], 1))
+
+    
+    for n in range(1, 3+1):
+        dev = L9['device/q%s' % n]
+        out.update({
+            (dev, L9['color']): col,
+            (dev, L9['zoom']): effectSettings.get(L9['zoom'], .5),
+            })
+        out.update({
+            (dev, L9['rx']):
+            lerp(.3, .8, nsin(songTime / period + n / 4)),
+        (dev, L9['ry']): effectSettings.get(L9['ry'], .2),
+            })
+    return out
+
+
+def effect_chase1(effectSettings, strength, songTime, noteTime):
+    members = [
+        DEV['backlight1'],
+        DEV['lip1'],
+        DEV['backlight2'],
+        DEV['down2'],
+        DEV['lip2'],
+        DEV['backlight3'],
+        DEV['down3'],
+        DEV['lip3'],
+        DEV['backlight4'],
+        DEV['down4'],
+        DEV['lip4'],
+        DEV['backlight5'],
+        DEV['down5Edge'],
+        DEV['lip5'],
+        #DEV['upCenter'],
+        ]
+
+    members = members + members[-2:0:-1]
+    
+    out = {}
+    period = float(effectSettings.get(L9['period'], 2 / len(members)))
+
+    for i, dev in enumerate(members):
+        cursor = (songTime / period) % float(len(members))
+        dist = abs(i - cursor)
+        radius = 3
+        if dist < radius:
+            col = effectSettings.get(L9['colorScale'], '#ffffff')
+            col = scale(col, effectSettings.get(L9['strength'], 1))
+            col = scale(col, (1 - dist / radius))
+        
+            out.update({
+                (dev, L9['color']): col,
+            })
+    return out
+
+    
+def effect_orangeSearch(effectSettings, strength, songTime, noteTime):
     dev = L9['device/auraStage']
     return {(dev, L9['color']): '#c1905d',
             (dev, L9['rx']): lerp(.31, .68, nsquare(songTime / 2.0)),
@@ -186,7 +275,7 @@ def effect_orangeSearch(effectSettings, strength, songTime):
             (dev, L9['zoom']): .88,
             }
     
-def effect_Strobe(effectSettings, strength, songTime):
+def effect_Strobe(effectSettings, strength, songTime, noteTime):
     rate = 2
     duty = .3
     offset = 0
@@ -195,7 +284,7 @@ def effect_Strobe(effectSettings, strength, songTime):
     col = rgb_to_hex([c * 255, c * 255, c * 255])
     return {(L9['device/colorStrip'], L9['color']): Literal(col)}
 
-def effect_lightning(effectSettings, strength, songTime):
+def effect_lightning(effectSettings, strength, songTime, noteTime):
     devs = [L9['device/veryLow1'], L9['device/veryLow2'],
             L9['device/veryLow3'], L9['device/veryLow4'],
             L9['device/veryLow5'], L9['device/backlight1'],
@@ -208,7 +297,7 @@ def effect_lightning(effectSettings, strength, songTime):
     out = {}
     col = rgb_to_hex([255 * strength] * 3)
     for i, dev in enumerate(devs):
-        n = noise((songTime * 8 + i * 6.543) % 100.0)
+        n = noise(songTime * 8 + i * 6.543)
         if n > .4:
             out[(dev, L9['color'])] = col
     return out

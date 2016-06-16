@@ -120,7 +120,11 @@ class Note(object):
         """
         effectSettings = self.baseEffectSettings.copy()
         effectSettings[L9['strength']] = self.evalCurve(t)
-        return self.effectEval.outputFromEffect(effectSettings.items(), t)
+        return self.effectEval.outputFromEffect(
+            effectSettings.items(),
+            songTime=t,
+            # note: not using origin here since it's going away
+            noteTime=t - self.points[0][0])
 
 
 class CodeWatcher(object):
