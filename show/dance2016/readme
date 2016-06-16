@@ -52,3 +52,20 @@ it would be nice to see the light brightness and rotation lags in the timeline, 
 ------------------
 
 slider didnt go to 0
+
+colorscale should be a palette mask of multiplee colors to let through
+
+auto pan time if your mouse is out; let you drive if mouse is in?
+
+need darker bg on TL
+
+seamless way to get the KC sub into the song as a note
+
+song used 'chase' which i renamed, so it did nothing. TL should have flagged it as a noneffect
+
+rseolving angles should take strength into account, so fading works in a prettier way
+
+could we blink a chase lt with every syllable of lyrics?
+
+why does timeline stall and stop drawing so much? piled up net requests? should use more sockets or webrtc probably
+
