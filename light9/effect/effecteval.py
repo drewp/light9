@@ -1,17 +1,22 @@
 from __future__ import division
 from rdflib import URIRef, Literal
-from light9.namespaces import L9, RDF
+from light9.namespaces import L9, RDF, DEV
 from webcolors import rgb_to_hex, hex_to_rgb
+from colorsys import hsv_to_rgb
 from decimal import Decimal
 import math
 from noise import pnoise1
 import logging
+import time
 
 log = logging.getLogger('effecteval')
 
 def literalColor(rnorm, gnorm, bnorm):
     return Literal(rgb_to_hex([rnorm * 255, gnorm * 255, bnorm * 255]))
 
+def literalColorHsv(h, s, v):
+    return literalColor(*hsv_to_rgb(h, s, v))
+    
 def nsin(x): return (math.sin(x * (2 * math.pi)) + 1) / 2
 def ncos(x): return (math.cos(x * (2 * math.pi)) + 1) / 2
 def nsquare(t, on=.5):
@@ -19,7 +24,7 @@ def nsquare(t, on=.5):
 def lerp(a, b, t):
     return a + (b - a) * t
 def noise(t):
-    return pnoise1(t, 2)
+    return pnoise1(t % 1000.0, 2)
 
 def scale(value, strength):
     if isinstance(value, Literal):
@@ -30,6 +35,8 @@ def scale(value, strength):
         
     if isinstance(value, basestring):
         if value[0] == '#':
+            if strength == '#ffffff':
+                return value
             r,g,b = hex_to_rgb(value)
             if isinstance(strength, Literal):
                 strength = strength.toPython()
@@ -40,8 +47,8 @@ def scale(value, strength):
             return rgb_to_hex([int(r * sr), int(g * sg), int(b * sb)])
     elif isinstance(value, (int, float)):
         return value * strength
-    else:
-        raise NotImplementedError(repr(value))
+
+    raise NotImplementedError("%r,%r" % (value, strength))
     
 class EffectEval(object):
     """
