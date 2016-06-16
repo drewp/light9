@@ -1,5 +1,8 @@
 from light9.effect.sequencer import sendToCollector
 from twisted.internet import reactor, task
+import traceback
+import logging
+log = logging.getLogger()
 
 class SubClient:
     def __init__(self):
@@ -11,11 +14,16 @@ class SubClient:
         object."""
 
     def send_levels(self):
+        # shouldn't be handler- should be immediate mode!
         self.graph.addHandler(self._send_sub)
 
     def send_levels_loop(self, delay=1000):
         task.LoopingCall(lambda: self.graph.addHandler(self.send_levels)).start(delay)
 
     def _send_sub(self):
-        outputSettings = self.get_output_settings()
+        try:
+            outputSettings = self.get_output_settings()
+        except:
+            traceback.print_exc()
+            return
         sendToCollector('subclient', self.session, outputSettings)
