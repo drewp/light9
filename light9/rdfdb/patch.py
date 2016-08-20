@@ -62,7 +62,10 @@ class Patch(object):
         delLines = ["  -%s" % formatQuad(q) for q in self.delQuads]
         addLines = ["  +%s" % formatQuad(q) for q in self.addQuads]
         return "\nPatch:\n" + "\n".join(delLines) + "\n" + "\n".join(addLines)
-                
+
+    def shortSummary(self):
+        return "[-%s +%s]" % (len(self.delQuads), len(self.addQuads))
+        
     @classmethod
     def fromDiff(cls, oldGraph, newGraph):
         """
