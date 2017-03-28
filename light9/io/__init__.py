@@ -1,7 +1,7 @@
 from __future__ import division
 import sys
 
-class BaseIO:
+class BaseIO(object):
     def __init__(self):
         self.dummy=1
         self.__name__ = 'BaseIO'
@@ -83,57 +83,3 @@ class UsbDMX(BaseIO):
                                   for lev in levels]) + "\x55"
         self._dmx().write(packet)
         
-class SerialPots(BaseIO):
-    """
-    this is a dummy object (that returns zeros forever) until you call startup()
-    which makes it bind to the port, etc
-    
-    """
-    def __init__(self):
-        # no init here- call getport() to actually initialize
-        self.dummy=1
-        self.__name__='SerialPots' # i thought this was automatic!
-
-    def golive(self):
-        """
-        ls -l /dev/i2c-0
-        crw-rw-rw-    1 root     root      89,   0 Jul 11 12:27 /dev/i2c-0
-        """
-        import serport
-        self.serport = serport
-        
-        self.f = open("/dev/i2c-0","rw")
-
-        # this is for a chip with A0,A1,A2 lines all low:
-        port = 72
-
-        from fcntl import *
-
-        I2C_SLAVE = 0x0703  #/* Change slave address                 */
-        ioctl(self.f,I2C_SLAVE,port)
-        self.dummy=0
-
-    def godummy(self):
-        BaseIO.godummy(self)
-        self.f.close()
-
-    def getlevels(self):
-        if self.dummy:
-            return (0,0,0,0)
-        else:
-            return self.serport.read_all_adc(self.f.fileno())
-
-
-if __name__=='__main__':
-    
-    """ tester program that just dumps levels for a while """
-    from time import sleep
-    from serport import *
-
-    i=0
-    while i<100:
-        sleep(.033)
-        i=i+1
-
-        print read_all_adc(f.fileno())
-

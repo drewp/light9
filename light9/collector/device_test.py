@@ -20,8 +20,8 @@ class TestColorStrip(unittest.TestCase):
         
 class TestDimmer(unittest.TestCase):
     def testConvert(self):
-        self.assertEqual({L9['brightness']: 127},
-                         toOutputAttrs(L9['Dimmer'], {L9['brightness']: .5}))
+        self.assertEqual({L9['level']: 127},
+                         toOutputAttrs(L9['SimpleDimmer'], {L9['brightness']: .5}))
 
 class TestMini15(unittest.TestCase):
     def testConvertColor(self):

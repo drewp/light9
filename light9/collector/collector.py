@@ -2,13 +2,22 @@ from __future__ import division
 import time
 import logging
 from rdflib import Literal
-from light9.namespaces import L9, RDF, DEV
+from light9.namespaces import L9, RDF
 from light9.collector.output import setListElem
 from light9.collector.device import toOutputAttrs, resolve
+
+# types only
+from rdflib import Graph, URIRef
+from typing import List, Dict, Tuple, Any, TypeVar, Generic
+from light9.collector.output import Output
+
+ClientType = TypeVar('ClientType')
+ClientSessionType = TypeVar('ClientSessionType')
 
 log = logging.getLogger('collector')
 
 def outputMap(graph, outputs):
+    # type: (Graph, List[Output]) -> Dict[Tuple[URIRef, URIRef], Tuple[Output, int]]
     """From rdf config graph, compute a map of
        (device, outputattr) : (output, index)
     that explains which output index to set for any device update.
@@ -20,26 +29,38 @@ def outputMap(graph, outputs):
         outputByUri[out.uri] = out
 
     for dc in graph.subjects(RDF.type, L9['DeviceClass']):
+        log.info('mapping DeviceClass %s', dc)
         for dev in graph.subjects(RDF.type, dc):
-            output = outputByUri[graph.value(dev, L9['dmxUniverse'])]
+            log.info('  mapping device %s', dev)
+            universe = graph.value(dev, L9['dmxUniverse'])
+            try:
+                output = outputByUri[universe]
+            except Exception:
+                log.warn('dev %r :dmxUniverse %r', dev, universe)
+                raise
             dmxBase = int(graph.value(dev, L9['dmxBase']).toPython())
             for row in graph.objects(dc, L9['attr']):
                 outputAttr = graph.value(row, L9['outputAttr'])
                 offset = int(graph.value(row, L9['dmxOffset']).toPython())
                 index = dmxBase + offset - 1
                 ret[(dev, outputAttr)] = (output, index)
-                log.info('map %s,%s to %s,%s', dev, outputAttr, output, index)
+                log.info('    map %s to %s,%s', outputAttr, output, index)
     return ret
         
-class Collector(object):
+class Collector(Generic[ClientType, ClientSessionType]):
     def __init__(self, graph, outputs, clientTimeoutSec=10):
+        # type: (Graph, List[Output], float) -> None
         self.graph = graph
         self.outputs = outputs
         self.clientTimeoutSec = clientTimeoutSec
 
         self.graph.addHandler(self.rebuildOutputMap)
-        self.lastRequest = {} # client : (session, time, {(dev,devattr): latestValue})
-        self.stickyAttrs = {} # (dev, devattr): value to use instead of 0
+
+        # client : (session, time, {(dev,devattr): latestValue})
+        self.lastRequest = {} # type: Dict[ClientType, Tuple[ClientSessionType, float, Dict[Tuple[URIRef, URIRef], float]]]
+
+        # (dev, devAttr): value to use instead of 0
+        self.stickyAttrs = {} # type: Dict[Tuple[URIRef, URIRef], float] 
 
     def rebuildOutputMap(self):
         self.outputMap = outputMap(self.graph, self.outputs) # (device, outputattr) : (output, index)
@@ -56,15 +77,18 @@ class Collector(object):
                     self.remapOut[(dev, attr)] = start, end
 
     def _forgetStaleClients(self, now):
+        # type: (float) -> None
         staleClients = []
-        for c, (_, t, _) in self.lastRequest.iteritems():
+        for c, (_, t, _2) in self.lastRequest.iteritems():
             if t < now - self.clientTimeoutSec:
                 staleClients.append(c)
         for c in staleClients:
+            log.info('forgetting stale client %r', c)
             del self.lastRequest[c]
 
     def resolvedSettingsDict(self, settingsList):
-        out = {}
+        # type: (List[Tuple[URIRef, URIRef, float]]) -> Dict[Tuple[URIRef, URIRef], float]
+        out = {} # type: Dict[Tuple[URIRef, URIRef], float]
         for d, da, v in settingsList:
             if (d, da) in out:
                 out[(d, da)] = resolve(d, da, [out[(d, da)], v])
@@ -72,6 +96,12 @@ class Collector(object):
                 out[(d, da)] = v
         return out
 
+    def _warnOnLateRequests(self, client, now, sendTime):
+        requestLag = now - sendTime
+        if requestLag > .1:
+            log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
+                     client, requestLag * 1000)
+        
     def setAttrs(self, client, clientSession, settings, sendTime):
         """
         settings is a list of (device, attr, value). These attrs are
@@ -82,10 +112,7 @@ class Collector(object):
         Call with settings=[] to ping us that your session isn't dead.
         """
         now = time.time()
-        requestLag = now - sendTime
-        if requestLag > .1:
-            log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
-                     client, requestLag * 1000)
+        self._warnOnLateRequests(client, now, sendTime)
 
         self._forgetStaleClients(now)
 
@@ -128,6 +155,7 @@ class Collector(object):
         pendingOut = {} # output : values
         for out in self.outputs:
             pendingOut[out] = [0] * out.numChannels
+
         for device, attrs in outputAttrs.iteritems():
             for outputAttr, value in attrs.iteritems():
                 self.setAttr(device, outputAttr, value, pendingOut)

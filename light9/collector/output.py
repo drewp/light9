@@ -23,6 +23,8 @@ class Output(object):
     often as you want- the result will be sent as soon as possible,
     and with repeats as needed to outlast hardware timeouts.
     """
+    uri = None  # type: URIRef
+    numChannels = None  # type: int
     def __init__(self):
         raise NotImplementedError
         

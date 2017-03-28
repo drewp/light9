@@ -27,6 +27,8 @@ class TestGraphFileOutput(unittest.TestCase):
         gf.flush()
         wroteContent = open(tf.name).read()
         self.assertEqual('''@prefix : <http://example.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix n: <http://example.com/n/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -34,6 +36,4 @@ class TestGraphFileOutput(unittest.TestCase):
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 :boo n:two <http://example.com/other/ns> .
-
 ''', wroteContent)
-

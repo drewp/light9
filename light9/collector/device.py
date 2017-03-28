@@ -76,7 +76,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         out = deviceAttrSettings.get(attr)
         if out is None:
             return default
-        return float(out.toPython())
+        return float(out.toPython()) if isinstance(out, Literal) else out
 
     def rgbAttr(attr):
         color = deviceAttrSettings.get(attr, '#000000')

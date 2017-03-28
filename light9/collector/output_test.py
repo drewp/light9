@@ -33,14 +33,6 @@ class TestSetListElem(unittest.TestCase):
         self.assertEqual([0, 1, 1], x)
         
 class TestDmxOutput(unittest.TestCase):
-    def testGeneratesConnectionList(self):
-        out = DmxOutput(L9['output/udmx/'], 3)
-        self.assertEqual([
-            (0, L9['output/udmx/c1']),
-            (1, L9['output/udmx/c2']),
-            (2, L9['output/udmx/c3']),
-        ], list(out.allConnections()))
-
     def testFlushIsNoop(self):
         out = DmxOutput(L9['output/udmx/'], 3)
         out.flush()
