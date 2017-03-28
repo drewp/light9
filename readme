@@ -42,3 +42,15 @@ special curve row
 hotter reloading of subs and values. from KC, drag a new sub into CC
 
 drag looks into CC
+
+--------------
+
+eeepc setup:
+/etc/systemd/logind.conf
++HandleLidSwitch=ignore
+
+
+--------------------------------
+
+https://caniusepython3.com/check/6c7f4f8a-ff28-4926-908b-3bbafeb79f95
+notably: cyclone, pyjade
