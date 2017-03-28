@@ -149,16 +149,3 @@ class Fadable:
 
         self.set_var_rounded(newlevel)
 
-if __name__ == "__main__":
-    class SubScale(Scale, Fadable):
-        def __init__(self, master, *args, **kw):
-            self.scale_var = DoubleVar()
-            kw['variable'] = self.scale_var
-            Scale.__init__(self, master, *args, **kw)
-            Fadable.__init__(self, var=self.scale_var)
-
-    root = Tk()
-    root.tk_focusFollowsMouse()
-    ss = SubScale(root, from_=1, to_=0, res=0.01)
-    ss.pack()
-    mainloop()

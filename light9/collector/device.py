@@ -11,8 +11,7 @@ log = logging.getLogger('device')
 
 
 class Device(object):
-    def setAttrs():
-        pass
+    pass
 
 
 class ChauvetColorStrip(Device):

@@ -375,14 +375,3 @@ def get_sub_by_name(name, submasters=None):
 
     # make an error sub
     return Submaster('%s' % name, levels=ValueError)
-
-if __name__ == "__main__":
-    reload_data()
-    s = Submasters()
-    print 'subs', s.get_all_subs()
-    if 0: # turn this on to normalize all subs
-        for sub in s.get_all_subs():
-            print "before", sub
-            sub.normalize_patch_names()
-            sub.save()
-            print "after", sub
