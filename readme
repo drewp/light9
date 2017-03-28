@@ -42,3 +42,10 @@ special curve row
 hotter reloading of subs and values. from KC, drag a new sub into CC
 
 drag looks into CC
+
+--------------
+
+eeepc setup:
+/etc/systemd/logind.conf
++HandleLidSwitch=ignore
+
