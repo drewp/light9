@@ -7,7 +7,7 @@ if sys.path[0] == '/usr/lib/python2.7/dist-packages':
     sys.path = sys.path[1:]
 
 import unittest
-from rdflib import ConjunctiveGraph, Graph, URIRef as U
+from rdflib import ConjunctiveGraph, Graph, URIRef as U, Literal
 
 def patchQuads(graph, deleteQuads, addQuads, perfect=False):
     """
@@ -73,9 +73,15 @@ def graphFromNQuad(text):
     g1.parse(data=text, format='nquads')
     return g1
 
-from rdflib.plugins.serializers.nt import _xmlcharref_encode
+from rdflib.plugins.serializers.nt import _quoteLiteral
 def serializeQuad(g):
-    """replacement for graph.serialize(format='nquads')"""
+    """
+    replacement for graph.serialize(format='nquads')
+
+    Still broken in rdflib 4.2.2: graph.serialize(format='nquads')
+    returns empty string for my graph in
+    TestGraphFromQuads.testSerializes.
+    """
     out = []
     for s,p,o,c in g.quads((None,None,None)):
         if isinstance(c, Graph):
@@ -84,9 +90,10 @@ def serializeQuad(g):
             c = c.identifier
         if '[' in c.n3():
             import ipdb;ipdb.set_trace()
+        ntObject = _quoteLiteral(o) if isinstance(o, Literal) else o.n3()
         out.append(u"%s %s %s %s .\n" % (s.n3(),
                                      p.n3(),
-                                     _xmlcharref_encode(o.n3()),
+                                     ntObject,
                                      c.n3()))
     return ''.join(out)
 

@@ -1,4 +1,4 @@
-rdflib==4.1.2
+rdflib==4.2.2
 Twisted==17.1.0
 webcolors==1.7
 Louie==1.1
