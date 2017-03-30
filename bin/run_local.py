@@ -31,16 +31,18 @@ progName = sys.argv[0].split('/')[-1]
 log = logging.getLogger() # this has to get the root logger
 log.name = progName # but we can rename it for clarity
 
+class FractionTimeFilter(logging.Filter):
+    def filter(self, record):
+        record.fractionTime = (
+            time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(record.created)) +
+            ("%.3f" % (record.created % 1)).lstrip('0'))
+        # Don't filter the record.
+        return 1
 
-class CSH(coloredlogs.ColoredStreamHandler):
-    def render_timestamp(self, created):
-        return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(created)) + (
-            "%.3f" % (created % 1)).lstrip('0')
-
-    def render_name(self, name):
-        return name
-
-log.addHandler(CSH(show_hostname=False, show_name=True))
+coloredlogs.install(
+    level='DEBUG',
+    fmt='%(fractionTime)s %(name)s[%(process)d] %(levelname)s %(message)s')
+logging.getLogger().handlers[0].addFilter(FractionTimeFilter())
 
 
 def setTerminalTitle(s):
