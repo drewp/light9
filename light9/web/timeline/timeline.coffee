@@ -121,10 +121,10 @@ Polymer
     setTimeout(@songTimeChanged.bind(@), 1)
 
   songTimeChanged: ->
-    @dia.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
-                     @$.zoomed.$.time.offsetTop,
-                     @$.zoomed.$.time.offsetHeight,
-                     @fullZoomX, @zoomInX, @viewState.cursor)
+    @$.cursorCanvas.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
+                              @$.zoomed.$.time.offsetTop,
+                              @$.zoomed.$.time.offsetHeight,
+                              @fullZoomX, @zoomInX, @viewState.cursor)
     
   trackMouse: ->
     # not just for show- we use the mouse pos sometimes
@@ -139,7 +139,7 @@ Polymer
         @root = @getBoundingClientRect()
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
-        @dia.setMouse(@viewState.mouse.pos())
+        @$.cursorCanvas.setMouse(@viewState.mouse.pos())
         @sendMouseToVidref()
 
   sendMouseToVidref: ->
@@ -715,6 +715,79 @@ svgPathFromPoints = (pts) ->
   out
 
 Polymer
+  is: 'light9-cursor-canvas'
+  behaviors: [ Polymer.IronResizableBehavior ]
+  listeners: 'iron-resize': 'update'
+
+  ready: ->
+    @mouseX = 0
+    @mouseY = 0
+    @cursorPath = null
+    @ctx = @$.canvas.getContext('2d')
+
+  update: (ev) ->
+    @$.canvas.width = ev.target.offsetWidth
+    @$.canvas.height = ev.target.offsetHeight
+    @redraw()
+
+  setMouse: (pos) ->
+    @mouseX = pos.e(1)
+    @mouseY = pos.e(2)
+    @redraw()
+
+  setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
+    
+    xZoomedOut = fullZoomX(cursor.t())
+    xZoomedIn = zoomInX(cursor.t())
+
+    @cursorPath = {
+      top0: $V([xZoomedOut, y1])
+      top1: $V([xZoomedOut, y1 + h1])
+      mid0: $V([xZoomedIn + 2, y2 + h2])
+      mid1: $V([xZoomedIn - 2, y2 + h2])
+      mid2: $V([xZoomedOut - 1, y1 + h1])
+      mid3: $V([xZoomedOut + 1, y1 + h1])
+      bot0: $V([xZoomedIn, y2 + h2])
+      bot1: $V([xZoomedIn, @offsetParent.offsetHeight])
+    }
+    @redraw()
+
+  _line: (p1, p2) ->
+    @ctx.moveTo(p1.e(1), p1.e(2))
+    @ctx.lineTo(p2.e(1), p2.e(2))
+
+  redraw: ->
+    @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
+
+    @ctx.strokeStyle = '#fff'
+    @ctx.lineWidth = 0.5
+    @ctx.beginPath()
+    @_line($V([0, @mouseY]), $V([@$.canvas.width, @mouseY]), '#fff', '0.5px')
+    @_line($V([@mouseX, 0]), $V([@mouseX, @$.canvas.height]), '#fff', '0.5px')
+    @ctx.stroke()
+
+    if @cursorPath
+      @ctx.strokeStyle = '#ff0303'
+      @ctx.lineWidth = 1.5
+      @ctx.beginPath()
+      @_line(@cursorPath.top0, @cursorPath.top1, '#ff0303', 1.5)
+      @ctx.stroke()
+
+      @ctx.fillStyle = '#9c0303'
+      @ctx.beginPath()
+      @ctx.moveTo(@cursorPath.mid0.e(1), @cursorPath.mid0.e(2))
+      @ctx.lineTo(p.e(1), p.e(2)) for p in [
+        @cursorPath.mid1, @cursorPath.mid2, @cursorPath.mid3]
+      @ctx.fill()
+      
+      @ctx.strokeStyle = '#ff0303'
+      @ctx.lineWidth = 3
+      @ctx.beginPath()
+      @_line(@cursorPath.bot0, @cursorPath.bot1, '#ff0303', '3px')
+      @ctx.stroke()
+    
+    
+Polymer
   is: 'light9-timeline-diagram-layer'
   properties: {}
   ready: ->
@@ -724,12 +797,6 @@ Polymer
     pxPerTick = 50
     axis = d3.axisTop(scale).ticks(width / pxPerTick)
     d3.select(@$.timeAxis).attr('transform', 'translate(0,'+yTop+')').call(axis)
-
-  setMouse: (pos) ->
-    elem = @getOrCreateElem('mouse-x', 'mouse', 'path', {style: "fill:none;stroke:#fff;stroke-width:0.5;"})
-    elem.setAttribute('d', svgPathFromPoints([[-9999, pos.e(2)], [9999, pos.e(2)]]))
-    elem = @getOrCreateElem('mouse-y', 'mouse', 'path', {style: "fill:none;stroke:#fff;stroke-width:0.5;"})
-    elem.setAttribute('d', svgPathFromPoints([[pos.e(1), -9999], [pos.e(1), 9999]]))   
 
   getOrCreateElem: (uri, groupId, tag, attrs) ->
     elem = @elemById[uri]
@@ -783,30 +850,6 @@ Polymer
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)
     #elem.innerHTML = effectLabel;
-
-  setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
-    @cursorPath =
-      top: @querySelector('#cursor1')
-      mid: @querySelector('#cursor2')
-      bot: @querySelector('#cursor3')
-    return if !@cursorPath.top
-    
-    xZoomedOut = fullZoomX(cursor.t())
-    xZoomedIn = zoomInX(cursor.t())
-    @cursorPath.top.setAttribute 'd', svgPathFromPoints([
-      [xZoomedOut, y1]
-      [xZoomedOut, y1 + h1]
-    ])
-    @cursorPath.mid.setAttribute 'd', svgPathFromPoints([
-      [xZoomedIn + 2, y2 + h2]
-      [xZoomedIn - 2, y2 + h2]
-      [xZoomedOut - 1, y1 + h1]
-      [xZoomedOut + 1, y1 + h1]
-    ]) + ' Z'
-    @cursorPath.bot.setAttribute 'd', svgPathFromPoints([
-      [xZoomedIn, y2 + h2]
-      [xZoomedIn, @offsetParent.offsetHeight]
-    ])
 
   setAdjusterConnector: (uri, center, target) ->
     id = uri + '/adj'

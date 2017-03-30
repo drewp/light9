@@ -28,7 +28,7 @@
      light9-timeline-time-zoomed {
          flex-grow: 1;
      }
-     light9-timeline-diagram-layer, light9-timeline-adjusters {
+     #dia, #adjusters, #cursorCanvas {
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
      }
@@ -72,6 +72,7 @@
                                set-adjuster="{{setAdjuster}}"
                                zoom-in-x="{{zoomInX}}">
     </light9-timeline-adjusters>
+    <light9-cursor-canvas id="cursorCanvas"></light9-cursor-canvas>
   </template>
  
 </dom-module>
@@ -165,16 +166,22 @@ background: rgba(126, 52, 245, 0.0784313725490196);
         <g id="notes"></g>
         <g id="noteLabels"></g>
         <g id="connectors"></g>
-        <g id="cursor">
-          <path id="cursor1" style="fill:none; stroke:#ff0303; stroke-width:1.5; stroke-linecap:butt;" />
-          <path id="cursor2" style="fill:#9c0303;" />
-          <path id="cursor3" style="fill:none; stroke:#ff0303; stroke-width:3; stroke-linecap:butt;" />
-        </g>
       </g>
     </svg>
   </template>
 </dom-module>
 
+<dom-module id="light9-cursor-canvas">
+  <template>
+    <style>
+     #canvas, :host {
+         pointer-events: none;
+     }
+    </style>
+    <canvas id="canvas"></canvas>
+  </template>
+</dom-module>
+      
 
 <!-- seconds labels -->
 <dom-module id="light9-timeline-time-axis">
