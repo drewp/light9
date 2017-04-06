@@ -56,6 +56,8 @@ Polymer
     @song = @playerSong if @followPlayerSong
 
   ready: ->
+    ko.options.deferUpdates = true;
+
     window.debug_zoomOrLayoutChangedCount = 0
     window.debug_adjUpdateDisplay = 0
     
@@ -89,7 +91,7 @@ Polymer
     
   attached: ->
     @dia = @$.dia
-    ko.computed(@zoomOrLayoutChanged.bind(@)).extend({rateLimit: 5})
+    ko.computed(@zoomOrLayoutChanged.bind(@))
     ko.computed(@songTimeChanged.bind(@))
 
     @trackMouse()
@@ -743,7 +745,8 @@ Polymer
   ready: ->
     @adjs = {}
     @ctx = @$.canvas.getContext('2d')
-    
+
+    @dirty = false
     @redraw()
    
   onDown: (ev) ->
@@ -779,9 +782,7 @@ Polymer
         @adjs[adjId] = adj
         adj.id = adjId
 
-    # this is relying on makeCurveAdjusters always calling setAdjuster
-    # whenever the values may have changed
-    @debounce('adjsChanged', @adjsChanged.bind(@), 10)
+    @dirty = true 
 
     window.debug_adjsCount = Object.keys(@adjs).length
     
@@ -828,6 +829,10 @@ Polymer
     @$.canvas.width = ev.target.offsetWidth
     @$.canvas.height = ev.target.offsetHeight
     @redraw()
+
+  flush: () ->
+    if @dirty
+      @redraw()
     
   redraw: (adjs) ->
     @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
@@ -840,7 +845,7 @@ Polymer
       @drawAdjuster(adj.getDisplayValue(),
                     Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
                     Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
-
+    @dirty = false
 
   drawConnector: (ctr, target) ->
     @ctx.strokeStyle = '#aaa'
@@ -851,13 +856,21 @@ Polymer
     
   drawAdjuster: (label, x1, y1, x2, y2) ->
     radius = 8
+
+    @ctx.shadowColor = 'black'
+    @ctx.shadowBlur = 15
+    @ctx.shadowOffsetX = 5
+    @ctx.shadowOffsetY = 9
+    
     @ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'
     @ctx.beginPath()
     _roundRect(@ctx, x1, y1, x2, y2, radius)
     @ctx.fill()
-    
+
+    @ctx.shadowColor = 'rgba(0,0,0,0)'
+        
     @ctx.strokeStyle = 'yellow'
-    @ctx.lineWidth = 3
+    @ctx.lineWidth = 2
     @ctx.setLineDash([3, 3])
     @ctx.beginPath()
     _roundRect(@ctx, x1, y1, x2, y2, radius)
