@@ -1,8 +1,8 @@
 log = console.log
 
 class Adjustable
-  # Some value you can edit in the UI, probably by dragging stuff. May
-  # have a <light9-timeline-adjuster> associated. This object does the
+  # Some value you can edit in the UI, probably by dragging
+  # stuff. Drawn by light9-adjusters-canvas. This object does the
   # layout and positioning.
   #
   # The way dragging should work is that you start in the yellow *adj

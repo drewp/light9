@@ -28,7 +28,7 @@
      light9-timeline-time-zoomed {
          flex-grow: 1;
      }
-     #dia, #adjusters, #cursorCanvas {
+     #dia, #adjusters, #cursorCanvas, #adjustersCanvas {
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
      }
@@ -65,13 +65,8 @@
                                  zoom-in-x="{{zoomInX}}">
     </light9-timeline-time-zoomed>
     <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
-    <light9-timeline-adjusters id="adjusters"
-                               dia="{{dia}}"
-                               graph="{{graph}}"
-                               song="{{song}}"
-                               set-adjuster="{{setAdjuster}}"
-                               zoom-in-x="{{zoomInX}}">
-    </light9-timeline-adjusters>
+    <light9-adjusters-canvas id="adjustersCanvas" set-adjuster="{{setAdjuster}}">
+    </light9-adjusters-canvas>
     <light9-cursor-canvas id="cursorCanvas"></light9-cursor-canvas>
   </template>
  
@@ -182,6 +177,17 @@ background: rgba(126, 52, 245, 0.0784313725490196);
   </template>
 </dom-module>
       
+<dom-module id="light9-adjusters-canvas">
+  <template>
+    <style>
+     #canvas, :host {
+         pointer-events: none;
+     }
+    </style>
+    <canvas id="canvas"></canvas>
+  </template>
+</dom-module>
+      
 
 <!-- seconds labels -->
 <dom-module id="light9-timeline-time-axis">
@@ -231,7 +237,7 @@ background: rgba(126, 52, 245, 0.0784313725490196);
   </template>
 </dom-module>
 
-<!-- All the adjusters you can edit or select.
+<!-- All the adjusters you can edit or select. Tells a light9-adjusters-canvas how to draw them. Probabaly doesn't need to be an element.
      This element manages their layout and suppresion.
      Owns the selection.
      Maybe includes selecting things that don't even have adjusters.
@@ -245,9 +251,6 @@ background: rgba(126, 52, 245, 0.0784313725490196);
      }
 
     </style>
-    <div id="all">
-      <!-- light9-timeline-adjuster repeated here  -->
-    </div>
   </template>
 </dom-module>
 

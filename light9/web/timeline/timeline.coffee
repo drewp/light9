@@ -70,7 +70,7 @@ Polymer
         pos: ko.observable($V([0,0]))
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
-    @setAdjuster = @$.adjusters.setAdjuster.bind(@$.adjusters)
+    @setAdjuster = @$.adjustersCanvas.setAdjuster.bind(@$.adjustersCanvas)
 
     setInterval(@updateDebugSummary.bind(@), 100)
 
@@ -82,7 +82,6 @@ Polymer
     elemCount = (tag) -> document.getElementsByTagName(tag).length
     @debug = "#{window.debug_zoomOrLayoutChangedCount} layout change,
      #{elemCount('light9-timeline-note')} notes,
-     #{elemCount('light9-timeline-adjuster')} adjusters,
      #{elemCount('light9-timeline-graph-row')} rows,
      #{window.debug_adjsCount} adjuster items registered,
      #{window.debug_adjUpdateDisplay} adjuster updateDisplay calls,
@@ -96,6 +95,7 @@ Polymer
     @trackMouse()
     @bindKeys()
     @bindWheelZoom()
+    @forwardMouseEventsToAdjustersCanvas()
 
     @makeZoomAdjs()
 
@@ -114,7 +114,7 @@ Polymer
 
     # todo: these run a lot of work purely for a time change    
     @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
-    @$.adjusters.updateAllCoords()
+    @$.adjustersCanvas.updateAllCoords()
 
     # cursor needs update when layout changes, but I don't want
     # zoom/layout to depend on the playback time
@@ -164,6 +164,12 @@ Polymer
       zs.t1(center - left * scale)
       zs.t2(center + right * scale)
 
+  forwardMouseEventsToAdjustersCanvas: ->
+    ac = @$.adjustersCanvas
+    @addEventListener('mousedown', ac.onDown.bind(ac))
+    @addEventListener('mousemove', ac.onMove.bind(ac))
+    @addEventListener('mouseup', ac.onUp.bind(ac))
+
   animatedZoom: (newT1, newT2, secs) ->
     fps = 30
     oldT1 = @viewState.zoomSpec.t1()
@@ -202,7 +208,7 @@ Polymer
         @animatedZoom(newCenter - visSeconds / 2,
                       newCenter + visSeconds / 2, zoomAnimSec)
     shortcut.add "L", =>
-      @$.adjusters.updateAllCoords()
+      @$.adjustersCanvas.updateAllCoords()
 
   makeZoomAdjs: ->
     yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
@@ -574,86 +580,9 @@ Polymer
     patch = {delQuads: [{subject: @song, predicate: @graph.Uri(':note'), object: @uri, graph: @song}], addQuads: []}
     @graph.applyAndSendPatch(patch)
 
-
-Polymer
-  is: "light9-timeline-adjusters"
-  properties:
-    adjs: { type: Object, notify: true }, # adjId: Adjustable
-    dia: { type: Object }
-
-  ready: ->
-    @adjs = {}
     
-  setAdjuster: (adjId, makeAdjustable) ->
-    # callers register/unregister the Adjustables they want us to make
-    # adjuster elements for. Caller invents adjId.  makeAdjustable is
-    # a function returning the Adjustable or it is null to clear any
-    # adjusters with this id.
-
-    if not @adjs[adjId] or not makeAdjustable?
-      if not makeAdjustable?
-        delete @adjs[adjId]
-      else
-        adj = makeAdjustable()
-        @adjs[adjId] = adj
-        adj.id = adjId
-      @debounce('adjsChanged', @adjsChanged.bind(@), 1)
-    else
-      for e in @$.all.children
-        if e.id == adjId
-          e.updateDisplay()
-
-    window.debug_adjsCount = Object.keys(@adjs).length
-    
-  adjsChanged: ->
-    updateChildren @$.all, Object.keys(@adjs), (newUri) =>
-      child = document.createElement('light9-timeline-adjuster')
-      child.dia = @dia
-      child.graph = @graph
-      child.uri = newUri
-      child.id = newUri
-      child.visible = true
-      child.adj = @adjs[newUri]
-      return child
-    @updateAllCoords()
-
-  layoutCenters: ->
-    # push Adjustable centers around to avoid overlaps
-    qt = d3.quadtree()
-    qt.extent([[0,0], [8000,8000]])
-    for _, adj of @adjs
-      desired = adj.getSuggestedCenter()
-      output = desired
-      for tries in [0...2]
-        nearest = qt.find(output.e(1), output.e(2))
-        if nearest
-          dist = output.distanceFrom(nearest)
-          if dist < 60
-            away = output.subtract(nearest).toUnitVector()
-            toScreenCenter = $V([500,200]).subtract(output).toUnitVector()
-            output = output.add(away.x(60).add(toScreenCenter.x(10)))
-
-      if -50 < output.e(1) < 20 # mostly for zoom-left
-        output.setElements([
-          Math.max(20, output.e(1)),
-          output.e(2)])
-        
-      adj.centerOffset = output.subtract(adj.getTarget())
-      qt.add(output.elements)
-
-  updateAllCoords: ->
-    @layoutCenters()
-    
-    for elem in @querySelectorAll('light9-timeline-adjuster')
-      elem.updateDisplay()
-    
-
-Polymer
-  is: 'light9-timeline-adjuster'
-  properties:
-    graph: { type: Object, notify: true }
-    adj: { type: Object, notify: true }
-    id: { type: String, notify: true }
+class deleteme
+  go: ->
     visible: { type: Boolean, notify: true }
     
     displayValue: { type: String }
@@ -714,6 +643,28 @@ svgPathFromPoints = (pts) ->
     return
   out
 
+_line = (ctx, p1, p2) ->
+  ctx.moveTo(p1.e(1), p1.e(2))
+  ctx.lineTo(p2.e(1), p2.e(2))
+
+# http://stackoverflow.com/a/4959890
+_roundRect = (ctx, sx,sy,ex,ey,r) ->
+    d2r = Math.PI/180
+    r = ( ( ex - sx ) / 2 ) if ( ex - sx ) - ( 2 * r ) < 0 # ensure that the radius isn't too large for x
+    r = ( ( ey - sy ) / 2 ) if ( ey - sy ) - ( 2 * r ) < 0 # ensure that the radius isn't too large for y
+    ctx.beginPath();
+    ctx.moveTo(sx+r,sy);
+    ctx.lineTo(ex-r,sy);
+    ctx.arc(ex-r,sy+r,r,d2r*270,d2r*360,false);
+    ctx.lineTo(ex,ey-r);
+    ctx.arc(ex-r,ey-r,r,d2r*0,d2r*90,false);
+    ctx.lineTo(sx+r,ey);
+    ctx.arc(sx+r,ey-r,r,d2r*90,d2r*180,false);
+    ctx.lineTo(sx,sy+r);
+    ctx.arc(sx+r,sy+r,r,d2r*180,d2r*270,false);
+    ctx.closePath();
+
+
 Polymer
   is: 'light9-cursor-canvas'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -752,25 +703,21 @@ Polymer
     }
     @redraw()
 
-  _line: (p1, p2) ->
-    @ctx.moveTo(p1.e(1), p1.e(2))
-    @ctx.lineTo(p2.e(1), p2.e(2))
-
   redraw: ->
     @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
 
     @ctx.strokeStyle = '#fff'
     @ctx.lineWidth = 0.5
     @ctx.beginPath()
-    @_line($V([0, @mouseY]), $V([@$.canvas.width, @mouseY]), '#fff', '0.5px')
-    @_line($V([@mouseX, 0]), $V([@mouseX, @$.canvas.height]), '#fff', '0.5px')
+    _line(@ctx, $V([0, @mouseY]), $V([@$.canvas.width, @mouseY]))
+    _line(@ctx, $V([@mouseX, 0]), $V([@mouseX, @$.canvas.height]))
     @ctx.stroke()
 
     if @cursorPath
       @ctx.strokeStyle = '#ff0303'
       @ctx.lineWidth = 1.5
       @ctx.beginPath()
-      @_line(@cursorPath.top0, @cursorPath.top1, '#ff0303', 1.5)
+      _line(@ctx, @cursorPath.top0, @cursorPath.top1)
       @ctx.stroke()
 
       @ctx.fillStyle = '#9c0303'
@@ -783,10 +730,150 @@ Polymer
       @ctx.strokeStyle = '#ff0303'
       @ctx.lineWidth = 3
       @ctx.beginPath()
-      @_line(@cursorPath.bot0, @cursorPath.bot1, '#ff0303', '3px')
+      _line(@ctx, @cursorPath.bot0, @cursorPath.bot1, '#ff0303', '3px')
       @ctx.stroke()
     
     
+Polymer
+  is: 'light9-adjusters-canvas'
+  behaviors: [ Polymer.IronResizableBehavior ]
+  properties:
+    adjs: { type: Object, notify: true }, # adjId: Adjustable
+  listeners: 'iron-resize': 'update'
+  ready: ->
+    @adjs = {}
+    @ctx = @$.canvas.getContext('2d')
+    
+    @redraw()
+   
+  onDown: (ev) ->
+    if ev.buttons == 1
+      ev.stopPropagation()
+      start = $V([ev.x, ev.y])
+      adj = @adjAtPoint(start)
+      if adj
+        @currentDrag = {start: start, adj: adj}
+        adj.startDrag()
+
+  onMove: (ev) ->
+    pos = $V([ev.x, ev.y])
+    if @currentDrag
+      @currentDrag.cur = pos
+      @currentDrag.adj.continueDrag(@currentDrag.cur.subtract(@currentDrag.start))
+
+  onUp: (ev) ->
+    return unless @currentDrag
+    @currentDrag.adj.endDrag()
+    @currentDrag = null
+    
+  setAdjuster: (adjId, makeAdjustable) ->
+    # callers register/unregister the Adjustables they want us to make
+    # adjuster elements for. Caller invents adjId.  makeAdjustable is
+    # a function returning the Adjustable or it is null to clear any
+    # adjusters with this id.
+    if not @adjs[adjId] or not makeAdjustable?
+      if not makeAdjustable?
+        delete @adjs[adjId]
+      else
+        adj = makeAdjustable()
+        @adjs[adjId] = adj
+        adj.id = adjId
+
+    # this is relying on makeCurveAdjusters always calling setAdjuster
+    # whenever the values may have changed
+    @debounce('adjsChanged', @adjsChanged.bind(@), 10)
+
+    window.debug_adjsCount = Object.keys(@adjs).length
+    
+  adjsChanged: ->
+    @updateAllCoords()
+
+  layoutCenters: ->
+    # push Adjustable centers around to avoid overlaps
+    # Todo: also don't overlap inlineattr boxes
+    @qt = d3.quadtree([], ((d)->d.e(1)), ((d)->d.e(2)))
+    @qt.extent([[0,0], [8000,8000]])
+    for _, adj of @adjs
+      desired = adj.getSuggestedCenter()
+      output = desired
+      for tries in [0...2]
+        nearest = @qt.find(output.e(1), output.e(2))
+        if nearest
+          dist = output.distanceFrom(nearest)
+          if dist < 60
+            away = output.subtract(nearest).toUnitVector()
+            toScreenCenter = $V([500,200]).subtract(output).toUnitVector()
+            output = output.add(away.x(60).add(toScreenCenter.x(10)))
+
+      if -50 < output.e(1) < 20 # mostly for zoom-left
+        output.setElements([
+          Math.max(20, output.e(1)),
+          output.e(2)])
+        
+      adj.centerOffset = output.subtract(adj.getTarget())
+      output.adj = adj
+      @qt.add(output)
+
+  adjAtPoint: (pt) ->
+    nearest = @qt.find(pt.e(1), pt.e(2))
+    if not nearest? or nearest.distanceFrom(pt) > 50
+      return null
+    return nearest?.adj
+
+  updateAllCoords: ->
+    @layoutCenters()
+    @redraw()
+
+  update: (ev) ->
+    @$.canvas.width = ev.target.offsetWidth
+    @$.canvas.height = ev.target.offsetHeight
+    @redraw()
+    
+  redraw: (adjs) ->
+    @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
+
+    for adjId, adj of @adjs
+      ctr = adj.getCenter()
+      target = adj.getTarget()
+      @drawConnector(ctr, target)
+      
+      @drawAdjuster(adj.getDisplayValue(),
+                    Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
+                    Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
+
+
+  drawConnector: (ctr, target) ->
+    @ctx.strokeStyle = '#aaa'
+    @ctx.lineWidth = 2
+    @ctx.beginPath()
+    _line(@ctx, ctr, target)
+    @ctx.stroke()
+    
+  drawAdjuster: (label, x1, y1, x2, y2) ->
+    radius = 8
+    @ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'
+    @ctx.beginPath()
+    _roundRect(@ctx, x1, y1, x2, y2, radius)
+    @ctx.fill()
+    
+    @ctx.strokeStyle = 'yellow'
+    @ctx.lineWidth = 3
+    @ctx.setLineDash([3, 3])
+    @ctx.beginPath()
+    _roundRect(@ctx, x1, y1, x2, y2, radius)
+    @ctx.stroke()
+    @ctx.setLineDash([])
+
+    @ctx.font = "12px sans"
+    @ctx.fillStyle = '#000'
+    @ctx.fillText(label, x1 + 5, y2 - 5, x2 - x1 - 10)
+
+    # coords from a center that's passed in
+    # # special layout for the thaeter ones with middinh 
+    # l/r arrows
+    # connector
+
+  
 Polymer
   is: 'light9-timeline-diagram-layer'
   properties: {}
