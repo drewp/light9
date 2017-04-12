@@ -619,7 +619,7 @@ class deleteme
       return if isNaN(center.e(1))
       @centerStyle = {x: center.e(1), y: center.e(2)}
       @dia.setAdjusterConnector(@adj.id + '/conn', center, target)
-    @debounce('updateDisplay', go, 1)
+    @debounce('updateDisplay', go)
         
   attached: ->
     drag = d3.drag()
@@ -751,7 +751,6 @@ Polymer
     @adjs = {}
     @ctx = @$.canvas.getContext('2d')
 
-    @dirty = false
     @redraw()
    
   onDown: (ev) ->
@@ -787,7 +786,7 @@ Polymer
         @adjs[adjId] = adj
         adj.id = adjId
 
-    @dirty = true 
+    @redraw()
 
     window.debug_adjsCount = Object.keys(@adjs).length
     
@@ -835,11 +834,11 @@ Polymer
     @$.canvas.height = ev.target.offsetHeight
     @redraw()
 
-  flush: () ->
-    if @dirty
-      @redraw()
-    
   redraw: (adjs) ->
+    @debounce('redraw', @_throttledRedraw.bind(@, adjs))
+
+  _throttledRedraw: (adjs) ->
+    console.time('adj redraw')
     @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
 
     for adjId, adj of @adjs
@@ -850,7 +849,7 @@ Polymer
       @drawAdjuster(adj.getDisplayValue(),
                     Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
                     Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
-    @dirty = false
+    console.timeEnd('adj redraw')
 
   drawConnector: (ctr, target) ->
     @ctx.strokeStyle = '#aaa'
