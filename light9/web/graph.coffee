@@ -136,6 +136,7 @@ class window.SyncedGraph
     # if we had a Store already, this lets N3.Store free all its indices/etc
     @graph = N3.Store()
     @_addPrefixes(@prefixes)
+    @cachedFloatValues = new Map();
     
       
   _addPrefixes: (prefixes) ->
@@ -179,6 +180,7 @@ class window.SyncedGraph
     # In most cases you want applyAndSendPatch.
     # 
     # This is the only method that writes to @graph!
+    @cachedFloatValues.clear()
     for quad in patch.delQuads
       @graph.removeTriple(quad)
     for quad in patch.addQuads
@@ -233,7 +235,13 @@ class window.SyncedGraph
         throw new Error("too many values: " + JSON.stringify(quads))
 
   floatValue: (s, p) ->
-    parseFloat(N3.Util.getLiteralValue(@_singleValue(s, p)))
+    key = s + '|' + p
+    hit = @cachedFloatValues.get(key)
+    return hit if hit != undefined
+
+    ret = parseFloat(N3.Util.getLiteralValue(@_singleValue(s, p)))
+    @cachedFloatValues.set(key, ret)
+    return ret
     
   stringValue: (s, p) ->
     N3.Util.getLiteralValue(@_singleValue(s, p))

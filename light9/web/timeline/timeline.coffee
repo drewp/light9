@@ -433,7 +433,12 @@ Polymer
       @graph.subjects(@uri, @uri, @uri)
       return
     if @isDetached?
-      return 
+      return
+ 
+    @updateDisplay()
+
+  updateDisplay: ->
+      
     # update our note DOM and SVG elements based on the graph
     U = (x) -> @graph.Uri(x)
 
@@ -559,6 +564,7 @@ Polymer
     
   addHandler: ->
     @graph.runHandler(@update.bind(@))
+    
   update: ->
     U = (x) -> @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
@@ -734,7 +740,6 @@ Polymer
       @ctx.beginPath()
       _line(@ctx, @cursorPath.bot0, @cursorPath.bot1, '#ff0303', '3px')
       @ctx.stroke()
-    
     
 Polymer
   is: 'light9-adjusters-canvas'
