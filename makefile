@@ -1,4 +1,4 @@
-NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect light9.collector light9.rdfdb.graphfile_test"
+NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect light9.collector light9.rdfdb.graphfile_test light9.paint"
 
 tests:
 	eval env/bin/nosetests -x $(NOSEARGS)
@@ -71,7 +71,7 @@ gst_packages:
 	sudo aptitude install python-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio python-gst0.10 python-gst-1.0 python-pygoocanvas gir1.2-goocanvas-2.0
 
 packages:
-	sudo aptitude install coffeescript normalize-audio audacity python-pygame libffi-dev tix libzmq3-dev python-dev libssl-dev python-opencv
+	sudo aptitude install coffeescript normalize-audio audacity python-pygame libffi-dev tix libzmq3-dev python-dev libssl-dev python-opencv python-cairo
 
 bower:
 	cd light9/web/lib; bower install

@@ -1,5 +1,6 @@
 <link rel="import" href="/lib/polymer/polymer.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
+<link rel="import" href="/lib/iron-ajax/iron-ajax.html">
 
 <dom-module id="light9-paint">
   <template>
@@ -25,9 +26,9 @@
          stroke-miterlimit:4;
      }
     </style>
-    
+    <iron-ajax id="solve" method="POST" url="../paintServer/solve"></iron-ajax>
     <div id="parent">
-      <img src="bg1.jpg">
+      <img src="bg2.jpg">
       <svg id="paint" viewBox="0 0 500 221">
         <defs id="defs12751">
           <filter

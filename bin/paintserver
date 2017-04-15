@@ -15,12 +15,15 @@ from light9.rdfdb import clientsession
 import light9.paint.solve
 from lib.cycloneerr import PrettyErrorHandler
 
+
 class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
         painting = json.loads(self.request.body)
         reload(light9.paint.solve)
+        solver = light9.paint.solve.Solver(self.settings.graph)
+        solver.loadSamples()
         with self.settings.stats.solve.time():
-            out = light9.paint.solve.solve(painting)
+            out = solver.solve(painting)
         self.write(json.dumps(out))
 
 class App(object):
