@@ -12,7 +12,10 @@ from twisted.internet import reactor
 graph = showconfig.getGraph()
 
 netHome = graph.value(showconfig.showUri(), L9['networking'])
-print "listen %s;" % splitport(urlparse(graph.value(netHome, L9['webServer'])).netloc)[1]
+webServer = graph.value(netHome, L9['webServer'])
+if not webServer:
+    raise ValueError('no %r :webServer' % netHome)
+print "listen %s;" % splitport(urlparse(webServer).netloc)[1]
 
 def location(path, server):
     print """

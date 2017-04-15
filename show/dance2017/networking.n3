@@ -1,8 +1,8 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix show: <http://light9.bigasterisk.com/show/> .
-@prefix sh: <http://light9.bigasterisk.com/show/dance2016/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2017/> .
 
-show:dance2016 :networking sh:netHome .
+show:dance2017 :networking sh:netHome .
 sh:netHome
   :webServer        <http://dash:8200/>;
   :patchReceiverUpdateHost "dash";
@@ -14,6 +14,7 @@ sh:netHome
   :keyboardComposer <http://dash:8205/>;
   :musicPlayer      <http://dash:8206/>;
   :oscDmxServer     <udp://dash:8207/>;
+  :paintServer      <http://dash:8213/>;
   :picamserve       <http://10.2.0.5:8208/>;
   :rdfdb            <http://dash:8209/>;
   :subComposer      <http://dash:8210/>;
@@ -26,6 +27,7 @@ sh:netHome
 :keyboardComposer :urlPath "keyboardComposer" .
 :musicPlayer      :urlPath "ascoltami" .
 :picamserve       :urlPath "picamserve" .
+:paintServer      :urlPath "paintServer" .
 :rdfdb            :urlPath "rdfdb" .
 :subComposer      :urlPath "subComposer" .
 :subServer        :urlPath "subServer" .

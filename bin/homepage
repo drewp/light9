@@ -4,8 +4,7 @@ CONF=/tmp/light9_nginx.conf
 ROOT=`dirname $0`/..
 ROOT=${ROOT:a}
 
-bin/homepageConfig > /tmp/light9_nginx_routes.conf
-
+bin/homepageConfig > /tmp/light9_nginx_routes.conf && \
 cat > $CONF <<EOF
 worker_processes 1;
 

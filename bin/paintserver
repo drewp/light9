@@ -1,0 +1,71 @@
+#!bin/python
+
+from __future__ import division
+from run_local import log
+import json
+from twisted.internet import reactor
+from light9.greplin_cyclone import StatsForCyclone
+from light9.rdfdb.syncedgraph import SyncedGraph
+from light9 import networking, showconfig
+from greplin import scales
+import optparse, sys, logging
+import cyclone.web
+from rdflib import URIRef
+from light9.rdfdb import clientsession
+import light9.paint.solve
+from lib.cycloneerr import PrettyErrorHandler
+
+class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def post(self):
+        painting = json.loads(self.request.body)
+        reload(light9.paint.solve)
+        with self.settings.stats.solve.time():
+            out = light9.paint.solve.solve(painting)
+        self.write(json.dumps(out))
+
+class App(object):
+    def __init__(self, show, session):
+        self.show = show
+        self.session = session
+
+        self.graph = SyncedGraph(networking.rdfdb.url, "paintServer")
+        self.graph.initiallySynced.addCallback(self.launch)
+
+        self.stats = scales.collection('/',
+                                       scales.PmfStat('solve'),
+                                       )
+    def launch(self, *args):
+        self.cycloneApp = cyclone.web.Application(handlers=[
+            (r'/stats', StatsForCyclone),
+            (r'/solve', Solve),
+        ],
+                                                  debug=True,
+                                                  graph=self.graph,
+                                                  stats=self.stats)
+        reactor.listenTCP(networking.paintServer.port, self.cycloneApp)
+        log.info("listening on %s" % networking.paintServer.port)
+
+
+if __name__ == "__main__":
+    parser = optparse.OptionParser()
+    parser.add_option('--show',
+        help='show URI, like http://light9.bigasterisk.com/show/dance2008',
+                      default=showconfig.showUri())
+    parser.add_option("-v", "--verbose", action="store_true",
+                      help="logging.DEBUG")
+    parser.add_option("--twistedlog", action="store_true",
+                      help="twisted logging")
+    clientsession.add_option(parser)
+    (options, args) = parser.parse_args()
+    log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
+
+    if not options.show:
+        raise ValueError("missing --show http://...")
+        
+    session = clientsession.getUri('paint', options)
+
+    app = App(URIRef(options.show), session)
+    if options.twistedlog:
+        from twisted.python import log as twlog
+        twlog.startLogging(sys.stderr)
+    reactor.run()
