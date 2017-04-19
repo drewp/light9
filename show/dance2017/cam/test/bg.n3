@@ -9,32 +9,32 @@
 
 
 :sample0 a :LightSample; :path "bg2-a.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;     :scaledValue "#ffffff" ],
+[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.2 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
 :sample1 a :LightSample; :path "bg2-b.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;     :scaledValue "#ffffff" ],
+[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.3 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
 :sample2 a :LightSample; :path "bg2-c.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;     :scaledValue "#ffffff" ],
+[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.4 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
 :sample3 a :LightSample; :path "bg2-d.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;     :scaledValue "#ffffff" ],
+[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.5 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
 :sample4 a :LightSample; :path "bg2-e.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;     :scaledValue "#ffffff" ],
+[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.6 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
 :sample5 a :LightSample; :path "bg2-f.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;     :scaledValue "#ffffff" ],
+[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.7 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
