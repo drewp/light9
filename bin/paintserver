@@ -24,7 +24,8 @@ class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
         solver.loadSamples()
         with self.settings.stats.solve.time():
             out = solver.solve(painting)
-        self.write(json.dumps(out))
+            layers = solver.simulationLayers(out)
+        self.write(json.dumps({'layers': layers, 'out': out}))
 
 class App(object):
     def __init__(self, show, session):

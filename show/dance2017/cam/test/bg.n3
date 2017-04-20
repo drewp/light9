@@ -33,8 +33,9 @@
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.6 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
+# note: different device
 :sample5 a :LightSample; :path "bg2-f.jpg"; :setting 
-[ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
-[ :device dev:aura1; :deviceAttr :rx;     :value 0.7 ],
-[ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
+[ :device dev:aura2; :deviceAttr :color;  :scaledValue "#ffffff" ],
+[ :device dev:aura2; :deviceAttr :rx;     :value 0.7 ],
+[ :device dev:aura2; :deviceAttr :ry;     :value 0.573 ] .
 
