@@ -30,6 +30,7 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   listeners: 'iron-resize': 'onResize'
   properties: {
+    layers: { type: Object }
   }
   ready: ->
     @painting = new Painting()
@@ -63,4 +64,17 @@ Polymer
 
   onResize: (ev) ->
     @$.paint.attributes.viewBox.value = "0 0 #{ev.target.offsetWidth} 500"
-    
+
+
+Polymer
+  is: "light9-simulation"
+  properties: {
+    layers: { type: Object }
+  }
+  listeners: [
+    "onLayers(layers)"
+  ]
+  ready: ->
+    null
+  onLayers: (layers) ->
+    log('upd', layers)
