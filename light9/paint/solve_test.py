@@ -1,4 +1,5 @@
 import unittest
+import numpy.testing
 import solve
 from light9.namespaces import RDF, L9, DEV
 from light9.rdfdb.localsyncedgraph import LocalSyncedGraph
@@ -60,3 +61,18 @@ class TestSimulationLayers(unittest.TestCase):
             {'path': 'bg2-d.jpg', 'color': (1, 1, 1)},
             {'path': 'bg2-f.jpg', 'color': (1, 1, 1)},
                       ], layers)
+
+class TestCombineImages(unittest.TestCase):
+    def setUp(self):
+        graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
+        self.solver = solve.Solver(graph)
+        self.solver.loadSamples()
+    def test(self):
+        out = self.solver.combineImages(layers=[
+            {'path': 'bg2-d.jpg', 'color': (.2, .2, .3)},
+            {'path': 'bg2-a.jpg', 'color': (.888, 0, .3)},
+        ])
+        solve.saveNumpy('/tmp/t.png', out)
+        golden = solve.loadNumpy('show/dance2017/cam/test/layers_out1.png')
+        numpy.testing.assert_array_equal(golden, out)
+

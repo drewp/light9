@@ -45,10 +45,16 @@ def getVal(graph, subj):
         ret = float(ret)
     return ret
 
+def loadNumpy(path, thumb=(100, 100)):
+    img = Image.open(path)
+    img.thumbnail(thumb)
+    return numpyFromPil(img)
+    
 class Solver(object):
     def __init__(self, graph):
         self.graph = graph
         self.samples = {} # uri: Image array
+        self.fromPath = {} # basename: image array
         self.blurredSamples = {}
         self.sampleSettings = {} # (uri, path): { dev: { attr: val } }
         
@@ -57,10 +63,9 @@ class Solver(object):
 
         with self.graph.currentState() as g:
             for samp in g.subjects(RDF.type, L9['LightSample']):
-                path = 'show/dance2017/cam/test/%s' % g.value(samp, L9['path'])
-                img = Image.open(path)
-                img.thumbnail((100, 100))
-                self.samples[samp] = numpyFromPil(img)
+                base = g.value(samp, L9['path']).toPython()
+                path = 'show/dance2017/cam/test/%s' % base
+                self.samples[samp] = self.fromPath[base] = loadNumpy(path)
                 self.blurredSamples[samp] = self._blur(self.samples[samp])
 
                 for s in g.objects(samp, L9['setting']):
@@ -133,6 +138,15 @@ class Solver(object):
                            
         return out
 
+    def combineImages(self, layers):
+        """make a result image from our self.samples images"""
+        out = (self.fromPath.itervalues().next() * 0).astype(numpy.uint16)
+        for layer in layers:
+            colorScaled = self.fromPath[layer['path']] * layer['color']
+            out += colorScaled.astype(numpy.uint16)
+        numpy.clip(out, 0, 255, out)
+        return out.astype(numpy.uint8)
+        
     def simulationLayers(self, settings):
         """
         how should a simulation preview approximate the light settings
