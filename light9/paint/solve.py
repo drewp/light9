@@ -1,9 +1,9 @@
 from __future__ import division
-from light9.namespaces import RDF, L9
+from light9.namespaces import RDF, L9, DEV
 from PIL import Image
 import decimal
 import numpy
-import scipy.misc, scipy.ndimage
+import scipy.misc, scipy.ndimage, scipy.optimize
 import cairo
 
 # numpy images in this file are (x, y, c) layout.
@@ -24,6 +24,9 @@ def saveNumpy(path, img):
 def parseHex(h):
     if h[0] != '#': raise ValueError(h)
     return [int(h[i:i+2], 16) for i in 1, 3, 5]
+
+def toHex(rgbFloat):
+    return '#%02x%02x%02x' % tuple(int(v * 255) for v in rgbFloat)
 
 def scaledHex(h, scale):
     rgb = parseHex(h)
@@ -49,6 +52,13 @@ def loadNumpy(path, thumb=(100, 100)):
     img = Image.open(path)
     img.thumbnail(thumb)
     return numpyFromPil(img)
+
+
+class Settings(object):
+    def toVector(self):
+    def fromVector(self):
+    def distanceTo(self, other):
+        
     
 class Solver(object):
     def __init__(self, graph):
@@ -138,6 +148,54 @@ class Solver(object):
                            
         return out
 
+    def solveBrute(self, painting):
+        pic0 = self.draw(painting, 100, 48).astype(numpy.float)
+
+        colorSteps = 3
+        colorStep = 1. / colorSteps
+
+        dims = [
+            (DEV['aura1'], L9['rx'], [slice(.2, .7+.1, .1)]),
+            (DEV['aura1'], L9['ry'], [slice(.573, .573+1, 1)]),
+            (DEV['aura1'], L9['color'], [slice(0, 1 + colorStep, colorStep),
+                                         slice(0, 1 + colorStep, colorStep),
+                                         slice(0, 1 + colorStep, colorStep)]),
+        ]
+
+        def settingsFromVector(x):
+            settings = []
+
+            xLeft = x.tolist()
+            for dev, attr, _ in dims:
+                if attr == L9['color']:
+                    rgb = (xLeft.pop(), xLeft.pop(), xLeft.pop())
+                    settings.append((dev, attr, toHex(rgb)))
+                else:
+                    settings.append((dev, attr, xLeft.pop()))
+            return settings
+
+        
+        def drawError(x):
+            settings = settingsFromVector(x)
+            preview = self.combineImages(self.simulationLayers(settings))
+            saveNumpy('/tmp/x_%s.png' % abs(hash(tuple(settings))), preview)
+            
+            diff = preview.astype(numpy.float) - pic0
+            out = scipy.sum(abs(diff))
+            
+            #print 'measure at', x, 'drawError=', out
+            return out
+            
+        x0, fval, grid, Jout = scipy.optimize.brute(
+            drawError,
+            sum([s for dev, da, s in dims], []),
+            finish=None,
+            disp=True,
+            full_output=True)
+        if fval > 30000:
+            raise ValueError('solution has error of %s' % fval)
+        return settingsFromVector(x0)
+        
     def combineImages(self, layers):
         """make a result image from our self.samples images"""
         out = (self.fromPath.itervalues().next() * 0).astype(numpy.uint16)
@@ -156,22 +214,41 @@ class Solver(object):
         compiled = {} # dev: { attr: val }
         for row in settings:
             compiled.setdefault(row[0], {})[row[1]] = row[2]
-        
+
         layers = []
 
-        for (sample, path), s in self.sampleSettings.items():
-            for d, dav in s.items():
-                if d not in compiled:
-                    continue
-                requestedAttrs = compiled[d].copy()
-                picAttrs = dav.copy()
-                del requestedAttrs[L9['color']]
-                del picAttrs[L9['color']]
-                if requestedAttrs == picAttrs:
-                    requestedColor = compiled[d][L9['color']]
-                    picColor = dav[L9['color']]
-                    layers.append({'path': path,
-                                   'color': colorRatio(requestedColor,
-                                                       picColor)})
+        for dev, davs in compiled.items():
+            candidatePics = [] # (distance, path, picColor)
+            
+            for (sample, path), s in self.sampleSettings.items():
+                for picDev, picDavs in s.items():
+                    if picDev != dev:
+                        continue
+
+                    requestedAttrs = davs.copy()
+                    picAttrs = picDavs.copy()
+                    del requestedAttrs[L9['color']]
+                    del picAttrs[L9['color']]
+
+                    dist = attrDistance(picAttrs, requestedAttrs)
+                    candidatePics.append((dist, path, picDavs[L9['color']]))
+            candidatePics.sort()
+            # we could even blend multiple top candidates, or omit all
+            # of them if they're too far
+            bestDist, bestPath, bestPicColor = candidatePics[0]
+
+            requestedColor = davs[L9['color']]
+            layers.append({'path': bestPath,
+                           'color': colorRatio(requestedColor, bestPicColor)})
         
         return layers
+
+
+def attrDistance(attrs1, attrs2):
+    dist = 0
+    for key in set(attrs1).union(set(attrs2)):
+        if key not in attrs1 or key not in attrs2:
+            dist += 999
+        else:
+            dist += abs(attrs1[key] - attrs2[key])
+    return dist

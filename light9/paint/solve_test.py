@@ -9,13 +9,14 @@ class TestSolve(unittest.TestCase):
         graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
         self.solver = solve.Solver(graph)
         self.solver.loadSamples()
+        self.solveMethod = self.solver.solve
 
     def testBlack(self):
-        devAttrs = self.solver.solve({'strokes': []})
+        devAttrs = self.solveMethod({'strokes': []})
         self.assertEqual([], devAttrs)
 
     def testSingleLightCloseMatch(self):
-        devAttrs = self.solver.solve({'strokes': [{'pts': [[224, 141],
+        devAttrs = self.solveMethod({'strokes': [{'pts': [[224, 141],
                                                  [223, 159]],
                                          'color': '#ffffff'}]})
         self.assertItemsEqual([
@@ -23,7 +24,11 @@ class TestSolve(unittest.TestCase):
             (DEV['aura1'], L9['rx'], 0.5 ),
             (DEV['aura1'], L9['ry'], 0.573),
         ], devAttrs)
-        
+
+class TestSolveBrute(TestSolve):
+    def setUp(self):
+        super(TestSolveBrute, self).setUp()
+        self.solveMethod = self.solver.solveBrute
         
 class TestSimulationLayers(unittest.TestCase):
     def setUp(self):
@@ -39,7 +44,7 @@ class TestSimulationLayers(unittest.TestCase):
             (DEV['aura1'], L9['color'], u"#ffffff"),
             (DEV['aura1'], L9['rx'], 0.5 ),
             (DEV['aura1'], L9['ry'], 0.573)])
-        self.assertEqual([{'path': 'bg2-d.jpg', 'color': (1, 1, 1)}], layers)
+        self.assertEqual([{'path': 'bg2-d.jpg', 'color': (1., 1., 1.)}], layers)
 
     def testPerfect1MatchTinted(self):
         layers = self.solver.simulationLayers(settings=[
