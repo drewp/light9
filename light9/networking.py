@@ -12,7 +12,8 @@ class ServiceAddress(object):
         net = graph.value(showUri(), L9['networking'])
         ret = graph.value(net, self.service)
         if ret is None:
-            raise ValueError("no url for %s %s" % (showUri(), L9['networking']))
+            raise ValueError("no url for %s -> %s -> %s" % (showUri(), L9['networking'],
+                                                            self.service))
         return str(ret)
 
     @property

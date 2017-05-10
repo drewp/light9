@@ -1,7 +1,7 @@
 #!bin/python
 """
 live web display of all existing subs with pictures, mainly for
-dragging them into CC
+dragging them into CC or Timeline
 """
 from run_local import log
 import sys, optparse, logging, json, subprocess, datetime

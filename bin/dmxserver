@@ -1,5 +1,7 @@
 #!bin/python
 """
+Replaced by bin/collector
+
 
 this is the only process to talk to the dmx hardware. other clients
 can connect to this server and present dmx output, and this server

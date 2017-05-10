@@ -63,14 +63,17 @@ def startZmq(port, collector):
     s.onPull = onPull
 
 def launch(graph, doLoadTest=False):
-
-    # todo: drive outputs with config files
-    outputs = [
-        EnttecDmx(L9['output/dmx0/'], '/dev/dmx0', 80),
-        Udmx(L9['output/udmx/'], 510),
-    ]
+    try:
+        # todo: drive outputs with config files
+        outputs = [
+            #EnttecDmx(L9['output/dmx0/'], '/dev/dmx0', 80),
+            Udmx(L9['output/udmx/'], 510),
+        ]
+    except Exception as e:
+        log.error("setting up outputs: %r", e)
+        traceback.print_exc()
+        raise
     c = Collector(graph, outputs)
-
     server = WebServer(c)
     startZmq(networking.collectorZmq.port, c)
     

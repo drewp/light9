@@ -38,7 +38,7 @@ class PatchReceiver(object):
             postdata=body,
             ).addCallbacks(self._done,
                            lambda err: self._registerError(err, url, body))
-        log.info("registering with rdfdb")
+        log.info("registering with rdfdb at %s", url)
 
     def _registerError(self, err, url, body):
         log.error('registering to url=%r body=%r', url, body)
