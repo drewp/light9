@@ -33,7 +33,7 @@ Polymer
     playerSong: {type: String, notify: true}
     followPlayerSong: {type: Boolean, notify: true, value: true}
     song: {type: String, notify: true}
-    show: {value: 'http://light9.bigasterisk.com/show/dance2016'}
+    show: {value: 'http://light9.bigasterisk.com/show/dance2017'}
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
     songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}

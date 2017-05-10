@@ -74,7 +74,7 @@ Polymer
     U = (x) -> @graph.Uri(x)
 
     effectUri = U(":effect") + "/#{uriName}"
-    ctx = U("http://light9.bigasterisk.com/show/dance2016/effect/#{uriName}")
+    ctx = U("http://light9.bigasterisk.com/show/dance2017/effect/#{uriName}")
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: ctx}
 
     addQuads = [
