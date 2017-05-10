@@ -55,8 +55,16 @@ def loadNumpy(path, thumb=(100, 100)):
 
 
 class Settings(object):
+    def __init__(self, graph, settingsList):
+        self._compiled = {} # dev: { attr: val }
+        for row in settingsList:
+            self._compiled.setdefault(row[0], {})[row[1]] = row[2]
+
     def toVector(self):
-    def fromVector(self):
+        """
+        
+    def fromVector(cls, graph, vector):
+        """update our settings from a vector with the same ordering as toVector would make"""
     def distanceTo(self, other):
         
     
