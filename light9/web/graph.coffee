@@ -225,14 +225,16 @@ class window.SyncedGraph
   _singleValue: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
     quads = @graph.findByIRI(s, p)
-    switch quads.length
+    objs = new Set(q.object for q in quads)
+    
+    switch objs.size
       when 0
         throw new Error("no value for "+s+" "+p)
       when 1
-        obj = quads[0].object
+        obj = objs.values().next().value
         return obj
       else
-        throw new Error("too many values: " + JSON.stringify(quads))
+        throw new Error("too many different values: " + JSON.stringify(quads))
 
   floatValue: (s, p) ->
     key = s + '|' + p
