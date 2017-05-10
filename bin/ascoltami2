@@ -5,13 +5,16 @@ import web, thread, sys, optparse, logging
 from rdflib import URIRef
 sys.path.append(".")
 sys.path.append('/usr/lib/python2.7/dist-packages') # For gi
+
+import gi
+gi.require_version('Gst', '1.0')
+gi.require_version('Gtk', '3.0')
+
 from light9.ascoltami.player import Player
 from light9.ascoltami.playlist import Playlist, NoSuchSong
 from light9.ascoltami.webapp import makeWebApp, songUri, songLocation
 from light9 import networking, showconfig
 
-import gi
-gi.require_version('Gst', '1.0')
 from gi.repository import GObject, Gst, Gtk
 
 class App(object):
