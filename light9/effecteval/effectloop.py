@@ -185,6 +185,7 @@ Z = numpy.zeros((50, 3), dtype=numpy.float16)
 
 class ControlBoard(object):
     def __init__(self, dev='/dev/serial/by-id/usb-FTDI_FT232R_USB_UART_A7027NYX-if00-port0'):
+        log.info('opening %s', dev)
         self._dev = serial.Serial(dev, baudrate=115200)
 
     def _8bitMessage(self, floatArray):

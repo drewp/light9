@@ -289,7 +289,7 @@ class App(object):
         self.show = show
         self.outputWhere = outputWhere
         self.graph = SyncedGraph(networking.rdfdb.url, "effectEval")
-        self.graph.initiallySynced.addCallback(self.launch)
+        self.graph.initiallySynced.addCallback(self.launch).addErrback(log.error)
 
         self.stats = scales.collection('/',
                                        scales.PmfStat('sendLevels'),
@@ -300,6 +300,7 @@ class App(object):
                                        )
 
     def launch(self, *args):
+        log.info('launch')
         self.loop = makeEffectLoop(self.graph, self.stats, self.outputWhere)
         self.loop.startLoop()
         
