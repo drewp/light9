@@ -73,7 +73,9 @@ class AutoDependencies
 
     h = new Handler(func, label)
     @handlerStack[@handlerStack.length - 1].innerHandlers.push(h)
+    console.time("handler #{label}")
     @_rerunHandler(h, null)
+    console.timeEnd("handler #{label}")
     
   _rerunHandler: (handler, patch) ->
     handler.patterns = []

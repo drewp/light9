@@ -346,6 +346,8 @@ Polymer
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: (patch) ->
+    console.time('row update')
+
     U = (x) -> @graph.Uri(x)
 
     notesForThisRow = []
@@ -364,6 +366,7 @@ Polymer
       child.song = @song # could change, but all the notes will be rebuilt
       child.zoomInX = @zoomInX # missing binding; see onZoom
       return child      
+    console.timeEnd('row update')
 
   onZoom: ->
     for e in @children
@@ -566,6 +569,7 @@ Polymer
     @graph.runHandler(@update.bind(@))
     
   update: ->
+    console.time('attrs update')
     U = (x) -> @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
     @effectLabel = @effect.replace(/.*\//, '')
@@ -582,6 +586,7 @@ Polymer
     if @existingColorScaleSetting == null
       @colorScaleFromGraph = '#ffffff'
       @colorScale = '#ffffff'
+    console.timeEnd('attrs update')
 
 
   onDel: ->
