@@ -751,7 +751,11 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     adjs: { type: Object, notify: true }, # adjId: Adjustable
-  listeners: 'iron-resize': 'update'
+  observers: [
+    'updateAllCoords(adjs)'
+  ]
+  listeners:
+    'iron-resize': 'resizeUpdate'
   ready: ->
     @adjs = {}
     @ctx = @$.canvas.getContext('2d')
@@ -762,7 +766,7 @@ Polymer
     if ev.buttons == 1
       ev.stopPropagation()
       start = $V([ev.x, ev.y])
-      adj = @adjAtPoint(start)
+      adj = @_adjAtPoint(start)
       if adj
         @currentDrag = {start: start, adj: adj}
         adj.startDrag()
@@ -794,13 +798,14 @@ Polymer
     @redraw()
 
     window.debug_adjsCount = Object.keys(@adjs).length
-    
-  adjsChanged: ->
-    @updateAllCoords()
 
-  layoutCenters: ->
+  updateAllCoords: ->
+    @redraw()
+
+  _layoutCenters: ->
     # push Adjustable centers around to avoid overlaps
     # Todo: also don't overlap inlineattr boxes
+    # Todo: don't let their connector lines cross each other
     @qt = d3.quadtree([], ((d)->d.e(1)), ((d)->d.e(2)))
     @qt.extent([[0,0], [8000,8000]])
     for _, adj of @adjs
@@ -824,17 +829,13 @@ Polymer
       output.adj = adj
       @qt.add(output)
 
-  adjAtPoint: (pt) ->
+  _adjAtPoint: (pt) ->
     nearest = @qt.find(pt.e(1), pt.e(2))
     if not nearest? or nearest.distanceFrom(pt) > 50
       return null
     return nearest?.adj
 
-  updateAllCoords: ->
-    @layoutCenters()
-    @redraw()
-
-  update: (ev) ->
+  resizeUpdate: (ev) ->
     @$.canvas.width = ev.target.offsetWidth
     @$.canvas.height = ev.target.offsetHeight
     @redraw()
@@ -843,27 +844,29 @@ Polymer
     @debounce('redraw', @_throttledRedraw.bind(@, adjs))
 
   _throttledRedraw: (adjs) ->
-    console.time('adj redraw')
+    console.time('adjs redraw')
+    @_layoutCenters()
+    
     @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
 
     for adjId, adj of @adjs
       ctr = adj.getCenter()
       target = adj.getTarget()
-      @drawConnector(ctr, target)
+      @_drawConnector(ctr, target)
       
-      @drawAdjuster(adj.getDisplayValue(),
+      @_drawAdjuster(adj.getDisplayValue(),
                     Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
                     Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
-    console.timeEnd('adj redraw')
+    console.timeEnd('adjs redraw')
 
-  drawConnector: (ctr, target) ->
+  _drawConnector: (ctr, target) ->
     @ctx.strokeStyle = '#aaa'
     @ctx.lineWidth = 2
     @ctx.beginPath()
     _line(@ctx, ctr, target)
     @ctx.stroke()
     
-  drawAdjuster: (label, x1, y1, x2, y2) ->
+  _drawAdjuster: (label, x1, y1, x2, y2) ->
     radius = 8
 
     @ctx.shadowColor = 'black'
@@ -897,6 +900,7 @@ Polymer
 
   
 Polymer
+  # note boxes
   is: 'light9-timeline-diagram-layer'
   properties: {}
   ready: ->
