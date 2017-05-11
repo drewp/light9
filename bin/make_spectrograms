@@ -1,5 +1,7 @@
 #!/bin/zsh
 
+# todo: "rainbowgrams" like page 5 of this: https://arxiv.org/pdf/1704.01279.pdf
+
 mkdir -p $LIGHT9_SHOW/spectrogram
 for x ($LIGHT9_SHOW/music/pad/*) {
   sox $x -n remix 1 rate 3k spectrogram -X 50 -y 100 -z 80 -m -r -o $LIGHT9_SHOW/spectrogram/$x:t:r.png
