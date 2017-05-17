@@ -56,6 +56,7 @@
                    graph: {type: Object, notify: true},
                    uri: {type: String, notify: true},
                    label: {type: String, notify: true},
+                   attrs: {type: Array, notify: true},
                },
                observers: [
                    "setLabel(graph, uri)",
@@ -64,7 +65,7 @@
                initUpdates: function(updates) {
                    updates.addListener(function(msg) {
                        if (msg.outputAttrsSet && msg.outputAttrsSet.dev == this.uri) {
-                           this.attrs = msg.outputAttrsSet.attrs;
+                           this.set('attrs', msg.outputAttrsSet.attrs);
                            this.attrs.forEach(function(row) {
                                row.valClass = row.val == 255 ? 'full' : (row.val ? 'nonzero' : '');
                            });
@@ -72,7 +73,6 @@
                    }.bind(this));
                },
                setLabel: function(graph, uri) {
-                   console.log('setlab', uri);
                    this.label = uri.replace(/.*\//, '');
                    graph.runHandler(function() {
                        this.label = graph.stringValue(uri, graph.Uri('rdfs:label'));

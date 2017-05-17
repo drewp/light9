@@ -54,6 +54,8 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.outputs = outputs
         self.listeners = listeners
         self.clientTimeoutSec = clientTimeoutSec
+        self.initTime = time.time()
+        self.allDevices = set()
 
         self.graph.addHandler(self.rebuildOutputMap)
 
@@ -69,6 +71,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.remapOut = {} # (device, deviceAttr) : (start, end)
         for dc in self.graph.subjects(RDF.type, L9['DeviceClass']):
             for dev in self.graph.subjects(RDF.type, dc):
+                self.allDevices.add(dev)
                 self.deviceType[dev] = dc
 
                 for remap in self.graph.objects(dev, L9['outputAttrRange']):
@@ -99,7 +102,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
     def _warnOnLateRequests(self, client, now, sendTime):
         requestLag = now - sendTime
-        if requestLag > .1:
+        if requestLag > .1 and now > self.initTime + 5:
             log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
                      client, requestLag * 1000)
         
@@ -145,13 +148,13 @@ class Collector(Generic[ClientType, ClientSessionType]):
                 daDict[da] = v
                     
         outputAttrs = {} # device: {outputAttr: value}
-        for d in deviceAttrs:
+        for d in self.allDevices:
             try:
                 devType = self.deviceType[d]
             except KeyError:
                 log.warn("request for output to unconfigured device %s" % d)
                 continue
-            outputAttrs[d] = toOutputAttrs(devType, deviceAttrs[d])
+            outputAttrs[d] = toOutputAttrs(devType, deviceAttrs.get(d, {}))
             if self.listeners:
                 self.listeners.outputAttrsSet(d, outputAttrs[d], self.outputMap)
         

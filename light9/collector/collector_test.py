@@ -219,8 +219,8 @@ class TestCollector(unittest.TestCase):
         c.setAttrs('client1', 'sess1', [(DEV['inst1'], L9['brightness'], 1)], t0)
         c.setAttrs('client1', 'sess1', [(DEV['colorStrip'], L9['color'], '#00ff00')], t0)
 
-        self.assertEqual([[0, 0, 0, 0], 'flush',
-                          [0, 0, 0, 0], 'flush',
+        self.assertEqual([[215, 0, 0, 0], 'flush',
+                          [215, 0, 0, 0], 'flush',
                           [215, 0, 255, 0], 'flush'],
                          self.udmx.updates)
         self.assertEqual([[127, 0, 0, 0], 'flush',
