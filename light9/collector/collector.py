@@ -44,14 +44,15 @@ def outputMap(graph, outputs):
                 offset = int(graph.value(row, L9['dmxOffset']).toPython())
                 index = dmxBase + offset - 1
                 ret[(dev, outputAttr)] = (output, index)
-                log.info('    map %s to %s,%s', outputAttr, output, index)
+                log.debug('    map %s to %s,%s', outputAttr, output, index)
     return ret
         
 class Collector(Generic[ClientType, ClientSessionType]):
-    def __init__(self, graph, outputs, clientTimeoutSec=10):
+    def __init__(self, graph, outputs, listeners=None, clientTimeoutSec=10):
         # type: (Graph, List[Output], float) -> None
         self.graph = graph
         self.outputs = outputs
+        self.listeners = listeners
         self.clientTimeoutSec = clientTimeoutSec
 
         self.graph.addHandler(self.rebuildOutputMap)
@@ -151,6 +152,8 @@ class Collector(Generic[ClientType, ClientSessionType]):
                 log.warn("request for output to unconfigured device %s" % d)
                 continue
             outputAttrs[d] = toOutputAttrs(devType, deviceAttrs[d])
+            if self.listeners:
+                self.listeners.outputAttrsSet(d, outputAttrs[d], self.outputMap)
         
         pendingOut = {} # output : values
         for out in self.outputs:
@@ -164,9 +167,9 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.flush(pendingOut)
         dt2 = 1000 * (time.time() - now)
         if dt1 > 10:
-            print "slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" % (
+            log.warn("slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" % (
                 dt1, dt2, len(self.lastRequest), len(deviceAttrs), len(outputAttrs)
-            )
+            ))
 
     def setAttr(self, device, outputAttr, value, pendingOut):
         output, index = self.outputMap[(device, outputAttr)]

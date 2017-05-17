@@ -191,3 +191,12 @@ a.big {
     display: inline-block;
     border-radius: 5px;
 }
+
+table {
+    border-collapse: collapse;
+}
+
+table.borders td, table.borders th {
+    border: 1px solid #4a4a4a;
+    padding: 2px 8px;
+}

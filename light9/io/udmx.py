@@ -1,6 +1,9 @@
 from __future__ import division
+import logging
 import usb.core
 from usb.util import CTRL_TYPE_VENDOR, CTRL_RECIPIENT_DEVICE, CTRL_OUT
+
+log = logging.getLogger('udmx')
 
 """
 Send dmx to one of these:
@@ -23,6 +26,7 @@ cmd_SetChannelRange = 0x0002
 class Udmx(object):
     def __init__(self):
         self.dev = usb.core.find(idVendor=0x16c0, idProduct=0x05dc)
+        log.info('found udmx at %r', self.dev)
         
     def SendDMX(self, buf):
         ret = self.dev.ctrl_transfer(

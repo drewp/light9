@@ -112,14 +112,13 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         rx8 = float(inp.get(L9['rx'], 0)) / 540 * 255
         ry8 = float(inp.get(L9['ry'], 0)) / 240 * 255
         r, g, b = hex_to_rgb(inp.get(L9['color'], '#000000'))
-
         return {
             L9['xRotation']: clamp255(int(math.floor(rx8))),
             # didn't find docs on this, but from tests it looks like 64 fine steps takes you to the next coarse step
             L9['xFine']: _8bit(1 - (rx8 % 1.0)),
             L9['yRotation']: clamp255(int(math.floor(ry8))),
             L9['yFine']: _8bit((ry8 % 1.0) / 4),
-            L9['rotationSpeed']: 0,
+            L9['rotationSpeed']: 0, # seems to have no effect
             L9['dimmer']: 255,
             L9['red']: r,
             L9['green']: g,

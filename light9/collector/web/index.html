@@ -1,0 +1,157 @@
+<!doctype html>
+<html>
+  <head>
+    <title>collector</title>
+    <meta charset="utf-8" />
+    <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="/lib/polymer/polymer.html">
+    <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+    <link rel="import" href="../rdfdb-synced-graph.html">
+    <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
+    <script src="/lib/async/dist/async.js"></script>
+    <script src="/lib/underscore/underscore-min.js"></script>
+
+    <link rel="stylesheet"  href="/style.css">
+  </head>
+  <body>
+
+    <dom-module id="light9-collector-device">
+      <template>
+        <style>
+         :host {
+             display: block;
+             break-inside: avoid-column;
+         }
+         td.nonzero {
+             background: #310202;
+             color: #e25757;
+         }
+         td.full {
+             background: #2b0000;
+             color: red;
+             font-weight: bold;
+         }
+        </style>
+        <h3>{{label}}</h3>
+        <table class="borders">
+          <tr>
+            <th>output attr</th>
+            <th>value</th>
+            <th>output chan</th>
+          </tr>
+          <template is="dom-repeat" items="{{attrs}}">
+            <tr>
+              <td>{{item.attr}}</td>
+              <td class$="{{item.valClass}}">{{item.val}} →</td>
+              <td>{{item.chan}}</td>
+            </tr>
+          </template>
+
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-collector-device",
+               properties: {
+                   graph: {type: Object, notify: true},
+                   uri: {type: String, notify: true},
+                   label: {type: String, notify: true},
+               },
+               observers: [
+                   "setLabel(graph, uri)",
+                   "initUpdates(updates)",
+               ],
+               initUpdates: function(updates) {
+                   updates.addListener(function(msg) {
+                       if (msg.outputAttrsSet && msg.outputAttrsSet.dev == this.uri) {
+                           this.attrs = msg.outputAttrsSet.attrs;
+                           this.attrs.forEach(function(row) {
+                               row.valClass = row.val == 255 ? 'full' : (row.val ? 'nonzero' : '');
+                           });
+                       }
+                   }.bind(this));
+               },
+               setLabel: function(graph, uri) {
+                   console.log('setlab', uri);
+                   this.label = uri.replace(/.*\//, '');
+                   graph.runHandler(function() {
+                       this.label = graph.stringValue(uri, graph.Uri('rdfs:label'));
+                   }.bind(this), 'setLabel');
+               }
+           });
+       });
+      </script>
+    </dom-module>
+
+
+    <dom-module id="light9-collector-ui">
+      <template>
+        <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
+
+        <h1>Collector <a href="stats">[stats]</a></h1>
+
+        <h2>Devices</h2>
+        <div style="column-width: 18em">
+        <template is="dom-repeat" items="{{devices}}">
+          <light9-collector-device
+              graph="{{graph}}" updates="{{updates}}"
+              uri="{{item}}"></light9-collector-device>
+        </template>
+        </div>
+      </template>
+      <script>
+       class Updates {
+           constructor() {
+               this.listeners = [];
+               
+           }
+           addListener(cb) {
+               this.listeners.push(cb);
+           }
+           onMessage(msg) {
+               this.listeners.forEach(function(lis) {
+                   lis(msg);
+               });
+           }
+       }
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-collector-ui",
+               properties: {
+                   graph: {type: Object, notify: true},
+                   updates: {type: Object, notify: true},
+                   devices: {type: Array},
+               },
+               observers: [
+                   'onGraph(graph)',
+               ],
+               ready: function() {
+                   this.updates = new Updates();
+                   var sock = new WebSocket(
+                       window.location.href.replace(/^http/, 'ws') + 'updates');
+                   sock.onmessage = function(ev) {
+                       this.updates.onMessage(JSON.parse(ev.data));
+                   }.bind(this);
+               },
+               onGraph: function(graph) {
+                   this.graph.runHandler(this.findDevices.bind(this), 'findDevices');
+               },
+               findDevices: function() {
+                   var U = function(x) {
+                       return this.graph.Uri(x);
+                   };
+                   this.set('devices', []);
+                   _.uniq(_.sortBy(this.graph.subjects(U('rdf:type'), U(':DeviceClass'))), true).forEach(function(dc) {
+                       _.sortBy(this.graph.subjects(U('rdf:type'), dc)).forEach(function(dev) {
+                           this.push('devices', dev);
+                       }.bind(this));
+                   }.bind(this));
+               }
+           });
+       });
+      </script>
+    </dom-module>
+    
+    <light9-collector-ui></light9-collector-ui>    
+  </body>
+</html>

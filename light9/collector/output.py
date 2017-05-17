@@ -49,6 +49,9 @@ class Output(object):
         """
         raise NotImplementedError
 
+    def shortId(self):
+        """short string to distinguish outputs"""
+        raise NotImplementedError
 
 class DmxOutput(Output):
     def __init__(self, uri, numChannels):
@@ -106,6 +109,9 @@ class EnttecDmx(DmxOutput):
     def countError(self):
         pass
 
+    def shortId(self):
+        return 'enttec'
+
                                   
 class Udmx(DmxOutput):
     stats = scales.collection('/output/udmx',
@@ -151,6 +157,7 @@ class Udmx(DmxOutput):
     def countError(self):
         # in main thread
         Udmx.stats.usbErrors += 1
-                
-                                  
         
+    def shortId(self):
+        return 'udmx' # and something unique from self.dev?
+

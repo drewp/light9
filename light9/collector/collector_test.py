@@ -84,7 +84,6 @@ class TestOutputMap(unittest.TestCase):
         '''), [out0])
 
 
-
 class TestCollector(unittest.TestCase):
     def setUp(self):
         self.config = MockSyncedGraph(PREFIX + THEATER + '''
