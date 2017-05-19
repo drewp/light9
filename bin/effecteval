@@ -301,8 +301,9 @@ class App(object):
 
     def launch(self, *args):
         log.info('launch')
-        self.loop = makeEffectLoop(self.graph, self.stats, self.outputWhere)
-        self.loop.startLoop()
+        if self.outputWhere:
+            self.loop = makeEffectLoop(self.graph, self.stats, self.outputWhere)
+            self.loop.startLoop()
         
         SFH = cyclone.web.StaticFileHandler
         self.cycloneApp = cyclone.web.Application(handlers=[
