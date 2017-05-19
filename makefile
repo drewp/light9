@@ -1,4 +1,4 @@
-NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect light9.collector light9.rdfdb.graphfile_test light9.paint"
+NOSEARGS="--no-path-adjustment light9.rdfdb.rdflibpatch light9.rdfdb.patch light9.effecteval.test_effect light9.collector light9.rdfdb.graphfile_test light9.paint light9.effect"
 
 tests:
 	eval env/bin/nosetests -x $(NOSEARGS)

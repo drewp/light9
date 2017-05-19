@@ -51,9 +51,11 @@ class WebListeners(object):
 
     def addClient(self, client):
         self.clients.append([client, {}])
+        log.info('added client %s', client)
 
     def delClient(self, client):
         self.clients = [[c, t] for c, t in self.clients if c != client]
+        log.info('delClient %s, %s left', client, len(self.clients))
         
     def outputAttrsSet(self, dev, attrs, outputMap):
         now = time.time()
@@ -75,7 +77,7 @@ class WebListeners(object):
             output, index = outputMap[(dev, attr)]
             attrRows.append({'attr': attr.rsplit('/')[-1],
                              'val': val,
-                             'chan': (output.shortId(), index)})
+                             'chan': (output.shortId(), index + 1)})
         attrRows.sort(key=lambda r: r['chan'])
         for row in attrRows:
             row['chan'] = '%s %s' % (row['chan'][0], row['chan'][1])
@@ -86,6 +88,7 @@ class WebListeners(object):
 class Updates(cyclone.websocket.WebSocketHandler):
 
     def connectionMade(self, *args, **kwargs):
+        log.info('socket connect %s', self)
         self.settings.listeners.addClient(self)
 
     def connectionLost(self, reason):

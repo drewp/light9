@@ -28,6 +28,7 @@ def location(path, server):
       proxy_set_header Host $host;
 
       proxy_pass %(server)s;
+      proxy_buffering off;
       rewrite /[^/]+/(.*) /$1 break;
     }""" % vars()
 
