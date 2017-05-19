@@ -328,7 +328,8 @@ class Db(object):
     def clientErrored(self, err, c):
         err.trap(twisted.internet.error.ConnectError, WebsocketDisconnect)
         log.info("%r %r - dropping client", c, err.getErrorMessage())
-        self.clients.remove(c)
+        if c in self.clients:
+            self.clients.remove(c)
         self.sendClientsToAllLivePages()
 
     def summarizeToLog(self):
