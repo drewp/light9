@@ -78,13 +78,13 @@ bower:
 	cd light9/web/lib/N3.js; npm install; npm run browser
 	cd light9/web/lib/d3; npm install
 
+raspberry_pi_packages:
+	sudo apt-get install python-picamera python-dev python-twisted python-virtualenv
+
 raspberry_pi_virtualenv:
 	mkdir -p env_pi
 	virtualenv --system-site-packages env_pi
-
-raspberry_pi_packages:
-	sudo apt-get install python-picamera python-dev python-twisted python-virtualenv
-	env_pi/bin/pip install cyclone 'coloredlogs==1.0.1'
+	env_pi/bin/pip install cyclone 'coloredlogs==6.0'
 
 darcs_show_checkpoint:
 	darcs add --quiet --recursive ${LIGHT9_SHOW} 

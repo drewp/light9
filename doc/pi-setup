@@ -1,0 +1,8 @@
+raspbian
+enable ssh
+enable camera
+sudo aptitude install darcs zsh
+darcs get drewp@10.1.0.1:/my/proj/light9
+~/light9 $ make raspberry_pi_packages
+make raspberry_pi_virtualenv
+bin/picamserve
