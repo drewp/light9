@@ -7,8 +7,8 @@ from light9.effect.settings import DeviceSettings
 
 class TestSolve(unittest.TestCase):
     def setUp(self):
-        graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
-        self.solver = solve.Solver(graph)
+        self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
+        self.solver = solve.Solver(self.graph)
         self.solver.loadSamples()
         self.solveMethod = self.solver.solve
 
