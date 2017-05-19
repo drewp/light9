@@ -5,6 +5,8 @@ import numpy
 import scipy.misc, scipy.ndimage, scipy.optimize
 import cairo
 
+from light9.effect.settings import DeviceSettings
+
 # numpy images in this file are (x, y, c) layout.
 
 def numpyFromCairo(surface):
@@ -45,40 +47,14 @@ def colorRatio(col1, col2):
 def brightest(img):
     return numpy.amax(img, axis=(0, 1))
 
-def getVal(graph, subj):
-    lit = graph.value(subj, L9['value']) or graph.value(subj, L9['scaledValue'])
-    ret = lit.toPython()
-    if isinstance(ret, decimal.Decimal):
-        ret = float(ret)
-    return ret
 
-def loadNumpy(path, thumb=(100, 100)):
-    img = Image.open(path)
-    img.thumbnail(thumb)
-    return numpyFromPil(img)
-
-
-class Settings(object):
-    def __init__(self, graph, settingsList):
-        self._compiled = {} # dev: { attr: val }
-        for row in settingsList:
-            self._compiled.setdefault(row[0], {})[row[1]] = row[2]
-
-    def toVector(self):
-        """
-        
-    def fromVector(cls, graph, vector):
-        """update our settings from a vector with the same ordering as toVector would make"""
-    def distanceTo(self, other):
-        
-    
 class Solver(object):
     def __init__(self, graph):
         self.graph = graph
         self.samples = {} # uri: Image array
         self.fromPath = {} # basename: image array
         self.blurredSamples = {}
-        self.sampleSettings = {} # (uri, path): { dev: { attr: val } }
+        self.sampleSettings = {} # (uri, path): DeviceSettings
         
     def loadSamples(self):
         """learn what lights do from images"""
@@ -89,13 +65,9 @@ class Solver(object):
                 path = 'show/dance2017/cam/test/%s' % base
                 self.samples[samp] = self.fromPath[base] = loadNumpy(path)
                 self.blurredSamples[samp] = self._blur(self.samples[samp])
-
-                for s in g.objects(samp, L9['setting']):
-                    d = g.value(s, L9['device'])
-                    da = g.value(s, L9['deviceAttr'])
-                    v = getVal(g, s)
-                    key = (samp, g.value(samp, L9['path']).toPython())
-                    self.sampleSettings.setdefault(key, {}).setdefault(d, {})[da] = v
+                
+                key = (samp, g.value(samp, L9['path']).toPython())
+                self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
 
     def _blur(self, img):
         return scipy.ndimage.gaussian_filter(img, 10, 0, mode='nearest')
@@ -123,7 +95,7 @@ class Solver(object):
     def solve(self, painting):
         """
         given strokes of colors on a photo of the stage, figure out the
-        best light settings to match the image
+        best light DeviceSettings to match the image
         """
         pic0 = self.draw(painting, 100, 48).astype(numpy.float)
         pic0Blur = self._blur(pic0)
@@ -148,17 +120,10 @@ class Solver(object):
             return []
 
         scale = brightest0 / brightestSample
-        
-        out = []
-        with self.graph.currentState() as g:
-            for obj in g.objects(sample, L9['setting']):
-                attr = g.value(obj, L9['deviceAttr'])
-                val = getVal(g, obj)
-                if attr == L9['color']:
-                    val = scaledHex(val, scale)
-                out.append((g.value(obj, L9['device']), attr, val))
-                           
-        return out
+
+        s = DeviceSettings.fromResource(self.graph, sample)
+        # missing color scale, but it was wrong to operate on all devs at once
+        return s
 
     def solveBrute(self, painting):
         pic0 = self.draw(painting, 100, 48).astype(numpy.float)
@@ -188,9 +153,9 @@ class Solver(object):
 
         
         def drawError(x):
-            settings = settingsFromVector(x)
+            settings = DeviceSettings.fromVector(self.graph, x)
             preview = self.combineImages(self.simulationLayers(settings))
-            saveNumpy('/tmp/x_%s.png' % abs(hash(tuple(settings))), preview)
+            saveNumpy('/tmp/x_%s.png' % abs(hash(settings)), preview)
             
             diff = preview.astype(numpy.float) - pic0
             out = scipy.sum(abs(diff))
@@ -206,7 +171,7 @@ class Solver(object):
             full_output=True)
         if fval > 30000:
             raise ValueError('solution has error of %s' % fval)
-        return settingsFromVector(x0)
+        return DeviceSettings.fromVector(self.graph, x0)
         
     def combineImages(self, layers):
         """make a result image from our self.samples images"""
@@ -222,45 +187,21 @@ class Solver(object):
         how should a simulation preview approximate the light settings
         (device attribute values) by combining photos we have?
         """
-
-        compiled = {} # dev: { attr: val }
-        for row in settings:
-            compiled.setdefault(row[0], {})[row[1]] = row[2]
-
+        assert isinstance(settings, DeviceSettings)
         layers = []
 
-        for dev, davs in compiled.items():
+        for dev, devSettings in settings.byDevice():
+            requestedColor = devSettings.getValue(dev, L9['color'])
             candidatePics = [] # (distance, path, picColor)
-            
             for (sample, path), s in self.sampleSettings.items():
-                for picDev, picDavs in s.items():
-                    if picDev != dev:
-                        continue
-
-                    requestedAttrs = davs.copy()
-                    picAttrs = picDavs.copy()
-                    del requestedAttrs[L9['color']]
-                    del picAttrs[L9['color']]
-
-                    dist = attrDistance(picAttrs, requestedAttrs)
-                    candidatePics.append((dist, path, picDavs[L9['color']]))
+                dist = devSettings.distanceTo(s.ofDevice(dev))
+                candidatePics.append((dist, path, s.getValue(dev, L9['color'])))
             candidatePics.sort()
             # we could even blend multiple top candidates, or omit all
             # of them if they're too far
             bestDist, bestPath, bestPicColor = candidatePics[0]
 
-            requestedColor = davs[L9['color']]
             layers.append({'path': bestPath,
                            'color': colorRatio(requestedColor, bestPicColor)})
         
         return layers
-
-
-def attrDistance(attrs1, attrs2):
-    dist = 0
-    for key in set(attrs1).union(set(attrs2)):
-        if key not in attrs1 or key not in attrs2:
-            dist += 999
-        else:
-            dist += abs(attrs1[key] - attrs2[key])
-    return dist

@@ -17,6 +17,8 @@ from light9 import networking
 from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
 from light9.effect import effecteval
+from light9.effect.settings import DeviceSettings
+
 from greplin import scales
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 
@@ -38,7 +40,7 @@ class TwistedZmqClient(object):
 
 
 def toCollectorJson(client, session, settings):
-    return json.dumps({'settings': settings,
+    return json.dumps({'settings': settings.asList() if isinstance(settings, DeviceSettings) else settings,
                        'client': client,
                        'clientSession': session,
                        'sendTime': time.time(),
