@@ -35,7 +35,7 @@ class TestMini15(unittest.TestCase):
         self.assertEqual(42, out[L9['xRotation']])
         self.assertEqual(127, out[L9['xFine']])
         self.assertEqual(47, out[L9['yRotation']])
-        self.assertEqual(51, out[L9['yFine']])
+        self.assertEqual(207, out[L9['yFine']])
         self.assertEqual(0, out[L9['rotationSpeed']])
         
 class TestResolve(unittest.TestCase):

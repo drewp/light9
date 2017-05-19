@@ -59,7 +59,8 @@ def resolve(deviceType, deviceAttr, values):
                 floatVals.append(float(v))
             else:
                 raise TypeError(repr(v))
-            
+
+        # averaging with zeros? not so good
         return Literal(sum(floatVals) / len(floatVals))
     
     return max(values)
@@ -91,8 +92,8 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             _8bit(out.cmy_m),
             _8bit(out.cmy_y))
 
-    def fine16Attr(attr):
-        x = floatAttr(attr)
+    def fine16Attr(attr, scale=1.0):
+        x = floatAttr(attr) * scale
         hi = _8bit(x)
         lo = _8bit((x * 255) % 1.0)
         return hi, lo
@@ -108,26 +109,20 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
     elif deviceType == L9['SimpleDimmer']:
         return {L9['level']: _8bit(floatAttr(L9['brightness']))}
     elif deviceType == L9['Mini15']:
-        inp = deviceAttrSettings
-        rx8 = float(inp.get(L9['rx'], 0)) / 540 * 255
-        ry8 = float(inp.get(L9['ry'], 0)) / 240 * 255
-        r, g, b = hex_to_rgb(inp.get(L9['color'], '#000000'))
-        return {
-            L9['xRotation']: clamp255(int(math.floor(rx8))),
-            # didn't find docs on this, but from tests it looks like 64 fine steps takes you to the next coarse step
-            L9['xFine']: _8bit(1 - (rx8 % 1.0)),
-            L9['yRotation']: clamp255(int(math.floor(ry8))),
-            L9['yFine']: _8bit((ry8 % 1.0) / 4),
+        out = {
             L9['rotationSpeed']: 0, # seems to have no effect
             L9['dimmer']: 255,
-            L9['red']: r,
-            L9['green']: g,
-            L9['blue']: b,
             L9['colorChange']: 0,
             L9['colorSpeed']: 0,
             L9['goboShake']: 0,
             L9['goboChoose']: 0,
         }
+        out[L9['red']], out[L9['green']], out[L9['blue']] = rgbAttr(L9['color'])
+        out[L9['xRotation']], out[L9['xFine']] = fine16Attr(L9['rx'], 1/540)
+        out[L9['yRotation']], out[L9['yFine']] = fine16Attr(L9['ry'], 1/240)
+        # didn't find docs on this, but from tests it looks like 64 fine steps takes you to the next coarse step
+
+        return out
     elif deviceType == L9['ChauvetHex12']:
         out = {}
         out[L9['red']], out[L9['green']], out[L9['blue']] = r, g, b = rgbAttr(L9['color'])
