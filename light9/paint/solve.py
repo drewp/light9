@@ -1,7 +1,6 @@
 from __future__ import division
 from light9.namespaces import RDF, L9, DEV
 from PIL import Image
-import decimal
 import numpy
 import scipy.misc, scipy.ndimage, scipy.optimize
 import cairo
@@ -17,6 +16,11 @@ def numpyFromCairo(surface):
 
 def numpyFromPil(img):
     return scipy.misc.fromimage(img, mode='RGB').transpose((1, 0, 2))
+
+def loadNumpy(path, thumb=(100, 100)):
+    img = Image.open(path)
+    img.thumbnail(thumb)
+    return numpyFromPil(img)
 
 def saveNumpy(path, img):
     scipy.misc.imsave(path, img.transpose((1, 0, 2)))

@@ -36,6 +36,7 @@ class ServiceAddress(object):
     def path(self, more):
         return self.url + str(more)
 
+captureDevice = ServiceAddress(L9['captureDevice'])
 curveCalc = ServiceAddress(L9['curveCalc'])
 dmxServer = ServiceAddress(L9['dmxServer'])
 dmxServerZmq = ServiceAddress(L9['dmxServerZmq'])
