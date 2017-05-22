@@ -48,6 +48,7 @@ class Camera(object):
 
 
 class Capture(object):
+    firstMoveTime = 5
     settleTime = .5
     def __init__(self, graph):
         self.graph = graph
@@ -86,7 +87,8 @@ class Capture(object):
         yield sendToCollector(client='captureDevice', session='main', settings=settings)
         
         d = Deferred()
-        reactor.callLater(self.settleTime, d.callback, None)
+        reactor.callLater(self.firstMoveTime if self.numPics == 0 else self.settleTime,
+                          d.callback, None)
         yield d
         dev = settings.devices()[0]
 
