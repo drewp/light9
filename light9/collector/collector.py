@@ -49,7 +49,7 @@ def outputMap(graph, outputs):
         
 class Collector(Generic[ClientType, ClientSessionType]):
     def __init__(self, graph, outputs, listeners=None, clientTimeoutSec=10):
-        # type: (Graph, List[Output], float) -> None
+        # type: (Graph, List[Output], List[Listener], float) -> None
         self.graph = graph
         self.outputs = outputs
         self.listeners = listeners

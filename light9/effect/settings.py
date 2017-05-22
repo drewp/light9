@@ -17,13 +17,51 @@ def getVal(graph, subj):
     return ret
 
 class _Settings(object):
+    """
+    default values are 0. Internal rep must not store zeros or some
+    comparisons will break.
+    """
     def __init__(self, graph, settingsList):
         self.graph = graph # for looking up all possible attrs
         self._compiled = {} # dev: { attr: val }
         for row in settingsList:
             self._compiled.setdefault(row[0], {})[row[1]] = row[2]
         # self._compiled may not be final yet- see _fromCompiled
+        self._delZeros()
+        
+    @classmethod
+    def _fromCompiled(cls, graph, compiled):
+        obj = cls(graph, [])
+        obj._compiled = compiled
+        obj._delZeros()
+        return obj
+            
+    @classmethod
+    def fromResource(cls, graph, subj):
+        settingsList = []
+        with graph.currentState() as g:
+            for s in g.objects(subj, L9['setting']):
+                d = g.value(s, L9['device'])
+                da = g.value(s, L9['deviceAttr'])
+                v = getVal(g, s)
+                settingsList.append((d, da, v))
+        return cls(graph, settingsList)
 
+    @classmethod
+    def fromVector(cls, graph, vector):
+        compiled = {}
+        for (d, a), v in zip(cls(graph, [])._vectorKeys(), vector):
+            compiled.setdefault(d, {})[a] = v
+        return cls._fromCompiled(graph, compiled)
+
+    def _delZeros(self):
+        for dev, av in self._compiled.items():
+            for attr, val in av.items():
+                if val == 0:
+                    del av[attr]
+            if not av:
+                del self._compiled[dev]
+        
     def __hash__(self):
         itemed = tuple([(d, tuple([(a, v) for a, v in sorted(av.items())]))
                         for d, av in sorted(self._compiled.items())])
@@ -54,30 +92,6 @@ class _Settings(object):
         
     def getValue(self, dev, attr):
         return self._compiled.get(dev, {}).get(attr, 0)
-        
-    @classmethod
-    def _fromCompiled(cls, graph, compiled):
-        obj = cls(graph, [])
-        obj._compiled = compiled
-        return obj
-            
-    @classmethod
-    def fromResource(cls, graph, subj):
-        settingsList = []
-        with graph.currentState() as g:
-            for s in g.objects(subj, L9['setting']):
-                d = g.value(s, L9['device'])
-                da = g.value(s, L9['deviceAttr'])
-                v = getVal(g, s)
-                settingsList.append((d, da, v))
-        return cls(graph, settingsList)
-
-    @classmethod
-    def fromVector(cls, graph, vector):
-        compiled = {}
-        for (d, a), v in zip(cls(graph, [])._vectorKeys(), vector):
-            compiled.setdefault(d, {})[a] = v
-        return cls._fromCompiled(graph, compiled)
 
     def _vectorKeys(self):
         """stable order of all the dev,attr pairs for this type of settings"""
@@ -118,7 +132,7 @@ class _Settings(object):
                 dist += abs(attrs1[key] - attrs2[key])
         return dist
 
-    def addStatements(self, subj, ctx, settingRoot, settingsSubgraphCache):
+    def statements(self, subj, ctx, settingRoot, settingsSubgraphCache):
         """
         settingRoot can be shared across images (or even wider if you want)
         """
@@ -141,7 +155,7 @@ class _Settings(object):
                 ])
             settingsSubgraphCache.add(setting)
             
-        self.graph.patch(Patch(addQuads=add))
+        return add
 
 
 class DeviceSettings(_Settings):

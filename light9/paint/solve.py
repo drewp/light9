@@ -149,7 +149,7 @@ class Solver(object):
                     settings.append((dev, attr, toHex(rgb)))
                 else:
                     settings.append((dev, attr, xLeft.pop()))
-            return settings
+            return DeviceSettings(self.graph, settings)
 
         
         def drawError(x):
