@@ -7,7 +7,8 @@ from light9.effect.settings import DeviceSettings
 
 class TestSolve(unittest.TestCase):
     def setUp(self):
-        self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
+        self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
+                                             'show/dance2017/cam/test/bg.n3'])
         self.solver = solve.Solver(self.graph)
         self.solver.loadSamples()
         self.solveMethod = self.solver.solve
@@ -33,7 +34,8 @@ class TestSolveBrute(TestSolve):
         
 class TestSimulationLayers(unittest.TestCase):
     def setUp(self):
-        self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
+        self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
+                                             'show/dance2017/cam/test/bg.n3'])
         self.solver = solve.Solver(self.graph)
         self.solver.loadSamples()
         
@@ -72,7 +74,8 @@ class TestSimulationLayers(unittest.TestCase):
 
 class TestCombineImages(unittest.TestCase):
     def setUp(self):
-        graph = LocalSyncedGraph(files=['show/dance2017/cam/test/bg.n3'])
+        graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
+                                        'show/dance2017/cam/test/bg.n3'])
         self.solver = solve.Solver(graph)
         self.solver.loadSamples()
     def test(self):

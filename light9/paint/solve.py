@@ -5,7 +5,7 @@ import numpy
 import scipy.misc, scipy.ndimage, scipy.optimize
 import cairo
 
-from light9.effect.settings import DeviceSettings
+from light9.effect.settings import DeviceSettings, parseHex, toHex
 
 # numpy images in this file are (x, y, c) layout.
 
@@ -26,13 +26,6 @@ def loadNumpy(path, thumb=(100, 100)):
 
 def saveNumpy(path, img):
     scipy.misc.imsave(path, img.transpose((1, 0, 2)))
-
-def parseHex(h):
-    if h[0] != '#': raise ValueError(h)
-    return [int(h[i:i+2], 16) for i in 1, 3, 5]
-
-def toHex(rgbFloat):
-    return '#%02x%02x%02x' % tuple(int(v * 255) for v in rgbFloat)
 
 def scaledHex(h, scale):
     rgb = parseHex(h)
@@ -66,7 +59,7 @@ class Solver(object):
                 self.samples[samp] = self.fromPath[base] = loadNumpy(path)
                 self.blurredSamples[samp] = self._blur(self.samples[samp])
                 
-                key = (samp, g.value(samp, L9['path']).toPython())
+                key = (samp, g.value(samp, L9['path']).toPython().encode('utf8'))
                 self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
 
     def _blur(self, img):
@@ -117,7 +110,7 @@ class Solver(object):
         brightestSample = brightest(self.samples[sample])
         
         if max(brightest0) < 1 / 255:
-            return []
+            return DeviceSettings(self.graph, [])
 
         scale = brightest0 / brightestSample
 
@@ -138,19 +131,6 @@ class Solver(object):
                                          slice(0, 1 + colorStep, colorStep),
                                          slice(0, 1 + colorStep, colorStep)]),
         ]
-
-        def settingsFromVector(x):
-            settings = []
-
-            xLeft = x.tolist()
-            for dev, attr, _ in dims:
-                if attr == L9['color']:
-                    rgb = (xLeft.pop(), xLeft.pop(), xLeft.pop())
-                    settings.append((dev, attr, toHex(rgb)))
-                else:
-                    settings.append((dev, attr, xLeft.pop()))
-            return DeviceSettings(self.graph, settings)
-
         
         def drawError(x):
             settings = DeviceSettings.fromVector(self.graph, x)

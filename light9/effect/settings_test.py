@@ -12,7 +12,7 @@ class TestDeviceSettings(unittest.TestCase):
 
     def testToVectorZero(self):
         ds = DeviceSettings(self.graph, [])
-        self.assertEqual([0] * 20, ds.toVector())
+        self.assertEqual([0] * 30, ds.toVector())
 
     def testEq(self):
         s1 = DeviceSettings(self.graph, [
@@ -53,17 +53,20 @@ class TestDeviceSettings(unittest.TestCase):
     def testToVector(self):
         v = DeviceSettings(self.graph, [
             (DEV['aura1'], L9['rx'], 0.5),
+            (DEV['aura1'], L9['color'], '#00ff00'),
         ]).toVector()
         self.assertEqual(
-            [0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], v)
+            [0, 1, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+            v)
         
     def testFromVector(self):
         s = DeviceSettings.fromVector(
             self.graph,
-            [0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+            [0, 1, 0, 0.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         
         self.assertEqual(DeviceSettings(self.graph, [
             (DEV['aura1'], L9['rx'], 0.5),
+            (DEV['aura1'], L9['color'], '#00ff00'),
         ]), s)                            
 
     def testAsList(self):
@@ -75,22 +78,33 @@ class TestDeviceSettings(unittest.TestCase):
 
     def testDevices(self):
         s = DeviceSettings(self.graph, [
-            (L9['aura1'], L9['rx'], 0),
-            (L9['aura2'], L9['rx'], 0.1),
+            (DEV['aura1'], L9['rx'], 0),
+            (DEV['aura2'], L9['rx'], 0.1),
             ])
         # aura1 is all defaults (zeros), so it doesn't get listed
-        self.assertItemsEqual([L9['aura2']], s.devices())
+        self.assertItemsEqual([DEV['aura2']], s.devices())
 
     def testAddStatements(self):
         s = DeviceSettings(self.graph, [
-            (L9['aura2'], L9['rx'], 0.1),
+            (DEV['aura2'], L9['rx'], 0.1),
             ])
         stmts = s.statements(L9['foo'], L9['ctx1'], L9['s_'], set())
         self.maxDiff=None
         self.assertItemsEqual([
-            (L9['foo'], L9['setting'], L9['s_set8011962'], L9['ctx1']),
-            (L9['s_set8011962'], L9['device'], L9['aura2'], L9['ctx1']),
-            (L9['s_set8011962'], L9['deviceAttr'], L9['rx'], L9['ctx1']),
-            (L9['s_set8011962'], L9['value'], Literal(0.1), L9['ctx1']),
+            (L9['foo'], L9['setting'], L9['s_set4350023'], L9['ctx1']),
+            (L9['s_set4350023'], L9['device'], DEV['aura2'], L9['ctx1']),
+            (L9['s_set4350023'], L9['deviceAttr'], L9['rx'], L9['ctx1']),
+            (L9['s_set4350023'], L9['value'], Literal(0.1), L9['ctx1']),
         ], stmts)
+        
+    def testDistanceTo(self):
+        s1 = DeviceSettings(self.graph, [
+            (DEV['aura1'], L9['rx'], 0.1),
+            (DEV['aura1'], L9['ry'], 0.6),
+        ])
+        s2 = DeviceSettings(self.graph, [
+            (DEV['aura1'], L9['rx'], 0.3),
+            (DEV['aura1'], L9['ry'], 0.3),
+        ])
+        self.assertEqual(0.36055512754639896, s1.distanceTo(s2))
         

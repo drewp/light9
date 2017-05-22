@@ -1,13 +1,22 @@
+from __future__ import division
 """
 Data structure and convertors for a table of (device,attr,value)
 rows. These might be effect attrs ('strength'), device attrs ('rx'),
 or output attrs (dmx channel).
 """
 import decimal
+import numpy
 from rdflib import URIRef, Literal
 from light9.namespaces import RDF, L9, DEV
 from light9.rdfdb.patch import Patch
 
+
+def parseHex(h):
+    if h[0] != '#': raise ValueError(h)
+    return [int(h[i:i+2], 16) for i in 1, 3, 5]
+
+def toHex(rgbFloat):
+    return '#%02x%02x%02x' % tuple(int(v * 255) for v in rgbFloat)
 
 def getVal(graph, subj):
     lit = graph.value(subj, L9['value']) or graph.value(subj, L9['scaledValue'])
@@ -18,12 +27,12 @@ def getVal(graph, subj):
 
 class _Settings(object):
     """
-    default values are 0. Internal rep must not store zeros or some
+    default values are 0 or '#000000'. Internal rep must not store zeros or some
     comparisons will break.
     """
     def __init__(self, graph, settingsList):
         self.graph = graph # for looking up all possible attrs
-        self._compiled = {} # dev: { attr: val }
+        self._compiled = {} # dev: { attr: val }; val is number or colorhex
         for row in settingsList:
             self._compiled.setdefault(row[0], {})[row[1]] = row[2]
         # self._compiled may not be final yet- see _fromCompiled
@@ -50,14 +59,26 @@ class _Settings(object):
     @classmethod
     def fromVector(cls, graph, vector):
         compiled = {}
-        for (d, a), v in zip(cls(graph, [])._vectorKeys(), vector):
+        i = 0
+        for (d, a) in cls(graph, [])._vectorKeys():
+            if a == L9['color']:
+                v = toHex(vector[i:i+3])
+                i += 3
+            else:
+                v = vector[i]
+                i += 1
             compiled.setdefault(d, {})[a] = v
         return cls._fromCompiled(graph, compiled)
+
+    def _zeroForAttr(self, attr):
+        if attr == L9['color']:
+            return '#000000'
+        return 0
 
     def _delZeros(self):
         for dev, av in self._compiled.items():
             for attr, val in av.items():
-                if val == 0:
+                if val == self._zeroForAttr(attr):
                     del av[attr]
             if not av:
                 del self._compiled[dev]
@@ -81,7 +102,7 @@ class _Settings(object):
         def accum():
             for dev, av in self._compiled.iteritems():
                 for attr, val in av.iteritems():
-                    words.append('%s.%s=%g' % (dev.rsplit('/')[-1],
+                    words.append('%s.%s=%s' % (dev.rsplit('/')[-1],
                                                attr.rsplit('/')[-1],
                                                val))
                     if len(words) > 5:
@@ -91,7 +112,7 @@ class _Settings(object):
         return '<%s %s>' % (self.__class__.__name__, ' '.join(words))
         
     def getValue(self, dev, attr):
-        return self._compiled.get(dev, {}).get(attr, 0)
+        return self._compiled.get(dev, {}).get(attr, self._zeroForAttr(attr))
 
     def _vectorKeys(self):
         """stable order of all the dev,attr pairs for this type of settings"""
@@ -111,7 +132,12 @@ class _Settings(object):
     def toVector(self):
         out = []
         for dev, attr in self._vectorKeys():
-            out.append(self._compiled.get(dev, {}).get(attr, 0))
+            # color components may need to get spread out
+            v = self.getValue(dev, attr)
+            if attr == L9['color']:
+                out.extend([x / 255 for x in parseHex(v)])
+            else:
+                out.append(v)
         return out
 
     def byDevice(self):
@@ -123,14 +149,9 @@ class _Settings(object):
                                             {dev: self._compiled.get(dev, {})})
         
     def distanceTo(self, other):
-        raise NotImplementedError
-        dist = 0
-        for key in set(attrs1).union(set(attrs2)):
-            if key not in attrs1 or key not in attrs2:
-                dist += 999
-            else:
-                dist += abs(attrs1[key] - attrs2[key])
-        return dist
+        diff = numpy.array(self.toVector()) - other.toVector()
+        d = numpy.linalg.norm(diff, ord=None)
+        return d
 
     def statements(self, subj, ctx, settingRoot, settingsSubgraphCache):
         """
