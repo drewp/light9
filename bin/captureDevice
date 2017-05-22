@@ -1,6 +1,6 @@
 #!bin/python
 from __future__ import division
-from rdflib import URIRef, Literal
+from rdflib import URIRef
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, Deferred
 
@@ -8,7 +8,6 @@ import logging
 import optparse
 import os
 import time
-import traceback
 import treq
 import cyclone.web, cyclone.websocket, cyclone.httpclient
 from greplin import scales
@@ -26,12 +25,6 @@ from light9.effect.sequencer import sendToCollector
 
 stats = scales.collection('/webServer', scales.PmfStat('setAttr'))
 
-class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
-    def put(self):
-        with stats.setAttr.time():
-            client, clientSession, settings, sendTime = parseJsonMessage(self.request.body)
-            self.set_status(202)
-
 
 class Camera(object):
     def __init__(self, imageUrl):
@@ -39,7 +32,8 @@ class Camera(object):
     
     def takePic(self, uri, writePath):
         log.info('takePic %s', uri)
-        return treq.get(self.imageUrl).addCallbacks(lambda r: self._done(writePath, r), log.error)
+        return treq.get(self.imageUrl).addCallbacks(lambda r: self._done(writePath, r),
+                                                    log.error)
         
     @inlineCallbacks
     def _done(self, writePath, response):
@@ -53,65 +47,81 @@ class Camera(object):
         log.info('wrote %s', writePath)
 
 
+class Capture(object):
+    settleTime = .5
+    def __init__(self, graph):
+        self.graph = graph
+        
+        def steps(a, b, n):
+            return [round(a + (b - a) * i / n, 5) for i in range(n)]
 
-settleTime = .5
+        startTime = time.time()
+        self.captureId = 'cap%s' % (int(startTime) - 1495170000)
+        self.toGather = []
 
-camera = Camera('http://dash:8200/picamserve/pic?res=480&resize=480&rotation=180&iso=800&redgain=1.6&bluegain=2&shutter=60000')
+        row = 0
+        for ry in steps(0.85, .92, 6):
+            xSteps = steps(.24, .45, 12)
+            if row % 2:
+                xSteps.reverse()
+            row += 1
+            for rx in xSteps:
+                self.toGather.append(DeviceSettings(graph, [
+                    (L9['device/moving1'], L9['rx'], rx),
+                    (L9['device/moving1'], L9['ry'], ry),
+                ]))
 
-def launch(graph):
-
-    def steps(a, b, n):
-        return [round(a + (b - a) * i / n, 5) for i in range(n)]
-
-    startTime = time.time()
-    toGather = []
-
-    row = 0
-    for ry in steps(0.85, .92, 6):
-        xSteps = steps(.24, .45, 12)
-        if row % 2:
-            xSteps.reverse()
-        row += 1
-        for rx in xSteps:
-            toGather.append(DeviceSettings(graph, [
-                (L9['device/moving1'], L9['rx'], rx),
-                (L9['device/moving1'], L9['ry'], ry),
-            ]))
-
-    numPics = [0]
-    settingsCache = set()
+        self.numPics = 0
+        self.settingsCache = set()
+        self.step().addErrback(log.error)
+        
     @inlineCallbacks
-    def step():
-        if not toGather:
+    def step(self):
+        if not self.toGather:
             reactor.stop()
             return
-        settings = toGather.pop()
+        settings = self.toGather.pop()
         
         log.info('move to %r', settings)
         yield sendToCollector(client='captureDevice', session='main', settings=settings)
         
         d = Deferred()
-        reactor.callLater(settleTime, d.callback, None)
+        reactor.callLater(self.settleTime, d.callback, None)
         yield d
         dev = settings.devices()[0]
 
         devTail = dev.rsplit('/')[-1]
-        captureId = 'cap%s' % (int(startTime) - 1495170000)
-        picId = 'pic%s' % numPics[0]
-        path = '/'.join(['capture', devTail, captureId, picId])
-        ctx = URIRef('/'.join([showconfig.showUri(), 'capture', devTail, captureId, 'index']))
-        uri = URIRef('/'.join([showconfig.showUri(), 'capture', devTail, captureId, picId]))
+        
+        picId = 'pic%s' % self.numPics
+        path = '/'.join(['capture', devTail, self.captureId, picId])
+        ctx = URIRef('/'.join([showconfig.showUri(), 'capture', devTail, self.captureId,
+                               'index']))
+        uri = URIRef('/'.join([showconfig.showUri(), 'capture', devTail, self.captureId,
+                               picId]))
                      
         relOutPath = path + '.jpg'
         
         yield camera.takePic(uri, os.path.join(showconfig.root(), relOutPath))
-        numPics[0] += 1
+        self.numPics += 1
 
-        writeCaptureDescription(graph, ctx, uri, dev, relOutPath, settingsCache, settings)
+        writeCaptureDescription(self.graph, ctx, uri, dev, relOutPath,
+                                self.settingsCache, settings)
         
-        reactor.callLater(0, step)
-    step().addErrback(log.error)
-    
+        reactor.callLater(0, self.step)
+
+        
+
+camera = Camera('http://dash:8200/picamserve/pic?res=480&resize=480&rotation=180&iso=800&redgain=1.6&bluegain=2&shutter=60000')
+
+class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def put(self):
+        with stats.setAttr.time():
+            client, clientSession, settings, sendTime = parseJsonMessage(self.request.body)
+            self.set_status(202)
+
+def launch(graph):
+
+    cap = Capture(graph)
     reactor.listenTCP(networking.captureDevice.port,
                       cyclone.web.Application(handlers=[
                           (r'/()', cyclone.web.StaticFileHandler,

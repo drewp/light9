@@ -3,7 +3,7 @@ from rdflib import URIRef
 from light9 import showconfig
 from light9.rdfdb.patch import Patch
 from light9.namespaces import L9
-from light9.paint.solve import loadNumPy
+from light9.paint.solve import loadNumpy
 
 def writeCaptureDescription(graph, ctx, uri, dev, relOutPath, settingsSubgraphCache, settings):
     graph.patch(Patch(addQuads=settings.statements(
@@ -24,7 +24,7 @@ class CaptureLoader(object):
         if not ip.startswith(showconfig.show()):
             raise ValueError(repr(ip))
         diskPath = os.path.join(showconfig.root(), ip[len(self.show):])
-        return loadNumPy(diskPath, thumb)
+        return loadNumpy(diskPath, thumb)
         
     def devices(self):
         """devices for which we have any captured data"""
