@@ -4,18 +4,17 @@ from run_local import log
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-import sys, optparse, logging, subprocess, json, time, traceback, itertools
+import sys, optparse, logging, subprocess, json, itertools
 from rdflib import URIRef, Literal
 
 sys.path.append('/usr/lib/pymodules/python2.7/') # for numpy, on rpi
 sys.path.append('/usr/lib/python2.7/dist-packages') # For numpy
-from light9 import networking, showconfig, Submaster, dmxclient
-from light9.curvecalc import musicaccess
-from light9.curvecalc.curve import CurveResource
+from light9 import networking, showconfig
 from light9.effecteval.effect import EffectNode
+from light9.effect.edit import getMusicStatus, songEffectPatch
 from light9.effecteval.effectloop import makeEffectLoop
 from light9.greplin_cyclone import StatsForCyclone
-from light9.namespaces import L9, RDF, RDFS
+from light9.namespaces import L9
 from light9.rdfdb.patch import Patch
 from light9.rdfdb.syncedgraph import SyncedGraph
 from greplin import scales
@@ -35,66 +34,6 @@ class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
             (song, L9['effect'], uri, ctx),
             ]))
         
-def clamp(x, lo, hi):
-    return max(lo, min(hi, x))
-
-@inlineCallbacks
-def getMusicStatus():
-    returnValue(json.loads((yield cyclone.httpclient.fetch(
-        networking.musicPlayer.path('time'), timeout=.5)).body))
-    
-@inlineCallbacks
-def newEnvelopeCurve(graph, ctx, uri, label):
-    """this does its own patch to the graph"""
-    
-    cr = CurveResource(graph, uri)
-    cr.newCurve(ctx, label=Literal(label))
-    yield insertEnvelopePoints(cr.curve)
-    cr.saveCurve()
-
-@inlineCallbacks
-def insertEnvelopePoints(curve):
-    # wrong: we might not be adding to the currently-playing song.
-    musicStatus = yield getMusicStatus()
-    songTime=musicStatus['t']
-    songDuration=musicStatus['duration']
-    
-    fade = 2
-    t1 = clamp(songTime - fade, .1, songDuration - .1 * 2) + fade
-    t2 = clamp(songTime + 20, t1 + .1, songDuration)
-    
-    curve.insert_pt((t1 - fade, 0))
-    curve.insert_pt((t1, 1))
-    curve.insert_pt((t2, 1))
-    curve.insert_pt((t2 + fade, 0))
-    
-    
-def newEffect(graph, song, ctx):
-    effect = graph.sequentialUri(song + "/effect-")
-    quads = [
-        (song, L9['effect'], effect, ctx),
-        (effect, RDF.type, L9['Effect'], ctx),
-    ]
-    print "newEffect", effect, quads
-    return effect, quads
-    
-def musicCurveForSong(uri):
-    return URIRef(uri + 'music')
-
-def maybeAddMusicLine(quads, effect, song, ctx):
-    """
-    add a line getting the current music into 'music' if any code might
-    be mentioning that var
-    """
-    
-    for spoc in quads:
-        if spoc[1] == L9['code'] and 'music' in spoc[2]:
-            quads.extend([
-                (effect, L9['code'],
-                 Literal('music = %s' % musicCurveForSong(song).n3()), ctx)
-                ])
-            break
-
 @inlineCallbacks
 def currentSong():
     s = (yield getMusicStatus())['song']
@@ -102,11 +41,6 @@ def currentSong():
         raise ValueError("no current song")
     returnValue(URIRef(s))
 
-def songHasEffect(graph, song, uri):
-    """does this song have an effect of class uri or a sub curve for sub
-    uri? this should be simpler to look up."""
-    return False # todo
-    
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
     def wideOpenCors(self):
         self.set_header('Access-Control-Allow-Origin', '*')
@@ -127,55 +61,17 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             song = URIRef(self.get_argument('uri'))
         except Exception: # which?
             song = yield currentSong()
+
+        event = self.get_argument('event') or 'default'
             
         log.info("adding to %s", song)
 
         ctx = song
         graph = self.settings.graph
-        
-        with graph.currentState(
-                tripleFilter=(dropped, None, None)) as g:
-            droppedTypes = list(g.objects(dropped, RDF.type))
-            droppedLabel = g.label(dropped)
-            droppedCodes = list(g.objects(dropped, L9['code']))
 
-        quads = []
+        p = yield songEffectPatch(graph, dropped, song, event, ctx)
 
-        if songHasEffect(graph, song, dropped):
-            # bump the existing curve
-            pass
-        else:
-            effect, q = newEffect(graph, song, ctx)
-            quads.extend(q)
-
-            curve = graph.sequentialUri(song + "/curve-")
-            yield newEnvelopeCurve(graph, ctx, curve, droppedLabel)
-            quads.extend([
-                (song, L9['curve'], curve, ctx),
-                (effect, RDFS.label, droppedLabel, ctx),
-                (effect, L9['code'], Literal('env = %s' % curve.n3()), ctx),
-                ])
-
-            if L9['EffectClass'] in droppedTypes:
-                quads.extend([
-                    (effect, RDF.type, dropped, ctx),
-                    ] + [(effect, L9['code'], c, ctx) for c in droppedCodes])
-            elif L9['Submaster'] in droppedTypes:
-                quads.extend([
-                    (effect, L9['code'], Literal('out = %s * env' % dropped.n3()),
-                     ctx),
-                    ])
-            else:
-                raise NotImplementedError(
-                    "don't know how to add an effect from %r (types=%r)" %
-                    (dropped, droppedTypes))
-
-            maybeAddMusicLine(quads, effect, song, ctx)
-
-        print "adding"
-        for qq in quads:
-            print qq
-        graph.patch(Patch(addQuads=quads))
+        graph.patch(p)
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
     def connectionMade(self, *args, **kwargs):
