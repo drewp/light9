@@ -10,7 +10,7 @@ class ReadOnlyConjunctiveGraph(object):
         self.graph = graph
 
     def __getattr__(self, attr):
-        if attr in ['subjects', 'value', 'objects', 'triples']: # not complete
+        if attr in ['subjects', 'value', 'objects', 'triples', 'label']: # not complete
             return getattr(self.graph, attr)
         raise TypeError("can't access %r of read-only graph" % attr)
 

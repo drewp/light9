@@ -33,6 +33,21 @@ model.addToCurrentSong = (e) ->
     data: {drop: e.uri}
   })
 
+model.addMomentary = (e) ->
+  $.ajax({
+    type: 'POST'
+    url: '/effectEval/songEffects'
+    data: {drop: e.uri, event: 'start'}
+  })
+
+model.addMomentaryUp = (e) ->
+  $.ajax({
+    type: 'POST'
+    url: '/effectEval/songEffects'
+    data: {drop: e.uri, event: 'end'}
+  })
+  
+
 reconnectingWebSocket "../effectsUpdates", (msg) ->
   model.chases(msg.chases) if msg.chases?
   model.classes(msg.classes) if msg.classes?

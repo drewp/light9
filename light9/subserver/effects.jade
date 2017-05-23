@@ -30,6 +30,7 @@ html
           | 
           a(data-bind="attr: {href: uri}, text: label")
           button(data-bind="click: $root.addToCurrentSong") Add to current song
+          button(data-bind="event: { mousedown: $root.addMomentary, mouseup: $root.addMomentaryUp }") Add momentary
         div
           code(data-bind="text: code")
         

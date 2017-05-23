@@ -19,6 +19,9 @@ def getMusicStatus():
 
 @inlineCallbacks
 def songEffectPatch(graph, dropped, song, event, ctx):
+    """
+    some uri was 'dropped' in the timeline. event is 'default' or 'start' or 'end'.
+    """
     with graph.currentState(
             tripleFilter=(dropped, None, None)) as g:
         droppedTypes = list(g.objects(dropped, RDF.type))

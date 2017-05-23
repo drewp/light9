@@ -62,7 +62,7 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
         except Exception: # which?
             song = yield currentSong()
 
-        event = self.get_argument('event') or 'default'
+        event = self.get_argument('event', default='default')
             
         log.info("adding to %s", song)
 

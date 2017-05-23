@@ -14,22 +14,22 @@ show:dance2017 :playList (
   sh:song16 sh:song17 sh:song18
 ) .
 
-sh:song1 a :Song; rdfs:label  "01"; :songFilename "01.wav" .
-sh:song2 a :Song; rdfs:label  "02"; :songFilename "02.wav" .
-sh:song3 a :Song; rdfs:label  "03"; :songFilename "03.wav" .
-sh:song4 a :Song; rdfs:label  "04"; :songFilename "04.wav" .
-sh:song5 a :Song; rdfs:label  "05"; :songFilename "05.wav" .
-sh:song6 a :Song; rdfs:label  "06"; :songFilename "06.wav" .
-sh:song7 a :Song; rdfs:label  "07"; :songFilename "07.wav" .
-sh:song8 a :Song; rdfs:label  "08"; :songFilename "08.wav" .
-sh:song9 a :Song; rdfs:label  "09"; :songFilename "09.wav" .
-sh:song10 a :Song; rdfs:label "10"; :songFilename "10.wav" .
-sh:song11 a :Song; rdfs:label "11"; :songFilename "11.wav" .
-sh:song12 a :Song; rdfs:label "12"; :songFilename "12.wav" .
-sh:song13 a :Song; rdfs:label "13"; :songFilename "13.wav" .
-sh:song14 a :Song; rdfs:label "14"; :songFilename "14.wav" .
-sh:song15 a :Song; rdfs:label "15"; :songFilename "15.wav" .
-sh:song16 a :Song; rdfs:label "16"; :songFilename "16.wav" .
-sh:song17 a :Song; rdfs:label "17"; :songFilename "17.wav" .
+sh:song1 a :Song; rdfs:label  "01"; :songFilename "01-out.wav" .
+sh:song2 a :Song; rdfs:label  "02"; :songFilename "02-out.wav" .
+sh:song3 a :Song; rdfs:label  "03"; :songFilename "03-out.wav" .
+sh:song4 a :Song; rdfs:label  "04"; :songFilename "04-out.wav" .
+sh:song5 a :Song; rdfs:label  "05"; :songFilename "05-out.wav" .
+sh:song6 a :Song; rdfs:label  "06"; :songFilename "06-out.wav" .
+sh:song7 a :Song; rdfs:label  "07"; :songFilename "07-out.wav" .
+sh:song8 a :Song; rdfs:label  "08"; :songFilename "08-out.wav" .
+sh:song9 a :Song; rdfs:label  "09"; :songFilename "09-out.wav" .
+sh:song10 a :Song; rdfs:label "10"; :songFilename "10-out.wav" .
+sh:song11 a :Song; rdfs:label "11"; :songFilename "11-out.wav" .
+sh:song12 a :Song; rdfs:label "12"; :songFilename "12-out.wav" .
+sh:song13 a :Song; rdfs:label "13"; :songFilename "13-out.wav" .
+sh:song14 a :Song; rdfs:label "14"; :songFilename "14-out.wav" .
+sh:song15 a :Song; rdfs:label "15"; :songFilename "15-africaout.wav" .
+sh:song16 a :Song; rdfs:label "16"; :songFilename "16-out.wav" .
+sh:song17 a :Song; rdfs:label "17"; :songFilename "17-out.wav" .
 
 

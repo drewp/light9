@@ -125,6 +125,10 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         self._sender.sendPatch(p).addErrback(self.sendFailed)
         log.debug('patch is done %s', debugKey)
 
+    def suggestPrefixes(self, prefixes):
+        song note edit should put song: to the song uri
+        self.addlPrefixes.update(prefixes)
+
     def sendFailed(self, result):
         """
         we asked for a patch to be queued and sent to the master, and
