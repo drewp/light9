@@ -66,12 +66,8 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             
         log.info("adding to %s", song)
 
-        ctx = song
-        graph = self.settings.graph
-
-        p = yield songEffectPatch(graph, dropped, song, event, ctx)
-
-        graph.patch(p)
+        p = yield songEffectPatch(self.settings.graph, dropped, song, event, ctx=song)
+        self.settings.graph.patch(p)
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
     def connectionMade(self, *args, **kwargs):
