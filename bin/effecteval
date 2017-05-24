@@ -11,7 +11,7 @@ sys.path.append('/usr/lib/pymodules/python2.7/') # for numpy, on rpi
 sys.path.append('/usr/lib/python2.7/dist-packages') # For numpy
 from light9 import networking, showconfig
 from light9.effecteval.effect import EffectNode
-from light9.effect.edit import getMusicStatus, songEffectPatch
+from light9.effect.edit import getMusicStatus, songNotePatch
 from light9.effecteval.effectloop import makeEffectLoop
 from light9.greplin_cyclone import StatsForCyclone
 from light9.namespaces import L9
@@ -66,7 +66,7 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             
         log.info("adding to %s", song)
 
-        p = yield songEffectPatch(self.settings.graph, dropped, song, event, ctx=song)
+        p = yield songNotePatch(self.settings.graph, dropped, song, event, ctx=song)
         self.settings.graph.patch(p)
         self.settings.graph.suggestPrefixes({'song': URIRef(song + '/')})
         
