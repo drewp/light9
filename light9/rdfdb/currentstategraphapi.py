@@ -71,7 +71,10 @@ class CurrentStateGraphApi(object):
         """
         for i in itertools.count(1):
             newUri = prefix + str(i)
-            if not list(self._graph.triples((newUri, None, None))):
+            if not list(self._graph.triples((newUri, None, None))) and newUri not in getattr(self, '_reservedSequentials', []):
+                if not hasattr(self, '_reservedSequentials'):
+                    self._reservedSequentials = set()
+                self._reservedSequentials.add(newUri)
                 return newUri
 
         
