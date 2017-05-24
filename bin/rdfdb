@@ -180,9 +180,10 @@ class WatchedFiles(object):
 
     This object watches directories. Each GraphFile watches its own file.
     """
-    def __init__(self, dirUriMap, patch, getSubgraph):
+    def __init__(self, dirUriMap, patch, getSubgraph, addlPrefixes=None):
         self.dirUriMap = dirUriMap # {abspath : uri prefix}
         self.patch, self.getSubgraph = patch, getSubgraph
+        self.addlPrefixes = addlPrefixes
         
         self.graphFiles = {} # context uri : GraphFile
         
@@ -239,7 +240,8 @@ class WatchedFiles(object):
             
         ctx = uriFromFile(self.dirUriMap, inFile)
         gf = GraphFile(self.notifier, inFile, ctx,
-                       self.patch, self.getSubgraph)
+                       self.patch, self.getSubgraph,
+                       addlPrefixes=self.addlPrefixes)
         self.graphFiles[ctx] = gf
         log.info("%s do initial read", inFile)
         gf.reread()
@@ -262,7 +264,8 @@ class WatchedFiles(object):
             assert '//' not in outFile, (outFile, self.dirUriMap, ctx)
             log.info("starting new file %r", outFile)
             self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
-                                             self.patch, self.getSubgraph)
+                                             self.patch, self.getSubgraph,
+                                             addlPrefixes=self.addlPrefixes)
 
     def dirtyFiles(self, ctxs):
         """mark dirty the files that we watch in these contexts.
@@ -282,13 +285,13 @@ class Db(object):
     """
     the master graph, all the connected clients, all the files we're watching
     """
-    def __init__(self, dirUriMap):
+    def __init__(self, dirUriMap, addlPrefixes=None):
       
         self.clients = []
         self.graph = ConjunctiveGraph()
 
         self.watchedFiles = WatchedFiles(dirUriMap,
-                                         self.patch, self.getSubgraph)
+                                         self.patch, self.getSubgraph, addlPrefixes)
         
         self.summarizeToLog()
 
@@ -466,7 +469,8 @@ if __name__ == "__main__":
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
     db = Db(dirUriMap={os.environ['LIGHT9_SHOW'].rstrip('/') + '/':
-                       showconfig.showUri() + '/'})
+                       showconfig.showUri() + '/'},
+            addlPrefixes={'show': URIRef(showconfig.showUri() + '/')})
 
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)

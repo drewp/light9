@@ -63,7 +63,7 @@ class GraphFile(object):
     """
     one rdf file that we read from, write to, and notice external changes to
     """
-    def __init__(self, notifier, path, uri, patch, getSubgraph):
+    def __init__(self, notifier, path, uri, patch, getSubgraph, addlPrefixes=None):
         """
         uri is the context for the triples in this file. We assume
         sometimes that we're the only ones with triples in this
@@ -84,6 +84,8 @@ class GraphFile(object):
             'effect': 'http://light9.bigasterisk.com/effect/',
             'dev': 'http://light9.bigasterisk.com/device/',
         }
+        if addlPrefixes:
+            self.namespaces.update(addlPrefixes)
         
         if not os.path.exists(path):
             # can't start notify until file exists

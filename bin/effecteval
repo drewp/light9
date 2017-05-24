@@ -68,6 +68,7 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
 
         p = yield songEffectPatch(self.settings.graph, dropped, song, event, ctx=song)
         self.settings.graph.patch(p)
+        self.settings.graph.suggestPrefixes({'song': URIRef(song + '/')})
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
     def connectionMade(self, *args, **kwargs):
