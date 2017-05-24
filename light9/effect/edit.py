@@ -77,12 +77,10 @@ def songNotePatch(graph, dropped, song, event, ctx):
     with graph.currentState(
             tripleFilter=(dropped, None, None)) as g:
         droppedTypes = list(g.objects(dropped, RDF.type))
-        droppedLabel = g.label(dropped)
 
     quads = []
     fade = 2 if event == 'default' else 0
 
-    print 'droppedTypes', droppedTypes
     if L9['Effect'] in droppedTypes:
         musicStatus = yield getMusicStatus()
         songTime = musicStatus['t']
