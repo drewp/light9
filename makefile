@@ -105,7 +105,10 @@ coffee:
 env-mypy/bin/mypy:
 	mkdir -p env-mypy
 	virtualenv -p /usr/bin/python3  env-mypy/
-	env-mypy/bin/pip install mypy==0.501 lxml==3.7.3
+	env-mypy/bin/pip install mypy==0.510 lxml==3.7.3
 
 mypy-collector: env-mypy/bin/mypy
 	env-mypy/bin/mypy --py2 --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep bin/collector light9/collector/*.py
+
+mypy-paint: env-mypy/bin/mypy
+	env-mypy/bin/mypy --py2 --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep light9/paint/*.py
