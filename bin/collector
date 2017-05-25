@@ -61,7 +61,10 @@ class WebListeners(object):
         now = time.time()
 
         msg = self.makeMsg(dev, attrs, outputMap)
-        
+
+        # this omits repeats, but can still send many
+        # messages/sec. Not sure if piling up messages for the browser
+        # could lead to slowdowns in the real dmx output.
         for client, seen in self.clients:
             for m, t in seen.items():
                 if t < now - 5:

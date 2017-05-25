@@ -346,8 +346,6 @@ Polymer
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: (patch) ->
-    console.time('row update')
-
     U = (x) -> @graph.Uri(x)
 
     notesForThisRow = []
@@ -366,7 +364,6 @@ Polymer
       child.song = @song # could change, but all the notes will be rebuilt
       child.zoomInX = @zoomInX # missing binding; see onZoom
       return child      
-    console.timeEnd('row update')
 
   onZoom: ->
     for e in @children
@@ -802,6 +799,36 @@ Polymer
   updateAllCoords: ->
     @redraw()
 
+  _adjAtPoint: (pt) ->
+    nearest = @qt.find(pt.e(1), pt.e(2))
+    if not nearest? or nearest.distanceFrom(pt) > 50
+      return null
+    return nearest?.adj
+
+  resizeUpdate: (ev) ->
+    @$.canvas.width = ev.target.offsetWidth
+    @$.canvas.height = ev.target.offsetHeight
+    @redraw()
+
+  redraw: (adjs) ->
+    @debounce('redraw', @_throttledRedraw.bind(@))
+
+  _throttledRedraw: () ->
+    console.time('adjs redraw')
+    @_layoutCenters()
+    
+    @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
+
+    for adjId, adj of @adjs
+      ctr = adj.getCenter()
+      target = adj.getTarget()
+      @_drawConnector(ctr, target)
+      
+      @_drawAdjuster(adj.getDisplayValue(),
+                     Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
+                     Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
+    console.timeEnd('adjs redraw')
+
   _layoutCenters: ->
     # push Adjustable centers around to avoid overlaps
     # Todo: also don't overlap inlineattr boxes
@@ -828,36 +855,6 @@ Polymer
       adj.centerOffset = output.subtract(adj.getTarget())
       output.adj = adj
       @qt.add(output)
-
-  _adjAtPoint: (pt) ->
-    nearest = @qt.find(pt.e(1), pt.e(2))
-    if not nearest? or nearest.distanceFrom(pt) > 50
-      return null
-    return nearest?.adj
-
-  resizeUpdate: (ev) ->
-    @$.canvas.width = ev.target.offsetWidth
-    @$.canvas.height = ev.target.offsetHeight
-    @redraw()
-
-  redraw: (adjs) ->
-    @debounce('redraw', @_throttledRedraw.bind(@, adjs))
-
-  _throttledRedraw: (adjs) ->
-    console.time('adjs redraw')
-    @_layoutCenters()
-    
-    @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
-
-    for adjId, adj of @adjs
-      ctr = adj.getCenter()
-      target = adj.getTarget()
-      @_drawConnector(ctr, target)
-      
-      @_drawAdjuster(adj.getDisplayValue(),
-                    Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
-                    Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
-    console.timeEnd('adjs redraw')
 
   _drawConnector: (ctr, target) ->
     @ctx.strokeStyle = '#aaa'

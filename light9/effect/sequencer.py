@@ -40,7 +40,8 @@ class TwistedZmqClient(object):
 
 
 def toCollectorJson(client, session, settings):
-    return json.dumps({'settings': settings.asList() if isinstance(settings, DeviceSettings) else settings,
+    assert isinstance(settings, DeviceSettings)
+    return json.dumps({'settings': settings.asList(),
                        'client': client,
                        'clientSession': session,
                        'sendTime': time.time(),
