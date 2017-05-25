@@ -487,7 +487,7 @@ Polymer
   makeCurveAdjusters: (curveWidth, yForV, worldPts) ->
     U = (x) -> @graph.Uri(x)
 
-    if 0
+    if true
       @adjusterIds[@uri+'/offset'] = true
       @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
         graph: @graph
