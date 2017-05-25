@@ -126,6 +126,8 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         log.debug('patch is done %s', debugKey)
 
     def suggestPrefixes(self, prefixes):
+        if not hasattr(self, 'addlPrefixes'):
+            self.addlPrefixes = {}
         self.addlPrefixes.update(prefixes)
 
     def sendFailed(self, result):
