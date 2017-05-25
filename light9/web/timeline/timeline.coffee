@@ -142,7 +142,8 @@ Polymer
         @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
 
         @$.cursorCanvas.setMouse(@viewState.mouse.pos())
-        @sendMouseToVidref()
+        # should be controlled by a checkbox next to follow-player-song-choice
+        @sendMouseToVidref() unless window.location.hash.match(/novidref/)
 
   sendMouseToVidref: ->
     now = Date.now()
