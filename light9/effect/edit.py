@@ -68,7 +68,7 @@ def songEffectPatch(graph, dropped, song, event, ctx):
     returnValue(Patch(addQuads=quads))
 
 @inlineCallbacks
-def songNotePatch(graph, dropped, song, event, ctx):
+def songNotePatch(graph, dropped, song, event, ctx, note=None):
     """
     drop into effectsequencer timeline
 
@@ -79,40 +79,66 @@ def songNotePatch(graph, dropped, song, event, ctx):
         droppedTypes = list(g.objects(dropped, RDF.type))
 
     quads = []
-    fade = 2 if event == 'default' else 0
+    fade = 2 if event == 'default' else 0.1
 
-    if L9['Effect'] in droppedTypes:
+    if note:
         musicStatus = yield getMusicStatus()
         songTime = musicStatus['t']
-        note = graph.sequentialUri(song + '/n')
-        curve = graph.sequentialUri(note + 'c')
-        quads.extend([
-            (song, L9['note'], note, ctx),
-            (note, RDF.type, L9['Note'], ctx),
-            (note, L9['curve'], curve, ctx),
-            (note, L9['effectClass'], dropped, ctx),
-            (note, L9['originTime'], Literal(songTime), ctx),
-            (curve, RDF.type, L9['Curve'], ctx),
-            (curve, L9['attr'], L9['strength'], ctx),
-            ])
-        if event == 'default':
-            coords = [(0 - fade, 0), (0, 1), (20, 1), (20 + fade, 0)]
-        elif event == 'start':
-            coords = [(0 - fade, 0), (0, 1), (20, 1), (20 + fade, 0)]
-        elif event == 'end':
-            raise
+        _finishCurve(graph, note, quads, ctx, songTime)
+    else:
+        if L9['Effect'] in droppedTypes:
+            musicStatus = yield getMusicStatus()
+            songTime = musicStatus['t']
+            note = _makeNote(graph, song, note, quads, ctx, dropped, songTime, event, fade)
         else:
-            raise NotImplementedError(event)
-        for t,v in coords:
-            pt = graph.sequentialUri(curve + 'p')
-            quads.extend([
-                (curve, L9['point'], pt, ctx),
-                (pt, L9['time'], Literal(t), ctx),
-                (pt, L9['value'], Literal(v), ctx),
-                ])
+            raise NotImplementedError
+
+    returnValue((note, Patch(addQuads=quads)))
+
+
+def _point(ctx, uri, t, v):
+    return [
+        (uri, L9['time'], Literal(round(t, 3)), ctx),
+        (uri, L9['value'], Literal(round(v, 3)), ctx)
+        ]
     
-    returnValue(Patch(addQuads=quads))
+def _finishCurve(graph, note, quads, ctx, songTime):
+    with graph.currentState() as g:
+        origin = g.value(note, L9['originTime']).toPython()
+        curve = g.value(note, L9['curve'])
+
+    pt2 = graph.sequentialUri(curve + 'p')
+    pt3 = graph.sequentialUri(curve + 'p')
+    quads.extend(
+        [(curve, L9['point'], pt2, ctx)] + _point(ctx, pt2, songTime - origin, 1) +
+        [(curve, L9['point'], pt3, ctx)] + _point(ctx, pt3, songTime - origin + .5, 0)
+        )
     
+
+def _makeNote(graph, song, note, quads, ctx, dropped, songTime, event, fade):
+    note = graph.sequentialUri(song + '/n')
+    curve = graph.sequentialUri(note + 'c')
+    quads.extend([
+        (song, L9['note'], note, ctx),
+        (note, RDF.type, L9['Note'], ctx),
+        (note, L9['curve'], curve, ctx),
+        (note, L9['effectClass'], dropped, ctx),
+        (note, L9['originTime'], Literal(songTime), ctx),
+        (curve, RDF.type, L9['Curve'], ctx),
+        (curve, L9['attr'], L9['strength'], ctx),
+        ])
+    if event == 'default':
+        coords = [(0 - fade, 0), (0, 1), (20, 1), (20 + fade, 0)]
+    elif event == 'start':
+        coords = [(0 - fade, 0), (0, 1), ]
+    elif event == 'end': # probably unused- goes to _finishCurve instead
+        coords = [(20, 1), (20 + fade, 0)]
+    else:
+        raise NotImplementedError(event)
+    for t,v in coords:
+        pt = graph.sequentialUri(curve + 'p')
+        quads.extend([(curve, L9['point'], pt, ctx)] + _point(ctx, pt, t, v))
+    return note
     
 def _songHasEffect(graph, song, uri):
     """does this song have an effect of class uri or a sub curve for sub

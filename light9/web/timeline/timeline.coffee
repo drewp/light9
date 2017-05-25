@@ -463,8 +463,10 @@ Polymer
     screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
     @dia.setNote(@uri, screenPts, effect)
 
-    leftX = Math.max(2, screenPts[1].e(1) + 5)
-    rightX = screenPts[2].e(1) - 5
+    leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].e(1) + 5)
+    rightX = screenPts[Math.min(2, screenPts.length - 1)].e(1) - 5
+    if screenPts.length < 3
+      rightX = leftX + 120
     w = 114
     h = 80
     @inlineRect = {
@@ -475,7 +477,7 @@ Polymer
       display: if rightX - leftX > w then 'block' else 'none'
       }
 
-    if screenPts[3].e(1) - screenPts[0].e(1) < 100
+    if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
       # also kill their connectors
       return

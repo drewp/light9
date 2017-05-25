@@ -33,18 +33,23 @@ model.addToCurrentSong = (e) ->
     data: {drop: e.uri}
   })
 
+lastMomentaryNote = null
+
 model.addMomentary = (e) ->
   $.ajax({
     type: 'POST'
     url: '/effectEval/songEffects'
     data: {drop: e.uri, event: 'start'}
+    success: (data) ->
+      lastMomentaryNote = JSON.parse(data)['note']
+
   })
 
 model.addMomentaryUp = (e) ->
   $.ajax({
     type: 'POST'
     url: '/effectEval/songEffects'
-    data: {drop: e.uri, event: 'end'}
+    data: {drop: e.uri, event: 'end', note: lastMomentaryNote}
   })
   
 
