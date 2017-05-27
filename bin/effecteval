@@ -69,7 +69,6 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
             note = URIRef(note)
 
         log.info("adding to %s", song)
-
         note, p = yield songNotePatch(self.settings.graph, dropped, song, event, ctx=song, note=note)
         
         self.settings.graph.patch(p)

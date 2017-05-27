@@ -64,33 +64,51 @@ class Solver(object):
 
     def _blur(self, img):
         return scipy.ndimage.gaussian_filter(img, 10, 0, mode='nearest')
-                
-    def draw(self, painting, w, h):
+
+    def draw(self, painting):
+        return self._draw(painting, 100, 48)
+        
+    def _draw(self, painting, w, h):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
         ctx = cairo.Context(surface)
         ctx.rectangle(0, 0, w, h)
         ctx.fill()
         
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        ctx.set_line_width(20)
+        ctx.set_line_width(20) # ?
         for stroke in painting['strokes']:
             for pt in stroke['pts']:
                 op = ctx.move_to if pt is stroke['pts'][0] else ctx.line_to
-                op(pt[0] / 4, pt[1] / 4) # todo scale
+                op(pt[0] * w, pt[1] * h)
 
             r,g,b = parseHex(stroke['color'])
             ctx.set_source_rgb(r / 255, g / 255, b / 255)
             ctx.stroke()
         
-        #surface.write_to_png('/tmp/surf.png')
+        surface.write_to_png('/tmp/surf.png')
         return numpyFromCairo(surface)
+
+
+    def _imgDist(self, a, b):
+        return numpy.sum(numpy.absolute(a - b), axis=None)
+        
+    def bestMatch(self, img):
+        results = []
+        for uri, img2 in self.samples.iteritems():
+            results.append((self._imgDist(img, img2), uri, img2))
+        results.sort()
+        print 'results:'
+        for r in results:
+            print r
+        saveNumpy('/tmp/bestsamp.png', results[-1][2])
+        return results[-1][1]
         
     def solve(self, painting):
         """
         given strokes of colors on a photo of the stage, figure out the
         best light DeviceSettings to match the image
         """
-        pic0 = self.draw(painting, 100, 48).astype(numpy.float)
+        pic0 = self.draw(painting).astype(numpy.float)
         pic0Blur = self._blur(pic0)
         saveNumpy('/tmp/sample_paint_%s.png' % len(painting['strokes']),
                   pic0Blur)
@@ -98,7 +116,7 @@ class Solver(object):
         for sample, picSample in sorted(self.blurredSamples.items()):
             #saveNumpy('/tmp/sample_%s.png' % sample.split('/')[-1],
             #          f(picSample))
-            dist = numpy.sum(numpy.absolute(pic0Blur - picSample), axis=None)
+            dist = self._imgDist(pic0Blur, picSample)
             sampleDist[sample] = dist
         results = [(d, uri) for uri, d in sampleDist.items()]
         results.sort()
@@ -119,7 +137,7 @@ class Solver(object):
         return s
 
     def solveBrute(self, painting):
-        pic0 = self.draw(painting, 100, 48).astype(numpy.float)
+        pic0 = self.draw(painting).astype(numpy.float)
 
         colorSteps = 3
         colorStep = 1. / colorSteps

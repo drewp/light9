@@ -1,10 +1,14 @@
 <link rel="import" href="/lib/polymer/polymer.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+<link rel="import" href="paint-report-elements.html">
 
-<dom-module id="light9-paint">
+<dom-module id="light9-paint-canvas">
   <template>
     <style>
+     :host {
+         display: block;
+     }
      #parent {
          position: relative;
          height: 500px;
@@ -34,9 +38,8 @@
       - erase
     </div>
     
-    <iron-ajax id="solve" method="POST" url="../paintServer/solve"></iron-ajax>
     <div id="parent">
-      <img src="bg2.jpg">
+      <img src="{{bg}}">
       <svg id="paint" viewBox="0 0 500 221">
         <defs id="defs12751">
           <filter
@@ -76,159 +79,17 @@
         </defs>
       </svg>
     </div>
+  </template>
+ 
+</dom-module>
 
+<dom-module id="light9-paint">
+  <template>
+    <light9-paint-canvas id="canvas" bg="bg2.jpg" painting="{{painting}}"></light9-paint-canvas>
+
+    <iron-ajax id="solve" method="POST" url="../paintServer/solve" last-response="{{solve}}"></iron-ajax>
     
-    
-    <light9-simulation layers="{{layers}}"></light9-simulation>
-  </template>
-</dom-module>
-
-<!-- merge more with light9-collector-device -->
-<dom-module id="light9-device-settings">
-  <template>
-    <style>
-     :host {
-         display: block;
-         break-inside: avoid-column;
-         border: 2px solid gray;
-         padding: 8px;
-     }
-     td.nonzero {
-         background: #310202;
-         color: #e25757;
-     }
-     td.full {
-         background: #2b0000;
-         color: red;
-         font-weight: bold;
-     }
-    </style>
-    <h3>{{label}}</h3>
-    <table class="borders">
-      <tr>
-        <th>device attr</th>
-        <th>value</th>
-      </tr>
-      <template is="dom-repeat" items="{{attrs}}">
-        <tr>
-          <td>{{item.attr}}</td>
-          <td class$="{{item.valClass}}">{{item.val}}</td>
-        </tr>
-      </template>
-
-  </template>
-  <script>
-   HTMLImports.whenReady(function () {
-       Polymer({
-           is: "light9-device-settings",
-           properties: {
-               label: {type: String, notify: true},
-               attrs: {type: Array, notify: true},
-
-           },
-           ready: function() {
-
-               this.label = "aura2";
-               this.attrs = [
-                   {attr: 'rx', val: .03},
-                   {attr: 'color', val: '#ffe897'},
-               ];
-                    
-           }
-       });
-   });
-  </script>
-</dom-module>
-
-<dom-module id="light9-capture-image">
-  <template>
-    <style>
-     :host { display: block; }
-    </style>
-    <div>{{name}}</div>
-    <div><img width="100" src="../{{path}}"></div>
-  </template>
-  <script>
-   HTMLImports.whenReady(function () {
-       Polymer({
-           is: "light9-capture-image",
-           properties: {
-               name: { type: String },
-               path: { type: String },
-           }
-       });
-   });
-  </script>
-</dom-module>
-
-<dom-module id="light9-simulation">
-  <template>
-    <style>
-     #solutions { display: flex; margin: 20px; }
-     #single-light { margin-right: 70px; }
-     #multi-light {}
-     #breakdown { position: relative; }
-     #sources { display: flex; }
-     #solution { display: flex; margin-top: 80px; }
-     #connectors { position: absolute; width: 100%; height: 100%; }
-     #connectors path { stroke: #615c54; stroke-width: 3px; }
-    </style>
-
-    <div id="solutions">
-      <div id="single-light">
-        <div>Single pic best match:</div>
-
-        <light9-capture-image name="mac2" path="show/dance2017/capture/moving1/cap258592/pic1.jpg"></light9-capture-image>
-
-        <div>Error: 280844</div>
-        
-        <div>DeviceSettings</div>
-        <light9-device-settings></light9-device-settings>
-      </div>
-
-      <!-- existing effect best match? -->
-      
-      <div id="multi-light">
-        Created from multiple lights:
-
-        <div id="breakdown">
-          <svg id="connectors">
-            <g>
-              <path d="M 112,241 L 150,280"></path>
-              <path d="M 332,241 L 150,280"></path>
-              <path d="M 532,241 L 150,280"></path>
-              <path d="M 732,241 L 150,280"></path>
-            </g>
-            
-          </svg>
-          <div id="sources">
-            <div>
-              <light9-capture-image name="aura1" path="show/dance2017/capture/moving1/cap258592/pic1.jpg"></light9-capture-image>
-              <light9-device-settings></light9-device-settings>
-            </div>
-            <div>
-              <light9-capture-image name="aura2" path="show/dance2017/capture/moving1/cap258592/pic1.jpg"></light9-capture-image>
-              <light9-device-settings></light9-device-settings>
-            </div>
-            <div>
-              <light9-capture-image name="aura3" path="show/dance2017/capture/moving1/cap258592/pic1.jpg"></light9-capture-image>
-              <light9-device-settings></light9-device-settings>
-            </div>
-            <div>
-              <light9-capture-image name="aura4" path="show/dance2017/capture/moving1/cap258592/pic1.jpg"></light9-capture-image>
-              <light9-device-settings></light9-device-settings>
-            </div>
-          </div>
-          
-          <div id="solution">
-            <div> <div>combined</div><div><img width="150" src="../show/dance2017/capture/moving1/cap258592/pic1.jpg"></div><div>error 9980</div></div>
-            <div> <div>residual</div><div><img width="150" src="../show/dance2017/capture/moving1/cap258592/pic1.jpg"></div></div>
-          </div>
-        </div>
-
-        Save as effect named <input> <button>Save</button>
-      </div>
-
+    <light9-simulation solution="{{solve}}" layers="{{layers}}"></light9-simulation>
   </template>
 </dom-module>
 

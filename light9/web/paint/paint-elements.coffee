@@ -9,9 +9,9 @@ class Painting
     {strokes: @strokes}
 
 class Stroke
-  constructor: (pos, @color) ->
+  constructor: (pos, @color, @size) ->
     @path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
-    @path.setAttributeNS(null, 'd', "M #{pos[0]} #{pos[1]}")
+    @path.setAttributeNS(null, 'd', "M #{pos[0]*@size[0]} #{pos[1]*@size[1]}")
     @pts = [pos]
     @lastPos = pos
 
@@ -19,20 +19,22 @@ class Stroke
     parent.appendChild(@path)
     
   move: (pos) ->
-    if Math.hypot(pos[0] - @lastPos[0], pos[1] - @lastPos[1]) < 30
+    if Math.hypot(pos[0] - @lastPos[0], pos[1] - @lastPos[1]) < .02
       return
-    @path.attributes.d.value += " L #{pos[0]} #{pos[1]}"
+    @path.attributes.d.value += " L #{pos[0]*@size[0]} #{pos[1]*@size[1]}"
     @pts.push(pos)
     @lastPos = pos
-  
+
 Polymer
-  is: "light9-paint"
+  is: "light9-paint-canvas"
   behaviors: [ Polymer.IronResizableBehavior ]
   listeners: 'iron-resize': 'onResize'
   properties: {
-    layers: { type: Object }
+    bg: { type: String },
+    painting: { type: Object } # output
   }
   ready: ->
+    @onResize()
     @painting = new Painting()
     @$.paint.addEventListener('mousedown', @onDown.bind(@))
     @$.paint.addEventListener('mousemove', @onMove.bind(@))
@@ -42,12 +44,13 @@ Polymer
     @$.paint.addEventListener('touchend', @onUp.bind(@))
 
   evPos: (ev) ->
-    return (if ev.touches?.length? then [Math.round(ev.touches[0].clientX),
-                                         Math.round(ev.touches[0].clientY)] else [ev.x, ev.y]) 
+    px = (if ev.touches?.length? then [Math.round(ev.touches[0].clientX),
+                                       Math.round(ev.touches[0].clientY)] else [ev.x, ev.y])
+    return [px[0] / @size[0], px[1] / @size[1]]
 
   onDown: (ev) ->
     # if it's on an existing one, do selection
-    @stroke = new Stroke(@evPos(ev), '#aaaaaa')
+    @stroke = new Stroke(@evPos(ev), '#aaaaaa', @size)
     @stroke.appendElem(@$.paint)
     @scopeSubtree(@$.paint)
 
@@ -57,19 +60,23 @@ Polymer
     @stroke.move(@evPos(ev))
 
   onUp: (ev) ->
+    return unless @stroke
     @painting.addStroke(@stroke.pts, @stroke.color)
-    @$.solve.body = JSON.stringify(@painting.getDoc())
-    @$.solve.generateRequest()
     @stroke = null
+    
+    @notifyPath('painting.strokes.length') # not working
+    @fire('paintingChanged', @painting)
 
   onResize: (ev) ->
-    @$.paint.attributes.viewBox.value = "0 0 #{ev.target.offsetWidth} 500"
+    @size = [@$.parent.offsetWidth, @$.parent.offsetHeight]
+    @$.paint.attributes.viewBox.value = "0 0 #{@size[0]} #{@size[1]}"
 
 
 Polymer
   is: "light9-simulation"
   properties: {
     layers: { type: Object }
+    solution: { type: Object }
   }
   listeners: [
     "onLayers(layers)"
@@ -78,3 +85,23 @@ Polymer
     null
   onLayers: (layers) ->
     log('upd', layers)
+
+    
+Polymer
+  is: "light9-paint"
+  properties: {
+    painting: { type: Object }
+  }
+
+  ready: () ->
+    # couldn't make it work to bind to painting's notifyPath events
+    @$.canvas.addEventListener('paintingChanged', @paintingChanged.bind(@))
+    @$.solve.addEventListener('response', @onSolve.bind(@))
+    
+  paintingChanged: (ev) ->
+    @painting = ev.detail
+    @$.solve.body = JSON.stringify(@painting.getDoc())
+    @$.solve.generateRequest()
+
+  onSolve: (response) ->
+    console.log(response)

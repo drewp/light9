@@ -14,6 +14,7 @@ from rdflib import URIRef
 from light9.rdfdb import clientsession
 import light9.paint.solve
 from lib.cycloneerr import PrettyErrorHandler
+from light9.namespaces import RDF, L9, DEV
 
 
 class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
@@ -23,9 +24,18 @@ class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
         solver = light9.paint.solve.Solver(self.settings.graph)
         solver.loadSamples()
         with self.settings.stats.solve.time():
-            out = solver.solve(painting)
-            layers = solver.simulationLayers(out)
-        self.write(json.dumps({'layers': layers, 'out': out}))
+            img = solver.draw(painting)
+            sample = solver.bestMatch(img)
+            with self.settings.graph.currentState() as g:
+                bestPath = 'show/dance2017/cam/test/%s' % g.value(sample, L9['path'])
+            #out = solver.solve(painting)
+            #layers = solver.simulationLayers(out)
+            
+        self.write(json.dumps({
+            'bestMatch': {'uri': sample, 'path': bestPath},
+        #    'layers': layers,
+        #    'out': out,
+        }))
 
 class App(object):
     def __init__(self, show, session):
