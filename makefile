@@ -73,10 +73,17 @@ gst_packages:
 packages:
 	sudo aptitude install coffeescript normalize-audio audacity python-pygame libffi-dev tix libzmq3-dev python-dev libssl-dev python-opencv python-cairo
 
-bower:
-	cd light9/web/lib; bower install
-	cd light9/web/lib/N3.js; npm install; npm run browser
-	cd light9/web/lib/d3; npm install
+
+node_modules/bower/bin/bower:
+	npm install
+
+bin/node:
+	ln -sf `which nodejs` bin/node
+
+bower: node_modules/bower/bin/bower bin/node
+	cd light9/web/lib; nodejs ../../../node_modules/bower/bin/bower install
+	cd light9/web/lib/N3.js; npm install; PATH=../../../../bin:$(PATH) npm run browser
+	cd light9/web/lib/d3; PATH=../../../../bin:$(PATH) npm install
 
 raspberry_pi_packages:
 	sudo apt-get install python-picamera python-dev python-twisted python-virtualenv
