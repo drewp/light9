@@ -16,11 +16,15 @@
     "N3.js": "https://github.com/RubenVerborgh/N3.js.git#04f4e21f4ccb351587dc00a3f26340b28d4bb10f",
     "shortcut": "http://www.openjs.com/scripts/events/keyboard_shortcuts/shortcut.js",
     "async": "https://github.com/caolan/async.git#^1.5.2",
-    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.3"
+    "iron-resizable-behavior": "PolymerElements/iron-resizable-behavior#^1.0.3",
+    "paper-radio-button": "PolymerElements/paper-radio-button#^1.2.2",
+    "paper-radio-group": "PolymerElements/paper-radio-group#^1.2.2"
   },
   "resolutions": {
     "paper-styles": "^1.1.4",
     "rdflib.js": "920e59fe37",
-    "d3": "e7194db33090a0afc06c77a959594361ffb949df"
+    "d3": "e7194db33090a0afc06c77a959594361ffb949df",
+    "webcomponentsjs": "^0.7.24",
+    "polymer": "^1.2.1"
   }
 }

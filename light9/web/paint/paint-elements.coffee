@@ -5,6 +5,9 @@ class Painting
   addStroke: (pts, color) ->
     @strokes.push({pts: pts, color: color})
 
+  hover: (pos) ->
+    @strokes = [{pts: [pos, [pos[0], pos[1] + .01]], color: "#ffffff"}]
+
   getDoc: ->
     {strokes: @strokes}
 
@@ -31,6 +34,7 @@ Polymer
   listeners: 'iron-resize': 'onResize'
   properties: {
     bg: { type: String },
+    tool: { type: String },
     painting: { type: Object } # output
   }
   ready: ->
@@ -43,21 +47,36 @@ Polymer
     @$.paint.addEventListener('touchmove', @onMove.bind(@))
     @$.paint.addEventListener('touchend', @onUp.bind(@))
 
+    @hover = _.throttle((ev) =>
+          @painting.hover(@evPos(ev))
+          @fire('paintingChanged', @painting)
+        , 100)
+
+
   evPos: (ev) ->
     px = (if ev.touches?.length? then [Math.round(ev.touches[0].clientX),
                                        Math.round(ev.touches[0].clientY)] else [ev.x, ev.y])
     return [px[0] / @size[0], px[1] / @size[1]]
 
   onDown: (ev) ->
-    # if it's on an existing one, do selection
-    @stroke = new Stroke(@evPos(ev), '#aaaaaa', @size)
-    @stroke.appendElem(@$.paint)
+    switch @tool
+      when "hover"
+        @onMove(ev)
+      when "paint"
+        # if it's on an existing one, do selection
+        @stroke = new Stroke(@evPos(ev), '#aaaaaa', @size)
+        @stroke.appendElem(@$.paint)
     @scopeSubtree(@$.paint)
 
   onMove: (ev) ->
-    # ..or move selection
-    return unless @stroke
-    @stroke.move(@evPos(ev))
+    switch @tool
+      when "hover"
+        @hover(ev)
+
+      when "paint"
+        # ..or move selection
+        return unless @stroke
+        @stroke.move(@evPos(ev))
 
   onUp: (ev) ->
     return unless @stroke
