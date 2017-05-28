@@ -18,6 +18,7 @@
 :quantumGoboChoice  a :DeviceAttr; :dataType :choice;
   :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
 
+
 :SimpleDimmer a :DeviceClass;
   :deviceAttr :brightness;
   :attr

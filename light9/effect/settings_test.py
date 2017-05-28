@@ -30,6 +30,10 @@ class TestDeviceSettings(unittest.TestCase):
         self.assertEqual(
             DeviceSettings(self.graph, [(L9['aura1'], L9['rx'], 0),]),
             DeviceSettings(self.graph, []))
+
+    def testFalseIfZero(self):
+        self.assertTrue(DeviceSettings(self.graph, [(L9['aura1'], L9['rx'], 0.1)]))
+        self.assertFalse(DeviceSettings(self.graph, []))
         
     def testFromResource(self):
         ctx = L9['']

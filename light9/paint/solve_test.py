@@ -87,3 +87,16 @@ class TestCombineImages(unittest.TestCase):
         golden = solve.loadNumpy('show/dance2017/cam/test/layers_out1.png')
         numpy.testing.assert_array_equal(golden, out)
 
+class TestBestMatch(unittest.TestCase):
+    def setUp(self):
+        graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
+                                        'show/dance2017/cam/test/bg.n3'])
+        self.solver = solve.Solver(graph)
+        self.solver.loadSamples()
+        
+    def testRightSide(self):
+        drawingOnRight = {"strokes":[{"pts":[[0.875,0.64],[0.854,0.644]],
+                                      "color":"#aaaaaa"}]}
+        drawImg = self.solver.draw(drawingOnRight)
+        match = self.solver.bestMatch(drawImg)
+        self.assertEqual(L9['sample5'], match)

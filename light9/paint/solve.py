@@ -4,8 +4,11 @@ from PIL import Image
 import numpy
 import scipy.misc, scipy.ndimage, scipy.optimize
 import cairo
+import logging
 
 from light9.effect.settings import DeviceSettings, parseHex, toHex
+
+log = logging.getLogger('solve')
 
 # numpy images in this file are (x, y, c) layout.
 
@@ -25,6 +28,7 @@ def loadNumpy(path, thumb=(100, 100)):
     return numpyFromPil(img)
 
 def saveNumpy(path, img):
+    # maybe this should only run if log level is debug?
     scipy.misc.imsave(path, img.transpose((1, 0, 2)))
 
 def scaledHex(h, scale):
@@ -35,7 +39,11 @@ def scaledHex(h, scale):
 def colorRatio(col1, col2):
     rgb1 = parseHex(col1)
     rgb2 = parseHex(col2)
-    return tuple([round(a / b, 3) for a, b in zip(rgb1, rgb2)])
+    def div(x, y):
+        if y == 0:
+            return 0
+        return round(x / y, 3)
+    return tuple([div(a, b) for a, b in zip(rgb1, rgb2)])
 
 def brightest(img):
     return numpy.amax(img, axis=(0, 1))
@@ -75,7 +83,7 @@ class Solver(object):
         ctx.fill()
         
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        ctx.set_line_width(20) # ?
+        ctx.set_line_width(w / 5) # ?
         for stroke in painting['strokes']:
             for pt in stroke['pts']:
                 op = ctx.move_to if pt is stroke['pts'][0] else ctx.line_to
@@ -93,15 +101,16 @@ class Solver(object):
         return numpy.sum(numpy.absolute(a - b), axis=None)
         
     def bestMatch(self, img):
+        """the one sample that best matches this image"""
         results = []
         for uri, img2 in self.samples.iteritems():
             results.append((self._imgDist(img, img2), uri, img2))
         results.sort()
-        print 'results:'
-        for r in results:
-            print r
-        saveNumpy('/tmp/bestsamp.png', results[-1][2])
-        return results[-1][1]
+        log.info('results:')
+        for d,u,i in results:
+            log.info('%s %g', u, d)
+        saveNumpy('/tmp/bestsamp.png', results[0][2])
+        return results[0][1]
         
     def solve(self, painting):
         """
@@ -192,13 +201,18 @@ class Solver(object):
             requestedColor = devSettings.getValue(dev, L9['color'])
             candidatePics = [] # (distance, path, picColor)
             for (sample, path), s in self.sampleSettings.items():
-                dist = devSettings.distanceTo(s.ofDevice(dev))
+                otherDevSettings = s.ofDevice(dev)
+                if not otherDevSettings:
+                    continue
+                dist = devSettings.distanceTo(otherDevSettings)
+                log.info('  candidate pic %s %s dist=%s', sample, path, dist)
                 candidatePics.append((dist, path, s.getValue(dev, L9['color'])))
             candidatePics.sort()
             # we could even blend multiple top candidates, or omit all
             # of them if they're too far
             bestDist, bestPath, bestPicColor = candidatePics[0]
-
+            log.info('  device best d=%g path=%s color=%s', bestDist, bestPath, bestPicColor)
+            
             layers.append({'path': bestPath,
                            'color': colorRatio(requestedColor, bestPicColor)})
         

@@ -9,7 +9,8 @@ import numpy
 from rdflib import URIRef, Literal
 from light9.namespaces import RDF, L9, DEV
 from light9.rdfdb.patch import Patch
-
+import logging
+log = logging.getLogger('settings')
 
 def parseHex(h):
     if h[0] != '#': raise ValueError(h)
@@ -96,7 +97,9 @@ class _Settings(object):
     def __ne__(self, other):
         return not self == other
 
-
+    def __nonzero__(self):
+        return bool(self._compiled)
+        
     def __repr__(self):
         words = []
         def accum():
@@ -151,6 +154,7 @@ class _Settings(object):
     def distanceTo(self, other):
         diff = numpy.array(self.toVector()) - other.toVector()
         d = numpy.linalg.norm(diff, ord=None)
+        log.info('distanceTo %r - %r = %g', self, other, d)
         return d
 
     def statements(self, subj, ctx, settingRoot, settingsSubgraphCache):
