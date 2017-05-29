@@ -276,19 +276,50 @@ Polymer
 
   attached: ->
     root = @closest('light9-timeline-editor')
-    setupDrop @, @$.rows, root, (effect, pos) =>
-      U = (x) -> @graph.Uri(x)
+    setupDrop(@, @$.rows, root, @onDrop.bind(@))
 
-      # we could probably accept some initial overrides right on the
-      # effect uri, maybe as query params
-      
-      if not @graph.contains(effect, RDF + 'type', U(':Effect'))
+  onDrop: (effect, pos) ->
+    U = (x) -> @graph.Uri(x)
+
+    # we could probably accept some initial overrides right on the
+    # effect uri, maybe as query params
+
+    if not @graph.contains(effect, RDF + 'type', U(':Effect'))
+      if @graph.contains(effect, RDF + 'type', U(':LightSample'))
+        effect = @makeEffect(effect)
+      else
         log("drop #{effect} is not an effect")
         return
+
+    dropTime = @zoomInX.invert(pos.e(1))
+    @makeNewNote(effect, dropTime)
+
+  makeEffect: (uri) ->
+    U = (x) -> @graph.Uri(x)
+    effect = U(uri + '/effect')
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: effect}
+    
+    quads = [
+      quad(effect, U('rdf:type'), U(':Effect')),
+      quad(effect, U(':copiedFrom'), uri),
+      quad(effect, U('rdfs:label'), @graph.Literal('')),
+      quad(effect, U(':publishAttr'), U(':strength')),
+      ]
+
+    fromSettings = @graph.objects(uri, U(':setting'))
+
+    toSettings = @graph.nextNumberedResources(effect + '_set', fromSettings.length)
       
-      dropTime = @zoomInX.invert(pos.e(1))
-      @makeNewNote(effect, dropTime)
-      
+    for fs in fromSettings
+      ts = toSettings.pop()
+      # full copies of these since I may have to delete captures
+      quads.push(quad(effect, U(':setting'), ts))
+      quads.push(quad(ts, U(':deviceAttr'), @graph.uriValue(fs, U(':deviceAttr'))))
+      quads.push(quad(ts, U(':value'), @graph.uriValue(fs, U(':value'))))
+
+    @graph.applyAndSendPatch({delQuads: [], addQuads: quads})
+    return effect
+        
   makeNewNote: (effect, dropTime) ->
     U = (x) -> @graph.Uri(x)
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}

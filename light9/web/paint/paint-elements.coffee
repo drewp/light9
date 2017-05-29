@@ -149,7 +149,7 @@ Polymer
         {attr: 'color', val: '#ffe897'},
     ]
   onSubj: (graph, @subj) ->
-    graph.runHandler(@loadAttrs.bind(@), 'loadAttrs #{subj}')
+    graph.runHandler(@loadAttrs.bind(@), "loadAttrs #{@subj}")
   loadAttrs: ->
     U = (x) -> @graph.Uri(x)
     @attrs = []
