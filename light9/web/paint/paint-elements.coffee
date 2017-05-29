@@ -177,4 +177,3 @@ Polymer
     @$.solve.generateRequest()
 
   onSolve: (response) ->
-    console.log(response)
