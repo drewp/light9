@@ -1,15 +1,30 @@
 class Painting
-  constructor: ->
+  constructor: (@svg) ->
     @strokes = []
 
-  addStroke: (pts, color) ->
-    @strokes.push({pts: pts, color: color})
+  setSize: (@size) ->
+
+  startStroke: (pos, color) ->
+    stroke = new Stroke(pos, color, @size)
+    stroke.appendElem(@svg)
+    @strokes.push(stroke)
+    return stroke
 
   hover: (pos) ->
-    @strokes = [{pts: [pos, [pos[0], pos[1] + .01]], color: "#ffffff"}]
+    @clear()
+    s = @startStroke(pos, '#ffffff', @size)
+    r = .02
+    steps = 5
+    for ang in [0..steps]
+      ang = 6.28 * ang / steps
+      s.move([pos[0] + r * Math.sin(ang), pos[1] + 1.5 * r * Math.cos(ang)])
 
   getDoc: ->
     {strokes: @strokes}
+
+  clear: ->
+    s.removeElem() for s in @strokes
+    @strokes = []
 
 class Stroke
   constructor: (pos, @color, @size) ->
@@ -20,6 +35,9 @@ class Stroke
 
   appendElem: (parent) ->
     parent.appendChild(@path)
+
+  removeElem: ->
+    @path.remove()
     
   move: (pos) ->
     if Math.hypot(pos[0] - @lastPos[0], pos[1] - @lastPos[1]) < .02
@@ -28,18 +46,20 @@ class Stroke
     @pts.push(pos)
     @lastPos = pos
 
+  finish: () ->
+
 Polymer
   is: "light9-paint-canvas"
   behaviors: [ Polymer.IronResizableBehavior ]
   listeners: 'iron-resize': 'onResize'
   properties: {
     bg: { type: String },
-    tool: { type: String },
+    tool: { type: String, value: 'hover' },
     painting: { type: Object } # output
   }
   ready: ->
+    @painting = new Painting(@$.paint)
     @onResize()
-    @painting = new Painting()
     @$.paint.addEventListener('mousedown', @onDown.bind(@))
     @$.paint.addEventListener('mousemove', @onMove.bind(@))
     @$.paint.addEventListener('mouseup', @onUp.bind(@))
@@ -49,23 +69,26 @@ Polymer
 
     @hover = _.throttle((ev) =>
           @painting.hover(@evPos(ev))
+          @scopeSubtree(@$.paint)
           @fire('paintingChanged', @painting)
         , 100)
-
 
   evPos: (ev) ->
     px = (if ev.touches?.length? then [Math.round(ev.touches[0].clientX),
                                        Math.round(ev.touches[0].clientY)] else [ev.x, ev.y])
     return [px[0] / @size[0], px[1] / @size[1]]
 
+  onClear: () ->
+    @painting.clear()
+    @fire('paintingChanged', @painting)
+    
   onDown: (ev) ->
     switch @tool
       when "hover"
         @onMove(ev)
       when "paint"
         # if it's on an existing one, do selection
-        @stroke = new Stroke(@evPos(ev), '#aaaaaa', @size)
-        @stroke.appendElem(@$.paint)
+        @currentStroke = @painting.startStroke(@evPos(ev), '#aaaaaa')
     @scopeSubtree(@$.paint)
 
   onMove: (ev) ->
@@ -75,13 +98,13 @@ Polymer
 
       when "paint"
         # ..or move selection
-        return unless @stroke
-        @stroke.move(@evPos(ev))
+        return unless @currentStroke
+        @currentStroke.move(@evPos(ev))
 
   onUp: (ev) ->
-    return unless @stroke
-    @painting.addStroke(@stroke.pts, @stroke.color)
-    @stroke = null
+    return unless @currentStroke
+    @currentStroke.finish()
+    @currentStroke = null
     
     @notifyPath('painting.strokes.length') # not working
     @fire('paintingChanged', @painting)
@@ -89,6 +112,7 @@ Polymer
   onResize: (ev) ->
     @size = [@$.parent.offsetWidth, @$.parent.offsetHeight]
     @$.paint.attributes.viewBox.value = "0 0 #{@size[0]} #{@size[1]}"
+    @painting.setSize(@size)
 
 
 Polymer

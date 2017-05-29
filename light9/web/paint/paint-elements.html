@@ -44,6 +44,7 @@
         <paper-radio-button name="paint">paint</paper-radio-button>
         <paper-radio-button name="erase">erase</paper-radio-button>
       </paper-radio-group>
+      <button on-click="onClear">clear</button>
     </div>
     
     <div id="parent">
@@ -53,10 +54,8 @@
           <filter
               style="color-interpolation-filters:sRGB"
               id="blur"
-              x="-1.0"
-              y="-1.0"
-              width="3.0"
-              height="3.0"
+              x="-5.0" y="-5.0"
+              width="11.0" height="11.0"
           >
             <feGaussianBlur
                 stdDeviation="20"
