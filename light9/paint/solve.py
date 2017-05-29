@@ -53,7 +53,7 @@ class Solver(object):
     def __init__(self, graph):
         self.graph = graph
         self.samples = {} # uri: Image array
-        self.fromPath = {} # basename: image array
+        self.fromPath = {} # imagePath: image array
         self.blurredSamples = {}
         self.sampleSettings = {} # (uri, path): DeviceSettings
         
@@ -62,12 +62,11 @@ class Solver(object):
 
         with self.graph.currentState() as g:
             for samp in g.subjects(RDF.type, L9['LightSample']):
-                base = g.value(samp, L9['path']).toPython()
-                path = 'show/dance2017/cam/test/%s' % base
-                self.samples[samp] = self.fromPath[base] = loadNumpy(path)
+                pathUri = g.value(samp, L9['imagePath'])
+                self.samples[samp] = self.fromPath[pathUri] = loadNumpy(pathUri.replace(L9[''], ''))
                 self.blurredSamples[samp] = self._blur(self.samples[samp])
                 
-                key = (samp, g.value(samp, L9['path']).toPython().encode('utf8'))
+                key = (samp, pathUri)
                 self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
 
     def _blur(self, img):
