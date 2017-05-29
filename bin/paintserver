@@ -20,23 +20,26 @@ from light9.namespaces import RDF, L9, DEV
 class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
     def post(self):
         painting = json.loads(self.request.body)
-        reload(light9.paint.solve)
-        solver = light9.paint.solve.Solver(self.settings.graph)
-        solver.loadSamples()
         with self.settings.stats.solve.time():
-            img = solver.draw(painting)
-            sample = solver.bestMatch(img)
+            img = self.settings.solver.draw(painting)
+            sample, sampleDist = self.settings.solver.bestMatch(img)
             with self.settings.graph.currentState() as g:
-                bestPath = 'show/dance2017/cam/test/%s' % g.value(sample, L9['path'])
+                bestPath = g.value(sample, L9['imagePath']).replace(L9[''], '')
             #out = solver.solve(painting)
             #layers = solver.simulationLayers(out)
             
         self.write(json.dumps({
-            'bestMatch': {'uri': sample, 'path': bestPath},
+            'bestMatch': {'uri': sample, 'path': bestPath, 'dist': sampleDist},
         #    'layers': layers,
         #    'out': out,
         }))
 
+    def reloadSolver(self):
+        reload(light9.paint.solve)
+        self.settings.solver = light9.paint.solve.Solver(self.settings.graph)
+        self.settings.solver.loadSamples()
+
+        
 class App(object):
     def __init__(self, show, session):
         self.show = show
@@ -44,17 +47,22 @@ class App(object):
 
         self.graph = SyncedGraph(networking.rdfdb.url, "paintServer")
         self.graph.initiallySynced.addCallback(self.launch)
-
-        self.stats = scales.collection('/',
-                                       scales.PmfStat('solve'),
+        
+        self.stats = scales.collection('/', scales.PmfStat('solve'),
                                        )
+       
     def launch(self, *args):
+
+        self.solver = light9.paint.solve.Solver(self.graph)
+        self.solver.loadSamples()
+        
         self.cycloneApp = cyclone.web.Application(handlers=[
             (r'/stats', StatsForCyclone),
             (r'/solve', Solve),
         ],
                                                   debug=True,
                                                   graph=self.graph,
+                                                  solver=self.solver,
                                                   stats=self.stats)
         reactor.listenTCP(networking.paintServer.port, self.cycloneApp)
         log.info("listening on %s" % networking.paintServer.port)

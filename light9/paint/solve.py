@@ -47,12 +47,30 @@ def colorRatio(col1, col2):
 
 def brightest(img):
     return numpy.amax(img, axis=(0, 1))
+    
+class ImageDist(object):
+    def __init__(self, img1):
+        self.a = img1.reshape((-1,))
+        self.d = 255 * 255 * self.a.shape[0]
 
+    def distanceTo(self, img2):
+        b = img2.reshape((-1,))
+        return 1 - numpy.dot(self.a, b) / self.d
 
+class ImageDistAbs(object):
+    def __init__(self, img1):
+        self.a = img1
+        self.maxDist = img1.shape[0] * img1.shape[1] * img1.shape[2] * 255
+
+    def distanceTo(self, img2):
+        return numpy.sum(numpy.absolute(self.a - img2), axis=None) / self.maxDist
+
+        
 class Solver(object):
-    def __init__(self, graph):
+    def __init__(self, graph, imgSize=(100, 75)):
         self.graph = graph
-        self.samples = {} # uri: Image array
+        self.imgSize = imgSize
+        self.samples = {} # uri: Image array (float 0-255)
         self.fromPath = {} # imagePath: image array
         self.blurredSamples = {}
         self.sampleSettings = {} # (uri, path): DeviceSettings
@@ -63,17 +81,18 @@ class Solver(object):
         with self.graph.currentState() as g:
             for samp in g.subjects(RDF.type, L9['LightSample']):
                 pathUri = g.value(samp, L9['imagePath'])
-                self.samples[samp] = self.fromPath[pathUri] = loadNumpy(pathUri.replace(L9[''], ''))
+                self.samples[samp] = self.fromPath[pathUri] = loadNumpy(pathUri.replace(L9[''], '')).astype(float)
                 self.blurredSamples[samp] = self._blur(self.samples[samp])
                 
                 key = (samp, pathUri)
                 self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
-
+        log.info('loaded %s samples', len(self.samples))
+                
     def _blur(self, img):
         return scipy.ndimage.gaussian_filter(img, 10, 0, mode='nearest')
 
     def draw(self, painting):
-        return self._draw(painting, 100, 48)
+        return self._draw(painting, self.imgSize[0], self.imgSize[1])
         
     def _draw(self, painting, w, h):
         surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
@@ -92,24 +111,25 @@ class Solver(object):
             ctx.set_source_rgb(r / 255, g / 255, b / 255)
             ctx.stroke()
         
-        surface.write_to_png('/tmp/surf.png')
+        #surface.write_to_png('/tmp/surf.png')
         return numpyFromCairo(surface)
 
-
-    def _imgDist(self, a, b):
-        return numpy.sum(numpy.absolute(a - b), axis=None)
-        
     def bestMatch(self, img):
         """the one sample that best matches this image"""
+        #img = self._blur(img)
         results = []
-        for uri, img2 in self.samples.iteritems():
-            results.append((self._imgDist(img, img2), uri, img2))
+        dist = ImageDist(img)
+        for uri, img2 in sorted(self.samples.items()):
+            if img.shape != img2.shape:
+                continue
+            results.append((dist.distanceTo(img2), uri, img2))
         results.sort()
-        log.info('results:')
-        for d,u,i in results:
-            log.info('%s %g', u, d)
-        saveNumpy('/tmp/bestsamp.png', results[0][2])
-        return results[0][1]
+        topDist, topUri, topImg = results[0]
+       
+        #saveNumpy('/tmp/best_in.png', img)
+        #saveNumpy('/tmp/best_out.png', topImg)
+        #saveNumpy('/tmp/mult.png', topImg / 255 * img)
+        return topUri, topDist
         
     def solve(self, painting):
         """

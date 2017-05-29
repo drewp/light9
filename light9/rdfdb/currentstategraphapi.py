@@ -14,6 +14,9 @@ class ReadOnlyConjunctiveGraph(object):
             return getattr(self.graph, attr)
         raise TypeError("can't access %r of read-only graph" % attr)
 
+    def __len__(self):
+        return len(self.graph)
+
 
 class CurrentStateGraphApi(object):
     """

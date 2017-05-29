@@ -10,7 +10,7 @@ class TestSolve(unittest.TestCase):
     def setUp(self):
         self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
                                              'show/dance2017/cam/test/bg.n3'])
-        self.solver = solve.Solver(self.graph)
+        self.solver = solve.Solver(self.graph, imgSize=(100, 48))
         self.solver.loadSamples()
         self.solveMethod = self.solver.solve
 
@@ -39,7 +39,7 @@ class TestSimulationLayers(unittest.TestCase):
     def setUp(self):
         self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
                                              'show/dance2017/cam/test/bg.n3'])
-        self.solver = solve.Solver(self.graph)
+        self.solver = solve.Solver(self.graph, imgSize=(100, 48))
         self.solver.loadSamples()
         
     def testBlack(self):
@@ -79,7 +79,7 @@ class TestCombineImages(unittest.TestCase):
     def setUp(self):
         graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
                                         'show/dance2017/cam/test/bg.n3'])
-        self.solver = solve.Solver(graph)
+        self.solver = solve.Solver(graph, imgSize=(100, 48))
         self.solver.loadSamples()
     def test(self):
         out = self.solver.combineImages(layers=[
@@ -94,12 +94,13 @@ class TestBestMatch(unittest.TestCase):
     def setUp(self):
         graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
                                         'show/dance2017/cam/test/bg.n3'])
-        self.solver = solve.Solver(graph)
+        self.solver = solve.Solver(graph, imgSize=(100, 48))
         self.solver.loadSamples()
         
     def testRightSide(self):
         drawingOnRight = {"strokes":[{"pts":[[0.875,0.64],[0.854,0.644]],
                                       "color":"#aaaaaa"}]}
         drawImg = self.solver.draw(drawingOnRight)
-        match = self.solver.bestMatch(drawImg)
+        match, dist = self.solver.bestMatch(drawImg)
         self.assertEqual(L9['sample5'], match)
+        self.assertAlmostEqual(0.06678758, dist)

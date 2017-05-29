@@ -22,7 +22,7 @@
         <!-- drag this img to make an effect out of just it -->
         <light9-capture-image name="mac2" path="{{solution.bestMatch.path}}"></light9-capture-image>
 
-        <div>Error: 280844</div>
+        <div>Error: {{solution.bestMatch.dist}}</div>
         
         <light9-device-settings></light9-device-settings>
       </div>
@@ -140,6 +140,10 @@
   <template>
     <style>
      :host { display: block; }
+       img {
+         outline: 1px solid #232323;
+         margin: 5px;
+     }
     </style>
     <div>{{name}}</div>
     <div><img width="100" src="../{{path}}"></div>

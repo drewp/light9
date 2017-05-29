@@ -15,6 +15,7 @@ def writeCaptureDescription(graph, ctx, uri, dev, relOutPath, settingsSubgraphCa
         (uri, RDF.type, L9['LightSample'], ctx),
         (uri, L9['imagePath'], URIRef('/'.join([showconfig.showUri(), relOutPath])), ctx),
         ]))
+    graph.suggestPrefixes('cap', URIRef(uri.rsplit('/', 1)[0] + '/'))
     
 class CaptureLoader(object):
     def __init__(self, graph):
