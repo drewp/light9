@@ -118,6 +118,7 @@ Polymer
 Polymer
   is: "light9-simulation"
   properties: {
+    graph: { type: Object }
     layers: { type: Object }
     solution: { type: Object }
   }
@@ -128,6 +129,35 @@ Polymer
     null
   onLayers: (layers) ->
     log('upd', layers)
+
+
+Polymer
+  is: "light9-device-settings",
+  properties: {
+    graph: { type: Object }
+    subj: {type: String, notify: true},
+    label: {type: String, notify: true},
+    attrs: {type: Array, notify: true},
+  },
+  observers: [
+    'onSubj(graph, subj)'
+  ]
+  ready: ->
+    @label = "aura2"
+    @attrs = [
+        {attr: 'rx', val: .03},
+        {attr: 'color', val: '#ffe897'},
+    ]
+  onSubj: (graph, @subj) ->
+    graph.runHandler(@loadAttrs.bind(@), 'loadAttrs #{subj}')
+  loadAttrs: ->
+    U = (x) -> @graph.Uri(x)
+    @attrs = []
+    for s in @graph.objects(U(@subj), U(':setting'))
+      attr = @graph.uriValue(s, U(':deviceAttr'))
+      attrLabel = @graph.stringValue(attr, U('rdfs:label'))
+      @push('attrs', {attr: attrLabel, val: @graph.floatValue(s, U(':value'))})
+    
 
     
 Polymer

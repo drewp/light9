@@ -5,6 +5,7 @@
 <link rel="import" href="/lib/paper-radio-group/paper-radio-group.html">
 <link rel="import" href="/lib/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="paint-report-elements.html">
+<link rel="import" href="../rdfdb-synced-graph.html">
 
 
 <dom-module id="light9-paint-canvas">
@@ -92,12 +93,19 @@
 
 <dom-module id="light9-paint">
   <template>
+    <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
+
     <light9-paint-canvas id="canvas" bg="bg2.jpg" painting="{{painting}}"></light9-paint-canvas>
 
     <iron-ajax id="solve" method="POST" url="../paintServer/solve" last-response="{{solve}}"></iron-ajax>
     
-    <light9-simulation solution="{{solve}}" layers="{{layers}}"></light9-simulation>
+    <light9-simulation graph="{{graph}}" solution="{{solve}}" layers="{{layers}}"></light9-simulation>
   </template>
 </dom-module>
+
+<script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
+<script src="/lib/shortcut/index.js"></script>
+<script src="/lib/underscore/underscore-min.js"></script>
+<script src="/lib/async/dist/async.js"></script>
 
 <script src="paint-elements.js"></script>

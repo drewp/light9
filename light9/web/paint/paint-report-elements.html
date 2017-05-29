@@ -25,7 +25,7 @@
 
         <div>Error: {{solution.bestMatch.dist}}</div>
         
-        <light9-device-settings></light9-device-settings>
+        <light9-device-settings graph="{{graph}}" subj="{{solution.bestMatch.uri}}"></light9-device-settings>
       </div>
 
       <!-- existing effect best match? -->
@@ -102,7 +102,7 @@
          font-weight: bold;
      }
     </style>
-    <h3>{{label}}</h3>
+    <h3><a href="{{subj}}">{{label}}</a></h3>
     <table class="borders">
       <tr>
         <th>device attr</th>
@@ -116,25 +116,7 @@
       </template>
 
   </template>
-  <script>
-   Polymer({
-       is: "light9-device-settings",
-       properties: {
-           label: {type: String, notify: true},
-           attrs: {type: Array, notify: true},
-
-       },
-       ready: function() {
-
-           this.label = "aura2";
-           this.attrs = [
-               {attr: 'rx', val: .03},
-               {attr: 'color', val: '#ffe897'},
-           ];
-           
-       }
-   });
-  </script>
+ 
 </dom-module>
 
 <dom-module id="light9-capture-image">

@@ -1,21 +1,21 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-:color              a :DeviceAttr; :dataType :color .
-:rx                 a :DeviceAttr; :dataType :angle .
-:ry                 a :DeviceAttr; :dataType :angle .
-:uv                 a :DeviceAttr; :dataType :scalar .
-:brightness         a :DeviceAttr; :dataType :scalar .
-:zoom               a :DeviceAttr; :dataType :scalar ;
+:color              a :DeviceAttr; rdfs:label "color"; :dataType :color .
+:rx                 a :DeviceAttr; rdfs:label "rx"; :dataType :angle .
+:ry                 a :DeviceAttr; rdfs:label "ry"; :dataType :angle .
+:uv                 a :DeviceAttr; rdfs:label "uv"; :dataType :scalar .
+:brightness         a :DeviceAttr; rdfs:label "brightness"; :dataType :scalar .
+:zoom               a :DeviceAttr; rdfs:label "zoom"; :dataType :scalar ;
   rdfs:comment "maybe make this a separate 'wide to narrow' type" .
-:focus              a :DeviceAttr; :dataType :scalar .
-:iris               a :DeviceAttr; :dataType :scalar .
-:prism              a :DeviceAttr; :dataType :scalar .
-:strobe             a :DeviceAttr; :dataType :scalar;
+:focus              a :DeviceAttr; rdfs:label "focus"; :dataType :scalar .
+:iris               a :DeviceAttr; rdfs:label "iris"; :dataType :scalar .
+:prism              a :DeviceAttr; rdfs:label "prism"; :dataType :scalar .
+:strobe             a :DeviceAttr; rdfs:label "strobe"; :dataType :scalar;
   rdfs:comment "0=none, 1=fastest" .
-:goboSpeed          a :DeviceAttr; :dataType :scalar ;
+:goboSpeed          a :DeviceAttr; rdfs:label "goboSpeed"; :dataType :scalar ;
   rdfs:comment "0=stopped, 1=rotate the fastest".
-:quantumGoboChoice  a :DeviceAttr; :dataType :choice;
+:quantumGoboChoice  a :DeviceAttr; rdfs:label "quantumGoboChoice"; :dataType :choice;
   :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
 
 
