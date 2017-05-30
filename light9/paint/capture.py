@@ -5,8 +5,8 @@ from light9.rdfdb.patch import Patch
 from light9.namespaces import L9, RDF
 from light9.paint.solve import loadNumpy
 
-def writeCaptureDescription(graph, ctx, uri, dev, outPath, settingsSubgraphCache,
-                            settings):
+def writeCaptureDescription(graph, ctx, session, uri, dev, outPath,
+                            settingsSubgraphCache, settings):
     graph.patch(Patch(addQuads=settings.statements(
         uri, ctx=ctx,
         settingRoot=URIRef('/'.join([
@@ -14,6 +14,7 @@ def writeCaptureDescription(graph, ctx, uri, dev, outPath, settingsSubgraphCache
         settingsSubgraphCache=settingsSubgraphCache)))
     graph.patch(Patch(addQuads=[
         (dev, L9['capture'], uri, ctx),
+        (session, L9['capture'], uri, ctx),
         (uri, RDF.type, L9['LightSample'], ctx),
         (uri, L9['imagePath'], URIRef('/'.join([
             showconfig.showUri(), outPath])), ctx),

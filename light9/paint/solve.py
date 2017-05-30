@@ -67,8 +67,9 @@ class ImageDistAbs(object):
 
         
 class Solver(object):
-    def __init__(self, graph, imgSize=(100, 75)):
+    def __init__(self, graph, sessions=None, imgSize=(100, 75)):
         self.graph = graph
+        self.sessions = sessions
         self.imgSize = imgSize
         self.samples = {} # uri: Image array (float 0-255)
         self.fromPath = {} # imagePath: image array
@@ -79,15 +80,19 @@ class Solver(object):
         """learn what lights do from images"""
 
         with self.graph.currentState() as g:
-            for samp in g.subjects(RDF.type, L9['LightSample']):
-                pathUri = g.value(samp, L9['imagePath'])
-                self.samples[samp] = self.fromPath[pathUri] = loadNumpy(pathUri.replace(L9[''], '')).astype(float)
-                self.blurredSamples[samp] = self._blur(self.samples[samp])
-                
-                key = (samp, pathUri)
-                self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
+            for sess in self.sessions:
+                for cap in g.objects(sess, L9['capture']):
+                    self._loadSample(g, cap)
         log.info('loaded %s samples', len(self.samples))
-                
+
+    def _loadSample(self, g, samp):
+        pathUri = g.value(samp, L9['imagePath'])
+        self.samples[samp] = self.fromPath[pathUri] = loadNumpy(pathUri.replace(L9[''], '')).astype(float)
+        self.blurredSamples[samp] = self._blur(self.samples[samp])
+
+        key = (samp, pathUri)
+        self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
+        
     def _blur(self, img):
         return scipy.ndimage.gaussian_filter(img, 10, 0, mode='nearest')
 

@@ -53,7 +53,7 @@ class App(object):
        
     def launch(self, *args):
 
-        self.solver = light9.paint.solve.Solver(self.graph)
+        self.solver = light9.paint.solve.Solver(self.graph, sessions=[L9['show/dance2017/capture/moving1/cap961804']])
         self.solver.loadSamples()
         
         self.cycloneApp = cyclone.web.Application(handlers=[
