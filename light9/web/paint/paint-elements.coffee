@@ -156,9 +156,21 @@ Polymer
     for s in @graph.objects(U(@subj), U(':setting'))
       attr = @graph.uriValue(s, U(':deviceAttr'))
       attrLabel = @graph.stringValue(attr, U('rdfs:label'))
-      @push('attrs', {attr: attrLabel, val: @graph.floatValue(s, U(':value'))})
-    
+      @attrs.push({attr: attrLabel, val: @settingValue(s)})
+    @attrs = _.sortBy(@attrs, 'attr')
 
+  settingValue: (s) ->
+    U = (x) => @graph.Uri(x)
+    for pred in [U(':value'), U(':scaledValue')]
+      try
+        return @graph.stringValue(s, pred)
+      catch
+        null
+      try
+        return @graph.floatValue(s, pred)
+      catch
+        null
+    throw new Error("no value for #{s}")
     
 Polymer
   is: "light9-paint"
