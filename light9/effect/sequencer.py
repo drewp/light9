@@ -167,20 +167,7 @@ class Sequencer(object):
             onChange=lambda: self.graph.addHandler(self.compileGraph))
 
     def compileGraph(self):
-        log.info('compileGraph request')
-        self._compileGraphRun()
-        return
-
-        # may not help
-        if self._compileGraphCall:
-            self._compileGraphCall.cancel()
-        self._compileGraphCall = reactor.callLater(
-            .5,
-            self.graph.addHandler, self._compileGraphRun)
-
-    def _compileGraphRun(self):
         """rebuild our data from the graph"""
-        self._compileGraphCall = None
         log.info('compileGraph start')
         g = self.graph
 
