@@ -71,6 +71,19 @@ class _Settings(object):
             compiled.setdefault(d, {})[a] = v
         return cls._fromCompiled(graph, compiled)
 
+    @classmethod
+    def fromList(cls, graph, others):
+        out = cls(graph, [])
+        for s in others:
+            if not isinstance(s, cls):
+                raise TypeError(s)
+            for row in s.asList(): # could work straight from s._compiled
+                if row[0] is None:
+                    raise TypeError('bad row %r' % (row,))
+                out._compiled.setdefault(row[0], {})[row[1]] = row[2]
+        out._delZeros()
+        return out
+        
     def _zeroForAttr(self, attr):
         if attr == L9['color']:
             return '#000000'

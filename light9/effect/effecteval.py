@@ -8,6 +8,8 @@ import math
 from noise import pnoise1
 import logging
 import time
+from light9.effect.settings import DeviceSettings
+
 
 log = logging.getLogger('effecteval')
 
@@ -75,6 +77,10 @@ class EffectEval(object):
                 sv = self.graph.value(setting, L9['scaledValue'])
                 if not (bool(v) ^ bool(sv)):
                     raise NotImplementedError
+                if d is None:
+                    raise TypeError('no device on %s' % effect)
+                if a is None:
+                    raise TypeError('no attr on %s' % effect)
 
                 settings.append((d, a, v if v is not None else sv, bool(sv)))
 
@@ -93,7 +99,7 @@ class EffectEval(object):
 
         strength = float(effectSettings[L9['strength']])
         if strength <= 0:
-            return []
+            return DeviceSettings(self.graph, [])
 
         out = {} # (dev, attr): value
 
@@ -109,11 +115,8 @@ class EffectEval(object):
             else:
                 out.update(func(effectSettings, strength, songTime, noteTime))
 
-        # todo: callers should prefer the dict form too
         outList = [(d, a, v) for (d, a), v in out.iteritems()]
-        outList.sort()
-        #import pprint; pprint.pprint(outList, width=170)
-        return outList
+        return DeviceSettings(self.graph, outList)
                             
     def simpleOutput(self, strength, colorScale):
         out = {}

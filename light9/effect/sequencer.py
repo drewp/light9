@@ -172,7 +172,7 @@ class Sequencer(object):
         g = self.graph
 
         sharedEffectOutputs = {}
-        
+
         for song in g.subjects(RDF.type, L9['Song']):
             self.notes[song] = []
             for note in g.objects(song, L9['note']):
@@ -199,7 +199,5 @@ class Sequencer(object):
         settings = []
         
         for note in self.notes.get(song, []):
-            outs = note.outputSettings(t)
-            #print 'out', outs
-            settings.extend(outs)
-        self.sendToCollector(settings)
+            settings.append(note.outputSettings(t))
+        self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
