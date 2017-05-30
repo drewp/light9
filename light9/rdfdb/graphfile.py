@@ -9,7 +9,7 @@ from light9.rdfdb.rdflibpatch import inContext
 log = logging.getLogger('graphfile')
 iolog = logging.getLogger('io')
 
-def patchN3SerializerToUseLessWhitespace():
+def patchN3SerializerToUseLessWhitespace(cutColumn=65):
     # todo: make a n3serializer subclass with whitespace settings
     from rdflib.plugins.serializers.turtle import TurtleSerializer, OBJECT
     originalWrite = TurtleSerializer.write
@@ -31,7 +31,7 @@ def patchN3SerializerToUseLessWhitespace():
         for predicate in propList[1:]:
             self.write(';')
             # can't do proper wrapping since we don't know how much is coming
-            if self._column > 50:
+            if self._column > cutColumn:
                 self.write('\n' + self.indent(1))
             self.verb(predicate, newline=False)
             self.objectList(properties[predicate])
@@ -63,29 +63,24 @@ class GraphFile(object):
     """
     one rdf file that we read from, write to, and notice external changes to
     """
-    def __init__(self, notifier, path, uri, patch, getSubgraph, addlPrefixes=None):
+    def __init__(self, notifier, path, uri, patch, getSubgraph, globalPrefixes, ctxPrefixes):
         """
         uri is the context for the triples in this file. We assume
         sometimes that we're the only ones with triples in this
         context.
         
         this does not include an initial reread() call
+
+        Prefixes are mutable dicts. The caller may add to them later.
         """
         self.path, self.uri = path, uri
         self.patch, self.getSubgraph = patch, getSubgraph
 
         self.lastWriteTimestamp = 0 # mtime from the last time _we_ wrote
 
-        self.namespaces = {
-            '': 'http://light9.bigasterisk.com/',
-            'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-            'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-            'xsd': 'http://www.w3.org/2001/XMLSchema#',
-            'effect': 'http://light9.bigasterisk.com/effect/',
-            'dev': 'http://light9.bigasterisk.com/device/',
-        }
-        if addlPrefixes:
-            self.namespaces.update(addlPrefixes)
+        self.globalPrefixes = globalPrefixes
+        self.ctxPrefixes = ctxPrefixes
+        self.readPrefixes = {}
         
         if not os.path.exists(path):
             # can't start notify until file exists
@@ -187,7 +182,7 @@ class GraphFile(object):
                 return
 
             new.parse(location=self.path, format='n3')
-            self.namespaces.update(dict(new.namespaces()))
+            self.readPrefixes = dict(new.namespaces())
         except SyntaxError as e:
             print e
             traceback.print_exc()
@@ -239,7 +234,9 @@ class GraphFile(object):
         tmpOut = self.path + ".rdfdb-temp"
         f = open(tmpOut, 'w')
         t1 = time.time()
-        for p, n in self.namespaces.items():
+        for p, n in (self.globalPrefixes.items() +
+                     self.readPrefixes.items() +
+                     self.ctxPrefixes.items()):
             self.graphToWrite.bind(p, n)
         self.graphToWrite.serialize(destination=f, format='n3')
         serializeTime = time.time() - t1

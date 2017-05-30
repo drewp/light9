@@ -19,6 +19,7 @@ PatchSender - collects and transmits your graph edits
 from rdflib import ConjunctiveGraph
 import logging, cyclone.httpclient, traceback
 from twisted.internet import defer
+import treq, json
 log = logging.getLogger('syncedgraph')
 from light9.rdfdb.rdflibpatch import patchQuads
 
@@ -125,10 +126,13 @@ class SyncedGraph(CurrentStateGraphApi, AutoDepGraphApi, GraphEditApi):
         self._sender.sendPatch(p).addErrback(self.sendFailed)
         log.debug('patch is done %s', debugKey)
 
-    def suggestPrefixes(self, prefixes):
-        if not hasattr(self, 'addlPrefixes'):
-            self.addlPrefixes = {}
-        self.addlPrefixes.update(prefixes)
+    def suggestPrefixes(self, ctx, prefixes):
+        """
+        when writing files for this ctx, try to use these n3
+        prefixes. async, not guaranteed to finish before any
+        particular file flush
+        """
+        treq.post(self.rdfdbRoot + 'prefixes', json.dumps({'ctx': ctx, 'prefixes': prefixes}))
 
     def sendFailed(self, result):
         """

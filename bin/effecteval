@@ -72,7 +72,7 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
         note, p = yield songNotePatch(self.settings.graph, dropped, song, event, ctx=song, note=note)
         
         self.settings.graph.patch(p)
-        self.settings.graph.suggestPrefixes({'song': URIRef(song + '/')})
+        self.settings.graph.suggestPrefixes(song, {'song': URIRef(song + '/')})
         self.write(json.dumps({'note': note}))
         
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):

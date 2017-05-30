@@ -180,7 +180,7 @@ class WatchedFiles(object):
 
     This object watches directories. Each GraphFile watches its own file.
     """
-    def __init__(self, dirUriMap, patch, getSubgraph, addlPrefixes=None):
+    def __init__(self, dirUriMap, patch, getSubgraph, addlPrefixes):
         self.dirUriMap = dirUriMap # {abspath : uri prefix}
         self.patch, self.getSubgraph = patch, getSubgraph
         self.addlPrefixes = addlPrefixes
@@ -239,10 +239,7 @@ class WatchedFiles(object):
             return
             
         ctx = uriFromFile(self.dirUriMap, inFile)
-        gf = GraphFile(self.notifier, inFile, ctx,
-                       self.patch, self.getSubgraph,
-                       addlPrefixes=self.addlPrefixes)
-        self.graphFiles[ctx] = gf
+        gf = self._addGraphFile(ctx, inFile)
         log.info("%s do initial read", inFile)
         gf.reread()
 
@@ -263,10 +260,19 @@ class WatchedFiles(object):
             outFile = fileForUri(self.dirUriMap, ctx)
             assert '//' not in outFile, (outFile, self.dirUriMap, ctx)
             log.info("starting new file %r", outFile)
-            self.graphFiles[ctx] = GraphFile(self.notifier, outFile, ctx,
-                                             self.patch, self.getSubgraph,
-                                             addlPrefixes=self.addlPrefixes)
+            self._addGraphFile(ctx, outFile)
 
+    def _addGraphFile(self, ctx, path):
+        self.addlPrefixes.setdefault(ctx, {})
+        self.addlPrefixes.setdefault(None, {})
+        gf = GraphFile(self.notifier, path, ctx,
+                       self.patch, self.getSubgraph,
+                       globalPrefixes=self.addlPrefixes[None],
+                       ctxPrefixes=self.addlPrefixes[ctx])
+        self.graphFiles[ctx] = gf 
+        return gf
+
+            
     def dirtyFiles(self, ctxs):
         """mark dirty the files that we watch in these contexts.
 
@@ -285,13 +291,14 @@ class Db(object):
     """
     the master graph, all the connected clients, all the files we're watching
     """
-    def __init__(self, dirUriMap, addlPrefixes=None):
+    def __init__(self, dirUriMap, addlPrefixes):
       
         self.clients = []
         self.graph = ConjunctiveGraph()
 
         self.watchedFiles = WatchedFiles(dirUriMap,
-                                         self.patch, self.getSubgraph, addlPrefixes)
+                                         self.patch, self.getSubgraph,
+                                         addlPrefixes)
         
         self.summarizeToLog()
 
@@ -403,6 +410,12 @@ class GraphClients(PrettyErrorHandler, cyclone.web.RequestHandler):
             traceback.print_exc()
             raise
             
+class Prefixes(PrettyErrorHandler, cyclone.web.RequestHandler):
+    def post(self):
+        suggestion = json.loads(self.request.body)
+        addlPrefixes = self.settings.db.watchedFiles.addlPrefixes
+        addlPrefixes.setdefault(URIRef(suggestion['ctx']), {}).update(suggestion['prefixes'])
+    
 _wsClientSerial = 0
 class WebsocketClient(cyclone.websocket.WebSocketHandler):
 
@@ -457,6 +470,8 @@ class NoExts(cyclone.web.StaticFileHandler):
             path = path + ".html"
         cyclone.web.StaticFileHandler.get(self, path, *args, **kw)
 
+
+        
 if __name__ == "__main__":
     logging.basicConfig()
     log = logging.getLogger()
@@ -470,7 +485,15 @@ if __name__ == "__main__":
 
     db = Db(dirUriMap={os.environ['LIGHT9_SHOW'].rstrip('/') + '/':
                        showconfig.showUri() + '/'},
-            addlPrefixes={'show': URIRef(showconfig.showUri() + '/')})
+            addlPrefixes={None: {
+                'show': showconfig.showUri() + '/',
+                '': 'http://light9.bigasterisk.com/',
+                'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+                'xsd': 'http://www.w3.org/2001/XMLSchema#',
+                'effect': 'http://light9.bigasterisk.com/effect/',
+                'dev': 'http://light9.bigasterisk.com/device/',
+            }})
 
     from twisted.python import log as twlog
     twlog.startLogging(sys.stdout)
@@ -481,6 +504,7 @@ if __name__ == "__main__":
         (r'/patches', Patches),
         (r'/graphClients', GraphClients),
         (r'/syncedGraph', WebsocketClient),
+        (r'/prefixes', Prefixes),
 
         (r'/(.*)', NoExts,
          {"path" : "light9/rdfdb/web",
