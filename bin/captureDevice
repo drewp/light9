@@ -46,11 +46,15 @@ class Camera(object):
             out.write(jpg)
         log.info('wrote %s', writePath)
 
-
+def deferSleep(sec):
+    d = Deferred()
+    reactor.callLater(sec, d.callback, None)
+    return d
+    
 class Capture(object):
-    firstMoveTime = 5
+    firstMoveTime = 3
     settleTime = .5
-    def __init__(self, graph):
+    def __init__(self, graph, dev):
         self.graph = graph
         
         def steps(a, b, n):
@@ -61,52 +65,55 @@ class Capture(object):
         self.toGather = []
 
         row = 0
-        for ry in steps(0.85, .92, 6):
-            xSteps = steps(.24, .45, 12)
+        for ry in steps(0.82, .92, 6):
+            xSteps = steps(.23, .42, 12)
             if row % 2:
                 xSteps.reverse()
             row += 1
             for rx in xSteps:
                 self.toGather.append(DeviceSettings(graph, [
-                    (L9['device/moving1'], L9['rx'], rx),
-                    (L9['device/moving1'], L9['ry'], ry),
+                    (dev, L9['rx'], rx),
+                    (dev, L9['ry'], ry),
+                    (dev, L9['color'], '#ffffff'),
                 ]))
 
         self.numPics = 0
         self.settingsCache = set()
         self.step().addErrback(log.error)
+
+    def off(self):
+        return sendToCollector(client='captureDevice', session='main',
+                               settings=DeviceSettings(self.graph, []))
         
     @inlineCallbacks
     def step(self):
         if not self.toGather:
+            yield self.off()
+            yield deferSleep(1)
             reactor.stop()
             return
         settings = self.toGather.pop()
         
-        log.info('move to %r', settings)
-        yield sendToCollector(client='captureDevice', session='main', settings=settings)
+        log.info('[%s left] move to %r', len(self.toGather), settings)
+        yield sendToCollector(client='captureDevice', session='main',
+                              settings=settings)
         
-        d = Deferred()
-        reactor.callLater(self.firstMoveTime if self.numPics == 0 else self.settleTime,
-                          d.callback, None)
-        yield d
+        yield deferSleep(self.firstMoveTime if self.numPics == 0 else
+                         self.settleTime)
+        
         dev = settings.devices()[0]
-
         devTail = dev.rsplit('/')[-1]
-        
         picId = 'pic%s' % self.numPics
-        path = '/'.join(['capture', devTail, self.captureId, picId])
-        ctx = URIRef('/'.join([showconfig.showUri(), 'capture', devTail, self.captureId,
-                               'index']))
-        uri = URIRef('/'.join([showconfig.showUri(), 'capture', devTail, self.captureId,
-                               picId]))
-                     
-        relOutPath = path + '.jpg'
+        path = '/'.join(['capture', devTail, self.captureId, picId]) + '.jpg'
+        ctx = URIRef('/'.join([showconfig.showUri(),
+                               'capture', devTail, self.captureId, 'index']))
+        uri = URIRef('/'.join([showconfig.showUri(),
+                               'capture', devTail, self.captureId, picId]))
         
-        yield camera.takePic(uri, os.path.join(showconfig.root(), relOutPath))
+        yield camera.takePic(uri, os.path.join(showconfig.root(), path))
         self.numPics += 1
 
-        writeCaptureDescription(self.graph, ctx, uri, dev, relOutPath,
+        writeCaptureDescription(self.graph, ctx, uri, dev, path,
                                 self.settingsCache, settings)
         
         reactor.callLater(0, self.step)
@@ -123,7 +130,7 @@ class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
 
 def launch(graph):
 
-    cap = Capture(graph)
+    cap = Capture(graph, dev=L9['device/moving1'])
     reactor.listenTCP(networking.captureDevice.port,
                       cyclone.web.Application(handlers=[
                           (r'/()', cyclone.web.StaticFileHandler,

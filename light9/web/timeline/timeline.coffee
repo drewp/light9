@@ -302,7 +302,7 @@ Polymer
     quads = [
       quad(effect, U('rdf:type'), U(':Effect')),
       quad(effect, U(':copiedFrom'), uri),
-      quad(effect, U('rdfs:label'), @graph.Literal('')),
+      quad(effect, U('rdfs:label'), @graph.Literal(uri.replace(/.*capture\//, ''))),
       quad(effect, U(':publishAttr'), U(':strength')),
       ]
 
@@ -314,6 +314,7 @@ Polymer
       ts = toSettings.pop()
       # full copies of these since I may have to delete captures
       quads.push(quad(effect, U(':setting'), ts))
+      quads.push(quad(ts, U(':device'), @graph.uriValue(fs, U(':device'))))
       quads.push(quad(ts, U(':deviceAttr'), @graph.uriValue(fs, U(':deviceAttr'))))
       quads.push(quad(ts, U(':value'), @graph.uriValue(fs, U(':value'))))
 
@@ -498,7 +499,7 @@ Polymer
     rightX = screenPts[Math.min(2, screenPts.length - 1)].e(1) - 5
     if screenPts.length < 3
       rightX = leftX + 120
-    w = 114
+    w = 150
     h = 80
     @inlineRect = {
       left: leftX,
@@ -603,7 +604,7 @@ Polymer
     console.time('attrs update')
     U = (x) -> @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
-    @effectLabel = @effect.replace(/.*\//, '')
+    @effectLabel = @graph.stringValue(@effect, U('rdfs:label')) or (@effect.replace(/.*\//, ''))
     @noteLabel = @uri.replace(/.*\//, '')
 
     @existingColorScaleSetting = null

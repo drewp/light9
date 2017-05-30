@@ -5,15 +5,18 @@ from light9.rdfdb.patch import Patch
 from light9.namespaces import L9, RDF
 from light9.paint.solve import loadNumpy
 
-def writeCaptureDescription(graph, ctx, uri, dev, relOutPath, settingsSubgraphCache, settings):
+def writeCaptureDescription(graph, ctx, uri, dev, outPath, settingsSubgraphCache,
+                            settings):
     graph.patch(Patch(addQuads=settings.statements(
         uri, ctx=ctx,
-        settingRoot=URIRef('/'.join([showconfig.showUri(), 'capture', dev.rsplit('/')[1]])),
+        settingRoot=URIRef('/'.join([
+            showconfig.showUri(), 'capture', dev.rsplit('/')[1]])),
         settingsSubgraphCache=settingsSubgraphCache)))
     graph.patch(Patch(addQuads=[
         (dev, L9['capture'], uri, ctx),
         (uri, RDF.type, L9['LightSample'], ctx),
-        (uri, L9['imagePath'], URIRef('/'.join([showconfig.showUri(), relOutPath])), ctx),
+        (uri, L9['imagePath'], URIRef('/'.join([
+            showconfig.showUri(), outPath])), ctx),
         ]))
     graph.suggestPrefixes(ctx, {'cap': uri.rsplit('/', 1)[0] + '/',
                                 'showcap': showconfig.showUri() + '/capture/'})
