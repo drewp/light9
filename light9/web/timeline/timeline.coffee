@@ -279,7 +279,7 @@ Polymer
     setupDrop(@, @$.rows, root, @onDrop.bind(@))
 
   onDrop: (effect, pos) ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
 
     # we could probably accept some initial overrides right on the
     # effect uri, maybe as query params
@@ -295,7 +295,7 @@ Polymer
     @makeNewNote(effect, dropTime)
 
   makeEffect: (uri) ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     effect = U(uri + '/effect')
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: effect}
     
@@ -322,7 +322,7 @@ Polymer
     return effect
         
   makeNewNote: (effect, dropTime) ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
       
     newNote = @graph.nextNumberedResource("#{@song}/n")
@@ -379,7 +379,7 @@ Polymer
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
   update: (patch) ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
 
     notesForThisRow = []
     i = 0
@@ -473,7 +473,7 @@ Polymer
   updateDisplay: ->
       
     # update our note DOM and SVG elements based on the graph
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
 
     yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
 
@@ -484,7 +484,7 @@ Polymer
         @updateStrengthCurveEtc(originTime, curve, yForV, effect)
         
   updateStrengthCurveEtc: (originTime, curve, yForV, effect) ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     [@pointUris, @worldPts] = getCurvePoints(@graph, curve, originTime) # (song time, value)
 
     curveWidth = =>
@@ -517,7 +517,7 @@ Polymer
     @makeCurveAdjusters(curveWidth, yForV, @worldPts)
     
   makeCurveAdjusters: (curveWidth, yForV, worldPts) ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
 
     if true
       @adjusterIds[@uri+'/offset'] = true
@@ -579,7 +579,7 @@ Polymer
     'onColorScale(graph, uri, colorScale)'
     ]
   onColorScale: ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     if @colorScale == @colorScaleFromGraph
       return
       
@@ -602,7 +602,7 @@ Polymer
     
   update: ->
     console.time('attrs update')
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
     @effectLabel = @graph.stringValue(@effect, U('rdfs:label')) or (@effect.replace(/.*\//, ''))
     @noteLabel = @uri.replace(/.*\//, '')

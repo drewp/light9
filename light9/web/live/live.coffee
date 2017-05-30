@@ -71,7 +71,7 @@ Polymer
     uriName = @newEffectName.replace(/[^a-zA-Z0-9_]/g, '')
     return if not uriName.length
 
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
 
     effectUri = U(":effect") + "/#{uriName}"
     ctx = U("http://light9.bigasterisk.com/show/dance2017/effect/#{uriName}")
@@ -113,7 +113,7 @@ Polymer
       llc.clear()
     
   update: ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
 
     @set('devices', [])
     for dc in _.sortBy(@graph.subjects(U('rdf:type'), U(':DeviceClass')))

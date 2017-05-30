@@ -151,7 +151,7 @@ Polymer
   onSubj: (graph, @subj) ->
     graph.runHandler(@loadAttrs.bind(@), "loadAttrs #{@subj}")
   loadAttrs: ->
-    U = (x) -> @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     @attrs = []
     for s in @graph.objects(U(@subj), U(':setting'))
       attr = @graph.uriValue(s, U(':deviceAttr'))
