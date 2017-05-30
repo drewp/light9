@@ -45,7 +45,12 @@ class AutoDepGraphApi(object):
         self.currentFuncs.append(func)
         log.debug('graph.currentFuncs push %s', func)
         try:
-            func()
+            try:
+                func()
+            except:
+                import traceback
+                traceback.print_exc()
+                raise
         finally:
             self.currentFuncs.pop()
             log.debug('graph.currentFuncs pop %s. stack now has %s', func, len(self.currentFuncs))
