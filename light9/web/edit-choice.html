@@ -16,10 +16,12 @@
          padding: 3px;
          display: inline-block;
      }
+    
      
     </style>
     <div id="box">
-      <a href="{{uri}}"><!-- type icon goes here -->{{label}}</a>
+      <!-- maybe use resource-display for this part -->
+      <a href="{{uri}}" title="{{label}}"><!-- type icon goes here -->{{label}}</a>
       <!-- <button on-click="unlink">Unlink</button>  -->
     </div>
   </template>

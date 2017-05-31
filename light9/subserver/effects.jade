@@ -3,6 +3,11 @@ html
   head
     title effects
     link(rel='stylesheet', href='/style.css')
+    style.
+      .headerRow {
+        display: flex;
+        justify-content: space-between;
+      }
   body
     #status starting...
     h1 Effects
@@ -25,12 +30,19 @@ html
 
     div(data-bind="foreach: classes")
       div.resource.effectClass
-        h2
-          | Effect class
-          | 
-          a(data-bind="attr: {href: uri}, text: label")
-          button(data-bind="click: $root.addToCurrentSong") Add to current song
-          button(data-bind="event: { mousedown: $root.addMomentary, mouseup: $root.addMomentaryUp }") Add momentary
+        div.headerRow
+          span
+            h2
+              | Effect class
+              | 
+              resource-display(data-bind="attr: {uri: uri, graph: graph}")
+              a(data-bind="attr: {href: uri}, text: label")
+              button(data-bind="click: $root.onRename") Rename
+          span.rightTools
+            button(data-bind="click: $root.addToCurrentSong") Add to current song
+            button(data-bind="event: { mousedown: $root.addMomentary, mouseup: $root.addMomentaryUp }") Add momentary
+        div.rename
+          input
         div
           code(data-bind="text: code")
         

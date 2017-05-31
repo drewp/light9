@@ -11,9 +11,14 @@
      #breakdown { position: relative; }
      #sources { display: flex; }
      #solution { display: flex; margin-top: 80px; }
-     #connectors { position: absolute; width: 100%; height: 100%; }
+     #connectors { position: absolute; width: 100%; height: 100%; z-index: -1; }
      #connectors path { stroke: #615c54; stroke-width: 3px; }
- 
+
+     [draggable=true]:hover {
+         box-shadow: 0 0 20px yellow;
+     }
+         
+     
     </style>
 
     <div id="solutions">

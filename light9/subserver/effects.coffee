@@ -51,6 +51,8 @@ model.addMomentaryUp = (e) ->
     url: '/effectEval/songEffects'
     data: {drop: e.uri, event: 'end', note: lastMomentaryNote}
   })
+
+
   
 
 reconnectingWebSocket "../effectsUpdates", (msg) ->

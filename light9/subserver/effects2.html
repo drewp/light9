@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <title>subserver effects2</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="/style.css">
+    <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="/lib/polymer/polymer.html">
+    <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
+    <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
+    <script src="/lib/async/dist/async.js"></script>
+    <script src="/lib/underscore/underscore-min.js"></script>
+    <link rel="import" href="/rdfdb-synced-graph.html">
+    <link rel="import" href="/resource-display.html">
+  </head>
+  <body>
+    <!-- replaces effects.jade for subserver -->
+
+    <dom-module id="light9-effect-class">
+      <template>
+        <style>
+         :host {
+             display: block;
+             padding: 5px;
+             border: 1px solid green;
+             background: #1e271e;
+             margin-bottom: 3px;
+         }
+        </style>
+
+        Effect
+        <resource-display graph="{{graph}}" uri="{{uri}}" rename></resource-display>
+        <iron-ajax id="songEffects"
+                   url="/effectEval/songEffects"
+                   method="POST"
+                   content-type="application/x-www-form-urlencoded"></iron-ajax>
+          <button on-click="onAdd">Add to current song</button>
+          <button on-mousedown="onMomentaryPress"
+                  on-mouseup="onMomentaryRelease">Add momentary</button>
+
+      </template>
+    </dom-module>
+    
+    <dom-module id="light9-effects">
+      <template>
+        <style>
+        </style>
+        <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
+
+        <template is="dom-repeat" items="{{effectClasses}}">
+          <light9-effect-class graph="{{graph}}" uri="{{item}}"></light9-effect-class>
+        </template>
+        
+      </template>
+    </dom-module>       
+
+    <light9-effects></light9-effects>
+
+    <script src="effects2.js"></script>
+  </body>
+</html>

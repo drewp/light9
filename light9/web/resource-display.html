@@ -1,0 +1,32 @@
+<link rel="import" href="/lib/polymer/polymer.html">
+
+<dom-module id="resource-display">
+  <template>
+    <link rel="stylesheet" href="/style.css">
+    <span class="resource"><a href="{{uri}}">{{label}}</a></span>
+    <template is="dom-if" if="{{rename}}">
+      <button>Rename</button>
+    </template>
+  </template>
+  <script>
+   Polymer({
+       is: "resource-display",
+       properties: {
+           graph: { type: Object },
+           uri: { type: String },
+           label: { type: String },
+           rename: { type: Boolean },
+       },
+       ready: function() {
+           this.graph.runHandler(this.setLabel.bind(this), "label #{this.uri}");
+           console.log('ren', this.rename);
+       },
+       setLabel: function() {
+           this.label = this.graph.stringValue(this.uri, this.graph.Uri('rdfs:label'));
+           if (!this.label) {
+               this.label = this.uri;
+           }
+       }
+   });
+  </script>
+</dom-module>
