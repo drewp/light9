@@ -316,7 +316,10 @@ Polymer
       quads.push(quad(effect, U(':setting'), ts))
       quads.push(quad(ts, U(':device'), @graph.uriValue(fs, U(':device'))))
       quads.push(quad(ts, U(':deviceAttr'), @graph.uriValue(fs, U(':deviceAttr'))))
-      quads.push(quad(ts, U(':value'), @graph.uriValue(fs, U(':value'))))
+      try
+        quads.push(quad(ts, U(':value'), @graph.uriValue(fs, U(':value'))))
+      catch
+        quads.push(quad(ts, U(':scaledValue'), @graph.uriValue(fs, U(':scaledValue'))))
 
     @graph.applyAndSendPatch({delQuads: [], addQuads: quads})
     return effect
