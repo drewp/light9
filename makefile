@@ -107,7 +107,7 @@ arduino_upload: /usr/share/arduino/Arduino.mk
 effect_node_setup: create_virtualenv packages binexec install_python_deps
 
 coffee:
-	zsh -c 'coffee -cw light9/web/{.,live,timeline,paint}/*.coffee'
+	zsh -c 'coffee -cw light9/web/{.,live,timeline,paint,effects}/*.coffee'
 
 env-mypy/bin/mypy:
 	mkdir -p env-mypy

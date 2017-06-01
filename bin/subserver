@@ -17,45 +17,6 @@ from light9 import networking, showconfig
 
 from lib.cycloneerr import PrettyErrorHandler
         
-liveClients = set()
-def sendToLiveClients(d=None, asJson=None):
-    j = asJson or json.dumps(d)
-    for c in liveClients:
-        c.sendMessage(j)
-
-class Live(cyclone.websocket.WebSocketHandler):
-    def connectionMade(self, *args, **kwargs):
-        log.info("websocket opened")
-        liveClients.add(self)
-        self.settings.onNewClient()
-
-    def connectionLost(self, reason):
-        log.info("websocket closed")
-        liveClients.remove(self)
-
-    def messageReceived(self, message):
-        log.info("got message %s" % message)
-        self.sendMessage(message)
-        
-class EffectsUpdates(cyclone.websocket.WebSocketHandler):
-    def connectionMade(self, *args, **kwargs):
-        self.connected = True
-        self.settings.graph.addHandler(self.onGraphChange)
-        
-    def connectionLost(self, reason):
-        self.connected = False
-        
-    def onGraphChange(self):
-        if not self.connected:
-            return
-        graph = self.settings.graph
-        classes = []
-        for e in graph.subjects(RDF.type, L9['Effect']):
-            classes.append({'uri': e,
-                            'label': graph.label(e),
-                            'code': graph.value(e, L9['code'])})
-        self.sendMessage({'classes': classes})
-
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
     def get(self, path, *args, **kw):
         if path in ['', 'effects']:
@@ -116,39 +77,9 @@ if __name__ == "__main__":
 
     graph = SyncedGraph(networking.rdfdb.url, "subServer")
 
-    d = {}
-    def updateSubs():
-        subs = []
-        for sub in sorted(graph.subjects(RDF.type, L9['Submaster'])):
-            rec = {'uri' : sub}
-            rec['isLocal'] = graph.contains((sub, RDF.type,
-                                             L9['LocalSubmaster']))
-            rec['label'] = graph.label(sub)
-            rec['img'] = newestImage(sub)
-            subs.append(rec)
-        
-        d.clear()
-        d.update({'subs': subs})
-
-        d['chases'] = []
-        for chase in sorted(graph.subjects(RDF.type, L9['Chase'])):
-            fakeLabel = chase.rsplit('/', 1)[-1]
-            d['chases'].append({
-                'uri': chase,
-                'label': fakeLabel,
-            })
-        
-        sendToLiveClients(d=d)
-    def onNewClient():
-        sendToLiveClients(d=d)
-        
-    graph.addHandler(updateSubs)
-    
     
     port = networking.subServer.port
     reactor.listenTCP(port, cyclone.web.Application(handlers=[
-        (r'/live', Live),
-        (r'/effectsUpdates', EffectsUpdates),
         (r'/snapshot', Snapshot),
         (r'/(.*)', Static,
          {"path" : "light9/subserver",
