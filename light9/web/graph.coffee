@@ -192,7 +192,7 @@ class window.SyncedGraph
     @_autoDeps.graphChanged(patch)
 
   getObjectPatch: (s, p, newObject, g) ->
-    # send a patch which removes existing values for (s,p,*,c) and
+    # make a patch which removes existing values for (s,p,*,c) and
     # adds (s,p,newObject,c). Values in other graphs are not affected.
     existing = @graph.findByIRI(s, p, null, g)
     return {
@@ -299,4 +299,10 @@ class window.SyncedGraph
 
   nextNumberedResource: (base) ->
     @nextNumberedResources(base, 1)[0]       
+
+  contextsWithPattern: (s, p, o) ->
+    ctxs = []
+    for q in @graph.find(s, p, o)
+      ctxs.push(q.graph)
+    return _.unique(ctxs)
 

@@ -1,11 +1,37 @@
 <link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/paper-dialog/paper-dialog.html">
+<link rel="import" href="/lib/paper-button/paper-button.html">
 
 <dom-module id="resource-display">
   <template>
     <link rel="stylesheet" href="/style.css">
+    <style>
+     :host {
+         display: inline-block;
+         vertical-align: top;
+         border: 2px rgba(84, 84, 84, 0.27) outset;
+         border-radius: 9px;
+         padding: 2px;
+     }
+    </style>
     <span class="resource"><a href="{{uri}}">{{label}}</a></span>
     <template is="dom-if" if="{{rename}}">
-      <button>Rename</button>
+      <button on-click="onRename">Rename</button>
+
+      <paper-dialog id="renameDialog" modal
+                    on-iron-overlay-closed="onRenameClosed">
+        <p>
+          New label:
+          <input id="renameTo" autofocus type="text"
+                 value="{{renameTo::input}}"
+                 on-keydown="onRenameKey">
+        </p>
+        <div class="buttons">
+          <paper-button dialog-dismiss>Cancel</paper-button>
+          <paper-button dialog-confirm>OK</paper-button>
+        </div>
+      </paper-dialog>
+      
     </template>
   </template>
   <script>
@@ -16,15 +42,42 @@
            uri: { type: String },
            label: { type: String },
            rename: { type: Boolean },
+           renameTo: { type: String, notify: true },
        },
        ready: function() {
-           this.graph.runHandler(this.setLabel.bind(this), "label #{this.uri}");
-           console.log('ren', this.rename);
+           this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri}`);
        },
        setLabel: function() {
-           this.label = this.graph.stringValue(this.uri, this.graph.Uri('rdfs:label'));
+           this.label = this.graph.stringValue(this.uri,
+                                               this.graph.Uri('rdfs:label'));
            if (!this.label) {
                this.label = this.uri;
+           }
+       },
+       onRename: function() {
+           this.renameTo = this.label;
+           this.querySelector("#renameDialog").open();
+           this.querySelector("#renameTo").setSelectionRange(0, -1);
+       },
+       onRenameKey: function(ev) {
+           if (ev.key == 'Enter') {
+               this.querySelector("[dialog-confirm]").click();
+           }
+           if (ev.key == 'Escape') {
+               this.querySelector("[dialog-dismiss]").click();
+           }
+       },
+       onRenameClosed: function() {
+           var dialog = this.querySelector("#renameDialog");
+           if (dialog.closingReason.confirmed) {
+               var label = this.graph.Uri('rdfs:label');
+               var ctxs = this.graph.contextsWithPattern(this.uri, label, null);
+               if (ctxs.length != 1) {
+                   throw new Error(`${ctxs.length} label stmts for ${this.uri}`);
+               }
+               this.graph.patchObject(this.uri, label,
+                                      this.graph.Literal(this.renameTo),
+                                      ctxs[0]);
            }
        }
    });
