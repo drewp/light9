@@ -160,6 +160,8 @@ a.resource {
 }
 .resource a {
     color: rgb(150, 150, 255);
+    padding: 1px;
+    display: inline-block;
 }
 .sub {
     display: inline-block;

@@ -19,6 +19,8 @@ Polymer
   onSlider: -> @value = @immediateSlider
   goWhite: -> @value = "#ffffff"
   goBlack: -> @value = "#000000"
+  onChoice: (ev) ->
+    console.log('ch', ev)
   
   onChange: (value) ->
     @lastSent = [[@device, @deviceAttr.uri, value]]
@@ -30,8 +32,56 @@ Polymer
       @value = '#000000'
     else
       @value = @immediateSlider = 0
-      
-  
+
+Polymer
+  is: "light9-live-device-control"
+  properties:
+    graph: { type: Object, notify: true }
+    uri: { type: String, notify: true }
+    label: { type: String, notify: true }
+    deviceClass: { type: String, notify: true }
+    deviceAttrs: { type: Array, notify: true }
+  observers: [
+    'onGraph(graph)'
+    ]
+  onGraph: ->
+    @graph.runHandler(@update.bind(@), "#{@uri} update")
+  update: ->
+    U = (x) => @graph.Uri(x)
+
+    @zlabel = (try
+        @graph.stringValue(@uri, U('rdfs:label'))
+      catch
+        words = @uri.split('/')
+        words[words.length-1]
+        )
+    @deviceClass = @graph.uriValue(@uri, U('rdf:type'))
+    
+    @deviceAttrs = []
+    for da in _.unique(_.sortBy(@graph.objects(@deviceClass, U(':deviceAttr'))))
+      dataType = @graph.uriValue(da, U(':dataType'))
+      daRow = {
+        uri: da
+        dataType: dataType
+        showColorPicker: dataType == U(':color')
+        }
+      if dataType == 'http://light9.bigasterisk.com/color'
+        daRow.useColor = true
+
+      else if dataType == U(':choice')
+        daRow.useChoice = true
+        daRow.choices = @graph.objects(da, U(':choice'))
+      else
+
+        daRow.useSlider = true
+        daRow.max = 1
+        if dataType == U(':angle')
+          # varies
+          daRow.max = 1
+
+      @push('deviceAttrs', daRow)
+
+    
 Polymer
   is: "light9-live-controls"
   properties:
@@ -118,34 +168,4 @@ Polymer
     @set('devices', [])
     for dc in _.sortBy(@graph.subjects(U('rdf:type'), U(':DeviceClass')))
       for dev in _.sortBy(@graph.subjects(U('rdf:type'), dc))
-        row = {uri: dev, label: (try
-            @graph.stringValue(dev, U('rdfs:label'))
-          catch
-            words = dev.split('/')
-            words[words.length-1]
-            ), deviceClass: dc}
-        row.deviceAttrs = []
-        for da in _.sortBy(@graph.objects(dc, U(':deviceAttr')))
-          dataType = @graph.uriValue(da, U(':dataType'))
-          daRow = {
-            uri: da
-            dataType: dataType
-            showColorPicker: dataType == U(':color')
-            }
-          if dataType == 'http://light9.bigasterisk.com/color'
-            daRow.useColor = true
-
-          else if dataType == U(':choice')
-            daRow.useChoice = true
-            daRow.choices = @graph.objects(da, U(':choice'))
-          else
-
-            daRow.useSlider = true
-            daRow.max = 1
-            if dataType == U(':angle')
-              # varies
-              daRow.max = 1
-          
-          row.deviceAttrs.push(daRow)
-        
-        @push('devices', row)
+        @push('devices', {uri: dev})

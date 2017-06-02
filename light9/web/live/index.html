@@ -15,6 +15,7 @@
     <script src="/lib/async/dist/async.js"></script>
     <script src="/lib/underscore/underscore-min.js"></script>
     <link rel="import" href="../rdfdb-synced-graph.html">
+    <link rel="import" href="/resource-display.html">
   </head>
   <body>
     
@@ -41,15 +42,19 @@
           <button on-click="goWhite">white</button>
           <button on-click="goBlack">black</button>
         </template>
-        <template is="dom-if" if="{{deviceAttr.useChoices}}">
-          choices go here
+        <template is="dom-if" if="{{deviceAttr.useChoice}}">
+          <select size="10">
+            <template is="dom-repeat" items="{{deviceAttr.choices}}">
+              <option>item {{item}}</option>
+            </template>
+          </select>
         </template>
 
       </template>
      
     </dom-module>
-    
-    <dom-module id="light9-live-controls">
+
+    <dom-module id="light9-live-device-control">
       <template>
         <style>
          .device {
@@ -58,6 +63,8 @@
              margin: 9px;
              padding: 5px;
              background: #171717;
+             break-inside: avoid-column;
+             
          }
          .deviceAttr {
              border-top: 1px solid #ffffff26;
@@ -81,10 +88,34 @@
              color: #9ab8fd;
              text-decoration: initial;
          }
+        </style>
+        <div class="device">
+          <h2>
+            <resource-display id="mainLabel" graph="{{graph}}" uri="{{uri}}"></resource-display>
+            (device class <resource-display graph="{{graph}}" uri="{{deviceClass}}"></resource-display>)
+          </h2>
+          <template is="dom-repeat" items="{{deviceAttrs}}" as="dattr">
+            <div class="deviceAttr">
+              <span>attr <resource-display graph="{{graph}}" uri="{{dattr.uri}}"></resource-display></span>
+              <light9-live-control device="{{uri}}" device-attr="{{dattr}}"></light9-live-control>
+            </div>
+          </template>
+        </div>
+      </template>
+    </dom-module>
+    
+    <dom-module id="light9-live-controls">
+      <template>
+        <style>
          #preview {
              width: 100%;
          }
-         
+         #deviceControls {
+             column-width: 400px;
+         }
+         light9-live-device-control > div {
+             break-inside: avoid-column;
+         }
         </style>
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
@@ -98,20 +129,12 @@
           </div>
           <textarea id="preview" value="{{effectPreview}}"></textarea>
         </div>
-        
-        <template is="dom-repeat" items="{{devices}}" as="device">
-          <div class="device">
-            <h2><a id="mainLabel" href="{{device.uri}}">{{device.label}}</a> (device class <a href="{{device.deviceClass}}">{{device.deviceClass}}</a>)</h2>
-            <template is="dom-repeat" items="{{device.deviceAttrs}}" as="dattr">
-              <div class="deviceAttr">
-                <span>attr <a href="{{dattr.uri}}">{{dattr.uri}}</a></span>
-                <light9-live-control
-                    device="{{device.uri}}"
-                    device-attr="{{dattr}}"></light9-live-control>
-              </div>
-            </template>
-          </div>
-        </template>
+
+        <div id="deviceControls">
+          <template is="dom-repeat" items="{{devices}}" as="device">
+            <light9-live-device-control graph="{{graph}}" uri="{{device.uri}}"></light9-live-device-control>
+          </template>
+        </div>
         
       </template>
     </dom-module>

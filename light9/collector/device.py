@@ -97,6 +97,13 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         hi = _8bit(x)
         lo = _8bit((x * 255) % 1.0)
         return hi, lo
+
+    def choiceAttr(attr):
+        # todo
+        if deviceAttrSettings.get(attr) == L9['g1']:
+            return 3
+        if deviceAttrSettings.get(attr) == L9['g2']:
+            return 10
         
     if deviceType == L9['ChauvetColorStrip']:
         r, g, b = rgbAttr(L9['color'])
@@ -115,7 +122,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['colorChange']: 0,
             L9['colorSpeed']: 0,
             L9['goboShake']: _8bit(floatAttr(L9['goboShake'])),
-            L9['goboChoose']: _8bit(floatAttr(L9['mini15GoboChoice'])),
+            L9['goboChoose']: choiceAttr(L9['mini15GoboChoice']),
         }
         out[L9['red']], out[L9['green']], out[L9['blue']] = rgbAttr(L9['color'])
         out[L9['xRotation']], out[L9['xFine']] = fine16Attr(L9['rx'], 1/540)
