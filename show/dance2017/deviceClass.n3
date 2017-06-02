@@ -17,6 +17,9 @@
   rdfs:comment "0=stopped, 1=rotate the fastest".
 :quantumGoboChoice  a :DeviceAttr; rdfs:label "quantumGoboChoice"; :dataType :choice;
   :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
+:mini15GoboChoice   a :DeviceAttr; :dataType :scalar;
+  :choice :g1, :g2 .
+  :goboShake  a :DeviceAttr; :dataType :scalar .
 
 
 :SimpleDimmer a :DeviceClass;
@@ -33,7 +36,7 @@
     [ :outputAttr :blue;  :dmxOffset 3 ] .
 
 :Mini15 a :DeviceClass;
-  :deviceAttr :color, :rx, :ry;
+  :deviceAttr :color, :rx, :ry, :mini15GoboChoice, :goboShake ;
   :attr
     [ :outputAttr :xRotation;     :dmxOffset 0 ],
     [ :outputAttr :xFine;         :dmxOffset 1 ],

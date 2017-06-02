@@ -1,4 +1,12 @@
 #!bin/python
+"""
+Collector receives device attrs from multiple senders, combines
+them, and sends output attrs to hardware. The combining part has
+custom code for some attributes.
+
+Input can be over http or zmq.
+"""
+
 from __future__ import division
 from rdflib import URIRef, Literal
 from twisted.internet import reactor, utils
