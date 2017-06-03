@@ -62,7 +62,6 @@ def resolve(deviceType, deviceAttr, values):
 
         # averaging with zeros? not so good
         return Literal(sum(floatVals) / len(floatVals))
-    
     return max(values)
 
 def toOutputAttrs(deviceType, deviceAttrSettings):

@@ -60,7 +60,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.graph.addHandler(self.rebuildOutputMap)
 
         # client : (session, time, {(dev,devattr): latestValue})
-        self.lastRequest = {} # type: Dict[ClientType, Tuple[ClientSessionType, float, Dict[Tuple[URIRef, URIRef], float]]]
+        self.lastRequest = {} # type: Dict[Tuple[ClientType, ClientSessionType], Tuple[float, Dict[Tuple[URIRef, URIRef], float]]]
 
         # (dev, devAttr): value to use instead of 0
         self.stickyAttrs = {} # type: Dict[Tuple[URIRef, URIRef], float] 
@@ -82,14 +82,15 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
     def _forgetStaleClients(self, now):
         # type: (float) -> None
-        staleClients = []
-        for c, (_, t, _2) in self.lastRequest.iteritems():
+        staleClientSessions = []
+        for c, (t, _) in self.lastRequest.iteritems():
             if t < now - self.clientTimeoutSec:
-                staleClients.append(c)
-        for c in staleClients:
+                staleClientSessions.append(c)
+        for c in staleClientSessions:
             log.info('forgetting stale client %r', c)
             del self.lastRequest[c]
 
+    # todo: move to settings.py
     def resolvedSettingsDict(self, settingsList):
         # type: (List[Tuple[URIRef, URIRef, float]]) -> Dict[Tuple[URIRef, URIRef], float]
         out = {} # type: Dict[Tuple[URIRef, URIRef], float]
@@ -105,26 +106,10 @@ class Collector(Generic[ClientType, ClientSessionType]):
         if requestLag > .1 and now > self.initTime + 5:
             log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
                      client, requestLag * 1000)
-        
-    def setAttrs(self, client, clientSession, settings, sendTime):
-        """
-        settings is a list of (device, attr, value). These attrs are
-        device attrs. We resolve conflicting values, process them into
-        output attrs, and call Output.update/Output.flush to send the
-        new outputs.
 
-        Call with settings=[] to ping us that your session isn't dead.
-        """
-        now = time.time()
-        self._warnOnLateRequests(client, now, sendTime)
-
-        self._forgetStaleClients(now)
-
-        uniqueSettings = self.resolvedSettingsDict(settings)
-        self.lastRequest[client] = (clientSession, now, uniqueSettings)
-
+    def _merge(self, lastRequests):
         deviceAttrs = {} # device: {deviceAttr: value}       
-        for _, _, lastSettings in self.lastRequest.itervalues():
+        for _, lastSettings in lastRequests:
             for (device, deviceAttr), value in lastSettings.iteritems():
                 if (device, deviceAttr) in self.remapOut:
                     start, end = self.remapOut[(device, deviceAttr)]
@@ -140,13 +125,37 @@ class Collector(Generic[ClientType, ClientSessionType]):
                 if deviceAttr in [L9['rx'], L9['ry'], L9['zoom'], L9['focus']]:
                     self.stickyAttrs[(device, deviceAttr)] = value
 
-        
         # e.g. don't let an unspecified rotation go to 0
         for (d, da), v in self.stickyAttrs.iteritems():
             daDict = deviceAttrs.setdefault(d, {})
             if da not in daDict:
                 daDict[da] = v
                     
+        return deviceAttrs
+
+    def setAttrs(self, client, clientSession, settings, sendTime):
+        """
+        settings is a list of (device, attr, value). These attrs are
+        device attrs. We resolve conflicting values, process them into
+        output attrs, and call Output.update/Output.flush to send the
+        new outputs.
+
+        client is a string naming the type of client. (client,
+        clientSession) is a unique client instance.
+
+        Each client session's last settings will be forgotten after
+        clientTimeoutSec.
+        """
+        now = time.time()
+        self._warnOnLateRequests(client, now, sendTime)
+
+        self._forgetStaleClients(now)
+
+        uniqueSettings = self.resolvedSettingsDict(settings)
+        self.lastRequest[(client, clientSession)] = (now, uniqueSettings)
+
+        deviceAttrs = self._merge(self.lastRequest.itervalues())
+        
         outputAttrs = {} # device: {outputAttr: value}
         for d in self.allDevices:
             try:
