@@ -4,14 +4,14 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-show:dance2017 :musicRoot "show/dance2016/music/pad";
-:spectrogramUrlRoot "/show/dance2016/spectrogram" .
+show:dance2017 :musicRoot "show/dance2017/music/pad";
+:spectrogramUrlRoot "/show/dance2017/spectrogram" .
 
 show:dance2017 :playList (
   sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
   sh:song6  sh:song7  sh:song8  sh:song9  sh:song10
   sh:song11 sh:song12 sh:song13 sh:song14 sh:song15
-  sh:song16 sh:song17 sh:song18
+  sh:song16 sh:song17
 ) .
 
 sh:song1 a :Song; rdfs:label  "01"; :songFilename "01-out.wav" .
