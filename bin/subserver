@@ -84,6 +84,6 @@ if __name__ == "__main__":
         (r'/(.*)', Static,
          {"path" : "light9/subserver",
           "default_filename" : "index.jade"}),
-        ], debug=True, graph=graph, onNewClient=onNewClient))
+        ], debug=True, graph=graph))
     log.info("serving on %s" % port)
     reactor.run()
