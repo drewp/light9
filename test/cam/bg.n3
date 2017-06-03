@@ -7,39 +7,41 @@
 
 @prefix set: <http://light9.bigasterisk.com/setting/> .
 
-
-:sample0 a :LightSample; :imagePath <http://light9.bigasterisk.com/show/dance2017/cam/test/bg2-a.jpg>;
+:session0 a :CaptureSession;
+     :capture :sample0, :sample1, :sample2, :sample3, :sample4, :sample5 .
+     
+:sample0 a :LightSample; :imagePath <http://light9.bigasterisk.com/test/cam/bg2-a.jpg>;
  :setting 
 [ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.2 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
-:sample1 a :LightSample; :imagePath <http://light9.bigasterisk.com/show/dance2017/cam/test/bg2-b.jpg>;
+:sample1 a :LightSample; :imagePath <http://light9.bigasterisk.com/test/cam/bg2-b.jpg>;
  :setting 
 [ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.3 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
-:sample2 a :LightSample; :imagePath <http://light9.bigasterisk.com/show/dance2017/cam/test/bg2-c.jpg>;
+:sample2 a :LightSample; :imagePath <http://light9.bigasterisk.com/test/cam/bg2-c.jpg>;
  :setting 
 [ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.4 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
-:sample3 a :LightSample; :imagePath <http://light9.bigasterisk.com/show/dance2017/cam/test/bg2-d.jpg>;
+:sample3 a :LightSample; :imagePath <http://light9.bigasterisk.com/test/cam/bg2-d.jpg>;
  :setting 
 [ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.5 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
-:sample4 a :LightSample; :imagePath <http://light9.bigasterisk.com/show/dance2017/cam/test/bg2-e.jpg>;
+:sample4 a :LightSample; :imagePath <http://light9.bigasterisk.com/test/cam/bg2-e.jpg>;
  :setting 
 [ :device dev:aura1; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura1; :deviceAttr :rx;     :value 0.6 ],
 [ :device dev:aura1; :deviceAttr :ry;     :value 0.573 ] .
 
 # note: different device
-:sample5 a :LightSample; :imagePath <http://light9.bigasterisk.com/show/dance2017/cam/test/bg2-f.jpg>;
+:sample5 a :LightSample; :imagePath <http://light9.bigasterisk.com/test/cam/bg2-f.jpg>;
  :setting 
 [ :device dev:aura2; :deviceAttr :color;  :scaledValue "#ffffff" ],
 [ :device dev:aura2; :deviceAttr :rx;     :value 0.7 ],

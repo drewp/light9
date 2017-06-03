@@ -69,7 +69,7 @@ class ImageDistAbs(object):
 class Solver(object):
     def __init__(self, graph, sessions=None, imgSize=(100, 75)):
         self.graph = graph
-        self.sessions = sessions
+        self.sessions = sessions # URIs of capture sessions to load
         self.imgSize = imgSize
         self.samples = {} # uri: Image array (float 0-255)
         self.fromPath = {} # imagePath: image array
@@ -146,11 +146,11 @@ class Solver(object):
         saveNumpy('/tmp/sample_paint_%s.png' % len(painting['strokes']),
                   pic0Blur)
         sampleDist = {}
+        dist = ImageDist(pic0Blur)
         for sample, picSample in sorted(self.blurredSamples.items()):
             #saveNumpy('/tmp/sample_%s.png' % sample.split('/')[-1],
             #          f(picSample))
-            dist = self._imgDist(pic0Blur, picSample)
-            sampleDist[sample] = dist
+            sampleDist[sample] = dist.distanceTo(picSample)
         results = [(d, uri) for uri, d in sampleDist.items()]
         results.sort()
 
@@ -172,37 +172,39 @@ class Solver(object):
     def solveBrute(self, painting):
         pic0 = self.draw(painting).astype(numpy.float)
 
-        colorSteps = 3
+        colorSteps = 2
         colorStep = 1. / colorSteps
 
+        # use toVector then add ranges
         dims = [
-            (DEV['aura1'], L9['rx'], [slice(.2, .7+.1, .1)]),
+            (DEV['aura1'], L9['rx'], [slice(.2, .7+.1, .2)]),
             (DEV['aura1'], L9['ry'], [slice(.573, .573+1, 1)]),
             (DEV['aura1'], L9['color'], [slice(0, 1 + colorStep, colorStep),
                                          slice(0, 1 + colorStep, colorStep),
                                          slice(0, 1 + colorStep, colorStep)]),
         ]
-        
+        deviceAttrFilter = [(d, a) for d,a,s in dims]
+
+        dist = ImageDist(pic0)
         def drawError(x):
-            settings = DeviceSettings.fromVector(self.graph, x)
+            settings = DeviceSettings.fromVector(self.graph, x, deviceAttrFilter=deviceAttrFilter)
             preview = self.combineImages(self.simulationLayers(settings))
-            saveNumpy('/tmp/x_%s.png' % abs(hash(settings)), preview)
+            #saveNumpy('/tmp/x_%s.png' % abs(hash(settings)), preview)
             
-            diff = preview.astype(numpy.float) - pic0
-            out = scipy.sum(abs(diff))
+            out = dist.distanceTo(preview)
             
             #print 'measure at', x, 'drawError=', out
             return out
             
         x0, fval, grid, Jout = scipy.optimize.brute(
-            drawError,
-            sum([s for dev, da, s in dims], []),
+            func=drawError,
+            ranges=sum([s for dev, da, s in dims], []),
             finish=None,
             disp=True,
             full_output=True)
         if fval > 30000:
             raise ValueError('solution has error of %s' % fval)
-        return DeviceSettings.fromVector(self.graph, x0)
+        return DeviceSettings.fromVector(self.graph, x0, deviceAttrFilter=deviceAttrFilter)
         
     def combineImages(self, layers):
         """make a result image from our self.samples images"""

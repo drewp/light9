@@ -7,8 +7,8 @@ from light9.effect.settings import DeviceSettings
 
 class TestDeviceSettings(unittest.TestCase):
     def setUp(self):
-        self.graph = LocalSyncedGraph(files=['show/dance2017/cam/test/lightConfig.n3',
-                                             'show/dance2017/cam/test/bg.n3'])
+        self.graph = LocalSyncedGraph(files=['test/cam/lightConfig.n3',
+                                             'test/cam/bg.n3'])
 
     def testToVectorZero(self):
         ds = DeviceSettings(self.graph, [])

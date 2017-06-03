@@ -44,7 +44,8 @@
            rename: { type: Boolean },
            renameTo: { type: String, notify: true },
        },
-       ready: function() {
+       observers: ['onUri(graph, uri)'],
+       onUri: function(graph, uri) {
            this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri}`);
        },
        setLabel: function() {

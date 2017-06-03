@@ -16,7 +16,7 @@ class TestGraphFileOutput(unittest.TestCase):
 
         def getSubgraph(uri):
             return Graph()
-        gf = GraphFile(mock.Mock(), tf.name, URIRef('uri'), mock.Mock(), getSubgraph)
+        gf = GraphFile(mock.Mock(), tf.name, URIRef('uri'), mock.Mock(), getSubgraph, {}, {})
         gf.reread()
         
         newGraph = Graph()
@@ -27,8 +27,6 @@ class TestGraphFileOutput(unittest.TestCase):
         gf.flush()
         wroteContent = open(tf.name).read()
         self.assertEqual('''@prefix : <http://example.com/> .
-@prefix dev: <http://light9.bigasterisk.com/device/> .
-@prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix n: <http://example.com/n/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .

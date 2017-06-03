@@ -1,0 +1,58 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix udmxB: <http://light9.bigasterisk.com/output/udmx/> .
+
+:color              a :DeviceAttr; :dataType :color .
+:rx                 a :DeviceAttr; :dataType :angle .
+:ry                 a :DeviceAttr; :dataType :angle .
+:zoom               a :DeviceAttr; :dataType :scalar .
+
+:MacAura a :DeviceClass; rdfs:label "MacAura";
+  :deviceAttr :color, :rx, :ry, :zoom;
+  :attr
+    [ :dmxOffset 0 ; :outputAttr :shutter ], # use 22
+    [ :dmxOffset 1 ; :outputAttr :dimmer ],
+    [ :dmxOffset 2 ; :outputAttr :zoom ],
+    [ :dmxOffset 3 ; :outputAttr :pan ],
+    [ :dmxOffset 4 ; :outputAttr :panFine ],
+    [ :dmxOffset 5 ; :outputAttr :tilt ],
+    [ :dmxOffset 6 ; :outputAttr :tiltFine ],
+    [ :dmxOffset 7 ; :outputAttr :fixtureControl ], # use 0
+    [ :dmxOffset 8 ; :outputAttr :colorWheel ], # use 0
+    [ :dmxOffset 9 ; :outputAttr :red ],
+    [ :dmxOffset 10 ; :outputAttr :green ],
+    [ :dmxOffset 11 ; :outputAttr :blue ],
+    [ :dmxOffset 12 ; :outputAttr :white ],
+    [ :dmxOffset 13 ; :outputAttr :colorTemperature ],
+    [ :dmxOffset 14 ; :outputAttr :fx1Select ],
+    [ :dmxOffset 15 ; :outputAttr :fx1Adjust ],
+    [ :dmxOffset 16 ; :outputAttr :fx2Select ],
+    [ :dmxOffset 17 ; :outputAttr :fx2Adjust ],
+    [ :dmxOffset 18 ; :outputAttr :fxSync ],
+    [ :dmxOffset 19 ; :outputAttr :auraShutter ], # use 22
+    [ :dmxOffset 20 ; :outputAttr :auraDimmer ],
+    [ :dmxOffset 21 ; :outputAttr :auraColorWheel ],
+    [ :dmxOffset 22 ; :outputAttr :auraRed ],
+    [ :dmxOffset 23 ; :outputAttr :auraGreen ],
+    [ :dmxOffset 24 ; :outputAttr :auraBlue ] .
+
+
+dev:aura1 a :MacAura; rdfs:label "aura1"; :dmxUniverse udmxB:; :dmxBase 406 .
+dev:aura2 a :MacAura; rdfs:label "aura2"; :dmxUniverse udmxB:; :dmxBase 420 .
+dev:aura3 a :MacAura; rdfs:label "aura3"; :dmxUniverse udmxB:; :dmxBase 434 .
+dev:aura4 a :MacAura; rdfs:label "aura4"; :dmxUniverse udmxB:; :dmxBase 448 .
+dev:aura5 a :MacAura; rdfs:label "aura5"; :dmxUniverse udmxB:; :dmxBase 462 .
+
+dev:aura1 :outputAttrRange dev:aura1rx . dev:aura1rx :outputAttr :rx; :start 0.145; :end 0.275 .
+dev:aura2 :outputAttrRange dev:aura2rx . dev:aura2rx :outputAttr :rx; :start 0.096; :end 0.259 .
+dev:aura3 :outputAttrRange dev:aura3rx . dev:aura3rx :outputAttr :rx; :start 0.068; :end 0.25 .
+dev:aura4 :outputAttrRange dev:aura4rx . dev:aura4rx :outputAttr :rx; :start 0.065; :end 0.21 .
+dev:aura5 :outputAttrRange dev:aura5rx . dev:aura5rx :outputAttr :rx; :start 0.06; :end 0.194 .
+
+dev:aura1 :outputAttrRange dev:aura1ry . dev:aura1ry :outputAttr :ry; :start 0.239; :end 0.153 .
+dev:aura2 :outputAttrRange dev:aura2ry . dev:aura2ry :outputAttr :ry; :start 0.248; :end 0.148 .
+dev:aura3 :outputAttrRange dev:aura3ry . dev:aura3ry :outputAttr :ry; :start 0.260; :end 0.151 .
+dev:aura4 :outputAttrRange dev:aura4ry . dev:aura4ry :outputAttr :ry; :start 0.250; :end 0.153 .
+dev:aura5 :outputAttrRange dev:aura5ry . dev:aura5ry :outputAttr :ry; :start 0.241; :end 0.151 .
+

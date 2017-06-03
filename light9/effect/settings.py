@@ -58,10 +58,10 @@ class _Settings(object):
         return cls(graph, settingsList)
 
     @classmethod
-    def fromVector(cls, graph, vector):
+    def fromVector(cls, graph, vector, deviceAttrFilter=None):
         compiled = {}
         i = 0
-        for (d, a) in cls(graph, [])._vectorKeys():
+        for (d, a) in cls(graph, [])._vectorKeys(deviceAttrFilter):
             if a == L9['color']:
                 v = toHex(vector[i:i+3])
                 i += 3
@@ -87,7 +87,7 @@ class _Settings(object):
     def _zeroForAttr(self, attr):
         if attr == L9['color']:
             return '#000000'
-        return 0
+        return 0.0
 
     def _delZeros(self):
         for dev, av in self._compiled.items():
@@ -130,7 +130,7 @@ class _Settings(object):
     def getValue(self, dev, attr):
         return self._compiled.get(dev, {}).get(attr, self._zeroForAttr(attr))
 
-    def _vectorKeys(self):
+    def _vectorKeys(self, deviceAttrFilter=None):
         """stable order of all the dev,attr pairs for this type of settings"""
         raise NotImplementedError
 
@@ -145,10 +145,9 @@ class _Settings(object):
     def devices(self):
         return self._compiled.keys()
         
-    def toVector(self):
+    def toVector(self, deviceAttrFilter=None):
         out = []
-        for dev, attr in self._vectorKeys():
-            # color components may need to get spread out
+        for dev, attr in self._vectorKeys(deviceAttrFilter):
             v = self.getValue(dev, attr)
             if attr == L9['color']:
                 out.extend([x / 255 for x in parseHex(v)])
@@ -197,7 +196,7 @@ class _Settings(object):
 
 
 class DeviceSettings(_Settings):
-    def _vectorKeys(self):
+    def _vectorKeys(self, deviceAttrFilter=None):
         with self.graph.currentState() as g:
             devs = set() # devclass, dev
             for dc in g.subjects(RDF.type, L9['DeviceClass']):
@@ -207,6 +206,9 @@ class DeviceSettings(_Settings):
             keys = []
             for dc, dev in sorted(devs):
                 for attr in sorted(g.objects(dc, L9['deviceAttr'])):
-                    keys.append((dev, attr))
+                    key = (dev, attr)
+                    if deviceAttrFilter and key not in deviceAttrFilter:
+                        continue
+                    keys.append(key)
         return keys
     
