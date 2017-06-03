@@ -32,7 +32,11 @@ def parseJsonMessage(msg):
     body = json.loads(msg)
     settings = []
     for device, attr, value in body['settings']:
-        settings.append((URIRef(device), URIRef(attr), Literal(value)))
+        if isinstance(value, basestring) and value.startswith('http'):
+            value = URIRef(value)
+        else:
+            value = Literal(value)
+        settings.append((URIRef(device), URIRef(attr), value))
     return body['client'], body['clientSession'], settings, body['sendTime']
 
 def startZmq(port, collector):

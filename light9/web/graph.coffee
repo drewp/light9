@@ -253,6 +253,13 @@ class window.SyncedGraph
   uriValue: (s, p) ->
     @_singleValue(s, p)
 
+  labelOrTail: (uri) ->
+    try
+      @graph.stringValue(uri, @graph.Uri('rdfs:label'))
+    catch
+      words = uri.split('/')
+      words[words.length-1]
+
   objects: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
     quads = @graph.findByIRI(s, p)

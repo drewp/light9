@@ -104,6 +104,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             return 3
         if deviceAttrSettings.get(attr) == L9['g2']:
             return 10
+        return 0
         
     if deviceType == L9['ChauvetColorStrip']:
         r, g, b = rgbAttr(L9['color'])

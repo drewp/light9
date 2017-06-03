@@ -43,9 +43,10 @@
           <button on-click="goBlack">black</button>
         </template>
         <template is="dom-if" if="{{deviceAttr.useChoice}}">
-          <select size="10">
+          <select size$="{{deviceAttr.choiceSize}}" value="{{pickedChoice::change}}">
+            <option value="">None</option>
             <template is="dom-repeat" items="{{deviceAttr.choices}}">
-              <option>item {{item}}</option>
+              <option value="{{item.uri}}">{{item.label}}</option>
             </template>
           </select>
         </template>

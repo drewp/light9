@@ -38,8 +38,8 @@
    Polymer({
        is: "resource-display",
        properties: {
-           graph: { type: Object },
-           uri: { type: String },
+           graph: { type: Object, notify: true },
+           uri: { type: String, notify: true },
            label: { type: String },
            rename: { type: Boolean },
            renameTo: { type: String, notify: true },
@@ -48,10 +48,14 @@
            this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri}`);
        },
        setLabel: function() {
-           this.label = this.graph.stringValue(this.uri,
-                                               this.graph.Uri('rdfs:label'));
+           try {
+             this.label = this.graph.stringValue(this.uri,
+                                                 this.graph.Uri('rdfs:label'));
+           } catch(e) {
+               this.label = null;
+           }
            if (!this.label) {
-               this.label = this.uri;
+               this.label = this.uri || "<no uri>";
            }
        },
        onRename: function() {

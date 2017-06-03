@@ -10,6 +10,7 @@ Polymer
     
     immediateSlider: { notify: true, observer: 'onSlider' }
     pickedColor: { observer: 'onPickedColor' }
+    pickedChoice: { observer: 'onChange' }
   observers: [
     'onChange(value)'
     ]
@@ -19,9 +20,6 @@ Polymer
   onSlider: -> @value = @immediateSlider
   goWhite: -> @value = "#ffffff"
   goBlack: -> @value = "#000000"
-  onChoice: (ev) ->
-    console.log('ch', ev)
-  
   onChange: (value) ->
     @lastSent = [[@device, @deviceAttr.uri, value]]
     @resend()
@@ -38,7 +36,6 @@ Polymer
   properties:
     graph: { type: Object, notify: true }
     uri: { type: String, notify: true }
-    label: { type: String, notify: true }
     deviceClass: { type: String, notify: true }
     deviceAttrs: { type: Array, notify: true }
   observers: [
@@ -48,13 +45,7 @@ Polymer
     @graph.runHandler(@update.bind(@), "#{@uri} update")
   update: ->
     U = (x) => @graph.Uri(x)
-
-    @zlabel = (try
-        @graph.stringValue(@uri, U('rdfs:label'))
-      catch
-        words = @uri.split('/')
-        words[words.length-1]
-        )
+    
     @deviceClass = @graph.uriValue(@uri, U('rdf:type'))
     
     @deviceAttrs = []
@@ -70,9 +61,10 @@ Polymer
 
       else if dataType == U(':choice')
         daRow.useChoice = true
-        daRow.choices = @graph.objects(da, U(':choice'))
+        choiceUris = _.sortBy(@graph.objects(da, U(':choice')))
+        daRow.choices = ({uri: x, label: @graph.labelOrTail(x)} for x in choiceUris)
+        daRow.choiceSize = Math.min(choiceUris.length + 1, 10)
       else
-
         daRow.useSlider = true
         daRow.max = 1
         if dataType == U(':angle')
