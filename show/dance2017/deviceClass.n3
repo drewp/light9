@@ -17,17 +17,28 @@
   rdfs:comment "0=stopped, 1=rotate the fastest".
 :quantumGoboChoice  a :DeviceAttr; rdfs:label "quantumGoboChoice"; :dataType :choice;
   :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
-:mini15GoboChoice   a :DeviceAttr; :dataType :scalar;
-  :choice :g1, :g2 .
-  :goboShake  a :DeviceAttr; :dataType :scalar .
+:mini15GoboChoice   a :DeviceAttr; rdfs:label "mini15GoboChoice"; :dataType :choice;
+  :choice :mini15Gobo1, :mini15Gobo2, :mini15Gobo3, :mini15Gobo4, :mini15Gobo5, :mini15Gobo6, :mini15Gobo7, :mini15Gobo8, :mini15Gobo9, :mini15Gobo10 .
 
+:goboShake          a :DeviceAttr; rdfs:label "goboShake"; :dataType :scalar .
 
-:SimpleDimmer a :DeviceClass;
+:mini15Gobo1 :value 3 .
+:mini15Gobo2 :value 10 .
+:mini15Gobo3 :value 18 .
+:mini15Gobo4 :value 26 .
+:mini15Gobo5 :value 34 .
+:mini15Gobo6 :value 42 .
+:mini15Gobo7 :value 50 .
+:mini15Gobo8 :value 58 .
+:mini15Gobo9 :value 66 .
+:mini15Gobo10 :value 74 .
+
+:SimpleDimmer a :DeviceClass; rdfs:label "SimpleDimmer";
   :deviceAttr :brightness;
   :attr
     [ :outputAttr :level; :dmxOffset 0 ] .
 
-:ChauvetColorStrip a :DeviceClass;
+:ChauvetColorStrip a :DeviceClass; rdfs:label "ChauvetColorStrip";
   :deviceAttr :color;
   :attr
     [ :outputAttr :mode;  :dmxOffset 0 ],
@@ -35,7 +46,7 @@
     [ :outputAttr :green; :dmxOffset 2 ],
     [ :outputAttr :blue;  :dmxOffset 3 ] .
 
-:Mini15 a :DeviceClass;
+:Mini15 a :DeviceClass; rdfs:label "Mini15";
   :deviceAttr :color, :rx, :ry, :mini15GoboChoice, :goboShake ;
   :attr
     [ :outputAttr :xRotation;     :dmxOffset 0 ],
@@ -52,7 +63,7 @@
     [ :outputAttr :goboShake;     :dmxOffset 11 ],
     [ :outputAttr :goboChoose;    :dmxOffset 12 ] .
 
-:Source4LedSeries2 a :DeviceClass;
+:Source4LedSeries2 a :DeviceClass; rdfs:label "Source4LedSeries2";
   :docs <https://www.etcconnect.com/WorkArea/DownloadAsset.aspx?id=10737483869>;
   :deviceAttr :color;
   :attr
@@ -70,7 +81,7 @@
     [ :dmxOffset 14; :outputAttr :fixed128_6 ] .
     
 
-:ChauvetHex12 a :DeviceClass;
+:ChauvetHex12 a :DeviceClass; rdfs:label "ChauvetHex12";
   :deviceAttr :color, :uv;
   :docs <https://www.chauvetprofessional.com/wp-content/uploads/2015/06/COLORdash_Par-Hex_12_QRG_Rev4_ML4_WO.pdf>;
   :attr
@@ -81,7 +92,7 @@
     [ :outputAttr :white; :dmxOffset 4 ],
     [ :outputAttr :uv; :dmxOffset 5 ] .
 
-:MacAura a :DeviceClass;
+:MacAura a :DeviceClass; rdfs:label "MacAura";
   :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/UM_MACAura_EN_B.pdf>;
   rdfs:comment "note- manual counts dmx from 1; :dmxOffset is from 0";
   :deviceAttr :color, :rx, :ry, :zoom;
@@ -112,7 +123,7 @@
     [ :dmxOffset 23 ; :outputAttr :auraGreen ],
     [ :dmxOffset 24 ; :outputAttr :auraBlue ] .
 
-:MacQuantum a :DeviceClass; 
+:MacQuantum a :DeviceClass; rdfs:label "MacQuantum";
   :docs <http://www.martin.com/Martin.Download.aspx?file=/files/files/productdocuments/11_MANUALS/999/35000279b%20UM_MACQuantumProfile_EN_B.pdf>;
   :deviceAttr :color, :rx, :ry, :zoom, :focus, :iris, :prism, :quantumGoboChoice, :goboSpeed, :strobe;
   :attr

@@ -4,8 +4,8 @@
 @prefix udmxB: <http://light9.bigasterisk.com/output/udmx/> .
 @prefix dmxA: <http://light9.bigasterisk.com/output/dmx0/> .
 
-#dev:colorStrip a :ChauvetColorStrip; :dmxUniverse dmxA:; :dmxBase 87 .
-#dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse udmxB:; :dmxBase 5 .
+dev:colorStrip a :ChauvetColorStrip; rdfs:label "colorStrip"; :dmxUniverse udmxB:; :dmxBase 87 .
+dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse udmxB:; :dmxBase 4 .
 
 dev:houseSide a :SimpleDimmer; rdfs:label "house-side"; :dmxUniverse dmxA:; :dmxBase 68 .
 dev:house1 a :SimpleDimmer; rdfs:label "house1"; :dmxUniverse dmxA:; :dmxBase 69 .
