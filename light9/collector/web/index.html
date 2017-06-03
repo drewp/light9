@@ -7,6 +7,7 @@
     <link rel="import" href="/lib/polymer/polymer.html">
     <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
     <link rel="import" href="../rdfdb-synced-graph.html">
+    <link rel="import" href="../resource-display.html">
     <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
     <script src="/lib/async/dist/async.js"></script>
     <script src="/lib/underscore/underscore-min.js"></script>
@@ -25,6 +26,10 @@
              display: block;
              break-inside: avoid-column;
          }
+         h3 {
+             margin-top: 2px;
+             margin-bottom: 0;
+         }
          td.nonzero {
              background: #310202;
              color: #e25757;
@@ -35,7 +40,7 @@
              font-weight: bold;
          }
         </style>
-        <h3>{{label}}</h3>
+        <h3><resource-display graph="{{graph}}" uri="{{uri}}"></resource-display></h3>
         <table class="borders">
           <tr>
             <th>output attr</th>
@@ -58,11 +63,9 @@
                properties: {
                    graph: {type: Object, notify: true},
                    uri: {type: String, notify: true},
-                   label: {type: String, notify: true},
                    attrs: {type: Array, notify: true},
                },
                observers: [
-                   "setLabel(graph, uri)",
                    "initUpdates(updates)",
                ],
                initUpdates: function(updates) {
@@ -75,12 +78,6 @@
                        }
                    }.bind(this));
                },
-               setLabel: function(graph, uri) {
-                   this.label = uri.replace(/.*\//, '');
-                   graph.runHandler(function() {
-                       this.label = graph.stringValue(uri, graph.Uri('rdfs:label'));
-                   }.bind(this), 'setLabel');
-               }
            });
        });
       </script>
