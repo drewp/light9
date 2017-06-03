@@ -151,8 +151,9 @@ class CodeWatcher(object):
         
 
 class Sequencer(object):
-    def __init__(self, graph, sendToCollector):
+    def __init__(self, graph, sendToCollector, fps=30):
         self.graph = graph
+        self.fps = 30
         self.sendToCollector = sendToCollector
         self.music = MusicTime(period=.2, pollCurvecalc=False)
 
@@ -188,7 +189,7 @@ class Sequencer(object):
             log.info("%.2f fps", stats.recentFps)
             self.lastStatLog = now
         
-        reactor.callLater(1/50, self.update)
+        reactor.callLater(1 / self.fps, self.update)
 
         musicState = self.music.getLatest()
         song = URIRef(musicState['song']) if musicState.get('song') else None

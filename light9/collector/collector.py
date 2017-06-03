@@ -169,7 +169,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
         dt1 = 1000 * (time.time() - now)
         self.flush(pendingOut)
         dt2 = 1000 * (time.time() - now)
-        if dt1 > 10:
+        if dt1 > 15:
             log.warn("slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" % (
                 dt1, dt2, len(self.lastRequest), len(deviceAttrs), len(outputAttrs)
             ))

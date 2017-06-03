@@ -60,9 +60,11 @@ def startZmq(port, collector):
 class WebListeners(object):
     def __init__(self):
         self.clients = []
-
+        self.pendingMessageForDev = {} # dev: (attrs, outputmap)
+        self.lastFlush = 0
+        
     def addClient(self, client):
-        self.clients.append([client, {}])
+        self.clients.append([client, {}]) # seen = {dev: attrs}
         log.info('added client %s', client)
 
     def delClient(self, client):
@@ -70,21 +72,33 @@ class WebListeners(object):
         log.info('delClient %s, %s left', client, len(self.clients))
         
     def outputAttrsSet(self, dev, attrs, outputMap):
+        """called often- don't be slow"""
+
+        self.pendingMessageForDev[dev] = (attrs, outputMap)
+        self._flush()
+
+    def _flush(self):
         now = time.time()
+        if now < self.lastFlush + .05 or not self.clients:
+            return
+        self.lastFlush = now
 
-        msg = self.makeMsg(dev, attrs, outputMap)
+        while self.pendingMessageForDev:
+            dev, (attrs, outputMap) = self.pendingMessageForDev.popitem()
 
-        # this omits repeats, but can still send many
-        # messages/sec. Not sure if piling up messages for the browser
-        # could lead to slowdowns in the real dmx output.
-        for client, seen in self.clients:
-            for m, t in seen.items():
-                if t < now - 5:
-                    del seen[m]
-            if msg in seen:
-                continue
-            seen[msg] = now
-            client.sendMessage(msg)
+            msg = None # lazy, since makeMsg is slow
+            
+            # this omits repeats, but can still send many
+            # messages/sec. Not sure if piling up messages for the browser
+            # could lead to slowdowns in the real dmx output.
+            for client, seen in self.clients:
+                if seen.get(dev) == attrs:
+                    continue
+                if msg is None:
+                    msg = self.makeMsg(dev, attrs, outputMap)
+
+                seen[dev] = attrs
+                client.sendMessage(msg)
 
     def makeMsg(self, dev, attrs, outputMap):
         attrRows = []
@@ -172,6 +186,8 @@ def main():
     (options, args) = parser.parse_args()
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
+    logging.getLogger('colormath').setLevel(logging.INFO)
+    
     graph = SyncedGraph(networking.rdfdb.url, "collector")
 
     graph.initiallySynced.addCallback(lambda _: launch(graph, options.loadtest)).addErrback(log.error)
