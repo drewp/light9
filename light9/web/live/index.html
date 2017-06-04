@@ -18,6 +18,84 @@
     <link rel="import" href="/resource-display.html">
   </head>
   <body>
+
+    <dom-module id="light9-color-picker">
+      <template>
+        <style>
+         :host {
+             position: relative;
+         }
+         #smallRainbow, #largeRainbow { overflow: hidden; position: relative; }
+         #smallRainbow {
+             background: url(/colorpick_rainbow_small.png);
+             width: 150px;
+             height: 30px;
+         }
+         #largeRainbow {
+             background: url(/colorpick_rainbow_large.png);
+             width: 400px;
+             height: 200px;
+         }
+         #smallCrosshair, #largeCrosshair {
+             position: absolute;
+             left: -60px;
+             top: -62px;
+             pointer-events: none;
+             }
+         #smallCrosshair {
+             background: url(/colorpick_crosshair_small.png);
+             width: 200px; 
+             height: 166px;
+
+         }
+         #largeCrosshair {
+             background: url(/colorpick_crosshair_large.png);
+             width: 492px; 
+             height: 409px;
+
+         }
+         #largeRainbowComp { display: none;    position: absolute;
+    z-index: 10;
+    left: -50px;
+             top: -110px;
+         }
+        </style>
+        <div id="smallRainbow" on-mouseenter="onEnterSmall"> <div id="smallCrosshair"></div></div>
+        <div id="largeRainbowComp">
+          <canvas id="largeRainbow"
+                  on-mousemove="onCanvasMove"
+                  on-mouseup="onCanvasUp"
+                  on-mouseleave="onCanvasLeave"></canvas>
+          <div id="largeCrosshair"></div>
+        </div>
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-color-picker",
+               properties: {
+               },
+               ready: function() {
+               },
+               onEnterSmall: function() {
+                   // not if we just closed the large one
+                   this.$.largeRainbowComp.style.display = 'block';
+               },
+               onCanvasMove: function(ev) {
+                   console.log('canvasmove');
+               },
+               onCanvasUp: function(ev) {
+                   console.log('canvasup');
+                   this.$.largeRainbowComp.style.display = 'none';
+               },
+               onCanvasLeave: function(ev) {
+                   console.log('canvasleave');
+                   this.$.largeRainbowComp.style.display = 'none';
+               },
+           });
+       });
+      </script>
+    </dom-module>
     
        
     <dom-module id="light9-live-control">
@@ -55,6 +133,7 @@
                  value="{{pickedColor}}">
           <button on-click="goWhite">white</button>
           <button on-click="goBlack">black</button>
+          <light9-color-picker value="{{pickedColor}}"></light9-color-picker>
         </template>
         <template is="dom-if" if="{{deviceAttr.useChoice}}">
           <select size$="{{deviceAttr.choiceSize}}" value="{{pickedChoice::change}}">
@@ -78,8 +157,6 @@
              padding: 1px;
              background: #171717;  /* deviceClass gradient added later */
              break-inside: avoid-column;
-             border-top-right-radius: 15px;
-             overflow: hidden;
              
          }
          .deviceAttr {
@@ -97,6 +174,10 @@
              font-size: 110%;
              padding: 4px;
          }
+         .device, h2 {
+         border-top-right-radius: 15px;
+}
+
          #mainLabel {
              font-size: 120%; 
              color: #9ab8fd;
