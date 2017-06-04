@@ -38,9 +38,17 @@ Polymer
     uri: { type: String, notify: true }
     deviceClass: { type: String, notify: true }
     deviceAttrs: { type: Array, notify: true }
+    bgStyle: { type: String, computed: '_bgStyle(deviceClass)' }
   observers: [
     'onGraph(graph)'
     ]
+  _bgStyle: (deviceClass) ->
+    hash = 0
+    for i in [(deviceClass.length-10)...deviceClass.length]
+        hash += deviceClass.charCodeAt(i)
+    hue = (hash * 8) % 360
+    accent = "hsl(#{hue}, 49%, 22%)"
+    "background: linear-gradient(to right, rgba(31,31,31,0) 50%, #{accent} 100%);"
   onGraph: ->
     @graph.runHandler(@update.bind(@), "#{@uri} update")
   update: ->

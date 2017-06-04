@@ -151,17 +151,27 @@ a.resource {
 }
 
 .resource {
-    border: 1px solid gray;
+    border: 1px solid #545454;
     border-radius: 5px;
     padding: 1px;
     margin: 2px;
-    background: rgb(66, 66, 66);
+    background: rgb(49, 49, 49);
     display: block;
+    text-shadow: 1px 1px 2px black;
+}
+.resource.minor {
+    background: none;
+    border: none;
 }
 .resource a {
     color: rgb(150, 150, 255);
     padding: 1px;
     display: inline-block;
+}
+.resource.minor a {
+    text-decoration: none;
+    color: rgb(155, 155, 193);
+    padding: 0
 }
 .sub {
     display: inline-block;

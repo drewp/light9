@@ -1,20 +1,20 @@
 <link rel="import" href="/lib/polymer/polymer.html">
 <link rel="import" href="/lib/paper-dialog/paper-dialog.html">
 <link rel="import" href="/lib/paper-button/paper-button.html">
+<link rel="stylesheet" href="/style.css">
 
 <dom-module id="resource-display">
   <template>
-    <link rel="stylesheet" href="/style.css">
     <style>
      :host {
          display: inline-block;
-         vertical-align: top;
-         border: 2px rgba(84, 84, 84, 0.27) outset;
-         border-radius: 9px;
-         padding: 2px;
+         zvertical-align: top;
+         zborder: 2px rgba(84, 84, 84, 0.27) outset;
+         zborder-radius: 9px;
+         zpadding: 2px;
      }
     </style>
-    <span class="resource"><a href="{{uri}}">{{label}}</a></span>
+    <span class$="[[resClasses]]"><a href="{{uri}}">{{label}}</a></span>
     <template is="dom-if" if="{{rename}}">
       <button on-click="onRename">Rename</button>
 
@@ -42,9 +42,14 @@
            uri: { type: String },
            label: { type: String },
            rename: { type: Boolean },
+           minor: { type: Boolean },
+           resClasses: { type: String, computed: '_resClasses(minor)', value: 'resource' },
            renameTo: { type: String, notify: true },
        },
        observers: ['onUri(graph, uri)'],
+       _resClasses: function(minor) {
+           return minor ? 'resource minor' : 'resource';
+       },
        onUri: function(graph, uri) {
            this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri}`);
        },

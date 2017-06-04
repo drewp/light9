@@ -26,6 +26,20 @@
          paper-slider { width: 100%; margin: -19px 0; }
         </style>
 
+        <style is="custom-style">
+         paper-slider {
+             --paper-slider-knob-color: var(--paper-red-500);
+             --paper-slider-active-color: var(--paper-red-500);
+
+             --paper-slider-font-color: white;
+             --paper-slider-input: {
+                 width: 75px;
+
+                 background: black;
+             }
+         }
+         </style>
+
         <template is="dom-if" if="{{deviceAttr.useSlider}}">
           <paper-slider min="0"
                         max="{{deviceAttr.max}}"
@@ -59,18 +73,18 @@
       <template>
         <style>
          .device {
-             border: 2px solid gray;
-             border: 2px solid gray;
-             margin: 9px;
-             padding: 5px;
-             background: #171717;
+             border: 2px solid #151e2d;
+             margin: 4px;
+             padding: 1px;
+             background: #171717;  /* deviceClass gradient added later */
              break-inside: avoid-column;
+             border-top-right-radius: 15px;
+             overflow: hidden;
              
          }
          .deviceAttr {
-             border-top: 1px solid #ffffff26;
-             margin-top: 6px;
-             padding-top: 4px;
+             border-top: 1px solid #272727;
+             padding-bottom: 2px;
              display: flex;
          }
          .deviceAttr > span {
@@ -82,7 +96,6 @@
          h2 {
              font-size: 110%;
              padding: 4px;
-             background: #1f1f1f;
          }
          #mainLabel {
              font-size: 120%; 
@@ -91,13 +104,13 @@
          }
         </style>
         <div class="device">
-          <h2>
+          <h2 style$="[[bgStyle]]">
             <resource-display id="mainLabel" graph="{{graph}}" uri="{{uri}}"></resource-display>
-            a <resource-display graph="{{graph}}" uri="{{deviceClass}}"></resource-display>
+            a <resource-display minor graph="{{graph}}" uri="{{deviceClass}}"></resource-display>
           </h2>
           <template is="dom-repeat" items="{{deviceAttrs}}" as="dattr">
             <div class="deviceAttr">
-              <span>attr <resource-display graph="{{graph}}" uri="{{dattr.uri}}"></resource-display></span>
+              <span>attr <resource-display minor graph="{{graph}}" uri="{{dattr.uri}}"></resource-display></span>
               <light9-live-control device="{{uri}}" device-attr="{{dattr}}"></light9-live-control>
             </div>
           </template>
