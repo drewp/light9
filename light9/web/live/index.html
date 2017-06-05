@@ -25,15 +25,18 @@
          :host {
              position: relative;
          }
-         #smallRainbow, #largeRainbow { overflow: hidden; position: relative; }
+         #smallRainbowComp, #largeRainbowComp {
+             overflow: hidden;
+             position: relative;
+         }
          #smallRainbow {
              background: url(/colorpick_rainbow_small.png);
-             width: 150px;
+             width: 150px; 
              height: 30px;
          }
          #largeRainbow {
              background: url(/colorpick_rainbow_large.png);
-             width: 400px;
+             width: 400px; 
              height: 200px;
          }
          #smallCrosshair, #largeCrosshair {
@@ -41,56 +44,171 @@
              left: -60px;
              top: -62px;
              pointer-events: none;
-             }
+         }
          #smallCrosshair {
              background: url(/colorpick_crosshair_small.png);
              width: 200px; 
              height: 166px;
-
          }
          #largeCrosshair {
              background: url(/colorpick_crosshair_large.png);
              width: 492px; 
              height: 409px;
-
          }
-         #largeRainbowComp { display: none;    position: absolute;
-    z-index: 10;
-    left: -50px;
+         #largeRainbowComp {
+             display: none;
+             position: absolute;
+             z-index: 10;
+             left: -50px;
              top: -110px;
          }
         </style>
-        <div id="smallRainbow" on-mouseenter="onEnterSmall"> <div id="smallCrosshair"></div></div>
+        <div id="smallRainbowComp">
+          <div id="smallRainbow" on-mouseenter="onEnterSmall"></div>
+          <div id="smallCrosshair"></div>
+        </div>
         <div id="largeRainbowComp">
-          <canvas id="largeRainbow"
+          <div id="largeRainbow"
                   on-mousemove="onCanvasMove"
                   on-mouseup="onCanvasUp"
-                  on-mouseleave="onCanvasLeave"></canvas>
+                  on-mouseleave="onCanvasLeave"></div>
           <div id="largeCrosshair"></div>
         </div>
       </template>
       <script>
        HTMLImports.whenReady(function () {
+           class RainbowCanvas {
+               constructor(url, size) {
+                   this.size = size;
+                   var elem = document.createElement('canvas');
+                   elem.width = size[0];
+                   elem.height = size[1];
+
+                   this.ctx = elem.getContext('2d');
+
+                   this.colorPos = {} // color: pos
+                   
+                   var img = new Image();
+                   img.onload = function() {
+                       this.ctx.drawImage(img, 0, 0);
+                       this._readImage();
+                   }.bind(this);
+                   img.src = url;
+               }
+               _readImage() {
+                   var data = this.ctx.getImageData(
+                       0, 0, this.size[0], this.size[1]).data;
+                   for (var y = 0; y < this.size[1]; y+=1) {
+                       for (var x = 0; x < this.size[0]; x+=1) {
+                           var base = (y * this.size[0] + x) * 4;
+                           var c = this._hexFromRgb(data[base + 0],
+                                                    data[base + 1],
+                                                    data[base + 2]);
+                           this.colorPos[c] = [x, y];
+                       }
+                   }
+               }
+               _hexFromRgb(r, g, b) {
+                   var hex = function (x) {
+                       return ('00' + x.toString(16)).slice(-2);
+                   };
+                   return '#' + hex(r) + hex(g) + hex(b);
+               }
+               colorAt(pos) {
+                   var data = this.ctx.getImageData(pos[0], pos[1], 1, 1).data;
+                   return this._hexFromRgb(data[0], data[1], data[2]);
+               }
+               posFor(color) {
+                   let r = parseInt(color.substr(1, 2), 16),
+                       g = parseInt(color.substr(3, 2), 16),
+                       b = parseInt(color.substr(5, 2), 16);
+
+                   var bright = Math.max(r, g, b);
+                   r = Math.floor(255 * r / bright);
+                   g = Math.floor(255 * g / bright);
+                   b = Math.floor(255 * b / bright);
+                   var ep = 8;
+                   for (var dr = 0; dr < ep; dr = -dr + (dr > 0 ? 0 : 1)) {
+                       for (var dg = 0; dg < ep; dg = -dg + (dg > 0 ? 0 : 1)) {
+                           for (var db = 0; db < ep; db = -db + (db > 0 ? 0 : 1)) {
+                               color = this._hexFromRgb(r + dr, g + dg, b + db);
+                               var pos = this.colorPos[color];
+                               if (pos !== undefined) {
+                                   return pos;
+                               }
+                           }
+                       }
+                   }
+                   throw new Error('no match');
+               }
+           }
+           
            Polymer({
                is: "light9-color-picker",
                properties: {
+                   value: { type: String, notify: true },
                },
-               ready: function() {
+               observers: ['updateSmall(value)'],
+               attached: function() {
+                   if (!window.pickerCanvases) {
+                       window.pickerCanvases = {
+                           large: new RainbowCanvas(
+                               '/colorpick_rainbow_large.png', [400, 200]),
+                           small: new RainbowCanvas(
+                               '/colorpick_rainbow_small.png', [150, 30]),
+                       };
+                   }
+                   this.large = window.pickerCanvases.large;
+                   this.small = window.pickerCanvases.small;
+               },
+               updateSmall: function(value) {
+                   try {
+                       var pos = this.small.posFor(value);
+                   } catch(e) {
+                       this.moveSmallCrosshair([-999, -999]);
+                       return;
+                   }
+                   this.moveSmallCrosshair(pos);
+               },
+               showLarge: function() {
+                   this.$.largeRainbowComp.style.display = 'block';
+                   try {
+                       this.moveLargeCrosshair(this.large.posFor(this.value));
+                   } catch(e) {
+                       this.moveLargeCrosshair([-999, -999]);
+                       return;
+                   }
+               },
+               hideLarge: function() {
+                   this.$.largeRainbowComp.style.display = 'none';
                },
                onEnterSmall: function() {
                    // not if we just closed the large one
-                   this.$.largeRainbowComp.style.display = 'block';
+                   this.showLarge();
+               },
+               moveLargeCrosshair: function(pos, _elem) {
+                   _elem = _elem || this.$.largeCrosshair;
+                   _elem.style.left = (pos[0] - _elem.offsetWidth / 2) + 'px';
+                   _elem.style.top = (pos[1] - _elem.offsetHeight / 2) + 'px';
+               },
+               moveSmallCrosshair: function(pos) {
+                   this.moveLargeCrosshair(pos, this.$.smallCrosshair);
                },
                onCanvasMove: function(ev) {
-                   console.log('canvasmove');
+                   if (ev.buttons != 1) {
+                       return;
+                   }
+                   var canvas = this.$.largeRainbow;
+                   var pos = [ev.offsetX - canvas.offsetLeft,
+                              ev.offsetY - canvas.offsetTop];
+                   this.moveLargeCrosshair(pos);
+                   this.value = this.large.colorAt(pos);
                },
                onCanvasUp: function(ev) {
-                   console.log('canvasup');
-                   this.$.largeRainbowComp.style.display = 'none';
+                   this.hideLarge();
                },
                onCanvasLeave: function(ev) {
-                   console.log('canvasleave');
-                   this.$.largeRainbowComp.style.display = 'none';
+                   this.hideLarge();
                },
            });
        });
@@ -133,7 +251,7 @@
                  value="{{pickedColor}}">
           <button on-click="goWhite">white</button>
           <button on-click="goBlack">black</button>
-          <light9-color-picker value="{{pickedColor}}"></light9-color-picker>
+          <light9-color-picker value="{{value}}"></light9-color-picker>
         </template>
         <template is="dom-if" if="{{deviceAttr.useChoice}}">
           <select size$="{{deviceAttr.choiceSize}}" value="{{pickedChoice::change}}">
