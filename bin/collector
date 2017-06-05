@@ -21,7 +21,7 @@ from greplin import scales
 
 from run_local import log
 from lib.cycloneerr import PrettyErrorHandler
-from light9.collector.output import EnttecDmx, Udmx
+from light9.collector.output import EnttecDmx, Udmx, DummyOutput
 from light9.collector.collector import Collector
 from light9.namespaces import L9
 from light9 import networking

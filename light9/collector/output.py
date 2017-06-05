@@ -53,6 +53,21 @@ class Output(object):
         """short string to distinguish outputs"""
         raise NotImplementedError
 
+class DummyOutput(Output):
+    def __init__(self, uri, *args):
+        self.uri = uri
+        self.numChannels = args[-1]
+    
+    def update(self, values):
+        pass
+
+    def flush(self):
+        pass
+
+    def shortId(self):
+        return repr(self)
+
+        
 class DmxOutput(Output):
     def __init__(self, uri, numChannels):
         self.uri = uri
