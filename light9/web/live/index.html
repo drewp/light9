@@ -26,6 +26,7 @@
              position: relative;
          }
          #smallRainbowComp, #largeRainbowComp {
+             display: inline-block;
              overflow: hidden;
              position: relative;
          }
@@ -46,18 +47,22 @@
              pointer-events: none;
          }
          #smallCrosshair {
-             background: url(/colorpick_crosshair_small.png);
-             width: 200px; 
-             height: 166px;
+             background: url(/colorpick_crosshair_small.svg);
+             /* this can't be too tall, or chrome will cull it in the 
+                second column if its top goes above the top of the columns */
+             width: 400px; 
+             height: 60px;
          }
          #largeCrosshair {
-             background: url(/colorpick_crosshair_large.png);
-             width: 492px; 
-             height: 409px;
+             background: url(/colorpick_crosshair_large.svg);
+             width: 1000px; 
+             height: 1000px;
          }
          #largeRainbowComp {
              display: none;
              position: absolute;
+             border: 4px solid #545454;
+             box-shadow: 8px 11px 40px 0px rgba(0, 0, 0, 0.74);
              z-index: 10;
              left: -50px;
              top: -110px;
@@ -70,8 +75,8 @@
         <div id="largeRainbowComp">
           <div id="largeRainbow"
                   on-mousemove="onCanvasMove"
-                  on-mouseup="onCanvasUp"
-                  on-mouseleave="onCanvasLeave"></div>
+                  on-mouseup="hideLarge"
+                  on-mouseleave="hideLarge"></div>
           <div id="largeCrosshair"></div>
         </div>
       </template>
@@ -118,19 +123,35 @@
                    var data = this.ctx.getImageData(pos[0], pos[1], 1, 1).data;
                    return this._hexFromRgb(data[0], data[1], data[2]);
                }
+               _fullBrightness(r, g, b) {
+                   var high = Math.max(r, g, b);
+                   if (high == 0) {
+                       return [0, 0, 0];
+                   }
+                   return [Math.floor(255 * r / high),
+                           Math.floor(255 * g / high),
+                           Math.floor(255 * b / high)];
+               }
                posFor(color) {
                    let r = parseInt(color.substr(1, 2), 16),
                        g = parseInt(color.substr(3, 2), 16),
                        b = parseInt(color.substr(5, 2), 16);
 
-                   var bright = Math.max(r, g, b);
-                   r = Math.floor(255 * r / bright);
-                   g = Math.floor(255 * g / bright);
-                   b = Math.floor(255 * b / bright);
-                   var ep = 8;
-                   for (var dr = 0; dr < ep; dr = -dr + (dr > 0 ? 0 : 1)) {
-                       for (var dg = 0; dg < ep; dg = -dg + (dg > 0 ? 0 : 1)) {
-                           for (var db = 0; db < ep; db = -db + (db > 0 ? 0 : 1)) {
+                   let bright = this._fullBrightness(r, g, b);
+                   r = bright[0]; g = bright[1]; b = bright[2];
+                   
+                   // We may not have a match for this color exactly (e.g. on
+                   // the small image), so we have to search for a near one.
+                   
+                   // 0, 1, -1, 2, -2, ...
+                   let walk = function(x) { return -x + (x > 0 ? 0 : 1); }
+                   
+                   var radius = 8;
+                   for (var dr = 0; dr < radius; dr = walk(dr)) {
+                       for (var dg = 0; dg < radius; dg = walk(dg)) {
+                           for (var db = 0; db < radius; db = walk(db)) {
+                               // Don't need bounds check- out of range
+                               // corrupt colors just won't match.
                                color = this._hexFromRgb(r + dr, g + dg, b + db);
                                var pos = this.colorPos[color];
                                if (pos !== undefined) {
@@ -170,7 +191,20 @@
                    }
                    this.moveSmallCrosshair(pos);
                },
+               _floatLarge: function() {
+                   // Large might span multiple columns, and chrome won't
+                   // send events for those parts. Workaround: take it out of
+                   // the columns.
+                   let large = this.$.largeRainbowComp;
+                   let rect = this.$.smallRainbowComp.getBoundingClientRect();
+                   document.body.append(large);
+                   large.style.position = 'fixed';
+                   large.style.left = (rect.left - 100) + 'px';
+                   large.style.top = (rect.top - 50) + 'px';
+
+               },
                showLarge: function() {
+                   this._floatLarge();
                    this.$.largeRainbowComp.style.display = 'block';
                    try {
                        this.moveLargeCrosshair(this.large.posFor(this.value));
@@ -203,12 +237,6 @@
                               ev.offsetY - canvas.offsetTop];
                    this.moveLargeCrosshair(pos);
                    this.value = this.large.colorAt(pos);
-               },
-               onCanvasUp: function(ev) {
-                   this.hideLarge();
-               },
-               onCanvasLeave: function(ev) {
-                   this.hideLarge();
                },
            });
        });
