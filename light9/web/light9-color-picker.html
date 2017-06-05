@@ -155,7 +155,7 @@
            sliderWriteValue: { type: Number, notify: true },
        },
        observers: [
-           'updateSmall(color)',
+           'readColor(color)',
            'onValue(value)',
            'writeColor(hueSatColor, value)'
        ],
@@ -178,7 +178,12 @@
        writeColor: function(hueSatColor, value) {
            this.color = one.color(hueSatColor).value(value / 255).hex();
        },
-       updateSmall: function(color) {
+       readColor: function(color) {
+           if (this.$.largeRainbowComp.style.display == 'block') {
+               // for performance, don't do color searches on covered widget
+               return;
+           }
+           
            // setting immediate-value doesn't work
            this.sliderWriteValue = one.color(color).value() * 255;
            
@@ -198,7 +203,7 @@
            let rect = this.$.smallRainbowComp.getBoundingClientRect();
            document.body.append(large);
            large.style.position = 'fixed';
-           large.style.left = (rect.left - 100) + 'px';
+           large.style.left = (rect.left) + 'px';
            large.style.top = (rect.top - 50) + 'px';
        },
        showLarge: function() {
@@ -213,6 +218,7 @@
        },
        hideLarge: function() {
            this.$.largeRainbowComp.style.display = 'none';
+           this.readColor(this.color);
        },
        onEnterSmall: function() {
            // not if we just closed the large one
