@@ -9,16 +9,13 @@ Polymer
     value: { type: Object, notify: true }
     
     immediateSlider: { notify: true, observer: 'onSlider' }
-    pickedColor: { observer: 'onPickedColor' }
     pickedChoice: { observer: 'onChange' }
   observers: [
     'onChange(value)'
     ]
   ready: ->
     
-  onPickedColor: (ev) -> @value = ev.target.value
   onSlider: -> @value = @immediateSlider
-  goWhite: -> @value = "#ffffff"
   goBlack: -> @value = "#000000"
   onChange: (value) ->
     @lastSent = [[@device, @deviceAttr.uri, value]]

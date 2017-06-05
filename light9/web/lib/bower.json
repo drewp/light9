@@ -20,7 +20,8 @@
     "paper-radio-button": "PolymerElements/paper-radio-button#^1.2.2",
     "paper-button": "PolymerElements/paper-button#^1.0.12",
     "paper-dialog": "PolymerElements/paper-dialog#^1.0.4",
-    "paper-radio-group": "PolymerElements/paper-radio-group#^1.2.2"
+    "paper-radio-group": "PolymerElements/paper-radio-group#^1.2.2",
+    "color": "https://github.com/One-com/one-color.git#^3.0.4"
   },
   "resolutions": {
     "paper-styles": "^1.1.4",

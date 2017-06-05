@@ -5,6 +5,8 @@
     <style>
      :host {
          position: relative;
+         display: flex;
+         align-items: center;
      }
      #smallRainbowComp, #largeRainbowComp {
          display: inline-block;
@@ -39,6 +41,9 @@
          width: 1000px; 
          height: 1000px;
      }
+     #smallRainbowComp {
+         margin-right: 3px;
+     }
      #largeRainbowComp {
          display: none;
          position: absolute;
@@ -53,6 +58,12 @@
       <div id="smallRainbow" on-mouseenter="onEnterSmall"></div>
       <div id="smallCrosshair"></div>
     </div>
+    <span>V:</span>
+    <paper-slider min="0"
+                  max="255"
+                  step="1"
+                  value="{{sliderWriteValue}}"
+                  immediate-value="{{value}}"></paper-slider>
     <div id="largeRainbowComp">
       <div id="largeRainbow"
            on-mousemove="onCanvasMove"
@@ -61,6 +72,7 @@
       <div id="largeCrosshair"></div>
     </div>
   </template>
+  <script src="/lib/color/one-color.js"></script>
   <script>
    class RainbowCanvas {
        constructor(url, size) {
@@ -86,38 +98,26 @@
            for (var y = 0; y < this.size[1]; y+=1) {
                for (var x = 0; x < this.size[0]; x+=1) {
                    var base = (y * this.size[0] + x) * 4;
-                   var c = this._hexFromRgb(
-                       data[base + 0], data[base + 1], data[base + 2]);
+                   var c = one.color([data[base + 0],
+                                      data[base + 1],
+                                      data[base + 2], 255]).hex();
                    this.colorPos[c] = [x, y];
                }
            }
-       }
-       _hexFromRgb(r, g, b) {
-           var hex = function (x) {
-               return ('00' + x.toString(16)).slice(-2);
-           };
-           return '#' + hex(r) + hex(g) + hex(b);
-       }
+       }       
        colorAt(pos) {
            var data = this.ctx.getImageData(pos[0], pos[1], 1, 1).data;
-           return this._hexFromRgb(data[0], data[1], data[2]);
-       }
-       _fullBrightness(r, g, b) {
-           var high = Math.max(r, g, b);
-           if (high == 0) {
-               return [0, 0, 0];
-           }
-           return [Math.floor(255 * r / high),
-                   Math.floor(255 * g / high),
-                   Math.floor(255 * b / high)];
+           return one.color([data[0], data[1], data[2], 255]).hex();
        }
        posFor(color) {
-           let r = parseInt(color.substr(1, 2), 16),
-               g = parseInt(color.substr(3, 2), 16),
-               b = parseInt(color.substr(5, 2), 16);
-
-           let bright = this._fullBrightness(r, g, b);
-           r = bright[0]; g = bright[1]; b = bright[2];
+           if (color == '#000000') {
+               throw new Error('no match');
+           }
+           
+           let bright = one.color(color).value(1).hex();
+           let r = parseInt(bright.substr(1, 2), 16),
+               g = parseInt(bright.substr(3, 2), 16),
+               b = parseInt(bright.substr(5, 2), 16);
            
            // We may not have a match for this color exactly (e.g. on
            // the small image), so we have to search for a near one.
@@ -131,7 +131,7 @@
                    for (var db = 0; db < radius; db = walk(db)) {
                        // Don't need bounds check- out of range
                        // corrupt colors just won't match.
-                       color = this._hexFromRgb(r + dr, g + dg, b + db);
+                       color = one.color([r + dr, g + dg, b + db, 255]).hex();
                        var pos = this.colorPos[color];
                        if (pos !== undefined) {
                            return pos;
@@ -146,9 +146,19 @@
    Polymer({
        is: "light9-color-picker",
        properties: {
-           value: { type: String, notify: true },
+           color: {
+               type: String,
+               notify: true,
+           },
+           hueSatColor: { type: String, notify: true, value: '#000000' },
+           value: { type: Number, notify: true }, // 0..255
+           sliderWriteValue: { type: Number, notify: true },
        },
-       observers: ['updateSmall(value)'],
+       observers: [
+           'updateSmall(color)',
+           'onValue(value)',
+           'writeColor(hueSatColor, value)'
+       ],
        attached: function() {
            if (!window.pickerCanvases) {
                window.pickerCanvases = {
@@ -161,9 +171,19 @@
            this.large = window.pickerCanvases.large;
            this.small = window.pickerCanvases.small;
        },
-       updateSmall: function(value) {
+       onValue: function(value) {
+           let neverBlack = .1 + .9 * value / 255;
+           this.$.smallRainbow.style.filter = `brightness(${neverBlack})`;
+       },
+       writeColor: function(hueSatColor, value) {
+           this.color = one.color(hueSatColor).value(value / 255).hex();
+       },
+       updateSmall: function(color) {
+           // setting immediate-value doesn't work
+           this.sliderWriteValue = one.color(color).value() * 255;
+           
            try {
-               var pos = this.small.posFor(value);
+               var pos = this.small.posFor(color);
            } catch(e) {
                this.moveSmallCrosshair([-999, -999]);
                return;
@@ -185,7 +205,7 @@
            this._floatLarge();
            this.$.largeRainbowComp.style.display = 'block';
            try {
-               this.moveLargeCrosshair(this.large.posFor(this.value));
+               this.moveLargeCrosshair(this.large.posFor(this.color));
            } catch(e) {
                this.moveLargeCrosshair([-999, -999]);
                return;
@@ -214,7 +234,12 @@
            var pos = [ev.offsetX - canvas.offsetLeft,
                       ev.offsetY - canvas.offsetTop];
            this.moveLargeCrosshair(pos);
-           this.value = this.large.colorAt(pos);
+           this.hueSatColor = this.large.colorAt(pos);
+
+           // special case: it's useless to adjust the hue/sat of black
+           if (this.value == 0) {
+               this.value = 255;
+           }
        },
    });
   </script>

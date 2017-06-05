@@ -23,7 +23,17 @@
     <dom-module id="light9-live-control">
       <template>
         <style>
-         paper-slider { width: 100%; margin: -19px 0; }
+         #colorControls {
+             display: flex;
+             align-items: center;
+         }
+         #colorControls > * {
+             margin: 0 3px;
+         }
+         #colorControls paper-slider {
+
+             }
+         paper-slider { width: 100%; height: 25px; }
         </style>
 
         <style is="custom-style">
@@ -49,13 +59,11 @@
                         immediate-value="{{immediateSlider}}"></paper-slider>
         </template>
         <template is="dom-if" if="{{deviceAttr.useColor}}">
-          <input type="color"
-                 id="col"
-                 on-input="onPickedColor"
-                 value="{{pickedColor}}">
-          <button on-click="goWhite">white</button>
-          <button on-click="goBlack">black</button>
-          <light9-color-picker value="{{value}}"></light9-color-picker>
+        <div id="colorControls">
+          <button on-click="goBlack">0.0</button>
+          <light9-color-picker color="{{value}}"></light9-color-picker>
+         
+        </div>
         </template>
         <template is="dom-if" if="{{deviceAttr.useChoice}}">
           <select size$="{{deviceAttr.choiceSize}}" value="{{pickedChoice::change}}">
