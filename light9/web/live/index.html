@@ -7,6 +7,8 @@
     <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
     <link rel="import" href="/lib/polymer/polymer.html">
     <link rel="import" href="/lib/paper-slider/paper-slider.html">
+    <link rel="import" href="/lib/paper-listbox/paper-listbox.html">
+    <link rel="import" href="/lib/paper-item/paper-item.html">
     <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
     <link rel="import" href="../light9-collector-client.html">
 
@@ -20,6 +22,76 @@
   </head>
   <body>
 
+    <dom-module id="light9-listbox">
+      <template>
+        <style>
+         paper-listbox {
+             --paper-listbox-background-color: none;
+             --paper-listbox-color: white;
+             --paper-listbox: {
+                 /* measure biggest item? use flex for columns? */
+                 column-width: 9em;
+             }
+         }
+         paper-item {
+             --paper-item-min-height: 0;
+             --paper-item: {
+                 display: block;
+                 border: 1px outset #0f440f;
+                 margin: 0 1px 5px 0;
+                 background: #0b1d0b;
+             }
+         }
+        </style>
+        <paper-listbox id="list"
+                       selected="{{value}}"
+                       attr-for-selected="uri"
+                       on-focus-changed="selectOnFocus"
+        >
+          <paper-item on-focus="selectOnFocus">None</paper-item>
+          <template is="dom-repeat" items="{{choices}}">
+            <paper-item on-focus="selectOnFocus" uri="{{item.uri}}">{{item.label}}</paper-item>
+          </template>
+        </paper-listbox>
+
+      </template>
+      <script>
+       HTMLImports.whenReady(function () {
+           Polymer({
+               is: "light9-listbox",
+               properties: {
+                   choices: { type: Array },
+                   value: { type: String, notify: true },
+               },
+               observers: ['onValue(value)'],
+               selectOnFocus: function(ev) {
+                   if (ev.target.uri === undefined) {
+                       // *don't* clear for this, or we can't cycle through all choices (including none) with up/down keys
+                       //this.clear();
+                       //return;
+                   }
+                   this.value = ev.target.uri;
+                   
+               },
+               onValue: function(value) {
+                   if (value === null) {
+                       this.clear();
+                   }
+               },
+               clear: function() {
+                   this.async(function() {
+                       this.querySelectorAll('paper-item').forEach(
+                           function(item) { item.blur(); });
+                       this.value = undefined;
+                   }.bind(this));
+
+               },
+               
+           });
+       });
+      </script>
+    </dom-module>
+    
     <dom-module id="light9-live-control">
       <template>
         <style>
@@ -32,7 +104,7 @@
          }
          #colorControls paper-slider {
 
-             }
+         }
          paper-slider { width: 100%; height: 25px; }
         </style>
 
@@ -48,7 +120,8 @@
                  background: black;
              }
          }
-         </style>
+         
+        </style>
 
         <template is="dom-if" if="{{deviceAttr.useSlider}}">
           <paper-slider min="0"
@@ -66,12 +139,8 @@
         </div>
         </template>
         <template is="dom-if" if="{{deviceAttr.useChoice}}">
-          <select size$="{{deviceAttr.choiceSize}}" value="{{pickedChoice::change}}">
-            <option value="">None</option>
-            <template is="dom-repeat" items="{{deviceAttr.choices}}">
-              <option value="{{item.uri}}">{{item.label}}</option>
-            </template>
-          </select>
+          <light9-listbox choices="{{deviceAttr.choices}}" value="{{value}}">
+          </light9-listbox>
         </template>
 
       </template>

@@ -101,7 +101,7 @@ Polymer
       # stick at the last setting if we don't explicitly send the
       # 0. rx/ry similar though not the exact same deal because of
       # their remap.
-      if value == 0 or value == '#000000'
+      if value == 0 or value == '#000000' or value == null or value == undefined
         delete @currentSettings[key]
       else
         @currentSettings[key] = [dev, devAttr, value]
