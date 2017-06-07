@@ -9,6 +9,7 @@ Polymer
     value: { type: Object, notify: true }
     
     immediateSlider: { notify: true, observer: 'onSlider' }
+    sliderWriteValue: { type: Number }
     pickedChoice: { observer: 'onChange' }
   observers: [
     'onChange(value)'
@@ -23,6 +24,8 @@ Polymer
   resend: ->
     window.gather(@lastSent)
   clear: ->
+    @pickedChoice = null
+    @sliderWriteValue = 0
     if @deviceAttr.useColor
       @value = '#000000'
     else
