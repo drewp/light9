@@ -511,6 +511,9 @@ Polymer
       height: h,
       display: if rightX - leftX > w then 'block' else 'none'
       }
+    if @inlineRect.display != 'none'
+      @async =>
+        @querySelector('light9-timeline-note-inline-attrs').displayed()
 
     if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
@@ -581,6 +584,8 @@ Polymer
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
     ]
+  displayed: ->
+    @querySelector('light9-color-picker').displayed()
   onColorScale: ->
     U = (x) => @graph.Uri(x)
     if @colorScale == @colorScaleFromGraph

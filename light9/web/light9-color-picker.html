@@ -85,14 +85,26 @@
            this.ctx = elem.getContext('2d');
 
            this.colorPos = {} // color: pos
+           this._loaded = false;
+           this._loadWatchers = []; // callbacks
            
            var img = new Image();
            img.onload = function() {
                this.ctx.drawImage(img, 0, 0);
                this._readImage();
-               if (onReady) onReady();
+               this._loaded = true;
+               this._loadWatchers.forEach(function(cb) { cb(); });
+               this._loadWatchers = [];
            }.bind(this);
            img.src = url;
+       }
+       onLoad(cb) {
+           // we'll call this when posFor is available
+           if (this._loaded) {
+               cb();
+               return;
+           }
+           this._loadWatchers.push(cb);
        }
        _readImage() {
            var data = this.ctx.getImageData(
@@ -161,21 +173,25 @@
            'onValue(value)',
            'writeColor(hueSatColor, value)'
        ],
+       displayed: function() {
+           // call this when the smallcrosshair first has a size
+           this._updateSmallCrosshair();
+       },
        attached: function() {
            if (!window.pickerCanvases) {
                window.pickerCanvases = {
                    large: new RainbowCanvas(
                        '/colorpick_rainbow_large.png', [400, 200]),
                    small: new RainbowCanvas(
-                       '/colorpick_rainbow_small.png', [150, 30],
-                       function() {
-                           // color may have been set before our image came
-                           this.readColor(this.color);
-                       }.bind(this)),
+                       '/colorpick_rainbow_small.png', [150, 30]),
                };
            }
            this.large = window.pickerCanvases.large;
            this.small = window.pickerCanvases.small;
+           this.small.onLoad(function() {
+               // color may have been set before our image came
+               this._updateSmallCrosshair();
+           }.bind(this));
        },
        onValue: function(value) {
            let neverBlack = .1 + .9 * value / 255;
@@ -190,18 +206,19 @@
                return;
            }
            
-           console.log('pos', color)
-           // setting immediate-value doesn't work
            var colorValue = one.color(color).value() * 255;
+           // writing back to immediate-value doesn't work on paper-slider
            this.sliderWriteValue = colorValue;
+           
+           this._updateSmallCrosshair();
+       },
+       _updateSmallCrosshair: function() {
            try {
-               var pos = this.small.posFor(color);
+               var pos = this.small.posFor(this.color);
            } catch(e) {
-               console.log('err')
                this.moveSmallCrosshair([-999, -999]);
                return;
            }
-           console.log('go', pos)
            this.moveSmallCrosshair(pos);
        },
        _floatLarge: function() {
