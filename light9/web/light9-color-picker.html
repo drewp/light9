@@ -1,4 +1,5 @@
 <link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/paper-slider/paper-slider.html">
 
 <dom-module id="light9-color-picker">
   <template>
@@ -75,7 +76,7 @@
   <script src="/lib/color/one-color.js"></script>
   <script>
    class RainbowCanvas {
-       constructor(url, size) {
+       constructor(url, size, onReady) {
            this.size = size;
            var elem = document.createElement('canvas');
            elem.width = size[0];
@@ -89,6 +90,7 @@
            img.onload = function() {
                this.ctx.drawImage(img, 0, 0);
                this._readImage();
+               if (onReady) onReady();
            }.bind(this);
            img.src = url;
        }
@@ -165,7 +167,11 @@
                    large: new RainbowCanvas(
                        '/colorpick_rainbow_large.png', [400, 200]),
                    small: new RainbowCanvas(
-                       '/colorpick_rainbow_small.png', [150, 30]),
+                       '/colorpick_rainbow_small.png', [150, 30],
+                       function() {
+                           // color may have been set before our image came
+                           this.readColor(this.color);
+                       }.bind(this)),
                };
            }
            this.large = window.pickerCanvases.large;
@@ -184,15 +190,18 @@
                return;
            }
            
+           console.log('pos', color)
            // setting immediate-value doesn't work
-           this.sliderWriteValue = one.color(color).value() * 255;
-           
+           var colorValue = one.color(color).value() * 255;
+           this.sliderWriteValue = colorValue;
            try {
                var pos = this.small.posFor(color);
            } catch(e) {
+               console.log('err')
                this.moveSmallCrosshair([-999, -999]);
                return;
            }
+           console.log('go', pos)
            this.moveSmallCrosshair(pos);
        },
        _floatLarge: function() {

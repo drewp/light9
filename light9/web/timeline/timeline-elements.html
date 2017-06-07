@@ -4,6 +4,7 @@
 <link rel="import" href="light9-timeline-audio.html">
 <link rel="import" href="../rdfdb-synced-graph.html">
 <link rel="import" href="../light9-music.html">
+<link rel="import" href="../light9-color-picker.html">
 <link rel="import" href="../edit-choice.html">
 
 
@@ -333,9 +334,7 @@ background: rgba(126, 52, 245, 0.0784313725490196);
       <table>
         <tr><th>effect:</th><td><edit-choice uri="{{effect}}" label="{{effectLabel}}"></edit-choice></td></tr>
         <tr><th>colorScale:</th><td>
-          <!-- this could share with live/index.html's
-          light9-live-control, but that one is currently junky -->
-          <span><input type="color" value="{{colorScale::input}}"></span>
+          <light9-color-picker color="{{colorScale}}"></light9-color-picker>
         </td></tr>
       </table>
     </div>

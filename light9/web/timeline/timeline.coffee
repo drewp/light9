@@ -502,7 +502,7 @@ Polymer
     rightX = screenPts[Math.min(2, screenPts.length - 1)].e(1) - 5
     if screenPts.length < 3
       rightX = leftX + 120
-    w = 150
+    w = 430
     h = 80
     @inlineRect = {
       left: leftX,
