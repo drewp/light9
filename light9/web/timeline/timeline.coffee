@@ -96,7 +96,7 @@ Polymer
 
     @trackMouse()
     @bindKeys()
-    @bindWheelZoom()
+    @bindWheelZoom(@dia.querySelector('svg'))
     @forwardMouseEventsToAdjustersCanvas()
 
     @makeZoomAdjs()
@@ -155,8 +155,8 @@ Polymer
   latestMouseTime: ->
     @zoomInX.invert(@viewState.mouse.pos().e(1))
 
-  bindWheelZoom: ->
-    @$.zoomed.addEventListener 'mousewheel', (ev) =>
+  bindWheelZoom: (elem) ->
+    elem.addEventListener 'mousewheel', (ev) =>
       zs = @viewState.zoomSpec
 
       center = @latestMouseTime()
@@ -895,6 +895,9 @@ Polymer
   properties: {}
   ready: ->
     @elemById = {}
+
+  attached: ->
+    @querySelector('svg').add
 
   setTimeAxis: (width, yTop, scale) ->
     pxPerTick = 50
