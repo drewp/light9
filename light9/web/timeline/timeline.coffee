@@ -633,57 +633,6 @@ Polymer
     patch = {delQuads: [{subject: @song, predicate: @graph.Uri(':note'), object: @uri, graph: @song}], addQuads: []}
     @graph.applyAndSendPatch(patch)
 
-    
-class deleteme
-  go: ->
-    visible: { type: Boolean, notify: true }
-    
-    displayValue: { type: String }
-    centerStyle: { type: Object }
-    spanClass: { type: String, value: '' }
-
-  observer: [
-    'onAdj(graph, adj, dia, id, visible)'
-    ]
-  onAdj:  ->
-    log('onAdj', @id)
-    @adj.subscribe(@updateDisplay.bind(this))
-    @graph.runHandler(@updateDisplay.bind(@))
-
-  updateDisplay: () ->
-    go = =>
-      if !@visible
-        @clearElements()
-        return
-      window.debug_adjUpdateDisplay++
-      @spanClass = if @adj.config.emptyBox then 'empty' else ''
-      @displayValue = @adj.getDisplayValue()
-      center = @adj.getCenter()
-      target = @adj.getTarget()
-      #log("adj updateDisplay center #{center.elements} target #{target.elements}")
-      return if isNaN(center.e(1))
-      @centerStyle = {x: center.e(1), y: center.e(2)}
-      @dia.setAdjusterConnector(@adj.id + '/conn', center, target)
-    @debounce('updateDisplay', go)
-        
-  attached: ->
-    drag = d3.drag()
-    sel = d3.select(@$.label)
-    sel.call(drag)
-    drag.subject((d) -> {x: @offsetLeft, y: @offsetTop})
-    drag.container(@offsetParent)
-    drag.on('start', () => @adj?.startDrag())
-    drag.on 'drag', () =>
-      @adj?.continueDrag($V([d3.event.x, d3.event.y]))
-    drag.on('end', () => @adj?.endDrag())
-
-    @updateDisplay()
-
-  detached: -> @clearElements()
-  clearElements: ->
-    @dia.clearElem(@adj.id, ['/conn'])
-
-
 svgPathFromPoints = (pts) ->
   out = ''
   pts.forEach (p) ->
@@ -881,7 +830,7 @@ Polymer
     for _, adj of @adjs
       desired = adj.getSuggestedCenter()
       output = desired
-      for tries in [0...2]
+      for tries in [0...4]
         nearest = @qt.find(output.e(1), output.e(2))
         if nearest
           dist = output.distanceFrom(nearest)
@@ -936,6 +885,7 @@ Polymer
     # coords from a center that's passed in
     # # special layout for the thaeter ones with middinh 
     # l/r arrows
+    # mouse arrow cursor upon hover, and accent the hovered adjuster
     # connector
 
   
@@ -1003,11 +953,3 @@ Polymer
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)
     #elem.innerHTML = effectLabel;
-
-  setAdjusterConnector: (uri, center, target) ->
-    id = uri + '/adj'
-    if not @anyPointsInView([center, target])
-      @clearElem(id, [''])
-      return
-    elem = @getOrCreateElem(uri, 'connectors', 'path', {style: "fill:none;stroke:#d4d4d4;stroke-width:0.9282527;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:2.78475821, 2.78475821;stroke-dashoffset:0;"})
-    elem.setAttribute('d', svgPathFromPoints([center, target]))

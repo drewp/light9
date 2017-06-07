@@ -87,7 +87,7 @@
          height: 100%;
      }
      #rows.dragging {
-background: rgba(126, 52, 245, 0.0784313725490196);
+         background: rgba(126, 52, 245, 0.0784);
          }
      light9-timeline-audio {
          width: 100%;
@@ -127,8 +127,6 @@ background: rgba(126, 52, 245, 0.0784313725490196);
        - background grids
        - zoom arcs
        - notes
-       - annotations on notes
-       - connectors between adjusters and their targets
      
      This element is not responsible for any hit detection. Things you click (rows,
      notes, adjusters, etc) are caught on their respective elements. (But is that
@@ -160,8 +158,6 @@ background: rgba(126, 52, 245, 0.0784313725490196);
         <g id="timeAxis" transform="translate(0,40)"></g>
         <g id="mouse"></g>
         <g id="notes"></g>
-        <g id="noteLabels"></g>
-        <g id="connectors"></g>
       </g>
     </svg>
   </template>
@@ -252,66 +248,6 @@ background: rgba(126, 52, 245, 0.0784313725490196);
      }
 
     </style>
-  </template>
-</dom-module>
-
-<!-- Yellow dotted handle that you can adjust to edit something.
-     Knows an attribute to edit and the true screen location, even if
-     parent <light9-timeline-adjusters> has offset us a bit to avoid a
-     text overlap.
-     Draws affordance arrows and a connector line if we're far
-     away from the point that we edit.
-     May grow to a bigger editor when you click or drag.
-   -->
-<dom-module id="light9-timeline-adjuster">
-  <template>
-    <style>
-     /* 
-     #top {outline: 2px solid rgba(255, 0, 0, 0.25);}
-     table {outline: 2px solid rgba(0, 0, 255, 0.19);}
-     */
-     
-     #top {
-         position: absolute;
-         display: inline-block;
-     }
-     table {
-         position: relative;
-         left: -50%;
-         top: -40px; /* percent had no effect */
-         z-index: 2;
-         border-collapse: collapse;
-     }
-     td {
-         text-align: center;
-         font-size: 20px;
-     }
-     span {
-         font-size: 16px;
-         background: rgba(255, 255, 0, 0.5);
-         border: 3px yellow dotted;
-         border-radius: 8px;
-         padding: 5px;
-
-         cursor: ew-resize;
-         -webkit-user-select: none;
-         pointer-events: all;
-     }
-     span.empty {
-         width: 30px; /* todo: supposed to fill the whole visible section*/
-         height: 13px;
-         display: inline-block;
-         background: rgba(0,0,0,0);
-     }
-    </style>
-    <div id="top" style$="left: [[centerStyle.x]]px; top: [[centerStyle.y]]px">
-      <table>
-        <tr><td></td><td style="visibility: hidden">↑</td><td></td></tr>
-        <tr><td>←</td><td><span id="label" class$="[[spanClass]]">[[displayValue]]</span></td><td>→</td></tr>
-        <tr><td></td><td style="visibility: hidden">↓</td><td></td></tr>
-      </table>
-    </div>
-    
   </template>
 </dom-module>
 
