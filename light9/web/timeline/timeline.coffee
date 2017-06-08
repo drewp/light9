@@ -459,7 +459,6 @@ Polymer
           if @worldPts and timeEditFor not in @pointUris
             return false
     return true
-      
             
   update: (patch) ->
     if not @patchCouldAffectMe(patch)
@@ -890,11 +889,12 @@ Polymer
 
   
 Polymer
-  # note boxes
+  # note boxes. Page selection.
   is: 'light9-timeline-diagram-layer'
   properties: {}
   ready: ->
     @elemById = {}
+    @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
   attached: ->
     @querySelector('svg').add
@@ -904,7 +904,7 @@ Polymer
     axis = d3.axisTop(scale).ticks(width / pxPerTick)
     d3.select(@$.timeAxis).attr('transform', 'translate(0,'+yTop+')').call(axis)
 
-  getOrCreateElem: (uri, groupId, tag, attrs) ->
+  getOrCreateElem: (uri, groupId, tag, attrs, moreBuild) ->
     elem = @elemById[uri]
     if !elem
       elem = @elemById[uri] = document.createElementNS("http://www.w3.org/2000/svg", tag)
@@ -912,6 +912,8 @@ Polymer
       elem.setAttribute('id', uri)
       for k,v of attrs
         elem.setAttribute(k, v)
+      if moreBuild
+        moreBuild(elem)
     return elem
 
   clearElem: (uri, suffixes) -> # todo: caller shouldn't have to know suffixes!
@@ -928,7 +930,7 @@ Polymer
         return true
     return false
     
-  setNote: (uri, curvePts, effect) ->
+  setNote: (uri, curvePts, effect, classes) ->
     areaId = uri + '/area'
     labelId = uri + '/label'
     if not @anyPointsInView(curvePts)
@@ -947,11 +949,34 @@ Polymer
         hash += effect.charCodeAt(i)
       hue = (hash * 8) % 360
       sat = 40 + (hash % 20) # don't conceal colorscale too much
-    
-    elem = @getOrCreateElem(areaId, 'notes', 'path',
-      {style:"fill:hsla(#{hue}, #{sat}%, 58%, 0.313); stroke:#000000; stroke-width:1.5;"})
-    elem.setAttribute('d', svgPathFromPoints(curvePts))
 
+    attrs = {style: "fill:hsla(#{hue}, #{sat}%, 58%, 0.313);"}
+    elem = @getOrCreateElem areaId, 'notes', 'path', attrs, (elem) =>
+      elem.addEventListener 'mouseenter', =>
+        @selection.hover(uri)
+        log('enter', uri)
+      elem.addEventListener 'mousedown', (ev) =>
+        log('click', uri)
+        sel = @selection.selected()
+        if ev.getModifierState('Control')
+          if uri in sel
+            sel = _.without(sel, uri)
+          else
+            sel.push(uri)
+        else
+          sel = [uri]
+        @selection.selected(sel)
+      elem.addEventListener 'mouseleave', =>
+        log('leave', uri)
+        @selection.hover(null)
+    elem.setAttribute('d', svgPathFromPoints(curvePts))
+    @updateNotePathClasses(uri, elem)
+
+  updateNotePathClasses: (uri, elem) ->
+    ko.computed =>
+      classes = 'light9-timeline-diagram-layer ' + (if @selection.hover() == uri then 'hover' else '') + ' '  + (if uri in @selection.selected() then 'selected' else '')
+      elem.setAttribute('class', classes)
+    
     #elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)
