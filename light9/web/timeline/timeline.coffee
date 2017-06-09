@@ -224,7 +224,6 @@ Polymer
       for note in @selection.selected()
         deleteNote(@graph, @song, note, @selection)
 
-
   makeZoomAdjs: ->
     yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
     dur = @viewState.zoomSpec.duration
@@ -400,7 +399,7 @@ Polymer
 
     notesForThisRow = []
     i = 0
-    for n in _.sortBy(@graph.objects(@song, U(':note')))
+    for n in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
       if (i % ROW_COUNT) == @rowIndex
         notesForThisRow.push(n)
       i++
@@ -421,17 +420,6 @@ Polymer
       e.zoomInX = @zoomInX
 
 
-getCurvePoints = (graph, curve, xOffset) ->
-  worldPts = []
-  uris = graph.objects(curve, graph.Uri(':point'))
-  for pt in uris
-    v = $V([xOffset + graph.floatValue(pt, graph.Uri(':time')),
-            graph.floatValue(pt, graph.Uri(':value'))])
-    v.uri = pt
-    worldPts.push(v)
-  worldPts.sort((a,b) -> a.e(1) > b.e(1))
-  return [uris, worldPts]
-
 Polymer
   is: 'light9-timeline-note'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -449,11 +437,11 @@ Polymer
     'update(graph, dia, uri, zoomInX, setAdjuster)'
     ]
   ready: ->
-    @adjusterIds = {}
+    @adjusterIds = {} # id : true
 
   detached: ->
     log('detatch', @uri)
-    @dia.clearElem(@uri, ['/area', '/label'])
+    @dia.clearNote(@uri)
     @isDetached = true
     @clearAdjusters()
 
@@ -477,6 +465,7 @@ Polymer
     return true
             
   update: (patch) ->
+    # update our note DOM and SVG elements based on the graph
     if not @patchCouldAffectMe(patch)
       # as autodep still fires all handlers on all patches, we just
       # need any single dep to cause another callback. (without this,
@@ -485,40 +474,44 @@ Polymer
       return
     if @isDetached?
       return
- 
-    @updateDisplay()
 
-  updateDisplay: ->
-      
-    # update our note DOM and SVG elements based on the graph
+    @_updateDisplay()
+
+  _updateDisplay: ->
     U = (x) => @graph.Uri(x)
 
+    # @offsetTop causes some CSS layout to run!
     yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
 
     originTime = @graph.floatValue(@uri, U(':originTime'))
     effect = @graph.uriValue(@uri, U(':effectClass'))
     for curve in @graph.objects(@uri, U(':curve'))
       if @graph.uriValue(curve, U(':attr')) == U(':strength')
-        @updateStrengthCurveEtc(originTime, curve, yForV, effect)
+
+        [@pointUris, @worldPts] = @_getCurvePoints(curve, originTime)
+        curveWidthCalc = () => @_curveWidth(@worldPts)
+    
+        screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
+    
+        @dia.setNote(@uri, screenPts, effect)
+        @_updateAdjusters(screenPts, curveWidthCalc, yForV)
+        @_updateInlineAttrs(screenPts)
         
-  updateStrengthCurveEtc: (originTime, curve, yForV, effect) ->
-    U = (x) => @graph.Uri(x)
-    [@pointUris, @worldPts] = getCurvePoints(@graph, curve, originTime) # (song time, value)
+  _updateAdjusters: (screenPts, curveWidthCalc, yForV) ->   
+    if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
+      @clearAdjusters()
+    else
+      @_makeOffsetAdjuster(yForV, curveWidthCalc)
+      @_makeCurvePointAdjusters(yForV, @worldPts)
 
-    curveWidth = =>
-      tMin = @graph.floatValue(@worldPts[0].uri, U(':time'))
-      tMax = @graph.floatValue(@worldPts[3].uri, U(':time'))
-      tMax - tMin            
-
-    screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
-    @dia.setNote(@uri, screenPts, effect)
-
+  _updateInlineAttrs: (screenPts) ->
     leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].e(1) + 5)
     rightX = screenPts[Math.min(2, screenPts.length - 1)].e(1) - 5
     if screenPts.length < 3
       rightX = leftX + 120
     w = 430
     h = 80
+    wasHidden = @inlineRect?.display == 'none'
     @inlineRect = {
       left: leftX,
       top: @offsetTop + @offsetHeight - h - 5,
@@ -526,23 +519,62 @@ Polymer
       height: h,
       display: if rightX - leftX > w then 'block' else 'none'
       }
-    if @inlineRect.display != 'none'
+    if wasHidden and @inlineRect.display != 'none'
       @async =>
         @querySelector('light9-timeline-note-inline-attrs')?.displayed()
-
-    if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
-      @clearAdjusters()
-      # also kill their connectors
-      return
-
-    @makeCurveAdjusters(curveWidth, yForV, @worldPts)
     
-  makeCurveAdjusters: (curveWidth, yForV, worldPts) ->
+  _getCurvePoints: (curve, xOffset) ->
+    worldPts = []
+    uris = @graph.objects(curve, @graph.Uri(':point'))
+    for pt in uris
+      v = $V([xOffset + @graph.floatValue(pt, @graph.Uri(':time')),
+              @graph.floatValue(pt, @graph.Uri(':value'))])
+      v.uri = pt
+      worldPts.push(v)
+    worldPts.sort((a,b) -> a.e(1) > b.e(1))
+    return [uris, worldPts]
+
+  _curveWidth: (worldPts) ->
+    tMin = @graph.floatValue(worldPts[0].uri, @graph.Uri(':time'))
+    tMax = @graph.floatValue(worldPts[3].uri, @graph.Uri(':time'))
+    tMax - tMin
+    
+  _makeCurvePointAdjusters: (yForV, worldPts) ->
+    for pointNum in [0, 1, 2, 3]
+      @_makePointAdjuster(yForV, worldPts, pointNum)
+
+  _makePointAdjuster: (yForV, worldPts, pointNum) ->
     U = (x) => @graph.Uri(x)
 
-    if true
-      @adjusterIds[@uri+'/offset'] = true
-      @setAdjuster(@uri+'/offset', => new AdjustableFloatObject({
+    adjId = @uri + '/p' + pointNum
+    @adjusterIds[adjId] = true
+    @setAdjuster adjId, =>
+      adj = new AdjustableFloatObject({
+        graph: @graph
+        subj: worldPts[pointNum].uri
+        pred: U(':time')
+        ctx: U(@song)
+        getTargetPosForValue: (value) =>
+          $V([@zoomInX(value), yForV(worldPts[pointNum].e(2))])
+        getValueForPos: (pos) =>
+          origin = @graph.floatValue(@uri, U(':originTime'))
+          (@zoomInX.invert(pos.e(1)) - origin)
+        getSuggestedTargetOffset: () => @_suggestedOffset(worldPts[pointNum]),
+      })
+      adj._getValue = (=>
+        # note: don't use originTime from the closure- we need the
+        # graph dependency
+        adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
+        )
+      adj
+
+  _makeOffsetAdjuster: (yForV, curveWidthCalc) ->
+    U = (x) => @graph.Uri(x)
+
+    adjId = @uri + '/offset'
+    @adjusterIds[adjId] = true
+    @setAdjuster adjId, => 
+      adj = new AdjustableFloatObject({
         graph: @graph
         subj: @uri
         pred: U(':originTime')
@@ -550,37 +582,18 @@ Polymer
         getDisplayValue: (v, dv) => "o=#{dv}"
         getTargetPosForValue: (value) =>
           # display bug: should be working from pt[0].t, not from origin
-          $V([@zoomInX(value + curveWidth() / 2), yForV(.5)])
+          $V([@zoomInX(value + curveWidthCalc() / 2), yForV(.5)])
         getValueForPos: (pos) =>
-          @zoomInX.invert(pos.e(1)) - curveWidth() / 2
+          @zoomInX.invert(pos.e(1)) - curveWidthCalc() / 2
         getSuggestedTargetOffset: () => $V([-10, 0])
-      }))
-
-    for pointNum in [0, 1, 2, 3]
-      do (pointNum) =>
-        @adjusterIds[@uri+'/p'+pointNum] = true
-        @setAdjuster(@uri+'/p'+pointNum, =>
-            adj = new AdjustableFloatObject({
-              graph: @graph
-              subj: worldPts[pointNum].uri
-              pred: U(':time')
-              ctx: U(@song)
-              getTargetPosForValue: (value) =>
-                $V([@zoomInX(value),
-                    yForV(worldPts[pointNum].e(2))])
-              getValueForPos: (pos) =>
-                origin = @graph.floatValue(@uri, U(':originTime'))
-                (@zoomInX.invert(pos.e(1)) - origin)
-              getSuggestedTargetOffset: () => $V([0, (if worldPts[pointNum].e(2) > .5 then 30 else -30)])
-            })
-            adj._getValue = (=>
-              # note: don't use originTime from the closure- we need the
-              # graph dependency
-              adj._currentValue + @graph.floatValue(@uri, U(':originTime'))
-              )
-            adj
-          )
-
+      })
+      adj
+    
+  _suggestedOffset: (pt) ->
+    if pt.e(2) > .5
+      $V([0, 30])
+    else
+      $V([0, -30])
     
     
 
@@ -633,7 +646,7 @@ Polymer
     @graph.runHandler(@update.bind(@))
     
   update: ->
-    console.time('attrs update')
+    #console.time('attrs update')
     U = (x) => @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
     @effectLabel = @graph.stringValue(@effect, U('rdfs:label')) or (@effect.replace(/.*\//, ''))
@@ -650,7 +663,7 @@ Polymer
     if existingColorScaleSetting == null
       @colorScaleFromGraph = '#ffffff'
       @colorScale = '#ffffff'
-    console.timeEnd('attrs update')
+    #console.timeEnd('attrs update')
 
 
   onDel: ->
@@ -781,7 +794,7 @@ Polymer
         @adjs[adjId] = adj
         adj.id = adjId
 
-    @redraw()
+    @debounce('adj redraw', @redraw.bind(@))
 
     window.debug_adjsCount = Object.keys(@adjs).length
 
@@ -915,29 +928,53 @@ Polymer
         moreBuild(elem)
     return elem
 
-  clearElem: (uri, suffixes) -> # todo: caller shouldn't have to know suffixes!
+  _clearElem: (uri, suffixes) ->
     for suff in suffixes
       elem = @elemById[uri+suff]
       if elem
         ko.removeNode(elem)
         delete @elemById[uri+suff]
 
-  anyPointsInView: (pts) ->
+  _anyPointsInView: (pts) ->
     for pt in pts
       # wrong:
       if pt.e(1) > -100 && pt.e(1) < 2500
         return true
     return false
     
-  setNote: (uri, curvePts, effect, classes) ->
+  setNote: (uri, curvePts, effect) ->
+    @debounce("setNote #{uri}", () => @_setNoteThrottle(uri, curvePts, effect))
+    
+  _setNoteThrottle: (uri, curvePts, effect) ->
     areaId = uri + '/area'
-    labelId = uri + '/label'
-    if not @anyPointsInView(curvePts)
-      @clearElem(uri, ['/area', '/label'])
+    if not @_anyPointsInView(curvePts)
+      @clearNote(uri)
       return
-    # for now these need to be pretty transparent since they're
-    # drawing on top of the inline-attrs widget :(
 
+    attrs = @_noteAttrs(effect)
+    elem = @getOrCreateElem areaId, 'notes', 'path', attrs, (elem) =>
+      @_addNoteListeners(elem, uri)
+    elem.setAttribute('d', Drawing.svgPathFromPoints(curvePts))
+    @_updateNotePathClasses(uri, elem)
+
+  _addNoteListeners: (elem, uri) ->
+    log("new note listeneers", uri)
+    elem.addEventListener 'mouseenter', =>
+      @selection.hover(uri)
+    elem.addEventListener 'mousedown', (ev) =>
+      sel = @selection.selected()
+      if ev.getModifierState('Control')
+        if uri in sel
+          sel = _.without(sel, uri)
+        else
+          sel.push(uri)
+      else
+        sel = [uri]
+      @selection.selected(sel)
+    elem.addEventListener 'mouseleave', =>
+      @selection.hover(null)
+
+  _noteAttrs: (effect) ->
     if effect in ['http://light9.bigasterisk.com/effect/blacklight',
       'http://light9.bigasterisk.com/effect/strobewarm']
       hue = 0
@@ -949,27 +986,17 @@ Polymer
       hue = (hash * 8) % 360
       sat = 40 + (hash % 20) # don't conceal colorscale too much
 
-    attrs = {style: "fill:hsla(#{hue}, #{sat}%, 58%, 0.313);"}
-    elem = @getOrCreateElem areaId, 'notes', 'path', attrs, (elem) =>
-      elem.addEventListener 'mouseenter', =>
-        @selection.hover(uri)
-      elem.addEventListener 'mousedown', (ev) =>
-        sel = @selection.selected()
-        if ev.getModifierState('Control')
-          if uri in sel
-            sel = _.without(sel, uri)
-          else
-            sel.push(uri)
-        else
-          sel = [uri]
-        @selection.selected(sel)
-      elem.addEventListener 'mouseleave', =>
-        @selection.hover(null)
-    elem.setAttribute('d', Drawing.svgPathFromPoints(curvePts))
-    @updateNotePathClasses(uri, elem)
+    {style: "fill:hsla(#{hue}, #{sat}%, 58%, 0.313);"}
 
-  updateNotePathClasses: (uri, elem) ->
+  clearNote: (uri) ->
+    @_clearElem(uri, ['/area'])
+
+  _noteInDiagram: (uri) ->
+    return !!@elemById[uri + '/area']
+
+  _updateNotePathClasses: (uri, elem) ->
     ko.computed =>
+      return if not @_noteInDiagram(uri)
       classes = 'light9-timeline-diagram-layer ' + (if @selection.hover() == uri then 'hover' else '') + ' '  + (if uri in @selection.selected() then 'selected' else '')
       elem.setAttribute('class', classes)
     

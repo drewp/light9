@@ -222,6 +222,14 @@ class window.SyncedGraph
     # runs your func once, tracking graph calls. if a future patch
     # matches what you queried, we runHandler your func again (and
     # forget your queries from the first time).
+
+    # helps with memleak? not sure yet. The point was if two matching
+    # labels get puushed on, we should run only one. So maybe
+    # appending a serial number is backwards.
+    @serial = 1 if not @serial
+    @serial += 1
+    #label = label + @serial
+    
     @_autoDeps.runHandler(func, label)
 
   _singleValue: (s, p) ->
@@ -242,6 +250,7 @@ class window.SyncedGraph
     key = s + '|' + p
     hit = @cachedFloatValues.get(key)
     return hit if hit != undefined
+    #log('float miss', s, p)
 
     ret = parseFloat(N3.Util.getLiteralValue(@_singleValue(s, p)))
     @cachedFloatValues.set(key, ret)
