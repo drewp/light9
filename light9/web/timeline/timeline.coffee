@@ -104,6 +104,10 @@ Polymer
 
     @makeZoomAdjs()
 
+    zoomed = @$.zoomed
+    setupDrop(@$.dia.querySelector('svg'), zoomed.$.rows, @, zoomed.onDrop.bind(zoomed))
+
+
   zoomOrLayoutChanged: ->
     # not for cursor updates
 
@@ -280,7 +284,6 @@ Polymer
 
   attached: ->
     root = @closest('light9-timeline-editor')
-    setupDrop(@, @$.rows, root, @onDrop.bind(@))
 
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
@@ -637,9 +640,13 @@ Polymer
 
 
   onDel: ->
-    patch = {delQuads: [{subject: @song, predicate: @graph.Uri(':note'), object: @uri, graph: @song}], addQuads: []}
-    @graph.applyAndSendPatch(patch)
+    deleteNote(@graph, @song, @uri)
 
+
+deleteNote = (graph, song, note) ->
+  patch = {delQuads: [{subject: song, predicate: graph.Uri(':note'), object: note, graph: song}], addQuads: []}
+  graph.applyAndSendPatch(patch)
+  
 
 Polymer
   is: 'light9-cursor-canvas'
@@ -873,7 +880,7 @@ Polymer
     @elemById = {}
 
   attached: ->
-    @querySelector('svg').add
+    
 
   setTimeAxis: (width, yTop, scale) ->
     pxPerTick = 50
