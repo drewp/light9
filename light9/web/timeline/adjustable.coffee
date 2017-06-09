@@ -88,6 +88,7 @@ class window.AdjustableFloatObservable extends Adjustable
     @config.observable(newValue)
 
   subscribe: (onChange) ->
+    log('AdjustableFloatObservable subscribe', @config)
     ko.computed =>
       @config.observable()
       onChange()

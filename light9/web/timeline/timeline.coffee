@@ -17,7 +17,7 @@ updateChildren = (parent, newUris, makeChild) ->
 
   for uri in _.difference(childUris, newUris)
     childByUri[uri].detached()
-    childByUri[uri].remove()
+    ko.removeNode(childByUri[uri])
   for uri in _.difference(newUris, childUris)
     parent.appendChild(makeChild(uri))
 
@@ -109,6 +109,7 @@ Polymer
 
 
   zoomOrLayoutChanged: ->
+    log('zoomOrLayoutChanged')
     # not for cursor updates
 
     window.debug_zoomOrLayoutChangedCount++
@@ -121,7 +122,7 @@ Polymer
     zoomInX.range([0, @width()])
     @zoomInX = zoomInX
 
-    # todo: these run a lot of work purely for a time change    
+    # todo: these run a lot of work purely for a time change
     @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
     @$.adjustersCanvas.updateAllCoords()
 
@@ -219,6 +220,10 @@ Polymer
                       newCenter + visSeconds / 2, zoomAnimSec)
     shortcut.add "L", =>
       @$.adjustersCanvas.updateAllCoords()
+    shortcut.add 'Delete', =>
+      for note in @selection.selected()
+        deleteNote(@graph, @song, note, @selection)
+
 
   makeZoomAdjs: ->
     yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
@@ -278,6 +283,7 @@ Polymer
     zoomFlattened: { type: Object, notify: true }
   onZoom: ->
     updateZoomFlattened = ->
+      log('updateZoomFlattened')
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
   ready: ->
@@ -522,7 +528,7 @@ Polymer
       }
     if @inlineRect.display != 'none'
       @async =>
-        @querySelector('light9-timeline-note-inline-attrs').displayed()
+        @querySelector('light9-timeline-note-inline-attrs')?.displayed()
 
     if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
@@ -600,18 +606,26 @@ Polymer
     U = (x) => @graph.Uri(x)
     if @colorScale == @colorScaleFromGraph
       return
-      
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
-    log('ch', ko.toJS(@selection))
-    settingValue = @graph.Literal(@colorScale)
-    if @existingColorScaleSetting
-      @graph.patchObject(@existingColorScaleSetting, U(':value'), settingValue, @song)
+    @editAttr(@song, @uri, U(':colorScale'), @graph.Literal(@colorScale))
+
+  editAttr: (song, note, attr, value) ->
+    U = (x) => @graph.Uri(x)
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: song}
+
+    existingColorScaleSetting = null
+    for setting in @graph.objects(note, U(':setting'))
+      ea = @graph.uriValue(setting, U(':effectAttr'))
+      if ea == attr
+        existingColorScaleSetting = setting
+        
+    if existingColorScaleSetting
+      @graph.patchObject(existingColorScaleSetting, U(':value'), value, song)
     else
-      setting = @graph.nextNumberedResource(@uri + 'set')
+      setting = @graph.nextNumberedResource(note + 'set')
       patch = {delQuads: [], addQuads: [
-        quad(@uri, U(':setting'), setting)
-        quad(setting, U(':effectAttr'), U(':colorScale'))
-        quad(setting, U(':value'), settingValue)
+        quad(note, U(':setting'), setting)
+        quad(setting, U(':effectAttr'), attr)
+        quad(setting, U(':value'), value)
         ]}
       @graph.applyAndSendPatch(patch)
     
@@ -625,27 +639,29 @@ Polymer
     @effectLabel = @graph.stringValue(@effect, U('rdfs:label')) or (@effect.replace(/.*\//, ''))
     @noteLabel = @uri.replace(/.*\//, '')
 
-    @existingColorScaleSetting = null
+    existingColorScaleSetting = null
     for setting in @graph.objects(@uri, U(':setting'))
       ea = @graph.uriValue(setting, U(':effectAttr'))
       value = @graph.stringValue(setting, U(':value'))
       if ea == U(':colorScale')
         @colorScaleFromGraph = value
         @colorScale = value
-        @existingColorScaleSetting = setting
-    if @existingColorScaleSetting == null
+        existingColorScaleSetting = setting
+    if existingColorScaleSetting == null
       @colorScaleFromGraph = '#ffffff'
       @colorScale = '#ffffff'
     console.timeEnd('attrs update')
 
 
   onDel: ->
-    deleteNote(@graph, @song, @uri)
+    deleteNote(@graph, @song, @uri, @selection)
 
 
-deleteNote = (graph, song, note) ->
+deleteNote = (graph, song, note, selection) ->
   patch = {delQuads: [{subject: song, predicate: graph.Uri(':note'), object: note, graph: song}], addQuads: []}
   graph.applyAndSendPatch(patch)
+  if note in selection.selected()
+    selection.selected(_.without(selection.selected(), note))
   
 
 Polymer
@@ -871,7 +887,7 @@ Polymer
 
   
 Polymer
-  # note boxes. Page selection.
+  # note boxes. 
   is: 'light9-timeline-diagram-layer'
   properties: {
     selection: {type: Object, notify: true}
@@ -903,7 +919,7 @@ Polymer
     for suff in suffixes
       elem = @elemById[uri+suff]
       if elem
-        elem.remove()
+        ko.removeNode(elem)
         delete @elemById[uri+suff]
 
   anyPointsInView: (pts) ->
