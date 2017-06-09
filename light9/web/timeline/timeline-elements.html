@@ -58,6 +58,7 @@
                            song="{{song}}"></light9-timeline-audio>
     <light9-timeline-time-zoomed id="zoomed"
                                  graph="{{graph}}"
+                                 selection="{{selection}}"
                                  dia="{{dia}}"
                                  set-adjuster="{{setAdjuster}}"
                                  song="{{song}}"
@@ -65,7 +66,7 @@
                                  zoom="{{viewState.zoomSpec}}"
                                  zoom-in-x="{{zoomInX}}">
     </light9-timeline-time-zoomed>
-    <light9-timeline-diagram-layer id="dia"></light9-timeline-diagram-layer>
+    <light9-timeline-diagram-layer id="dia" selection="{{selection}}"></light9-timeline-diagram-layer>
     <light9-adjusters-canvas id="adjustersCanvas" set-adjuster="{{setAdjuster}}">
     </light9-adjusters-canvas>
     <light9-cursor-canvas id="cursorCanvas"></light9-cursor-canvas>
@@ -108,6 +109,7 @@
       <div id="rows">
         <template is="dom-repeat" items="{{rows}}">
           <light9-timeline-graph-row graph="{{graph}}"
+                                     selection="{{selection}}"
                                      dia="{{dia}}"
                                      set-adjuster="{{setAdjuster}}"
                                      song="{{song}}"
@@ -238,6 +240,7 @@
     </style>
     <light9-timeline-note-inline-attrs rect="{{inlineRect}}"
                                        graph="{{graph}}"
+                                       selection="{{selection}}"
                                        song="{{song}}"
                                        uri="{{uri}}"
     >

@@ -39,6 +39,7 @@ Polymer
     songPlaying: {type: Boolean, notify: true}
     fullZoomX: {type: Object, notify: true}
     zoomInX: {type: Object, notify: true}
+    selection: {type: Object, notify: true}
   width: ko.observable(1)
   listeners:
     'iron-resize': '_onIronResize'
@@ -57,6 +58,7 @@ Polymer
 
   ready: ->
     ko.options.deferUpdates = true;
+    @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
     window.debug_zoomOrLayoutChangedCount = 0
     window.debug_adjUpdateDisplay = 0
@@ -84,6 +86,7 @@ Polymer
     elemCount = (tag) -> document.getElementsByTagName(tag).length
     @debug = "#{window.debug_zoomOrLayoutChangedCount} layout change,
      #{elemCount('light9-timeline-note')} notes,
+     #{@selection.selected().length} selected
      #{elemCount('light9-timeline-graph-row')} rows,
      #{window.debug_adjsCount} adjuster items registered,
      #{window.debug_adjUpdateDisplay} adjuster updateDisplay calls,
@@ -262,6 +265,7 @@ Polymer
   behaviors: [ Polymer.IronResizableBehavior ]
   properties:
     graph: { type: Object, notify: true }
+    selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
@@ -374,6 +378,7 @@ Polymer
     zoomInX: { type: Object, notify: true }
     noteUris: { type: Array, notify: true }
     rowIndex: { type: Object, notify: true }
+    selection: { type: Object, notify: true }
   observers: [
     'onGraph(graph, dia, setAdjuster, song, zoomInX)'
     'update(song, rowIndex)'
@@ -394,6 +399,7 @@ Polymer
     updateChildren @, notesForThisRow, (newUri) =>
       child = document.createElement('light9-timeline-note')
       child.graph = @graph
+      child.selection = @selection
       child.dia = @dia
       child.uri = newUri
       child.setAdjuster = @setAdjuster
@@ -423,6 +429,7 @@ Polymer
   listeners: 'iron-resize': 'update'
   properties:
     graph: { type: Object, notify: true }
+    selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
     uri: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
@@ -579,6 +586,7 @@ Polymer
     effectLabel: { type: String, notify: true }
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
+    selection: { type: Object, notify: true }
   observers: [
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
@@ -591,7 +599,7 @@ Polymer
       return
       
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
-
+    log('ch', ko.toJS(@selection))
     settingValue = @graph.Literal(@colorScale)
     if @existingColorScaleSetting
       @graph.patchObject(@existingColorScaleSetting, U(':value'), settingValue, @song)
@@ -891,10 +899,11 @@ Polymer
 Polymer
   # note boxes. Page selection.
   is: 'light9-timeline-diagram-layer'
-  properties: {}
+  properties: {
+    selection: {type: Object, notify: true}
+  }
   ready: ->
     @elemById = {}
-    @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
   attached: ->
     @querySelector('svg').add
@@ -954,9 +963,7 @@ Polymer
     elem = @getOrCreateElem areaId, 'notes', 'path', attrs, (elem) =>
       elem.addEventListener 'mouseenter', =>
         @selection.hover(uri)
-        log('enter', uri)
       elem.addEventListener 'mousedown', (ev) =>
-        log('click', uri)
         sel = @selection.selected()
         if ev.getModifierState('Control')
           if uri in sel
@@ -967,7 +974,6 @@ Polymer
           sel = [uri]
         @selection.selected(sel)
       elem.addEventListener 'mouseleave', =>
-        log('leave', uri)
         @selection.hover(null)
     elem.setAttribute('d', svgPathFromPoints(curvePts))
     @updateNotePathClasses(uri, elem)
