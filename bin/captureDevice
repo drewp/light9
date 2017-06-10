@@ -65,18 +65,30 @@ class Capture(object):
         self.captureId = 'cap%s' % (int(startTime) - 1495170000)
         self.toGather = []
 
+        #quantum
+        rxSteps = steps(.06, .952, 10)
+        rySteps = steps(0.1, .77, 5)
+        zoomSteps = steps(.12, .85, 3)
+        # aura
+        rxSteps = steps(0.15, .95, 10)
+        rySteps = steps(0, .9, 5)
+        zoomSteps = steps(.6, .9, 3)       
+        
         row = 0
-        for ry in steps(0.82, .92, 6):
-            xSteps = steps(.23, .42, 12)
+        for ry in rySteps:
+            xSteps = rxSteps[:]
             if row % 2:
                 xSteps.reverse()
             row += 1
             for rx in xSteps:
-                self.toGather.append(DeviceSettings(graph, [
-                    (dev, L9['rx'], rx),
-                    (dev, L9['ry'], ry),
-                    (dev, L9['color'], '#ffffff'),
-                ]))
+                for zoom in zoomSteps:
+                    self.toGather.append(DeviceSettings(graph, [
+                        (dev, L9['rx'], rx),
+                        (dev, L9['ry'], ry),
+                        (dev, L9['color'], '#ffffff'),
+                        (dev, L9['zoom'], zoom),
+                        #(dev, L9['focus'], 0.13),
+                    ]))
 
         self.devTail = dev.rsplit('/')[-1]
         self.session = URIRef('/'.join([showconfig.showUri(),
@@ -127,7 +139,7 @@ class Capture(object):
 
         
 
-camera = Camera('http://dash:8200/picamserve/pic?res=480&resize=480&rotation=180&iso=800&redgain=1.6&bluegain=2&shutter=60000')
+camera = Camera('http://plus:8200/picamserve/pic?res=1080&resize=800&iso=800&redgain=1.6&bluegain=1.6&shutter=60000&x=0&w=1&y=0&h=.952')
 
 class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
     def put(self):
@@ -137,7 +149,7 @@ class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
 
 def launch(graph):
 
-    cap = Capture(graph, dev=L9['device/moving1'])
+    cap = Capture(graph, dev=L9['device/aura5'])
     reactor.listenTCP(networking.captureDevice.port,
                       cyclone.web.Application(handlers=[
                           (r'/()', cyclone.web.StaticFileHandler,
