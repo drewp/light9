@@ -79,7 +79,7 @@ class SubmasterBox(tk.Frame):
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
 
-        self.namelabel = tk.Label(self, font="Arial 7", bg=darkBg,
+        self.namelabel = tk.Label(self, font="Arial 9", bg=darkBg,
             fg='white', pady=0)
         self.graph.addHandler(self.updateName)
 
