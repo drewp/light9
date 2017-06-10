@@ -141,7 +141,7 @@ def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
         outputs = [
-            #EnttecDmx(L9['output/dmx0/'], '/dev/dmx0', 80),
+            EnttecDmx(L9['output/dmx0/'], '/dev/dmx3', 80),
             Udmx(L9['output/udmx/'], 510),
         ]
     except Exception as e:
