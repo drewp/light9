@@ -516,8 +516,8 @@ Polymer
     rightX = screenPts[Math.min(2, screenPts.length - 1)].e(1) - 5
     if screenPts.length < 3
       rightX = leftX + 120
-    w = 430
-    h = 80
+    w = 250
+    h = 110
     wasHidden = @inlineRect?.display == 'none'
     @inlineRect = {
       left: leftX,
@@ -547,9 +547,7 @@ Polymer
     tMax - tMin
     
   _makeCurvePointAdjusters: (yForV, worldPts) ->
-    
     for pointNum in [0...worldPts.length]
-      log('wor', worldPts, pointNum)
       @_makePointAdjuster(yForV, worldPts, pointNum)
 
   _makePointAdjuster: (yForV, worldPts, pointNum) ->

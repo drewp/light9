@@ -8,6 +8,7 @@
          position: relative;
          display: flex;
          align-items: center;
+         flex-wrap: wrap;
      }
      #smallRainbowComp, #largeRainbowComp {
          display: inline-block;
@@ -58,17 +59,23 @@
      paper-slider {
          width: 170px;
      }
+     #vee {
+         display: flex;
+         align-items: center;
+     }
     </style>
     <div id="smallRainbowComp">
       <div id="smallRainbow" on-mouseenter="onEnterSmall"></div>
       <div id="smallCrosshair"></div>
     </div>
-    <span>V:</span>
-    <paper-slider min="0"
-                  max="255"
-                  step="1"
-                  value="{{sliderWriteValue}}"
-                  immediate-value="{{value}}"></paper-slider>
+    <span id="vee">
+      V:
+      <paper-slider min="0"
+                    max="255"
+                    step="1"
+                    value="{{sliderWriteValue}}"
+                    immediate-value="{{value}}"></paper-slider>
+    </span>
     <div id="largeRainbowComp">
       <div id="largeRainbow"
            on-mousemove="onCanvasMove"
