@@ -202,11 +202,16 @@
     <dom-module id="light9-live-controls">
       <template>
         <style>
+         :host {
+display: flex;
+    flex-direction: column;
+             }
          #preview {
              width: 100%;
          }
          #deviceControls {
              column-width: 400px;
+             overflow-y: auto;
          }
          light9-live-device-control > div {
              break-inside: avoid-column;
