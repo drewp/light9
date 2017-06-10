@@ -1,0 +1,56 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:mardi a :Effect; rdfs:label "mardi"; :publishAttr :strength;
+     :setting effect:mardi_set0, effect:mardi_set1, effect:mardi_set10, effect:mardi_set11, effect:mardi_set12, effect:mardi_set13, effect:mardi_set14, effect:mardi_set15, effect:mardi_set16, effect:mardi_set17, effect:mardi_set18, effect:mardi_set19, effect:mardi_set2, effect:mardi_set20, effect:mardi_set21, effect:mardi_set22, effect:mardi_set23, effect:mardi_set24, effect:mardi_set25, effect:mardi_set26, effect:mardi_set27, effect:mardi_set28, effect:mardi_set29, effect:mardi_set3, effect:mardi_set30, effect:mardi_set31, effect:mardi_set32, effect:mardi_set33, effect:mardi_set34, effect:mardi_set35, effect:mardi_set36, effect:mardi_set37, effect:mardi_set38, effect:mardi_set39, effect:mardi_set4, effect:mardi_set40, effect:mardi_set41, effect:mardi_set42, effect:mardi_set43, effect:mardi_set5, effect:mardi_set6, effect:mardi_set7, effect:mardi_set8, effect:mardi_set9 .
+effect:mardi_set0 :device dev:q1; :deviceAttr :color; :scaledValue "#ff5c61" .
+effect:mardi_set1 :device dev:q1; :deviceAttr :focus; :value 0.527 .
+effect:mardi_set10 :device dev:q3; :deviceAttr :focus; :value 0.518 .
+effect:mardi_set11 :device dev:q1; :deviceAttr :zoom; :value 0.131 .
+effect:mardi_set12 :device dev:q2; :deviceAttr :color; :scaledValue "#eeeeee" .
+effect:mardi_set13 :device dev:q2; :deviceAttr :rx; :value 0.492 .
+effect:mardi_set14 :device dev:q2; :deviceAttr :ry; :value 0.322 .
+effect:mardi_set15 :device dev:q2; :deviceAttr :focus; :value 0.021 .
+effect:mardi_set16 :device dev:cycL; :deviceAttr :brightness; :scaledValue 0.252 .
+effect:mardi_set17 :device dev:cycR; :deviceAttr :brightness; :scaledValue 0.297 .
+effect:mardi_set18 :device dev:f1; :deviceAttr :brightness; :scaledValue 0.575 .
+effect:mardi_set19 :device dev:f2; :deviceAttr :brightness; :scaledValue 0.445 .
+effect:mardi_set2 :device dev:q1; :deviceAttr :rx; :value 0.460 .
+effect:mardi_set20 :device dev:f3; :deviceAttr :brightness; :scaledValue 0.536 .
+effect:mardi_set21 :device dev:upCenter; :deviceAttr :color; :scaledValue "#ff8223" .
+effect:mardi_set22 :device dev:down3; :deviceAttr :color; :scaledValue "#ff0011" .
+effect:mardi_set23 :device dev:down4; :deviceAttr :color; :scaledValue "#72000f" .
+effect:mardi_set24 :device dev:down2; :deviceAttr :color; :scaledValue "#ff0d00" .
+effect:mardi_set25 :device dev:backlight2; :deviceAttr :color; :scaledValue "#7f000c" .
+effect:mardi_set26 :device dev:backlight1; :deviceAttr :color; :scaledValue "#ff8c00" .
+effect:mardi_set27 :device dev:backlight3; :deviceAttr :color; :scaledValue "#ff4d00" .
+effect:mardi_set28 :device dev:backlight4; :deviceAttr :color; :scaledValue "#ad3400" .
+effect:mardi_set29 :device dev:aura1; :deviceAttr :color; :scaledValue "#ff93a3" .
+effect:mardi_set3 :device dev:q1; :deviceAttr :ry; :value 0.486 .
+effect:mardi_set30 :device dev:aura1; :deviceAttr :rx; :value 0.769 .
+effect:mardi_set31 :device dev:aura1; :deviceAttr :zoom; :value 0.658 .
+effect:mardi_set32 :device dev:aura5; :deviceAttr :color; :scaledValue "#ff6d8f" .
+effect:mardi_set33 :device dev:aura5; :deviceAttr :rx; :value 0.187 .
+effect:mardi_set34 :device dev:aura5; :deviceAttr :zoom; :value 0.578 .
+effect:mardi_set35 :device dev:aura5; :deviceAttr :ry; :value 0.415 .
+effect:mardi_set36 :device dev:aura2; :deviceAttr :color; :scaledValue "#916e67" .
+effect:mardi_set37 :device dev:aura2; :deviceAttr :rx; :value 0.383 .
+effect:mardi_set38 :device dev:aura2; :deviceAttr :zoom; :value 0.715 .
+effect:mardi_set39 :device dev:aura2; :deviceAttr :ry; :value 0.411 .
+effect:mardi_set4 :device dev:q1; :deviceAttr :quantumGoboChoice; :value "http://light9.bigasterisk.com/limbo" .
+effect:mardi_set40 :device dev:aura4; :deviceAttr :rx; :value 0.671 .
+effect:mardi_set41 :device dev:aura4; :deviceAttr :color; :scaledValue "#ffc3d2" .
+effect:mardi_set42 :device dev:aura4; :deviceAttr :ry; :value 0.207 .
+effect:mardi_set43 :device dev:aura4; :deviceAttr :zoom; :value 0.680 .
+effect:mardi_set5 :device dev:q3; :deviceAttr :color; :scaledValue "#b18713" .
+effect:mardi_set6 :device dev:q3; :deviceAttr :rx; :value 0.447 .
+effect:mardi_set7 :device dev:q3; :deviceAttr :ry; :value 0.217 .
+effect:mardi_set8 :device dev:q3; :deviceAttr :zoom; :value 0.414 .
+effect:mardi_set9 :device dev:q3; :deviceAttr :quantumGoboChoice; :value "http://light9.bigasterisk.com/limbo" .

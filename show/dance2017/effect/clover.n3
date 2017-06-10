@@ -1,0 +1,34 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:clover a :Effect; rdfs:label "clover"; :publishAttr :strength;
+     :setting effect:clover_set0, effect:clover_set1, effect:clover_set10, effect:clover_set11, effect:clover_set12, effect:clover_set13, effect:clover_set14, effect:clover_set15, effect:clover_set16, effect:clover_set17, effect:clover_set18, effect:clover_set19, effect:clover_set2, effect:clover_set20, effect:clover_set21, effect:clover_set3, effect:clover_set4, effect:clover_set5, effect:clover_set6, effect:clover_set7, effect:clover_set8, effect:clover_set9 .
+effect:clover_set0 :device dev:aura1; :deviceAttr :color; :scaledValue "#205d2b" .
+effect:clover_set1 :device dev:aura4; :deviceAttr :color; :scaledValue "#216421" .
+effect:clover_set10 :device dev:q2; :deviceAttr :color; :scaledValue "#ff89be" .
+effect:clover_set11 :device dev:q2; :deviceAttr :focus; :value 0.046 .
+effect:clover_set12 :device dev:q2; :deviceAttr :rx; :value 0.504 .
+effect:clover_set13 :device dev:q2; :deviceAttr :ry; :value 0.480 .
+effect:clover_set14 :device dev:q2; :deviceAttr :zoom; :value 0.431 .
+effect:clover_set15 :device dev:q3; :deviceAttr :color; :scaledValue "#ff94a2" .
+effect:clover_set16 :device dev:q3; :deviceAttr :focus; :value 0.055 .
+effect:clover_set17 :device dev:q3; :deviceAttr :rx; :value 0.701 .
+effect:clover_set18 :device dev:q3; :deviceAttr :ry; :value 0.187 .
+effect:clover_set19 :device dev:q3; :deviceAttr :zoom; :value 0.459 .
+effect:clover_set2 :device dev:aura3; :deviceAttr :color; :scaledValue "#2e7433" .
+effect:clover_set20 :device dev:cycL; :deviceAttr :brightness; :scaledValue 0.242 .
+effect:clover_set21 :device dev:cycR; :deviceAttr :brightness; :scaledValue 0.282 .
+effect:clover_set3 :device dev:aura2; :deviceAttr :color; :scaledValue "#2d7d2e" .
+effect:clover_set4 :device dev:aura5; :deviceAttr :color; :scaledValue "#247028" .
+effect:clover_set5 :device dev:q1; :deviceAttr :color; :scaledValue "#ffa4b8" .
+effect:clover_set6 :device dev:q1; :deviceAttr :focus; :value 0.065 .
+effect:clover_set7 :device dev:q1; :deviceAttr :rx; :value 0.298 .
+effect:clover_set8 :device dev:q1; :deviceAttr :ry; :value 0.555 .
+effect:clover_set9 :device dev:q1; :deviceAttr :zoom; :value 0.372 .

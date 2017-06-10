@@ -1,0 +1,38 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:warm a :Effect; rdfs:label "warm"; :publishAttr :strength; :setting effect:warm_set0, effect:warm_set1, effect:warm_set10, effect:warm_set11, effect:warm_set12, effect:warm_set13, effect:warm_set14, effect:warm_set15, effect:warm_set16, effect:warm_set17, effect:warm_set18, effect:warm_set19, effect:warm_set2, effect:warm_set20, effect:warm_set21, effect:warm_set22, effect:warm_set23, effect:warm_set24, effect:warm_set25, effect:warm_set26, effect:warm_set3, effect:warm_set4, effect:warm_set5, effect:warm_set6, effect:warm_set7, effect:warm_set8, effect:warm_set9 .
+effect:warm_set0 :device dev:lip1; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:warm_set1 :device dev:lip4; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:warm_set10 :device dev:q2; :deviceAttr :color; :scaledValue "#c5ae7f" .
+effect:warm_set11 :device dev:q2; :deviceAttr :ry; :value 0.314 .
+effect:warm_set12 :device dev:aura1; :deviceAttr :zoom; :value 0.607 .
+effect:warm_set13 :device dev:aura1; :deviceAttr :rx; :value 0.303 .
+effect:warm_set14 :device dev:aura1; :deviceAttr :ry; :value 0.295 .
+effect:warm_set15 :device dev:aura2; :deviceAttr :rx; :value 0.425 .
+effect:warm_set16 :device dev:aura2; :deviceAttr :ry; :value 0.257 .
+effect:warm_set17 :device dev:aura2; :deviceAttr :zoom; :value 0.638 .
+effect:warm_set18 :device dev:aura3; :deviceAttr :rx; :value 0.554 .
+effect:warm_set19 :device dev:aura3; :deviceAttr :ry; :value 0.495 .
+effect:warm_set2 :device dev:lip3; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:warm_set20 :device dev:aura3; :deviceAttr :zoom; :value 0.655 .
+effect:warm_set21 :device dev:aura4; :deviceAttr :zoom; :value 0.670 .
+effect:warm_set22 :device dev:aura4; :deviceAttr :ry; :value 0.428 .
+effect:warm_set23 :device dev:aura4; :deviceAttr :rx; :value 0.675 .
+effect:warm_set24 :device dev:aura5; :deviceAttr :rx; :value 0.652 .
+effect:warm_set25 :device dev:aura5; :deviceAttr :ry; :value 0.351 .
+effect:warm_set26 :device dev:aura5; :deviceAttr :zoom; :value 0.696 .
+effect:warm_set3 :device dev:lip2; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:warm_set4 :device dev:lip5; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:warm_set5 :device dev:aura1; :deviceAttr :color; :scaledValue "#ffb79f" .
+effect:warm_set6 :device dev:aura2; :deviceAttr :color; :scaledValue "#ffc198" .
+effect:warm_set7 :device dev:aura3; :deviceAttr :color; :scaledValue "#ffb3ab" .
+effect:warm_set8 :device dev:aura4; :deviceAttr :color; :scaledValue "#ffc27c" .
+effect:warm_set9 :device dev:aura5; :deviceAttr :color; :scaledValue "#ffdfcd" .

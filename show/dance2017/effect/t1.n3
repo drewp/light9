@@ -1,0 +1,85 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:t1 a :Effect; rdfs:label "t1"; :publishAttr :strength; :setting <http://light9.bigasterisk.com/effect/t1/set1083646>, <http://light9.bigasterisk.com/effect/t1/set1366763>, <http://light9.bigasterisk.com/effect/t1/set1369519>, <http://light9.bigasterisk.com/effect/t1/set1780588>, <http://light9.bigasterisk.com/effect/t1/set2080308>, <http://light9.bigasterisk.com/effect/t1/set2714611>, <http://light9.bigasterisk.com/effect/t1/set3052967>, <http://light9.bigasterisk.com/effect/t1/set3133620>, <http://light9.bigasterisk.com/effect/t1/set3495203>, <http://light9.bigasterisk.com/effect/t1/set396419>, <http://light9.bigasterisk.com/effect/t1/set4765560>, <http://light9.bigasterisk.com/effect/t1/set4867552>, <http://light9.bigasterisk.com/effect/t1/set523820>, <http://light9.bigasterisk.com/effect/t1/set5313395>, <http://light9.bigasterisk.com/effect/t1/set542623>, <http://light9.bigasterisk.com/effect/t1/set5911210>, <http://light9.bigasterisk.com/effect/t1/set6241387>, <http://light9.bigasterisk.com/effect/t1/set627777>, <http://light9.bigasterisk.com/effect/t1/set6561949>, <http://light9.bigasterisk.com/effect/t1/set6796393>, <http://light9.bigasterisk.com/effect/t1/set6852032>, <http://light9.bigasterisk.com/effect/t1/set7036232>, <http://light9.bigasterisk.com/effect/t1/set73158>, <http://light9.bigasterisk.com/effect/t1/set7419473>, <http://light9.bigasterisk.com/effect/t1/set8143201>, <http://light9.bigasterisk.com/effect/t1/set8270937>, <http://light9.bigasterisk.com/effect/t1/set8535294>, <http://light9.bigasterisk.com/effect/t1/set8623208>, <http://light9.bigasterisk.com/effect/t1/set8647430>, <http://light9.bigasterisk.com/effect/t1/set8737120>, <http://light9.bigasterisk.com/effect/t1/set8778203>, <http://light9.bigasterisk.com/effect/t1/set8871359>, <http://light9.bigasterisk.com/effect/t1/set9228400>, <http://light9.bigasterisk.com/effect/t1/set9246261>, <http://light9.bigasterisk.com/effect/t1/set9572425>, <http://light9.bigasterisk.com/effect/t1/set9686606>, <http://light9.bigasterisk.com/effect/t1/set9713305> .
+<http://light9.bigasterisk.com/effect/t1/set1083646> :device dev:aura3;
+     :deviceAttr :rx; :value 0.533 .
+<http://light9.bigasterisk.com/effect/t1/set1366763> :device dev:lip1;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set1369519> :device dev:aura1;
+     :deviceAttr :ry; :value 0.412 .
+<http://light9.bigasterisk.com/effect/t1/set1780588> :device dev:lip3;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set2080308> :device dev:down5Edge;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set2714611> :device dev:aura5;
+     :deviceAttr :zoom; :value 0.685 .
+<http://light9.bigasterisk.com/effect/t1/set3052967> :device dev:hexLow3;
+     :deviceAttr :uv; :scaledValue 3.84e-03 .
+<http://light9.bigasterisk.com/effect/t1/set3133620> :device dev:down3;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set3495203> :device dev:aura2;
+     :deviceAttr :zoom; :value 0.616 .
+<http://light9.bigasterisk.com/effect/t1/set396419> :device dev:aura5;
+     :deviceAttr :rx; :value 0.628 .
+<http://light9.bigasterisk.com/effect/t1/set4765560> :device dev:down4;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set4867552> :device dev:aura4;
+     :deviceAttr :ry; :value 0.470 .
+<http://light9.bigasterisk.com/effect/t1/set523820> :device dev:down2;
+     :deviceAttr :uv; :scaledValue 4.7424e-01 .
+<http://light9.bigasterisk.com/effect/t1/set5313395> :device dev:aura5;
+     :deviceAttr :ry; :value 0.473 .
+<http://light9.bigasterisk.com/effect/t1/set542623> :device dev:aura4;
+     :deviceAttr :zoom; :value 0.651 .
+<http://light9.bigasterisk.com/effect/t1/set5911210> :device dev:aura4;
+     :deviceAttr :color; :scaledValue "#5d2d57" .
+<http://light9.bigasterisk.com/effect/t1/set6241387> :device dev:backlight1;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set627777> :device dev:aura4;
+     :deviceAttr :rx; :value 0.535 .
+<http://light9.bigasterisk.com/effect/t1/set6561949> :device dev:aura2;
+     :deviceAttr :ry; :value 0.448 .
+<http://light9.bigasterisk.com/effect/t1/set6796393> :device dev:upCenter;
+     :deviceAttr :uv; :scaledValue 5.2614e-01 .
+<http://light9.bigasterisk.com/effect/t1/set6852032> :device dev:backlight3;
+     :deviceAttr :uv; :scaledValue 4.7808e-01 .
+<http://light9.bigasterisk.com/effect/t1/set7036232> :device dev:backlight5;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set73158> :device dev:lip2;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set7419473> :device dev:aura1;
+     :deviceAttr :zoom; :value 0.629 .
+<http://light9.bigasterisk.com/effect/t1/set8143201> :device dev:aura5;
+     :deviceAttr :color; :scaledValue "#c9bc00" .
+<http://light9.bigasterisk.com/effect/t1/set8270937> :device dev:lip4;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set8535294> :device dev:aura1;
+     :deviceAttr :color; :scaledValue "#c9c800" .
+<http://light9.bigasterisk.com/effect/t1/set8623208> :device dev:aura3;
+     :deviceAttr :zoom; :value 0.652 .
+<http://light9.bigasterisk.com/effect/t1/set8647430> :device dev:backlight4;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .
+<http://light9.bigasterisk.com/effect/t1/set8737120> :device dev:aura2;
+     :deviceAttr :rx; :value 0.484 .
+<http://light9.bigasterisk.com/effect/t1/set8778203> :device dev:aura3;
+     :deviceAttr :ry; :value 0.273 .
+<http://light9.bigasterisk.com/effect/t1/set8871359> :device dev:aura3;
+     :deviceAttr :color; :scaledValue "#b3b212" .
+<http://light9.bigasterisk.com/effect/t1/set9228400> :device dev:upCenter;
+     :deviceAttr :color; :scaledValue "#c9c9c9" .
+<http://light9.bigasterisk.com/effect/t1/set9246261> :device dev:aura1;
+     :deviceAttr :rx; :value 0.326 .
+<http://light9.bigasterisk.com/effect/t1/set9572425> :device dev:aura2;
+     :deviceAttr :color; :scaledValue "#703977" .
+<http://light9.bigasterisk.com/effect/t1/set9686606> :device dev:backlight2;
+     :deviceAttr :uv; :scaledValue 4.7952e-01 .
+<http://light9.bigasterisk.com/effect/t1/set9713305> :device dev:lip5;
+     :deviceAttr :uv; :scaledValue 4.8e-01 .

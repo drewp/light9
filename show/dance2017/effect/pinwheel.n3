@@ -1,0 +1,48 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:pinwheel a :Effect; rdfs:label "pinwheel"; :publishAttr :strength;
+     :setting effect:pinwheel_set0, effect:pinwheel_set1, effect:pinwheel_set10, effect:pinwheel_set11, effect:pinwheel_set12, effect:pinwheel_set13, effect:pinwheel_set14, effect:pinwheel_set15, effect:pinwheel_set16, effect:pinwheel_set17, effect:pinwheel_set18, effect:pinwheel_set19, effect:pinwheel_set2, effect:pinwheel_set20, effect:pinwheel_set21, effect:pinwheel_set22, effect:pinwheel_set23, effect:pinwheel_set24, effect:pinwheel_set25, effect:pinwheel_set26, effect:pinwheel_set27, effect:pinwheel_set28, effect:pinwheel_set29, effect:pinwheel_set3, effect:pinwheel_set30, effect:pinwheel_set31, effect:pinwheel_set32, effect:pinwheel_set33, effect:pinwheel_set4, effect:pinwheel_set5, effect:pinwheel_set6, effect:pinwheel_set7, effect:pinwheel_set8, effect:pinwheel_set9 .
+effect:pinwheel_set0 :device dev:q1; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/windmill" .
+effect:pinwheel_set1 :device dev:q1; :deviceAttr :color; :scaledValue "#ffabe2" .
+effect:pinwheel_set10 :device dev:q3; :deviceAttr :rx; :value 0.360 .
+effect:pinwheel_set11 :device dev:q3; :deviceAttr :ry; :value 0.296 .
+effect:pinwheel_set12 :device dev:q3; :deviceAttr :goboSpeed; :value 0.088 .
+effect:pinwheel_set13 :device dev:q3; :deviceAttr :zoom; :value 0.300 .
+effect:pinwheel_set14 :device dev:aura1; :deviceAttr :color; :scaledValue "#00ffae" .
+effect:pinwheel_set15 :device dev:aura4; :deviceAttr :color; :scaledValue "#2200ff" .
+effect:pinwheel_set16 :device dev:aura3; :deviceAttr :color; :scaledValue "#ffee00" .
+effect:pinwheel_set17 :device dev:aura2; :deviceAttr :color; :scaledValue "#59ff00" .
+effect:pinwheel_set18 :device dev:aura5; :deviceAttr :color; :scaledValue "#5500ff" .
+effect:pinwheel_set19 :device dev:aura1; :deviceAttr :zoom; :value 0.574 .
+effect:pinwheel_set2 :device dev:q1; :deviceAttr :focus; :value 0.552 .
+effect:pinwheel_set20 :device dev:aura3; :deviceAttr :zoom; :value 0.548 .
+effect:pinwheel_set21 :device dev:aura2; :deviceAttr :zoom; :value 0.601 .
+effect:pinwheel_set22 :device dev:aura5; :deviceAttr :zoom; :value 0.659 .
+effect:pinwheel_set23 :device dev:aura4; :deviceAttr :zoom; :value 0.585 .
+effect:pinwheel_set24 :device dev:aura1; :deviceAttr :rx; :value 0.718 .
+effect:pinwheel_set25 :device dev:aura1; :deviceAttr :ry; :value 0.304 .
+effect:pinwheel_set26 :device dev:aura4; :deviceAttr :ry; :value 0.243 .
+effect:pinwheel_set27 :device dev:aura3; :deviceAttr :ry; :value 0.272 .
+effect:pinwheel_set28 :device dev:aura2; :deviceAttr :ry; :value 0.229 .
+effect:pinwheel_set29 :device dev:aura5; :deviceAttr :ry; :value 0.187 .
+effect:pinwheel_set3 :device dev:q1; :deviceAttr :goboSpeed; :value 0.088 .
+effect:pinwheel_set30 :device dev:aura5; :deviceAttr :rx; :value 0.404 .
+effect:pinwheel_set31 :device dev:aura3; :deviceAttr :rx; :value 0.468 .
+effect:pinwheel_set32 :device dev:aura2; :deviceAttr :rx; :value 0.370 .
+effect:pinwheel_set33 :device dev:auraStage; :deviceAttr :color; :scaledValue "#ff3e68" .
+effect:pinwheel_set4 :device dev:q1; :deviceAttr :rx; :value 0.617 .
+effect:pinwheel_set5 :device dev:q1; :deviceAttr :ry; :value 0.593 .
+effect:pinwheel_set6 :device dev:q1; :deviceAttr :zoom; :value 0.259 .
+effect:pinwheel_set7 :device dev:q3; :deviceAttr :color; :scaledValue "#ff8623" .
+effect:pinwheel_set8 :device dev:q3; :deviceAttr :focus; :value 0.522 .
+effect:pinwheel_set9 :device dev:q3; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/windmill" .

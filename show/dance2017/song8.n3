@@ -7,7 +7,6 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song8 :note <http://light9.bigasterisk.com/show/dance2017/song8/n0> .
 
 <http://light9.bigasterisk.com/show/dance2017/song8/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song8/n0c0>;
      :effectClass effect:sub1; :originTime 83.431 .
