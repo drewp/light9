@@ -15,13 +15,14 @@ from light9.Fadable import Fadable
 from light9.subclient import SubClient
 from light9 import showconfig, networking, prof
 from light9.uihelpers import toplevelat
-from light9.namespaces import L9, RDF
+from light9.namespaces import L9, RDF, RDFS
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
 from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.effect.sequencer import CodeWatcher
 import light9.effect.effecteval
 from light9.effect.settings import DeviceSettings
+from light9.rdfdb.patch import Patch
 
 from bcf2000 import BCF2000
 
@@ -451,11 +452,12 @@ class KeyboardComposer(tk.Frame, SubClient):
         return dict([(uri, box.slider_var.get())
             for uri, box in self.subbox.items()])
 
-    def get_output_settings(self):
+    def get_output_settings(self, _graph=None):
+        _graph = _graph or graph
         outputSettings = []
-        for setting in graph.objects(self.session, L9['subSetting']):
-            effect = graph.value(setting, L9['sub'])
-            strength = graph.value(setting, L9['level'])
+        for setting in _graph.objects(self.session, L9['subSetting']):
+            effect = _graph.value(setting, L9['sub'])
+            strength = _graph.value(setting, L9['level'])
             if strength:
                 now = time.time()
                 outputSettings.append(
@@ -465,23 +467,24 @@ class KeyboardComposer(tk.Frame, SubClient):
                         # should be counting from when you bumped up from 0
                         noteTime=now))
 
-        return DeviceSettings.fromList(graph, outputSettings)
+        return DeviceSettings.fromList(_graph, outputSettings)
 
     def save_current_stage(self, subname):
-        raise NotImplementedError
         log.info("saving current levels as %s", subname)
-        with self.graph.currentState() as current:
-            sub = self.get_levels_as_sub(graph=current)
+        with graph.currentState() as g:
+            ds = self.get_output_settings(_graph=g)
+        effect = L9['effect/%s' % subname]
+        ctx = URIRef(showconfig.showUri() + '/effect/' + subname)
+        stmts = ds.statements(effect, ctx, effect + '/', set())
+        stmts.extend([
+            (effect, RDF.type, L9['Effect'], ctx),
+            (effect, RDFS.label, Literal(subname), ctx),
+            (effect, L9['publishAttr'], L9['strength'], ctx),
+            ])
 
-        log.debug("new sub for reference: %r", sub)
-
-        newUri = showconfig.showUri() + "/sub/%s" % subname
-        ps = PersistentSubmaster(self.graph, newUri)
-        ps.changeName(subname)
-        for chanName, v in sub.get_levels().items():
-            chan = get_channel_uri(str(chanName))
-            ps.editLevel(chan, v)
-            
+        graph.suggestPrefixes(ctx, {'eff': effect + '/'})
+        graph.patch(Patch(addQuads=stmts, delQuads=[]))
+              
         self.sub_name.delete(0, tk.END)
 
     def send_frequent_updates(self):
