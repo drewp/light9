@@ -674,7 +674,10 @@ Polymer
     #console.time('attrs update')
     U = (x) => @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
-    @effectLabel = @graph.stringValue(@effect, U('rdfs:label')) or (@effect.replace(/.*\//, ''))
+    try
+      @effectLabel = @graph.stringValue(@effect, U('rdfs:label'))
+    catch
+      @effectLabel = @effect.replace(/.*\//, '')
     @noteLabel = @uri.replace(/.*\//, '')
 
     existingColorScaleSetting = null
