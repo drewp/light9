@@ -75,7 +75,11 @@ class AutoDependencies
       throw new Error("missing label")
 
     h = new Handler(func, label)
-    @handlerStack[@handlerStack.length - 1].innerHandlers.push(h)
+    tailChildren = @handlerStack[@handlerStack.length - 1].innerHandlers
+    matchingLabel = _.filter(tailChildren, ((c) -> c.label == label)).length
+    # ohno, something depends on some handlers getting run twice :(
+    if matchingLabel < 2
+      tailChildren.push(h)
     console.time("handler #{label}")
     @_rerunHandler(h, null)
     console.timeEnd("handler #{label}")
@@ -93,10 +97,20 @@ class AutoDependencies
       #log('done. got: ', handler.patterns)
       @handlerStack.pop()
     # handler might have no watches, in which case we could forget about it
+
+  _logHandlerTree: ->
+    log('handler tree:')
+    prn = (h, depth) ->
+      indent = ''
+      for i in [0...depth]
+        indent += '  '
+      log(indent + h.label)
+      for c in h.innerHandlers
+        prn(c, depth + 1)
+    prn(@handlers, 0)
     
   graphChanged: (patch) ->
     # SyncedGraph is telling us this patch just got applied to the graph.
-
     rerunInners = (cur) =>
       toRun = cur.innerHandlers.slice()
       for child in toRun
@@ -188,7 +202,6 @@ class window.SyncedGraph
         if not q.graph?
           throw new Error("corrupt patch: #{q}")
 
-    log('graph: patch', patch)
     @_applyPatch(patch)
     @_client.sendPatch(patch) if @_client
 
