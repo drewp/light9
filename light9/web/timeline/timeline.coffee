@@ -547,7 +547,9 @@ Polymer
     tMax - tMin
     
   _makeCurvePointAdjusters: (yForV, worldPts) ->
-    for pointNum in [0, 1, 2, 3]
+    
+    for pointNum in [0...worldPts.length]
+      log('wor', worldPts, pointNum)
       @_makePointAdjuster(yForV, worldPts, pointNum)
 
   _makePointAdjuster: (yForV, worldPts, pointNum) ->
