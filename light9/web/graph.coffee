@@ -19,44 +19,6 @@ patchSizeSummary = (patch) ->
 # (sloppily shared to rdfdbclient.coffee too)
 window.patchSizeSummary = patchSizeSummary
 
-# partial port of autodepgraphapi.py
-class GraphWatchers # throw this one away; use AutoDependencies
-  constructor: ->
-    @handlersSp = {} # {s: {p: [handlers]}}
-  subscribe: (s, p, o, onChange) -> # return subscription handle
-    if o? then throw Error('not implemented')
-    if not @handlersSp[s]
-      @handlersSp[s] = {}
-    if not @handlersSp[s][p]
-      @handlersSp[s][p] = []
-    @handlersSp[s][p].push(onChange)
-    handle = {s: s, p: p, func: onChange}
-    return handle
-    
-  unsubscribe: (subscription) ->
-    spList = @handlersSp[subscription.s][subscription.p]
-    i = spList.indexOf(subscription.func)
-    if i == -1
-      throw new Error('subscription not found')
-    spList.splice(i, 1)
-
-  matchingHandlers: (quad) ->
-    matches = []
-    for subjDict in [@handlersSp[quad.subject] || {}, @handlersSp[null] || {}]
-      for subjPredMatches in [subjDict[quad.predicate] || [], subjDict[null] || []]
-        matches = matches.concat(subjPredMatches)
-    return matches
-    
-  graphChanged: (patch) ->
-    for quad in patch.delQuads
-      for cb in @matchingHandlers(quad)
-        # currently calls multiple times, which is ok, but we might
-        # group things into fewer patches
-        cb({delQuads: [quad], addQuads: []})
-    for quad in patch.addQuads
-      for cb in @matchingHandlers(quad)
-        cb({delQuads: [], addQuads: [quad]})
-
 class Handler
   # a function and the quad patterns it cared about
   constructor: (@func, @label) ->
@@ -139,7 +101,6 @@ class window.SyncedGraph
   constructor: (@patchSenderUrl, @prefixes, @setStatus) ->
     # patchSenderUrl is the /syncedGraph path of an rdfdb server.
     # prefixes can be used in Uri(curie) calls.
-    @_watchers = new GraphWatchers() # old
     @_autoDeps = new AutoDependencies() # replaces GraphWatchers
     @clearGraph()
 
@@ -215,7 +176,6 @@ class window.SyncedGraph
     for quad in patch.addQuads
       @graph.addTriple(quad)
     #log('applied patch locally', patchSizeSummary(patch))
-    @_watchers.graphChanged(patch)
     @_autoDeps.graphChanged(patch)
 
   getObjectPatch: (s, p, newObject, g) ->
@@ -230,21 +190,6 @@ class window.SyncedGraph
   patchObject: (s, p, newObject, g) ->
     @applyAndSendPatch(@getObjectPatch(s, p, newObject, g))
   
-
-  subscribe: (s, p, o, onChange) -> # return subscription handle
-    throw
-    # onChange is called with a patch that's limited to the quads
-    # that match your request.
-    # We call you immediately on existing triples.
-    handle = @_watchers.subscribe(s, p, o, onChange)
-    immediatePatch = {delQuads: [], addQuads: @graph.findByIRI(s, p, o)}
-    if immediatePatch.addQuads.length
-      onChange(immediatePatch)
-    return handle
-
-  unsubscribe: (subscription) ->
-    @_watchers.unsubscribe(subscription)
-
   runHandler: (func, label) ->
     # runs your func once, tracking graph calls. if a future patch
     # matches what you queried, we runHandler your func again (and
