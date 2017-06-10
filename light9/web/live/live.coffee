@@ -157,7 +157,7 @@ Polymer
     @newEffectName = ''
 
   onGraph: ->
-    @graph.runHandler(@update.bind(@))
+    @graph.runHandler(@update.bind(@), 'controls')
   resendAll: ->
     for llc in @getElementsByTagName("light9-live-control")
       llc.resend()

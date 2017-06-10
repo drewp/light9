@@ -4,7 +4,7 @@ Polymer
     graph: {type: Object}
     effectClasses: { type: Array }
   ready: ->
-    @graph.runHandler(@getClasses.bind(@))
+    @graph.runHandler(@getClasses.bind(@), 'getClasses')
 
   getClasses: ->
     U = (x) => @graph.Uri(x)

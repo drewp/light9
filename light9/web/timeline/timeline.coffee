@@ -285,7 +285,7 @@ Polymer
     song: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
     rows: { value: [0...ROW_COUNT] }
-    zoom: { type: Object, notify: true, observer: 'onZoom' }
+    zoom: { type: Object, notify: true, observer: 'onZoom' } # viewState.zoomSpec
     zoomFlattened: { type: Object, notify: true }
   onZoom: ->
     updateZoomFlattened = ->
@@ -364,6 +364,7 @@ Polymer
 
     desiredWidthX = @offsetWidth * .3
     desiredWidthT = @zoomInX.invert(desiredWidthX) - @zoomInX.invert(0)
+    desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
     
     for i in [0...4]
       pt = points[i]
@@ -630,6 +631,9 @@ Polymer
 
   editAttr: (song, note, attr, value) ->
     U = (x) => @graph.Uri(x)
+    if not song?
+      log("can't edit inline attr yet, no song")
+      return
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: song}
 
     existingColorScaleSetting = null
@@ -650,7 +654,7 @@ Polymer
       @graph.applyAndSendPatch(patch)
     
   addHandler: ->
-    @graph.runHandler(@update.bind(@))
+    @graph.runHandler(@update.bind(@), "update inline attrs #{@uri}")
     
   update: ->
     #console.time('attrs update')

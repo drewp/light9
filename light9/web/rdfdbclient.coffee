@@ -52,7 +52,7 @@ parseJsonPatch = (jsonPatch, cb) ->
 
 class window.RdfDbClient
   # Send and receive patches from rdfdb
-  constructor: (@patchSenderUrl, @clearGraph, @applyPatch, @setStatus) ->
+  constructor: (@patchSenderUrl, @clearGraphOnNewConnection, @applyPatch, @setStatus) ->
     @_patchesToSend = []
     @_lastPingMs = -1
     @_patchesReceived = 0
@@ -77,7 +77,7 @@ class window.RdfDbClient
       #{ping}ms")
  
   sendPatch: (patch) ->
-    console.log('queue patch to server ', patchSizeSummary(patch))
+    console.log('rdfdbclient: queue patch to server ', patchSizeSummary(patch))
     @_patchesToSend.push(patch)
     @_updateStatus()
     @_continueSending()           
@@ -89,17 +89,17 @@ class window.RdfDbClient
     @ws = new WebSocket(fullUrl)
 
     @ws.onopen = =>
-      log('connected to', fullUrl)
+      log('rdfdbclient: connected to', fullUrl)
       @_updateStatus()
-      @clearGraph()
+      @clearGraphOnNewConnection()
       @_pingLoop()
 
     @ws.onerror = (e) =>
-      log('ws error ' + e)
+      log('rdfdbclient: ws error ' + e)
       @ws.onclose()
 
     @ws.onclose = =>
-      log('ws close')
+      log('rdfdbclient: ws close')
       @_updateStatus()
       clearTimeout(@_reconnectionTimeout) if @_reconnectionTimeout?
       @_reconnectionTimeout = setTimeout(@_newConnection.bind(@), 1000)
@@ -134,7 +134,7 @@ class window.RdfDbClient
 
     sendOne = (patch, cb) =>
         toJsonPatch(patch, (json) =>
-          log('send patch to server, ' + json.length + ' bytes')
+          log('rdfdbclient: send patch to server, ' + json.length + ' bytes')
           @ws.send(json)
           @_patchesSent++
           @_updateStatus()

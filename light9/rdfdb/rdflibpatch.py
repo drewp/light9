@@ -70,6 +70,7 @@ def graphFromQuads(q):
 
 def graphFromNQuad(text):
     g1 = ConjunctiveGraph()
+    # text might omit ctx on some lines. rdflib just puts in a bnode, which shows up later.
     g1.parse(data=text, format='nquads')
     return g1
 

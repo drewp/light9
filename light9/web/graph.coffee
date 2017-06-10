@@ -71,6 +71,9 @@ class AutoDependencies
   runHandler: (func, label) ->
     # what if we have this func already? duplicate is safe?
 
+    if not label?
+      throw new Error("missing label")
+
     h = new Handler(func, label)
     @handlerStack[@handlerStack.length - 1].innerHandlers.push(h)
     console.time("handler #{label}")
@@ -127,10 +130,10 @@ class window.SyncedGraph
     @clearGraph()
 
     if @patchSenderUrl
-      @_client = new RdfDbClient(@patchSenderUrl, @clearGraph.bind(@),
+      @_client = new RdfDbClient(@patchSenderUrl, @_clearGraphOnNewConnection.bind(@),
                                  @_applyPatch.bind(@), @setStatus)
     
-  clearGraph: -> # for debugging
+  clearGraph: ->
     # just deletes the statements; watchers are unaffected.
     if @graph?
       @_applyPatch({addQuads: [], delQuads: @graph.find()})
@@ -139,7 +142,11 @@ class window.SyncedGraph
     @graph = N3.Store()
     @_addPrefixes(@prefixes)
     @cachedFloatValues = new Map();
-    
+
+  _clearGraphOnNewConnection: -> # must not send a patch to the server!
+    log('graph: clearGraphOnNewConnection')
+    @clearGraph()
+    log('graph: clearGraphOnNewConnection done')
       
   _addPrefixes: (prefixes) ->
     @graph.addPrefixes(prefixes)
@@ -175,6 +182,13 @@ class window.SyncedGraph
   applyAndSendPatch: (patch) ->
     if !Array.isArray(patch.addQuads) || !Array.isArray(patch.delQuads)
       throw new Error("corrupt patch: #{patch}")
+
+    for qs in [patch.addQuads, patch.delQuads]
+      for q in qs
+        if not q.graph?
+          throw new Error("corrupt patch: #{q}")
+
+    log('graph: patch', patch)
     @_applyPatch(patch)
     @_client.sendPatch(patch) if @_client
 
