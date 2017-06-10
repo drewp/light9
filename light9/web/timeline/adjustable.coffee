@@ -123,7 +123,6 @@ class window.AdjustableFloatObject extends Adjustable
     throw new Error('multi subscribe not implemented') if @_onChange
     @_onChange = onChange
 
-    
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
     super(pos)
@@ -132,3 +131,50 @@ class window.AdjustableFloatObject extends Adjustable
     @config.graph.patchObject(@config.subj, @config.pred,
                               @config.graph.LiteralRoundedFloat(newValue),
                               @config.ctx)
+                              
+class window.AdjustableFade extends Adjustable
+  constructor: (@yForV, @i0, @i1, @note, offset) ->
+    @config = {
+      getSuggestedTargetOffset: -> offset
+      getTarget: @getTarget.bind(@)
+    }
+    super(@config)
+
+  getTarget: ->
+    mid = @note.worldPts[@i0].x(.5).add(@note.worldPts[@i1].x(.5))
+    $V([@note.zoomInX(mid.e(1)), @yForV(mid.e(2))])
+
+  _getValue: ->
+    mid = @note.worldPts[@i0].x(.5).add(@note.worldPts[@i1].x(.5))
+    mid.e(1)
+
+   continueDrag: (pos) ->
+    # pos is vec2 of pixels relative to the drag start
+    super(pos)
+    graph = @note.graph
+    U = (x) => graph.Uri(x)
+
+    goalCenterSec = @note.zoomInX.invert(@initialTarget.e(1) + pos.e(1))
+
+    diamSec = @note.worldPts[@i1].e(1) - @note.worldPts[@i0].e(1)
+    newSec0 = goalCenterSec - diamSec / 2
+    newSec1 = goalCenterSec + diamSec / 2
+
+    originSec = graph.floatValue(@note.uri, U(':originTime'))
+
+    ctx = @note.song
+    p0 = @_makePatch(graph, @i0, newSec0, originSec, ctx)
+    p1 = @_makePatch(graph, @i1, newSec1, originSec, ctx)
+
+    graph.applyAndSendPatch(@_addPatches(p0, p1))
+
+  _makePatch: (graph, idx, newSec, originSec, ctx) ->
+    graph.getObjectPatch(@note.worldPts[idx].uri,
+                         graph.Uri(':time'),
+                         graph.LiteralRoundedFloat(newSec - originSec), ctx)
+
+  _addPatches: (p0, p1) ->
+    {
+      addQuads: p0.addQuads.concat(p1.addQuads),
+      delQuads: p0.delQuads.concat(p1.delQuads)
+    }

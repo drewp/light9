@@ -275,6 +275,9 @@ Polymer
       }))
       
 
+# plan: in here, turn all the notes into simple js objects with all
+# their timing data and whatever's needed for adjusters. From that, do
+# the brick layout. update only changing adjusters.
 Polymer
   is: 'light9-timeline-time-zoomed'
   behaviors: [ Polymer.IronResizableBehavior ]
@@ -511,6 +514,7 @@ Polymer
     else
       @_makeOffsetAdjuster(yForV, curveWidthCalc)
       @_makeCurvePointAdjusters(yForV, @worldPts)
+      @_makeFadeAdjusters(yForV)
 
   _updateInlineAttrs: (screenPts) ->
     leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].e(1) + 5)
@@ -596,6 +600,15 @@ Polymer
         getSuggestedTargetOffset: () => $V([-10, 0])
       })
       adj
+
+  _makeFadeAdjusters: (yForV) ->
+    @_makeFadeAdjuster(yForV, @uri + '/fadeIn', 0, 1, $V([-50, -10]))
+    n = @worldPts.length
+    @_makeFadeAdjuster(yForV, @uri + '/fadeOut', n - 2, n - 1, $V([50, -10]))
+
+  _makeFadeAdjuster: (yForV, adjId, i0, i1, offset) ->
+    @adjusterIds[adjId] = true
+    @setAdjuster adjId, => new AdjustableFade(yForV, i0, i1, @, offset)
     
   _suggestedOffset: (pt) ->
     if pt.e(2) > .5
@@ -969,7 +982,6 @@ Polymer
     @_updateNotePathClasses(uri, elem)
 
   _addNoteListeners: (elem, uri) ->
-    log("new note listeneers", uri)
     elem.addEventListener 'mouseenter', =>
       @selection.hover(uri)
     elem.addEventListener 'mousedown', (ev) =>
