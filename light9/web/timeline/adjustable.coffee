@@ -133,10 +133,11 @@ class window.AdjustableFloatObject extends Adjustable
                               @config.ctx)
                               
 class window.AdjustableFade extends Adjustable
-  constructor: (@yForV, @i0, @i1, @note, offset) ->
+  constructor: (@yForV, @i0, @i1, @note, offset, ctx) ->
     @config = {
       getSuggestedTargetOffset: -> offset
       getTarget: @getTarget.bind(@)
+      ctx: ctx
     }
     super(@config)
 
@@ -162,9 +163,8 @@ class window.AdjustableFade extends Adjustable
 
     originSec = graph.floatValue(@note.uri, U(':originTime'))
 
-    ctx = @note.song
-    p0 = @_makePatch(graph, @i0, newSec0, originSec, ctx)
-    p1 = @_makePatch(graph, @i1, newSec1, originSec, ctx)
+    p0 = @_makePatch(graph, @i0, newSec0, originSec, @config.ctx)
+    p1 = @_makePatch(graph, @i1, newSec1, originSec, @config.ctx)
 
     graph.applyAndSendPatch(@_addPatches(p0, p1))
 

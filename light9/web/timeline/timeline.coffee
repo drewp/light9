@@ -443,9 +443,10 @@ Polymer
     zoomInX: { type: Object, notify: true }
     setAdjuster: {type: Function, notify: true }
     inlineRect: { type: Object, notify: true }
+    song: { type: String, notify: true }
   observers: [
-    'onUri(graph, dia, uri, zoomInX, setAdjuster)'
-    'update(graph, dia, uri, zoomInX, setAdjuster)'
+    'onUri(graph, dia, uri, zoomInX, setAdjuster, song)'
+    'update(graph, dia, uri, zoomInX, setAdjuster, song)'
     ]
   ready: ->
     @adjusterIds = {} # id : true
@@ -505,16 +506,16 @@ Polymer
         screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
     
         @dia.setNote(@uri, screenPts, effect)
-        @_updateAdjusters(screenPts, curveWidthCalc, yForV)
+        @_updateAdjusters(screenPts, curveWidthCalc, yForV, U(@song))
         @_updateInlineAttrs(screenPts)
         
-  _updateAdjusters: (screenPts, curveWidthCalc, yForV) ->   
+  _updateAdjusters: (screenPts, curveWidthCalc, yForV, ctx) ->   
     if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
     else
-      @_makeOffsetAdjuster(yForV, curveWidthCalc)
-      @_makeCurvePointAdjusters(yForV, @worldPts)
-      @_makeFadeAdjusters(yForV)
+      @_makeOffsetAdjuster(yForV, curveWidthCalc, ctx)
+      @_makeCurvePointAdjusters(yForV, @worldPts, ctx)
+      @_makeFadeAdjusters(yForV, ctx)
 
   _updateInlineAttrs: (screenPts) ->
     leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].e(1) + 5)
@@ -555,7 +556,7 @@ Polymer
     for pointNum in [0...worldPts.length]
       @_makePointAdjuster(yForV, worldPts, pointNum)
 
-  _makePointAdjuster: (yForV, worldPts, pointNum) ->
+  _makePointAdjuster: (yForV, worldPts, pointNum, ctx) ->
     U = (x) => @graph.Uri(x)
 
     adjId = @uri + '/p' + pointNum
@@ -565,7 +566,7 @@ Polymer
         graph: @graph
         subj: worldPts[pointNum].uri
         pred: U(':time')
-        ctx: U(@song)
+        ctx: ctx
         getTargetPosForValue: (value) =>
           $V([@zoomInX(value), yForV(worldPts[pointNum].e(2))])
         getValueForPos: (pos) =>
@@ -580,7 +581,7 @@ Polymer
         )
       adj
 
-  _makeOffsetAdjuster: (yForV, curveWidthCalc) ->
+  _makeOffsetAdjuster: (yForV, curveWidthCalc, ctx) ->
     U = (x) => @graph.Uri(x)
 
     adjId = @uri + '/offset'
@@ -590,7 +591,7 @@ Polymer
         graph: @graph
         subj: @uri
         pred: U(':originTime')
-        ctx: U(@song)
+        ctx: ctx
         getDisplayValue: (v, dv) => "o=#{dv}"
         getTargetPosForValue: (value) =>
           # display bug: should be working from pt[0].t, not from origin
@@ -601,14 +602,14 @@ Polymer
       })
       adj
 
-  _makeFadeAdjusters: (yForV) ->
-    @_makeFadeAdjuster(yForV, @uri + '/fadeIn', 0, 1, $V([-50, -10]))
+  _makeFadeAdjusters: (yForV, ctx) ->
+    @_makeFadeAdjuster(yForV, ctx, @uri + '/fadeIn', 0, 1, $V([-50, -10]))
     n = @worldPts.length
-    @_makeFadeAdjuster(yForV, @uri + '/fadeOut', n - 2, n - 1, $V([50, -10]))
+    @_makeFadeAdjuster(yForV, ctx, @uri + '/fadeOut', n - 2, n - 1, $V([50, -10]))
 
-  _makeFadeAdjuster: (yForV, adjId, i0, i1, offset) ->
+  _makeFadeAdjuster: (yForV, ctx, adjId, i0, i1, offset) ->
     @adjusterIds[adjId] = true
-    @setAdjuster adjId, => new AdjustableFade(yForV, i0, i1, @, offset)
+    @setAdjuster adjId, => new AdjustableFade(yForV, i0, i1, @, offset, ctx)
     
   _suggestedOffset: (pt) ->
     if pt.e(2) > .5
