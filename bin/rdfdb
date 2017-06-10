@@ -206,6 +206,9 @@ class WatchedFiles(object):
 
     def dirChange(self, watch, path, mask):
         if mask & IN_CREATE:
+            if path.path.endswith(('~', '.swp', 'swx', '.rdfdb-temp')):
+                return
+                
             log.debug("%s created; consider adding a watch", path)
             self.watchFile(path.path)
             
