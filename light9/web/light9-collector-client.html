@@ -4,7 +4,7 @@
 <dom-module id="light9-collector-client">
   <template>
     <iron-ajax url="/collector/attrs" method="PUT" id="put"></iron-ajax>
-    <span>{{status}}</span>
+    <span>{{status}} ([[sent]] sent)</span>
   </template>
   <script>
    Polymer({
@@ -12,7 +12,8 @@
        properties: {
            status: {type: String, value: 'init'},
            clientSession: {value: ""+Date.now()},
-           self: {type: Object, notify: true}
+           self: {type: Object, notify: true},
+           sent: {type: Number, value: 0},
        },
        ready: function() {
            this.self = this;
@@ -40,6 +41,7 @@
                "sendTime": Date.now() / 1000
            });
            this.$.put.generateRequest();
+           this.sent += 1;
            this.lastSent = settings.slice();
        }
    });
