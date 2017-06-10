@@ -199,7 +199,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['brush']: 51,
             L9['whirlpool']: 56,
             L9['stars']: 61,
-            }[deviceAttrSettings.get(L9['gobo'], L9['open'])]
+            }[deviceAttrSettings.get(L9['quantumGoboChoice'], L9['open'])]
 
         # my goboSpeed deviceAttr goes 0=stopped to 1=fastest (using one direction only)
         x = .5 + .5 * floatAttr(L9['goboSpeed'])
