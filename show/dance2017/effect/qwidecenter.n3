@@ -1,0 +1,27 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:qwidecenter a :Effect; rdfs:label "qwidecenter";
+     :publishAttr :strength; :setting effect:qwidecenter_set0, effect:qwidecenter_set1, effect:qwidecenter_set10, effect:qwidecenter_set11, effect:qwidecenter_set12, effect:qwidecenter_set13, effect:qwidecenter_set14, effect:qwidecenter_set15, effect:qwidecenter_set2, effect:qwidecenter_set3, effect:qwidecenter_set4, effect:qwidecenter_set5, effect:qwidecenter_set6, effect:qwidecenter_set7, effect:qwidecenter_set8, effect:qwidecenter_set9 .
+effect:qwidecenter_set0 :device dev:upCenter; :deviceAttr :color; :scaledValue "#fe00f6" .
+effect:qwidecenter_set1 :device dev:q2; :deviceAttr :color; :scaledValue "#f9f2e7" .
+effect:qwidecenter_set10 :device dev:q1; :deviceAttr :focus; :value 0.943 .
+effect:qwidecenter_set11 :device dev:q3; :deviceAttr :focus; :value 0.899 .
+effect:qwidecenter_set12 :device dev:q3; :deviceAttr :color; :scaledValue "#8d817b" .
+effect:qwidecenter_set13 :device dev:q3; :deviceAttr :rx; :value 0.501 .
+effect:qwidecenter_set14 :device dev:q3; :deviceAttr :ry; :value 0.280 .
+effect:qwidecenter_set15 :device dev:q3; :deviceAttr :zoom; :value 0.573 .
+effect:qwidecenter_set2 :device dev:q2; :deviceAttr :rx; :value 0.484 .
+effect:qwidecenter_set3 :device dev:q2; :deviceAttr :ry; :value 0.294 .
+effect:qwidecenter_set4 :device dev:q2; :deviceAttr :zoom; :value 0.121 .
+effect:qwidecenter_set5 :device dev:q2; :deviceAttr :focus; :value 0.736 .
+effect:qwidecenter_set6 :device dev:q1; :deviceAttr :color; :scaledValue "#bbb0a5" .
+effect:qwidecenter_set7 :device dev:q1; :deviceAttr :rx; :value 0.58 .
+effect:qwidecenter_set8 :device dev:q1; :deviceAttr :ry; :value 0.426 .
+effect:qwidecenter_set9 :device dev:q1; :deviceAttr :zoom; :value 0.3 .

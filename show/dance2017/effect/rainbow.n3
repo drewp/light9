@@ -1,0 +1,31 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:rainbow a :Effect; rdfs:label "rainbow"; :publishAttr :strength;
+     :setting effect:rainbow_set0, effect:rainbow_set1, effect:rainbow_set10, effect:rainbow_set11, effect:rainbow_set12, effect:rainbow_set13, effect:rainbow_set14, effect:rainbow_set15, effect:rainbow_set16, effect:rainbow_set17, effect:rainbow_set18, effect:rainbow_set19, effect:rainbow_set2, effect:rainbow_set3, effect:rainbow_set4, effect:rainbow_set5, effect:rainbow_set6, effect:rainbow_set7, effect:rainbow_set8, effect:rainbow_set9 .
+effect:rainbow_set0 :device dev:aura1; :deviceAttr :color; :scaledValue "#ff0000" .
+effect:rainbow_set1 :device dev:aura1; :deviceAttr :zoom; :value 0.465 .
+effect:rainbow_set10 :device dev:aura3; :deviceAttr :zoom; :value 0.477 .
+effect:rainbow_set11 :device dev:aura4; :deviceAttr :zoom; :value 0.524 .
+effect:rainbow_set12 :device dev:aura5; :deviceAttr :zoom; :value 0.519 .
+effect:rainbow_set13 :device dev:aura5; :deviceAttr :ry; :value 0.509 .
+effect:rainbow_set14 :device dev:aura4; :deviceAttr :ry; :value 0.542 .
+effect:rainbow_set15 :device dev:aura3; :deviceAttr :ry; :value 0.485 .
+effect:rainbow_set16 :device dev:aura2; :deviceAttr :ry; :value 0.494 .
+effect:rainbow_set17 :device dev:aura1; :deviceAttr :ry; :value 0.463 .
+effect:rainbow_set18 :device dev:aura1; :deviceAttr :rx; :value 0.272 .
+effect:rainbow_set19 :device dev:aura2; :deviceAttr :rx; :value 0.310 .
+effect:rainbow_set2 :device dev:aura2; :deviceAttr :color; :scaledValue "#fff700" .
+effect:rainbow_set3 :device dev:aura5; :deviceAttr :color; :scaledValue "#f901ff" .
+effect:rainbow_set4 :device dev:aura4; :deviceAttr :color; :scaledValue "#0c98f7" .
+effect:rainbow_set5 :device dev:aura3; :deviceAttr :color; :scaledValue "#00de33" .
+effect:rainbow_set6 :device dev:aura3; :deviceAttr :rx; :value 0.463 .
+effect:rainbow_set7 :device dev:aura4; :deviceAttr :rx; :value 0.672 .
+effect:rainbow_set8 :device dev:aura5; :deviceAttr :rx; :value 0.700 .
+effect:rainbow_set9 :device dev:aura2; :deviceAttr :zoom; :value 0.477 .

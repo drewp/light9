@@ -1,0 +1,35 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:qfilltighter a :Effect; rdfs:label "qfilltighter";
+     :publishAttr :strength; :setting effect:qfilltighter_set0, effect:qfilltighter_set1, effect:qfilltighter_set10, effect:qfilltighter_set11, effect:qfilltighter_set2, effect:qfilltighter_set3, effect:qfilltighter_set4, effect:qfilltighter_set5, effect:qfilltighter_set6, effect:qfilltighter_set7, effect:qfilltighter_set8, effect:qfilltighter_set9 .
+effect:qfilltighter_set0 :device dev:q1; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:qfilltighter_set1 :device dev:q1; :deviceAttr :zoom;
+     :value 0.478 .
+effect:qfilltighter_set10 :device dev:q2; :deviceAttr :ry;
+     :value 0.353 .
+effect:qfilltighter_set11 :device dev:q2; :deviceAttr :zoom;
+     :value 0.331 .
+effect:qfilltighter_set2 :device dev:q1; :deviceAttr :rx;
+     :value 0.314 .
+effect:qfilltighter_set3 :device dev:q1; :deviceAttr :ry;
+     :value 0.491 .
+effect:qfilltighter_set4 :device dev:q3; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:qfilltighter_set5 :device dev:q3; :deviceAttr :zoom;
+     :value 0.425 .
+effect:qfilltighter_set6 :device dev:q3; :deviceAttr :rx;
+     :value 0.653 .
+effect:qfilltighter_set7 :device dev:q3; :deviceAttr :ry;
+     :value 0.028 .
+effect:qfilltighter_set8 :device dev:q2; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:qfilltighter_set9 :device dev:q2; :deviceAttr :rx;
+     :value 0.525 .

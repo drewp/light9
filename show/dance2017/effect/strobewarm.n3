@@ -1,0 +1,15 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:strobewarm a :Effect; rdfs:label "strobewarm";
+     :publishAttr :strength; :setting effect:strobewarm_set0, effect:strobewarm_set1, effect:strobewarm_set2, effect:strobewarm_set7 .
+effect:strobewarm_set0 :device dev:q2; :deviceAttr :rx; :value 0.510 .
+effect:strobewarm_set1 :device dev:q2; :deviceAttr :ry; :value 0.244 .
+effect:strobewarm_set2 :device dev:q2; :deviceAttr :strobe; :value 0.937 .
+effect:strobewarm_set7 :device dev:q2; :deviceAttr :color; :scaledValue "#d35118" .

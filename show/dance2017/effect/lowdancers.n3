@@ -1,0 +1,19 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:lowdancers a :Effect; rdfs:label "lowdancers";
+     :publishAttr :strength; :setting effect:lowdancers_set0, effect:lowdancers_set1, effect:lowdancers_set2, effect:lowdancers_set3 .
+effect:lowdancers_set0 :device dev:veryLow5; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:lowdancers_set1 :device dev:veryLow1; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:lowdancers_set2 :device dev:hexLowBacklight1;
+     :deviceAttr :color; :scaledValue "#ffffff" .
+effect:lowdancers_set3 :device dev:hexLowBacklight6;
+     :deviceAttr :color; :scaledValue "#ffffff" .
