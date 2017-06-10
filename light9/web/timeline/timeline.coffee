@@ -65,7 +65,7 @@ Polymer
     
     @viewState =
       zoomSpec:
-        duration: ko.observable(100)
+        duration: ko.observable(100) # current song duration
         t1: ko.observable(0) # need validation to stay in bounds and not go too close
         t2: ko.observable(100)
       cursor:
@@ -112,13 +112,20 @@ Polymer
     log('zoomOrLayoutChanged')
     # not for cursor updates
 
+    vs = @viewState
+    
+    if vs.zoomSpec.t1() < 0
+      vs.zoomSpec.t1(0)
+    if vs.zoomSpec.duration() and vs.zoomSpec.t2() > vs.zoomSpec.duration()
+      vs.zoomSpec.t2(vs.zoomSpec.duration())
+
     window.debug_zoomOrLayoutChangedCount++
-    @fullZoomX.domain([0, @viewState.zoomSpec.duration()])
+    @fullZoomX.domain([0, vs.zoomSpec.duration()])
     @fullZoomX.range([0, @width()])
 
     # had trouble making notes update when this changes
     zoomInX = d3.scaleLinear()
-    zoomInX.domain([@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()])
+    zoomInX.domain([vs.zoomSpec.t1(), vs.zoomSpec.t2()])
     zoomInX.range([0, @width()])
     @zoomInX = zoomInX
 
@@ -235,7 +242,7 @@ Polymer
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
         $V([@fullZoomX(@viewState.zoomSpec.t1()), yMid()])
-      getSuggestedTargetOffset: () => $V([-50, 0])
+      getSuggestedTargetOffset: () => $V([50, 0])
       getValueForPos: valForPos
     }))
 
@@ -243,7 +250,7 @@ Polymer
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
         $V([@fullZoomX(@viewState.zoomSpec.t2()), yMid()])
-      getSuggestedTargetOffset: () => $V([50, 0])
+      getSuggestedTargetOffset: () => $V([-50, 0])
       getValueForPos: valForPos
     }))
 
