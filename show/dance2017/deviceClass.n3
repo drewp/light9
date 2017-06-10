@@ -16,7 +16,7 @@
 :goboSpeed          a :DeviceAttr; rdfs:label "goboSpeed"; :dataType :scalar ;
   rdfs:comment "0=stopped, 1=rotate the fastest".
 :quantumGoboChoice  a :DeviceAttr; rdfs:label "gobo"; :dataType :choice;
-  :choice :open, :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
+  :choice :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
 :mini15GoboChoice   a :DeviceAttr; rdfs:label "gobo"; :dataType :choice;
   :choice :mini15Gobo1, :mini15Gobo2, :mini15Gobo3, :mini15Gobo4, :mini15Gobo5, :mini15Gobo6, :mini15Gobo7, :mini15Gobo8, :mini15Gobo9, :mini15Gobo10 .
 
