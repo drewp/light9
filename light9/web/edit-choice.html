@@ -1,4 +1,5 @@
 <link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="resource-display.html">
 
 <!-- see light9/editchoice.py for gtk version -->
 <dom-module id="edit-choice">
@@ -7,9 +8,11 @@
      #box {
          display: inline-block;
          background: #141448;
+         min-width: 10em;
      }
      #box.dragging {
          background: rgba(126, 52, 245, 0.0784313725490196);
+         box-shadow: 0 0 20px #ffff00;
      }
      a {
          color: #8e8eff;
@@ -18,12 +21,11 @@
          font-size: 145%;
      }
      
-     
     </style>
     <div id="box">
-      <!-- maybe use resource-display for this part -->
-      <a href="{{uri}}" title="{{label}}"><!-- type icon goes here -->{{label}}</a>
-      <!-- <button on-click="unlink">Unlink</button>  -->
+      Effect:
+      <resource-display graph="{{graph}}" uri="{{uri}}" rename></resource-display>
+      <button on-click="unlink">Unlink</button>
     </div>
   </template>
   <script src="edit-choice.js"></script>

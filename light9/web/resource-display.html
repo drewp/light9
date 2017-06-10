@@ -14,7 +14,10 @@
          zpadding: 2px;
      }
     </style>
-    <span class$="[[resClasses]]"><a href="{{uri}}">{{label}}</a></span>
+    <span class$="[[resClasses]]"><a href="{{uri}}">
+      <!-- type icon goes here -->
+      {{label}}
+    </a></span>
     <template is="dom-if" if="{{rename}}">
       <button on-click="onRename">Rename</button>
 

@@ -51,6 +51,7 @@ Polymer
       ]
 
     ready: ->
+      @uri = null
       setupDrop @$.box, @$.box, null, (uri) =>
         @uri=uri
         @updateLabel()
@@ -63,4 +64,7 @@ Polymer
           @graph.stringValue(@uri, RDFS + 'label')
         catch
           @uri
+
+    unlink: ->
+      @uri = null
 
