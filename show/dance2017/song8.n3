@@ -1,0 +1,24 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+show:song8 :note <http://light9.bigasterisk.com/show/dance2017/song8/n0> .
+
+<http://light9.bigasterisk.com/show/dance2017/song8/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song8/n0c0>;
+     :effectClass effect:sub1; :originTime 83.431 .
+
+<http://light9.bigasterisk.com/show/dance2017/song8/n0c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2017/song8/n0c0p0>, <http://light9.bigasterisk.com/show/dance2017/song8/n0c0p1>, <http://light9.bigasterisk.com/show/dance2017/song8/n0c0p2>, <http://light9.bigasterisk.com/show/dance2017/song8/n0c0p3> .
+<http://light9.bigasterisk.com/show/dance2017/song8/n0c0p0> :time 0.000;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2017/song8/n0c0p1> :time 25.070;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2017/song8/n0c0p2> :time 76.357;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2017/song8/n0c0p3> :time 116.469;
+     :value 0.000 .

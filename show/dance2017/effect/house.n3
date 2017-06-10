@@ -1,0 +1,17 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:house a :Effect; rdfs:label "house"; :publishAttr :strength;
+     :setting effect:house_set0, effect:house_set1, effect:house_set2, effect:house_set3, effect:house_set4 .
+effect:house_set0 :device dev:house1; :deviceAttr :brightness; :scaledValue 1.000 .
+effect:house_set1 :device dev:house2; :deviceAttr :brightness; :scaledValue 1.000 .
+effect:house_set2 :device dev:house3; :deviceAttr :brightness; :scaledValue 1.000 .
+effect:house_set3 :device dev:house4; :deviceAttr :brightness; :scaledValue 1.000 .
+effect:house_set4 :device dev:houseSide; :deviceAttr :brightness; :scaledValue 1.000 .
