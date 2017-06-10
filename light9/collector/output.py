@@ -65,7 +65,7 @@ class DummyOutput(Output):
         pass
 
     def shortId(self):
-        return repr(self)
+        return 'null'
 
         
 class DmxOutput(Output):
