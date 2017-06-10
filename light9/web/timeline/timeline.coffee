@@ -400,11 +400,16 @@ Polymer
     selection: { type: Object, notify: true }
   observers: [
     'onGraph(graph, dia, setAdjuster, song, zoomInX)'
-    'update(song, rowIndex)'
+    'observedUpdate(song, rowIndex)'
     'onZoom(zoomInX)'
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
+
+  observedUpdate: (song, rowIndex) ->
+    @update() # old behavior
+    #@graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
+
   update: (patch) ->
     U = (x) => @graph.Uri(x)
 
@@ -552,9 +557,9 @@ Polymer
     tMax = @graph.floatValue(worldPts[3].uri, @graph.Uri(':time'))
     tMax - tMin
     
-  _makeCurvePointAdjusters: (yForV, worldPts) ->
+  _makeCurvePointAdjusters: (yForV, worldPts, ctx) ->
     for pointNum in [0...worldPts.length]
-      @_makePointAdjuster(yForV, worldPts, pointNum)
+      @_makePointAdjuster(yForV, worldPts, pointNum, ctx)
 
   _makePointAdjuster: (yForV, worldPts, pointNum, ctx) ->
     U = (x) => @graph.Uri(x)

@@ -104,6 +104,8 @@ class window.AdjustableFloatObject extends Adjustable
     #   getValueForPos
 
     super(@config)
+    if not @config.ctx?
+      throw new Error("missing ctx")
     @config.graph.runHandler(@_syncValue.bind(@), "adj sync #{@config.subj}")
 
   _syncValue: () ->

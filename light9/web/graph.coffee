@@ -45,7 +45,7 @@ class AutoDependencies
     console.time("handler #{label}")
     @_rerunHandler(h, null)
     console.timeEnd("handler #{label}")
-    @_logHandlerTree()
+    #@_logHandlerTree()
     
   _rerunHandler: (handler, patch) ->
     handler.patterns = []
@@ -99,13 +99,13 @@ class AutoDependencies
   graphChanged: (patch) ->
     # SyncedGraph is telling us this patch just got applied to the graph.
 
-    allPatchSubjs = @_allPatchSubjs(patch)
+    #allPatchSubjs = @_allPatchSubjs(patch)
     
     rerunInners = (cur) =>
       toRun = cur.innerHandlers.slice()
       for child in toRun
-        match = @_handlerIsAffected(child, allPatchSubjs)
-        log('match', child.label, match)
+        #match = @_handlerIsAffected(child, allPatchSubjs)
+        #log('match', child.label, match)
         #child.innerHandlers = [] # let all children get called again
         
         @_rerunHandler(child, patch)
@@ -113,12 +113,15 @@ class AutoDependencies
     rerunInners(@handlers)
 
   askedFor: (s, p, o, g) ->
+    return
     # SyncedGraph is telling us someone did a query that depended on
     # quads in the given pattern.
     current = @handlerStack[@handlerStack.length - 1]
     if current? and current != @handlers
       current.patterns.push([s, p, o, g])
       #log('push', s,p,o,g)
+    #else
+    #  console.trace('read outside runHandler')
 
 class window.SyncedGraph
   # Main graph object for a browser to use. Syncs both ways with
@@ -189,14 +192,17 @@ class window.SyncedGraph
     if !Array.isArray(patch.addQuads) || !Array.isArray(patch.delQuads)
       throw new Error("corrupt patch: #{JSON.stringify(patch)}")
 
-    for qs in [patch.addQuads, patch.delQuads]
-      for q in qs
-        if not q.graph?
-          throw new Error("corrupt patch: #{JSON.stringify(q)}")
+    @_validatePatch(patch)
 
     @_applyPatch(patch)
     @_client.sendPatch(patch) if @_client
     console.timeEnd('applyAndSendPatch')
+
+  _validatePatch: (patch) ->
+    for qs in [patch.addQuads, patch.delQuads]
+      for q in qs
+        if not q.graph?
+          throw new Error("corrupt patch: #{JSON.stringify(q)}")
     
   _applyPatch: (patch) ->
     # In most cases you want applyAndSendPatch.
