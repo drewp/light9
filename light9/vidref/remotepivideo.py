@@ -128,7 +128,7 @@ class Pipeline(object):
             img = Image.open(StringIO(jpg))
             if not hasattr(self, 'livePixBuf'):
                 self.livePixBuf = gtk.gdk.pixbuf_new_from_data(
-                    img.tostring(),
+                    img.tobytes(),
                     gtk.gdk.COLORSPACE_RGB,
                     False, 8,
                     img.size[0], img.size[1],
@@ -137,7 +137,7 @@ class Pipeline(object):
             else:
                 # don't leak pixbufs; update the one we have
                 a = self.livePixBuf.pixel_array
-                newImg = numpy.fromstring(img.tostring(), dtype=numpy.uint8)
+                newImg = numpy.fromstring(img.tobytes(), dtype=numpy.uint8)
                 a[:,:,:] = newImg.reshape(a.shape)
             self.liveVideo.set_from_pixbuf(self.livePixBuf)
 
