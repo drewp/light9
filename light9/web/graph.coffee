@@ -45,6 +45,7 @@ class AutoDependencies
     console.time("handler #{label}")
     @_rerunHandler(h, null)
     console.timeEnd("handler #{label}")
+    @_logHandlerTree()
     
   _rerunHandler: (handler, patch) ->
     handler.patterns = []
@@ -66,18 +67,47 @@ class AutoDependencies
       indent = ''
       for i in [0...depth]
         indent += '  '
-      log(indent + h.label)
+      log("#{indent} \"#{h.label}\" #{h.patterns.length} pats")
       for c in h.innerHandlers
         prn(c, depth + 1)
     prn(@handlers, 0)
+
+  _allPatchSubjs: (patch) ->
+
+    allPatchSubjs = []
+    for stmt in patch.addQuads
+      allPatchSubjs.push(stmt.subject)
+    for stmt in patch.delQuads
+      allPatchSubjs.push(stmt.subject)
+    allPatchSubjs = _.uniq(allPatchSubjs)
+    if _.contains(allPatchSubjs, null) or allPatchSubjs.length == 0
+      allPatchSubjs = null
+    log('allPatchSubjs', allPatchSubjs)
     
+  _handlerIsAffected: (child, allPatchSubjs) ->
+    if allPatchSubjs == null
+      return true
+    if not child.patterns.length
+      return false
+      
+    for stmt in child.patterns
+      if _.contains(allPatchSubjs, stmt[0])
+        return true
+
+    return false
+            
   graphChanged: (patch) ->
     # SyncedGraph is telling us this patch just got applied to the graph.
+
+    allPatchSubjs = @_allPatchSubjs(patch)
+    
     rerunInners = (cur) =>
       toRun = cur.innerHandlers.slice()
       for child in toRun
-
+        match = @_handlerIsAffected(child, allPatchSubjs)
+        log('match', child.label, match)
         #child.innerHandlers = [] # let all children get called again
+        
         @_rerunHandler(child, patch)
         rerunInners(child)
     rerunInners(@handlers)
@@ -155,17 +185,19 @@ class window.SyncedGraph
     [q.subject, q.predicate, q.object, q.graph] for q in @graph.find()
 
   applyAndSendPatch: (patch) ->
+    console.time('applyAndSendPatch')
     if !Array.isArray(patch.addQuads) || !Array.isArray(patch.delQuads)
-      throw new Error("corrupt patch: #{patch}")
+      throw new Error("corrupt patch: #{JSON.stringify(patch)}")
 
     for qs in [patch.addQuads, patch.delQuads]
       for q in qs
         if not q.graph?
-          throw new Error("corrupt patch: #{q}")
+          throw new Error("corrupt patch: #{JSON.stringify(q)}")
 
     @_applyPatch(patch)
     @_client.sendPatch(patch) if @_client
-
+    console.timeEnd('applyAndSendPatch')
+    
   _applyPatch: (patch) ->
     # In most cases you want applyAndSendPatch.
     # 
