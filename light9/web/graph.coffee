@@ -290,6 +290,8 @@ class window.SyncedGraph
       if current == RDF + 'nil'
         break
         
+      @_autoDeps.askedFor(current, null, null, null) # a little loose
+
       firsts = @graph.findByIRI(current, RDF + 'first', null)
       rests = @graph.findByIRI(current, RDF + 'rest', null)
       if firsts.length != 1
@@ -321,6 +323,7 @@ class window.SyncedGraph
     @nextNumberedResources(base, 1)[0]       
 
   contextsWithPattern: (s, p, o) ->
+    @_autoDeps.askedFor(s, p, o, null)
     ctxs = []
     for q in @graph.find(s, p, o)
       ctxs.push(q.graph)
