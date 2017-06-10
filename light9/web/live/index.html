@@ -17,14 +17,15 @@
     <script src="/lib/async/dist/async.js"></script>
     <script src="/lib/underscore/underscore-min.js"></script>
     <!-- see live.coffee
-    <script src="/lib/jquery/dist/jquery.js"></script>
-    <script src="/lib/isotope/dist/isotope.pkgd.min.js"></script>
-    <script src="/lib/isotope-fit-columns/fit-columns.js"></script>
-    <script src="/lib/jquery.columnizer/src/jquery.columnizer.js"></script>
-    -->
+         <script src="/lib/jquery/dist/jquery.js"></script>
+         <script src="/lib/isotope/dist/isotope.pkgd.min.js"></script>
+         <script src="/lib/isotope-fit-columns/fit-columns.js"></script>
+         <script src="/lib/jquery.columnizer/src/jquery.columnizer.js"></script>
+       -->
     <link rel="import" href="../rdfdb-synced-graph.html">
-    <link rel="import" href="/resource-display.html">
-    <link rel="import" href="/light9-color-picker.html">
+    <link rel="import" href="../resource-display.html">
+    <link rel="import" href="../light9-color-picker.html">
+    <link rel="import" href="../edit-choice.html">
   </head>
   <body>
     <style>
@@ -255,6 +256,7 @@
           <div>
             effect name: <input type="input" value="{{newEffectName::change}}">
             <button on-click="saveNewEffect">save new effect</button>
+            <edit-choice graph="{{graph}}" uri="{{effect}}"></edit-choice>
           </div>
           <textarea id="preview" value="{{effectPreview}}"></textarea>
         </div>

@@ -91,8 +91,10 @@ Polymer
     currentSettings: { type: Object, notify: true } # dev+attr: [dev, attr, value]
     effectPreview: { type: String, notify: true }
     newEffectName: { type: String, notify: true }
+    effect: { type: String, notify: true } # the one being edited, if any
   observers: [
     'onGraph(graph)'
+    'onEffect(effect)'
     ]
   ready: ->
     @currentSettings = {}
@@ -119,37 +121,56 @@ Polymer
       
   sendAll: ->
     @client.send(@currentSettingsList())
-      
+
+  valuePred: (attr) ->
+    U = (x) => @graph.Uri(x)
+    scaledAttributeTypes = [U(':color'), U(':brightness'), U(':uv')]
+    if attr in scaledAttributeTypes then U(':scaledValue') else U(':value')
+
+  onEffect: ->
+    U = (x) => @graph.Uri(x)
+    return unless @effect
+    log('load', @effect)
+    for s in @graph.objects(@effect, U(':setting'))
+      dev = @graph.uriValue(s, U(':device'))
+      devAttr = @graph.uriValue(s, U(':deviceAttr'))
+
+      pred = @valuePred(devAttr)
+      try
+        value = @graph.floatValue(s, pred)
+      catch
+        value = @graph.stringValue(s, pred)
+      log('got', devAttr, value)
+      window.gather([[dev, devAttr, value]])
+            
   saveNewEffect: ->
     uriName = @newEffectName.replace(/[^a-zA-Z0-9_]/g, '')
     return if not uriName.length
 
     U = (x) => @graph.Uri(x)
 
-    effectUri = U(":effect") + "/#{uriName}"
+    @effect = U(":effect") + "/#{uriName}"
     ctx = U("http://light9.bigasterisk.com/show/dance2017/effect/#{uriName}")
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: ctx}
 
     addQuads = [
-      quad(effectUri, U('rdf:type'), U(':Effect'))
-      quad(effectUri, U('rdfs:label'), @graph.Literal(@newEffectName))
-      quad(effectUri, U(':publishAttr'), U(':strength'))
+      quad(@effect, U('rdf:type'), U(':Effect'))
+      quad(@effect, U('rdfs:label'), @graph.Literal(@newEffectName))
+      quad(@effect, U(':publishAttr'), U(':strength'))
       ]
-    settings = @graph.nextNumberedResources(effectUri + '_set', @currentSettingsList().length)
+    settings = @graph.nextNumberedResources(@effect + '_set', @currentSettingsList().length)
     for row in @currentSettingsList()
       if row[2] == 0 or row[2] == '#000000'
         continue
       setting = settings.shift()
-      addQuads.push(quad(effectUri, U(':setting'), setting))
+      addQuads.push(quad(@effect, U(':setting'), setting))
       addQuads.push(quad(setting, U(':device'), row[0]))
       addQuads.push(quad(setting, U(':deviceAttr'), row[1]))
-      scaledAttributeTypes = [U(':color'), U(':brightness'), U(':uv')]
       value = if typeof(row[2]) == 'number'
           @graph.LiteralRoundedFloat(row[2])
         else
           @graph.Literal(row[2])
-      settingType = if row[1] in scaledAttributeTypes then U(':scaledValue') else U(':value')
-      addQuads.push(quad(setting, settingType, value))
+      addQuads.push(quad(setting, @valuePred(row[1]), value))
       
     patch = {addQuads: addQuads, delQuads: []}
     log('save', patch)
