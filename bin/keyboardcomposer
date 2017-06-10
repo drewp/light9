@@ -21,6 +21,7 @@ from light9.rdfdb import clientsession
 from light9.rdfdb.syncedgraph import SyncedGraph
 from light9.effect.sequencer import CodeWatcher
 import light9.effect.effecteval
+from light9.effect.settings import DeviceSettings
 
 from bcf2000 import BCF2000
 
@@ -69,7 +70,7 @@ class SubmasterBox(tk.Frame):
         bg = self.graph.value(sub, L9.color, default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
-        darkBg = webcolors.rgb_to_hex(tuple([x * 255 for x in colorsys.hsv_to_rgb(
+        darkBg = webcolors.rgb_to_hex(tuple([int(x * 255) for x in colorsys.hsv_to_rgb(
             hsv[0], hsv[1], .2)]))
         tk.Frame.__init__(self, master, bd=1, relief='raised', bg=bg)
         self.name = self.graph.label(sub)
@@ -457,14 +458,14 @@ class KeyboardComposer(tk.Frame, SubClient):
             strength = graph.value(setting, L9['level'])
             if strength:
                 now = time.time()
-                outputSettings.extend(
+                outputSettings.append(
                     self.effectEval[effect].outputFromEffect(
                         [(L9['strength'], strength)],
                         songTime=now,
                         # should be counting from when you bumped up from 0
                         noteTime=now))
 
-        return outputSettings
+        return DeviceSettings.fromList(graph, outputSettings)
 
     def save_current_stage(self, subname):
         raise NotImplementedError

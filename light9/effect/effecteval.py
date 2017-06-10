@@ -5,6 +5,7 @@ from webcolors import rgb_to_hex, hex_to_rgb
 from colorsys import hsv_to_rgb
 from decimal import Decimal
 import math
+import traceback
 from noise import pnoise1
 import logging
 import time
@@ -71,16 +72,20 @@ class EffectEval(object):
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
             settings = []
             for setting in self.graph.objects(effect, L9['setting']):
-                d = self.graph.value(setting, L9['device'])
-                a = self.graph.value(setting, L9['deviceAttr'])
-                v = self.graph.value(setting, L9['value'])
-                sv = self.graph.value(setting, L9['scaledValue'])
-                if not (bool(v) ^ bool(sv)):
-                    raise NotImplementedError
-                if d is None:
-                    raise TypeError('no device on %s' % effect)
-                if a is None:
-                    raise TypeError('no attr on %s' % effect)
+                try:
+                    d = self.graph.value(setting, L9['device'])
+                    a = self.graph.value(setting, L9['deviceAttr'])
+                    v = self.graph.value(setting, L9['value'])
+                    sv = self.graph.value(setting, L9['scaledValue'])
+                    if not (bool(v) ^ bool(sv)):
+                        raise NotImplementedError('no value for %s' % setting)
+                    if d is None:
+                        raise TypeError('no device on %s' % effect)
+                    if a is None:
+                        raise TypeError('no attr on %s' % effect)
+                except Exception:
+                    traceback.print_exc()
+                    continue
 
                 settings.append((d, a, v if v is not None else sv, bool(sv)))
 
