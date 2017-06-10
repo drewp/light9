@@ -386,6 +386,14 @@ class GraphResource(PrettyErrorHandler, cyclone.web.RequestHandler):
             format = 'nt'
         elif accept == 'application/n-quads':
             format = 'nquads'
+        elif accept == 'pickle':
+            # don't use this; it's just for speed comparison
+            import cPickle as pickle
+            pickle.dump(self.settings.db.graph, self, protocol=2)
+            return
+        elif accept == 'msgpack':
+            self.write(repr(self.settings.db.graph.__getstate__))
+            return
         self.write(self.settings.db.graph.serialize(format=format))
 
 class Patches(PrettyErrorHandler, cyclone.web.RequestHandler):
