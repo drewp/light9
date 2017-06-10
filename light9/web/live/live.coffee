@@ -97,6 +97,9 @@ Polymer
   ready: ->
     @currentSettings = {}
     @effectPreview = JSON.stringify({})
+
+    @sendAllThrottled = _.throttle(@sendAll.bind(@), 30)
+    
     window.gather = (sent) =>
       [dev, devAttr, value] = sent[0]
       key = dev + " " + devAttr
@@ -110,7 +113,7 @@ Polymer
         @currentSettings[key] = [dev, devAttr, value]
       @effectPreview = JSON.stringify(v for k,v of @currentSettings)
 
-      @debounce('send', @sendAll.bind(@), 2)
+      @sendAllThrottled()
 
   currentSettingsList: -> (v for k,v of @currentSettings)
       
@@ -169,3 +172,16 @@ Polymer
     for dc in _.sortBy(@graph.subjects(U('rdf:type'), U(':DeviceClass')))
       for dev in _.sortBy(@graph.subjects(U('rdf:type'), dc))
         @push('devices', {uri: dev})
+
+    return
+
+    # Tried css columns- big slowdown from relayout as I'm scrolling.
+    # Tried isotope- seems to only scroll to the right.
+    # Tried columnize- fails in jquery maybe from weird elements.
+    
+    # not sure how to get this run after the children are created
+    setTimeout((() => $('#deviceControls').isotope({
+      # fitColumns would be nice, but it doesn't scroll vertically
+      layoutMode: 'masonry',
+      containerStyle: null
+      })), 2000)

@@ -16,12 +16,29 @@
     <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
     <script src="/lib/async/dist/async.js"></script>
     <script src="/lib/underscore/underscore-min.js"></script>
+    <!-- see live.coffee
+    <script src="/lib/jquery/dist/jquery.js"></script>
+    <script src="/lib/isotope/dist/isotope.pkgd.min.js"></script>
+    <script src="/lib/isotope-fit-columns/fit-columns.js"></script>
+    <script src="/lib/jquery.columnizer/src/jquery.columnizer.js"></script>
+    -->
     <link rel="import" href="../rdfdb-synced-graph.html">
     <link rel="import" href="/resource-display.html">
     <link rel="import" href="/light9-color-picker.html">
   </head>
   <body>
-
+    <style>
+     body, html {
+         margin: 0;
+     }
+     light9-live-controls {
+         position: absolute;
+         left: 2px;
+         top: 2px;
+         right: 8px;
+         bottom: 0;
+     }
+    </style>
     <dom-module id="light9-listbox">
       <template>
         <style>
@@ -151,12 +168,16 @@
     <dom-module id="light9-live-device-control">
       <template>
         <style>
+         :host {
+             display: inline-block;
+         }
          .device {
              border: 2px solid #151e2d;
              margin: 4px;
              padding: 1px;
              background: #171717;  /* deviceClass gradient added later */
              break-inside: avoid-column;
+             width: 400px;
              
          }
          .deviceAttr {
@@ -175,8 +196,8 @@
              padding: 4px;
          }
          .device, h2 {
-         border-top-right-radius: 15px;
-}
+             border-top-right-radius: 15px;
+         }
 
          #mainLabel {
              font-size: 120%; 
@@ -203,24 +224,32 @@
       <template>
         <style>
          :host {
-display: flex;
-    flex-direction: column;
-             }
+             display: flex;
+             flex-direction: column;
+         }
          #preview {
              width: 100%;
          }
          #deviceControls {
-             column-width: 400px;
+             flex-grow: 1;
+             position: relative;
+             width: 100%;
              overflow-y: auto;
          }
+         
          light9-live-device-control > div {
              break-inside: avoid-column;
          }
+         light9-live-device-control {
+
+             }
         </style>
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
         <light9-collector-client self="{{client}}"></light9-collector-client>
-        <h1>device control <button on-click="resendAll">resend all</button> <button on-click="clearAll">clear all</button></h1>
+        <h1>device control
+          <button on-click="resendAll">resend all</button>
+          <button on-click="clearAll">clear all</button></h1>
 
         <div id="save">
           <div>
@@ -230,11 +259,12 @@ display: flex;
           <textarea id="preview" value="{{effectPreview}}"></textarea>
         </div>
 
-        <div id="deviceControls">
-          <template is="dom-repeat" items="{{devices}}" as="device">
-            <light9-live-device-control graph="{{graph}}" uri="{{device.uri}}"></light9-live-device-control>
-          </template>
-        </div>
+          <div id="deviceControls">
+            <template is="dom-repeat" items="{{devices}}" as="device">
+              <light9-live-device-control graph="{{graph}}" uri="{{device.uri}}"></light9-live-device-control>
+            </template>
+          </div>
+
         
       </template>
     </dom-module>
