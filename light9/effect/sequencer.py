@@ -170,6 +170,7 @@ class Sequencer(object):
     def compileGraph(self):
         """rebuild our data from the graph"""
         log.info('compileGraph start')
+        t1 = time.time()
         g = self.graph
 
         sharedEffectOutputs = {}
@@ -178,7 +179,7 @@ class Sequencer(object):
             self.notes[song] = []
             for note in g.objects(song, L9['note']):
                 self.notes[song].append(Note(g, note, effecteval, sharedEffectOutputs))
-        log.info('compileGraph done')
+        log.info('compileGraph done %.2f ms', 1000 * (time.time() - t1))
 
     @stats.update.time()
     def update(self):
