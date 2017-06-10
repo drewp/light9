@@ -16,8 +16,11 @@ def parseHex(h):
     if h[0] != '#': raise ValueError(h)
     return [int(h[i:i+2], 16) for i in 1, 3, 5]
 
+def parseHexNorm(h):
+    return [x / 255 for x in parseHex(h)]
+    
 def toHex(rgbFloat):
-    return '#%02x%02x%02x' % tuple(int(v * 255) for v in rgbFloat)
+    return '#%02x%02x%02x' % tuple(max(0, min(255, int(v * 255))) for v in rgbFloat)
 
 def getVal(graph, subj):
     lit = graph.value(subj, L9['value']) or graph.value(subj, L9['scaledValue'])
@@ -83,6 +86,27 @@ class _Settings(object):
                 out._compiled.setdefault(row[0], {})[row[1]] = row[2]
         out._delZeros()
         return out
+
+    @classmethod
+    def fromBlend(cls, graph, others):
+        """others is a list of (weight, Settings) pairs"""
+        out = cls(graph, [])
+        for weight, s in others:
+            if not isinstance(s, cls):
+                raise TypeError(s)
+            for row in s.asList(): # could work straight from s._compiled
+                if row[0] is None:
+                    raise TypeError('bad row %r' % (row,))
+                dd = out._compiled.setdefault(row[0], {})
+
+                if isinstance(row[2], basestring):
+                    prev = parseHexNorm(dd.get(row[1], '#000000'))
+                    newVal = toHex(prev + weight * numpy.array(parseHexNorm(row[2])))
+                else:
+                    newVal = dd.get(row[1], 0) + weight * row[2]
+                dd[row[1]] = newVal
+        out._delZeros()
+        return out
         
     def _zeroForAttr(self, attr):
         if attr == L9['color']:
@@ -117,7 +141,7 @@ class _Settings(object):
         words = []
         def accum():
             for dev, av in self._compiled.iteritems():
-                for attr, val in av.iteritems():
+                for attr, val in sorted(av.iteritems()):
                     words.append('%s.%s=%s' % (dev.rsplit('/')[-1],
                                                attr.rsplit('/')[-1],
                                                val))
@@ -126,7 +150,7 @@ class _Settings(object):
                         return
         accum()
         return '<%s %s>' % (self.__class__.__name__, ' '.join(words))
-        
+
     def getValue(self, dev, attr):
         return self._compiled.get(dev, {}).get(attr, self._zeroForAttr(attr))
 
@@ -150,7 +174,7 @@ class _Settings(object):
         for dev, attr in self._vectorKeys(deviceAttrFilter):
             v = self.getValue(dev, attr)
             if attr == L9['color']:
-                out.extend([x / 255 for x in parseHex(v)])
+                out.extend(parseHexNorm(v))
             else:
                 out.append(v)
         return out

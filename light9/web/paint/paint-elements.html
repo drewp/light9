@@ -6,6 +6,7 @@
 <link rel="import" href="/lib/paper-radio-button/paper-radio-button.html">
 <link rel="import" href="paint-report-elements.html">
 <link rel="import" href="../rdfdb-synced-graph.html">
+<link rel="import" href="../light9-collector-client.html">
 
 
 <dom-module id="light9-paint-canvas">
@@ -98,7 +99,11 @@
     <light9-paint-canvas id="canvas" bg="bg2.jpg" painting="{{painting}}"></light9-paint-canvas>
 
     <iron-ajax id="solve" method="POST" url="../paintServer/solve" last-response="{{solve}}"></iron-ajax>
+
+    <iron-ajax id="bestMatches" method="POST" url="../paintServer/bestMatches"></iron-ajax>
     
+    <div>To collector: <light9-collector-client self="{{client}}"></light9-collector-client></div>
+
     <light9-simulation graph="{{graph}}" solution="{{solve}}" layers="{{layers}}"></light9-simulation>
   </template>
 </dom-module>

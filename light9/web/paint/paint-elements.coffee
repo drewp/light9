@@ -1,3 +1,5 @@
+log = console.log
+
 class Painting
   constructor: (@svg) ->
     @strokes = []
@@ -176,16 +178,54 @@ Polymer
   is: "light9-paint"
   properties: {
     painting: { type: Object }
+    client: { type: Object }
+    graph: { type: Object }
   }
 
   ready: () ->
     # couldn't make it work to bind to painting's notifyPath events
     @$.canvas.addEventListener('paintingChanged', @paintingChanged.bind(@))
     @$.solve.addEventListener('response', @onSolve.bind(@))
+
+    @clientSendThrottled = _.throttle(@client.send.bind(@client), 60)
+    @bestMatchPending = false
     
   paintingChanged: (ev) ->
+    U = (x) => @graph.Uri(x)
+
     @painting = ev.detail
     @$.solve.body = JSON.stringify(@painting.getDoc())
-    @$.solve.generateRequest()
+    #@$.solve.generateRequest()
+
+    @$.bestMatches.body = JSON.stringify({
+      painting: @painting.getDoc(),
+      devices: [
+        U('dev:aura1'), U('dev:aura2'), U('dev:aura3'), U('dev:aura4'), U('dev:aura5'),
+        U('dev:q1'), U('dev:q2'), U('dev:q3'),
+        ]})
+
+    send = =>
+      @$.bestMatches.generateRequest().completes.then (r) =>
+        @clientSendThrottled(r.response.settings)
+        if @bestMatchPending
+          @bestMatchPending = false
+          send()
+    
+    if @$.bestMatches.loading
+      @bestMatchPending = true
+    else
+      send()
 
   onSolve: (response) ->
+    U = (x) => @graph.Uri(x)
+
+    sample = @$.solve.lastResponse.bestMatch.uri
+    settingsList = []
+    for s in @graph.objects(sample, U(':setting'))
+      try
+        v = @graph.floatValue(s, U(':value'))
+      catch
+        v = @graph.stringValue(s, U(':scaledValue'))
+      row = [@graph.uriValue(s, U(':device')), @graph.uriValue(s, U(':deviceAttr')), v]
+      settingsList.push(row)
+    @client.send(settingsList)

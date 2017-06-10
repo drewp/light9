@@ -67,17 +67,21 @@ class ImageDistAbs(object):
 
         
 class Solver(object):
-    def __init__(self, graph, sessions=None, imgSize=(100, 75)):
+    def __init__(self, graph, sessions=None, imgSize=(100, 53)):
         self.graph = graph
         self.sessions = sessions # URIs of capture sessions to load
         self.imgSize = imgSize
         self.samples = {} # uri: Image array (float 0-255)
         self.fromPath = {} # imagePath: image array
+        self.path = {} # sample: path
         self.blurredSamples = {}
-        self.sampleSettings = {} # (uri, path): DeviceSettings
+        self.sampleSettings = {} # sample: DeviceSettings
+        self.samplesForDevice = {} # dev : [(sample, img)]
         
     def loadSamples(self):
         """learn what lights do from images"""
+
+        log.info('loading...')
 
         with self.graph.currentState() as g:
             for sess in self.sessions:
@@ -87,11 +91,19 @@ class Solver(object):
 
     def _loadSample(self, g, samp):
         pathUri = g.value(samp, L9['imagePath'])
-        self.samples[samp] = self.fromPath[pathUri] = loadNumpy(pathUri.replace(L9[''], '')).astype(float)
-        self.blurredSamples[samp] = self._blur(self.samples[samp])
+        img = loadNumpy(pathUri.replace(L9[''], '')).astype(float)
+        settings = DeviceSettings.fromResource(self.graph, samp)
+        
+        self.samples[samp] = img
+        self.fromPath[pathUri] = img
+        self.blurredSamples[samp] = self._blur(img)
 
-        key = (samp, pathUri)
-        self.sampleSettings[key] = DeviceSettings.fromResource(self.graph, samp)
+        self.path[samp] = pathUri
+        assert samp not in self.sampleSettings
+        self.sampleSettings[samp] = settings
+        devs = settings.devices()
+        if len(devs) == 1:
+            self.samplesForDevice.setdefault(devs[0], []).append((samp, img))
         
     def _blur(self, img):
         return scipy.ndimage.gaussian_filter(img, 10, 0, mode='nearest')
@@ -106,7 +118,7 @@ class Solver(object):
         ctx.fill()
         
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        ctx.set_line_width(w / 5) # ?
+        ctx.set_line_width(w / 15) # ?
         for stroke in painting['strokes']:
             for pt in stroke['pts']:
                 op = ctx.move_to if pt is stroke['pts'][0] else ctx.line_to
@@ -119,22 +131,67 @@ class Solver(object):
         #surface.write_to_png('/tmp/surf.png')
         return numpyFromCairo(surface)
 
-    def bestMatch(self, img):
+    def bestMatch(self, img, device=None):
         """the one sample that best matches this image"""
         #img = self._blur(img)
         results = []
         dist = ImageDist(img)
-        for uri, img2 in sorted(self.samples.items()):
+        if device is None:
+            items = self.samples.items()
+        else:
+            items = self.samplesForDevice[device]
+        for uri, img2 in sorted(items):
             if img.shape != img2.shape:
+                log.warn("mismatch %s %s", img.shape, img2.shape)
                 continue
             results.append((dist.distanceTo(img2), uri, img2))
         results.sort()
         topDist, topUri, topImg = results[0]
+        print 'tops2'
+        for row in results[:4]:
+            print '%.5f' % row[0], row[1][-20:], self.sampleSettings[row[1]]
+        
        
         #saveNumpy('/tmp/best_in.png', img)
         #saveNumpy('/tmp/best_out.png', topImg)
         #saveNumpy('/tmp/mult.png', topImg / 255 * img)
         return topUri, topDist
+
+    def bestMatches(self, img, devices=None):
+        """settings for the given devices that point them each
+        at the input image"""
+        dist = ImageDist(img)
+        devSettings = []
+        for dev in devices:
+            results = []
+            for samp, img2 in self.samplesForDevice[dev]:
+                results.append((dist.distanceTo(img2), samp))
+            results.sort()
+            
+            s = self.blendResults([(d, self.sampleSettings[samp])
+                                   for d, samp in results[:8]])
+            devSettings.append(s)
+        return DeviceSettings.fromList(self.graph, devSettings)
+
+    def blendResults(self, results):
+        """list of (dist, settings)"""
+        
+        dists = [d for d, sets in results]
+        hi = max(dists)
+        lo = min(dists)
+        n = len(results)
+        remappedDists = [1 - (d - lo) / (hi - lo) * n / (n + 1)
+                         for d in dists]
+        total = sum(remappedDists)
+        
+        #print 'blend'
+        #for o,n in zip(dists, remappedDists):
+        #    print o,n, n / total
+        blend = DeviceSettings.fromBlend(
+            self.graph,
+            [(d / total, sets) for
+             d, (_, sets) in zip(remappedDists, results)])
+        return blend
         
     def solve(self, painting):
         """
@@ -226,7 +283,8 @@ class Solver(object):
         for dev, devSettings in settings.byDevice():
             requestedColor = devSettings.getValue(dev, L9['color'])
             candidatePics = [] # (distance, path, picColor)
-            for (sample, path), s in self.sampleSettings.items():
+            for sample, s in self.sampleSettings.items():
+                path = self.path[sample]
                 otherDevSettings = s.ofDevice(dev)
                 if not otherDevSettings:
                     continue

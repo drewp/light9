@@ -4,7 +4,8 @@ from light9.rdfdb.patch import Patch
 from light9.rdfdb.localsyncedgraph import LocalSyncedGraph
 from light9.namespaces import RDF, L9, DEV
 from light9.effect.settings import DeviceSettings
-
+             
+        
 class TestDeviceSettings(unittest.TestCase):
     def setUp(self):
         self.graph = LocalSyncedGraph(files=['test/cam/lightConfig.n3',
@@ -112,3 +113,37 @@ class TestDeviceSettings(unittest.TestCase):
         ])
         self.assertEqual(0.36055512754639896, s1.distanceTo(s2))
         
+
+L1 = L9['light1']
+ZOOM = L9['zoom']
+class TestFromBlend(unittest.TestCase):
+    def setUp(self):
+        self.graph = LocalSyncedGraph(files=['test/cam/lightConfig.n3',
+                                             'test/cam/bg.n3'])
+    def testSingle(self):
+        self.assertEqual(
+            DeviceSettings(self.graph, [(L1, ZOOM, 0.5)]),
+            DeviceSettings.fromBlend(self.graph, [
+                (1, DeviceSettings(self.graph, [(L1, ZOOM, 0.5)]))]))
+
+    def testScale(self):
+        self.assertEqual(
+            DeviceSettings(self.graph, [(L1, ZOOM, 0.1)]),
+            DeviceSettings.fromBlend(self.graph, [
+                (.2, DeviceSettings(self.graph, [(L1, ZOOM, 0.5)]))]))
+
+    def testMixFloats(self):
+        self.assertEqual(
+            DeviceSettings(self.graph, [(L1, ZOOM, 0.4)]),
+            DeviceSettings.fromBlend(self.graph, [
+                (.2, DeviceSettings(self.graph, [(L1, ZOOM, 0.5)])),
+                (.3, DeviceSettings(self.graph, [(L1, ZOOM, 1.0)])),
+            ]))
+
+    def testMixColors(self):
+        self.assertEqual(
+            DeviceSettings(self.graph, [(L1, ZOOM, '#503000')]),
+            DeviceSettings.fromBlend(self.graph, [
+                (.25, DeviceSettings(self.graph, [(L1, ZOOM, '#800000')])),
+                (.5, DeviceSettings(self.graph, [(L1, ZOOM, '#606000')])),
+            ]))
