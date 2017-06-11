@@ -149,7 +149,6 @@ def effect_animRainbow(effectSettings, strength, songTime, noteTime):
     out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
-    print tint, tintStrength
     tr, tg, tb = hex_to_rgb(tint)
     for n in range(1, 5+1):
         scl = strength * nsin(songTime + n * .3)**3
@@ -170,11 +169,33 @@ def effect_animRainbow(effectSettings, strength, songTime, noteTime):
             })
     return out
 
+def effect_auraSparkles(effectSettings, strength, songTime, noteTime):
+    out = {}
+    tint = effectSettings.get(L9['tint'], '#ffffff')
+    tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
+    print effectSettings
+    tr, tg, tb = hex_to_rgb(tint)
+    for n in range(1, 5+1):
+        scl = strength * ((int(songTime * 10) % n) < 1)
+        col = scale('#ffffff', scl)
+        print n, 'scl', col
+
+        dev = L9['device/aura%s' % n]
+        out.update({
+            (dev, L9['color']): col,
+            (dev, L9['zoom']): .95,
+            })
+        ang = songTime * 4
+        out.update({
+        (dev, L9['rx']): lerp(.27, .7, (n-1)/4) + .8 * math.sin(ang+n),
+        (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .8 * math.cos(ang+n),
+            })
+    return out
+
 def effect_pulseRainbow(effectSettings, strength, songTime, noteTime):
     out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
-    print tint, tintStrength
     tr, tg, tb = hex_to_rgb(tint)
     for n in range(1, 5+1):
         scl = strength 
