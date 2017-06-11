@@ -4,23 +4,23 @@
 
 show:dance2017 :networking sh:netHome .
 sh:netHome
-  :webServer        <http://plus:8200/>;
+  :webServer        <http://dot:8200/>;
   :patchReceiverUpdateHost "plus";
-  :captureDevice    <http://plus:8215/>;
-  :curveCalc        <http://plus:8201/>;
+  :captureDevice    <http://dot:8215/>;
+  :curveCalc        <http://dot:8201/>;
   :collector        <http://plus:8202/>;
   :collectorZmq     <http://plus:8203/>;
-  :effectEval       <http://plus:8204/>;
-  :effectSequencer  <http://plus:8213/>;
-  :keyboardComposer <http://plus:8205/>;
-  :musicPlayer      <http://plus:8206/>;
-  :oscDmxServer     <udp://plus:8207/>;
-  :paintServer      <http://plus:8214/>;
+  :effectEval       <http://dot:8204/>;
+  :effectSequencer  <http://dot:8213/>;
+  :keyboardComposer <http://dot:8205/>;
+  :musicPlayer      <http://dot:8206/>;
+  :oscDmxServer     <udp://dot:8207/>;
+  :paintServer      <http://dot:8214/>;
   :picamserve       <http://10.2.0.6:8208/>;
-  :rdfdb            <http://plus:8209/>;
-  :subComposer      <http://plus:8210/>;
-  :subServer        <http://plus:8211/>;
-  :vidref           <http://plus:8212/> .
+  :rdfdb            <http://dot:8209/>;
+  :subComposer      <http://dot:8210/>;
+  :subServer        <http://dot:8211/>;
+  :vidref           <http://dot:8212/> .
 
 :captureDevice    :urlPath "captureDevice" .
 :curveCalc        :urlPath "curveCalc" .
