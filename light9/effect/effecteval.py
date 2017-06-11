@@ -306,9 +306,9 @@ def effect_chase1(effectSettings, strength, songTime, noteTime):
     
 def effect_orangeSearch(effectSettings, strength, songTime, noteTime):
     dev = L9['device/auraStage']
-    return {(dev, L9['color']): '#c1905d',
-            (dev, L9['rx']): lerp(.31, .68, nsquare(songTime / 2.0)),
-            (dev, L9['ry']): lerp(.32, .4,  nsin(songTime / 5)),
+    return {(dev, L9['color']): '#a885ff',
+            (dev, L9['rx']): lerp(0, .36, nsin(songTime / 2.0)),
+            (dev, L9['ry']): lerp(.5, .6,  nsin(songTime / 5)),
             (dev, L9['zoom']): .88,
             }
     
