@@ -303,6 +303,8 @@ Polymer
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
 
+    return unless effect and effect.match(/^http/)
+
     # we could probably accept some initial overrides right on the
     # effect uri, maybe as query params
 
