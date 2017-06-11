@@ -9,7 +9,8 @@
 
 
 effect:auraeuro a :Effect; rdfs:label "auraeuro"; :publishAttr :strength;
-     :setting effect:auraeuro_set0, effect:auraeuro_set1, effect:auraeuro_set10, effect:auraeuro_set11, effect:auraeuro_set12, effect:auraeuro_set13, effect:auraeuro_set14, effect:auraeuro_set15, effect:auraeuro_set16, effect:auraeuro_set17, effect:auraeuro_set18, effect:auraeuro_set19, effect:auraeuro_set2, effect:auraeuro_set20, effect:auraeuro_set21, effect:auraeuro_set22, effect:auraeuro_set23, effect:auraeuro_set24, effect:auraeuro_set25, effect:auraeuro_set3, effect:auraeuro_set4, effect:auraeuro_set5, effect:auraeuro_set6, effect:auraeuro_set7, effect:auraeuro_set8, effect:auraeuro_set9 .
+     :setting effect:auraeuro_set0, effect:auraeuro_set1, effect:auraeuro_set10, effect:auraeuro_set11, effect:auraeuro_set12, effect:auraeuro_set13, effect:auraeuro_set14, effect:auraeuro_set15, effect:auraeuro_set16, effect:auraeuro_set17, effect:auraeuro_set18, effect:auraeuro_set19, effect:auraeuro_set2, effect:auraeuro_set20, effect:auraeuro_set21, effect:auraeuro_set22, effect:auraeuro_set23, effect:auraeuro_set24, effect:auraeuro_set25, effect:auraeuro_set3, effect:auraeuro_set4, effect:auraeuro_set5, effect:auraeuro_set6, effect:auraeuro_set7, effect:auraeuro_set8, effect:auraeuro_set9 ,
+     effect:auraeuro_set26 .
 effect:auraeuro_set0 :device dev:down2; :deviceAttr :color; :scaledValue "#ff2c41" .
 effect:auraeuro_set1 :device dev:down4; :deviceAttr :color; :scaledValue "#ff0c18" .
 effect:auraeuro_set10 :device dev:aura1; :deviceAttr :rx; :value 0.523 .
@@ -36,3 +37,4 @@ effect:auraeuro_set6 :device dev:lip4; :deviceAttr :color; :scaledValue "#ff93a7
 effect:auraeuro_set7 :device dev:upCenter; :deviceAttr :color; :scaledValue "#ffba30" .
 effect:auraeuro_set8 :device dev:aura1; :deviceAttr :color; :scaledValue "#3c7d8e" .
 effect:auraeuro_set9 :device dev:aura1; :deviceAttr :zoom; :value 0.645 .
+effect:auraeuro_set26 :device dev:auraStage; :deviceAttr :zoom; :value 0.2 .

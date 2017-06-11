@@ -1,0 +1,58 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+
+#effect:usa a :mockupEffect; rdfs:label "USA"; :chaseOffset 0;
+#     :chaseTempo 120; :code "chase()"; :devices dev:colorStrip, dev:moving1;
+#     :fadeShape :fadeCurve1; :palette "#0000ff", "#ff0000", "#ffffff";
+#     :publishAttr :strength .
+
+#effect:Strobe a :Effect; rdfs:label "strobe"; :publishAttr :duty, :offset, :rate, :strength .
+
+
+effect:animRainbow a :Effect; rdfs:label "animRainbow"; :publishAttr :strength, :rate ; :group "anim".
+effect:aurawash a :Effect; :publishAttr :strength ; :group "anim".
+effect:auraSparkles a :Effect; :publishAttr :strength ; :group "anim".
+effect:pulseRainbow a :Effect; rdfs:label "pulseRainbow"; :publishAttr :strength, :rate ; :group "main"; :order 6.
+
+effect:orangeSearch a :Effect; :publishAttr :strength ; :group "anim".
+effect:qsweep a :Effect; :publishAttr :strength ; :group "anim".
+effect:chase1 a :Effect; :publishAttr :strength ; :group "anim".
+
+effect:lightning a :Effect; :publishAttr :strength ; :group "main"; :order 7.
+
+effect:strobewarm :group "anim".
+
+effect:house :group "main"; :order 3 .
+effect:houseside :group "main"; :order 4 .
+effect:cyc :group "main"; :order 3 .
+effect:qwidecenter :group "main"; rdfs:label "qwidecenter [18]"; :order 5 .
+effect:curtain2  :group "main"; :order 2 .
+
+effect:centerSpot a :Effect; rdfs:label "center spot";
+     :group "main"; :order 1; :publishAttr :strength;
+     :setting effect:centerSpots0, effect:centerSpots1, effect:centerSpots2, effect:centerSpots3, effect:centerSpots4 .
+effect:centerSpots0 :device dev:q2; :deviceAttr :color;
+     :scaledValue "#ffefdf" .
+effect:centerSpots1 :device dev:q2; :deviceAttr :focus;
+     :value 0.31 .
+effect:centerSpots2 :device dev:q2; :deviceAttr :rx;
+     :value 0.50 .
+effect:centerSpots3 :device dev:q2; :deviceAttr :ry;
+     :value 0.01 .
+effect:centerSpots4 :device dev:q2; :deviceAttr :zoom;
+     :value 0.42 .
+
+
+:fadeCurve1 a :Curve; :point :fc1p0, :fc1p1, :fc1p2, :fc1p3 .
+:fc1p0 :time 0.00; :value 0 .
+:fc1p1 :time 0.02; :value 1 .
+:fc1p2 :time 0.10; :value 1 .
+:fc1p3 :time 0.15; :value 0 .
+:strength rdfs:label "strength" .
