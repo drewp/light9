@@ -1,0 +1,38 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+show:song13 :note <http://light9.bigasterisk.com/show/dance2017/song13/n0>, <http://light9.bigasterisk.com/show/dance2017/song13/n1> .
+
+<http://light9.bigasterisk.com/show/dance2017/song13/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song13/n0c0>;
+     :effectClass effect:song13; :originTime 55.892 .
+
+<http://light9.bigasterisk.com/show/dance2017/song13/n0c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2017/song13/n0c0p0>, <http://light9.bigasterisk.com/show/dance2017/song13/n0c0p1>, <http://light9.bigasterisk.com/show/dance2017/song13/n0c0p2>, <http://light9.bigasterisk.com/show/dance2017/song13/n0c0p3> .
+<http://light9.bigasterisk.com/show/dance2017/song13/n0c0p0> :time -53.341;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2017/song13/n0c0p1> :time -50.628;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2017/song13/n0c0p2> :time 170.230;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2017/song13/n0c0p3> :time 172.708;
+     :value 0.000 .
+
+<http://light9.bigasterisk.com/show/dance2017/song13/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song13/n1c0>;
+     :effectClass effect:down; :originTime 221.254 .
+
+<http://light9.bigasterisk.com/show/dance2017/song13/n1c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2017/song13/n1c0p0>, <http://light9.bigasterisk.com/show/dance2017/song13/n1c0p1>, <http://light9.bigasterisk.com/show/dance2017/song13/n1c0p2>, <http://light9.bigasterisk.com/show/dance2017/song13/n1c0p3> .
+<http://light9.bigasterisk.com/show/dance2017/song13/n1c0p0> :time -5.102;
+     :value 0.000 .
+<http://light9.bigasterisk.com/show/dance2017/song13/n1c0p1> :time -3.695;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2017/song13/n1c0p2> :time 5.214;
+     :value 1.000 .
+<http://light9.bigasterisk.com/show/dance2017/song13/n1c0p3> :time 7.151;
+     :value 0.000 .
