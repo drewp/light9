@@ -614,5 +614,5 @@ if __name__ == "__main__":
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
 
-    tksupport.install(root,ms=10)
+    tksupport.install(root,ms=20)
     prof.run(reactor.run, profile=None)
