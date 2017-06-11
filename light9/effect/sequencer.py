@@ -92,12 +92,14 @@ class Note(object):
         originTime = floatVal(uri, L9['originTime'])
         self.points = []
         for curve in g.objects(uri, L9['curve']):
-            if g.value(curve, L9['attr']) != L9['strength']:
+            po = list(g.predicate_objects(curve))
+            if dict(po).get(L9['attr'], None) != L9['strength']:
                 continue
-            for point in g.objects(curve, L9['point']):
+            for point in [row[1] for row in po if row[0] == L9['point']]:
+                po2 = dict(g.predicate_objects(point))
                 self.points.append((
-                    originTime + floatVal(point, L9['time']),
-                    floatVal(point, L9['value'])))
+                    originTime + float(po2[L9['time']]),
+                    float(po2[L9['value']])))
             self.points.sort()
         
     def activeAt(self, t):
@@ -175,8 +177,8 @@ class Sequencer(object):
         g = self.graph
 
         sharedEffectOutputs = {}
-
         for song in g.subjects(RDF.type, L9['Song']):
+            # ideally, wrap this (or smaller) in a sub-handler to run less on each patch
             self.notes[song] = []
             for note in g.objects(song, L9['note']):
                 self.notes[song].append(Note(g, note, effecteval, sharedEffectOutputs))
