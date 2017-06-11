@@ -84,8 +84,9 @@ class Note(object):
             graph, g.value(uri, L9['effectClass']), sharedEffectOutputs)
         self.baseEffectSettings = {}  # {effectAttr: value}
         for s in g.objects(uri, L9['setting']):
-            ea = g.value(s, L9['effectAttr'])
-            self.baseEffectSettings[ea] = g.value(s, L9['value'])
+            settingValues = dict(g.predicate_objects(s))
+            ea = settingValues[L9['effectAttr']]
+            self.baseEffectSettings[ea] = settingValues[L9['value']]
             
         floatVal = lambda s, p: float(g.value(s, p).toPython())
         originTime = floatVal(uri, L9['originTime'])

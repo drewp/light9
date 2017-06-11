@@ -72,11 +72,12 @@ class EffectEval(object):
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
             settings = []
             for setting in self.graph.objects(effect, L9['setting']):
+                settingValues = dict(self.graph.predicate_objects(setting))
                 try:
-                    d = self.graph.value(setting, L9['device'])
-                    a = self.graph.value(setting, L9['deviceAttr'])
-                    v = self.graph.value(setting, L9['value'])
-                    sv = self.graph.value(setting, L9['scaledValue'])
+                    d = settingValues.get(L9['device'], None)
+                    a = settingValues.get(L9['deviceAttr'], None)
+                    v = settingValues.get(L9['value'], None)
+                    sv = settingValues.get(L9['scaledValue'], None)
                     if not (bool(v) ^ bool(sv)):
                         raise NotImplementedError('no value for %s' % setting)
                     if d is None:
