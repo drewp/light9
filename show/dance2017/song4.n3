@@ -23,7 +23,7 @@ show:song4 :note <http://light9.bigasterisk.com/show/dance2017/song4/n0>, <http:
 <http://light9.bigasterisk.com/show/dance2017/song4/n0c0p3> :time 262.185;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2017/song4/n0set0> :effectAttr :colorScale;
-     :value "#ef40ff" .
+     :value "#ffffff" .
 
 <http://light9.bigasterisk.com/show/dance2017/song4/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song4/n1c0>;
      :effectClass effect:q1_3boost; :originTime 202.550 .

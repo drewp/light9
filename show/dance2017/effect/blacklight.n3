@@ -41,7 +41,7 @@ effect:blacklight_set8 :device dev:backlight5; :deviceAttr :uv;
 effect:blacklight_set9 :device dev:hexLow3; :deviceAttr :uv;
      :scaledValue 0.008 .
 
-
+ 
 #["dev:/upCenter","http://light9.bigasterisk.com/color","#040074"],
 #["dev:/q2","http://light9.bigasterisk.com/color","#0000ff"],
 #["dev:/q2","http://light9.bigasterisk.com/rx",0.485],
