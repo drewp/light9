@@ -18,6 +18,6 @@ effect:q1_3boost_set4 :device dev:q1; :deviceAttr :focus; :value 0.302 .
 effect:q1_3boost_set5 :device dev:q3; :deviceAttr :focus; :value 0.297 .
 effect:q1_3boost_set6 :device dev:q3; :deviceAttr :rx; :value 0.667 .
 effect:q1_3boost_set7 :device dev:q1; :deviceAttr :ry; :value 0.436 .
-effect:q1_3boost_set8 :device dev:q3; :deviceAttr :zoom; :value 0.207 .
-effect:q1_3boost_set9 :device dev:q3; :deviceAttr :ry; :value 0.436 .
+effect:q1_3boost_set8 :device dev:q3; :deviceAttr :zoom; :value 0.307 .
+effect:q1_3boost_set9 :device dev:q3; :deviceAttr :ry; :value 0.03 .
 

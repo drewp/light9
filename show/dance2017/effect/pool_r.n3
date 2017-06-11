@@ -9,13 +9,9 @@
 
 
 effect:pool_r a :Effect; rdfs:label "pool_r"; :publishAttr :strength;
-     :setting effect:pool_r_set0, effect:pool_r_set1, effect:pool_r_set2, effect:pool_r_set3, effect:pool_r_set4, effect:pool_r_set5, effect:pool_r_set6, effect:pool_r_set7, effect:pool_r_set8 .
-effect:pool_r_set0 :device dev:q1; :deviceAttr :zoom; :value 0.834 .
-effect:pool_r_set1 :device dev:q1; :deviceAttr :ry; :value 0.376 .
-effect:pool_r_set2 :device dev:q2; :deviceAttr :ry; :value 0.463 .
-effect:pool_r_set3 :device dev:q2; :deviceAttr :zoom; :value 0.900 .
-effect:pool_r_set4 :device dev:q2; :deviceAttr :rx; :value 0.492 .
+     :setting  effect:pool_r_set5, effect:pool_r_set6, effect:pool_r_set7, effect:pool_r_set8 ,effect:pool_r_set9.
 effect:pool_r_set5 :device dev:q3; :deviceAttr :color; :scaledValue "#ffffff" .
 effect:pool_r_set6 :device dev:q3; :deviceAttr :rx; :value 0.683 .
 effect:pool_r_set7 :device dev:q3; :deviceAttr :ry; :value 0.022 .
 effect:pool_r_set8 :device dev:q3; :deviceAttr :zoom; :value 0.879 .
+effect:pool_r_set9 :device dev:q3; :deviceAttr :focus; :value 0.5 .
