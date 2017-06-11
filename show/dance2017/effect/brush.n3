@@ -9,12 +9,14 @@
 
 
 effect:brush a :Effect; rdfs:label "qbrush"; :publishAttr :strength;
-     :setting effect:brush_set0, effect:brush_set1, effect:brush_set10, effect:brush_set2, effect:brush_set3, effect:brush_set4, effect:brush_set5, effect:brush_set6, effect:brush_set7, effect:brush_set8, effect:brush_set9 .
+     :setting effect:brush_set0, effect:brush_set1, effect:brush_set10, effect:brush_set2, effect:brush_set3, effect:brush_set4, effect:brush_set5, effect:brush_set6, effect:brush_set7, effect:brush_set8, effect:brush_set9, effect:brush_set3a .
 effect:brush_set0 :device dev:q1; :deviceAttr :quantumGoboChoice; :value "http://light9.bigasterisk.com/brush" .
 effect:brush_set1 :device dev:q1; :deviceAttr :color; :scaledValue "#ffffff" .
 effect:brush_set10 :device dev:q2; :deviceAttr :zoom; :value 0.055 .
 effect:brush_set2 :device dev:q1; :deviceAttr :focus; :value 0.544 .
+
 effect:brush_set3 :device dev:q1; :deviceAttr :rx; :value 0.371 .
+effect:brush_set3a :device dev:q1; :deviceAttr :ry; :value 0.532 .
 effect:brush_set4 :device dev:q1; :deviceAttr :zoom; :value 0.013 .
 effect:brush_set5 :device dev:q2; :deviceAttr :quantumGoboChoice; :value "http://light9.bigasterisk.com/brush" .
 effect:brush_set6 :device dev:q2; :deviceAttr :focus; :value 0.526 .

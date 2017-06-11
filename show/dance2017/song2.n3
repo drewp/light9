@@ -82,10 +82,11 @@ song:n7c0p2 :time 19.977; :value 1.000 .
 song:n7c0p3 :time 29.965; :value 0.000 .
 
 song:n8 a :Note; :curve song:n8c0; :effectClass effect:auracoolspread;
-     :originTime 18.143 .
+     :originTime 18.143; :setting song:n8set0 .
 
 song:n8c0 a :Curve; :attr :strength; :point song:n8c0p0, song:n8c0p1, song:n8c0p2, song:n8c0p3 .
 song:n8c0p0 :time -16.174; :value 0.000 .
-song:n8c0p1 :time -14.349; :value 1.000 .
+song:n8c0p1 :time -14.298; :value 1.000 .
 song:n8c0p2 :time 140.895; :value 1.000 .
 song:n8c0p3 :time 143.413; :value 0.000 .
+song:n8set0 :effectAttr :colorScale; :value "#ffffff" .

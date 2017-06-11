@@ -1,0 +1,31 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:stars a :Effect; rdfs:label "stars"; :publishAttr :strength;
+     :setting effect:stars_set0, effect:stars_set1, effect:stars_set10, effect:stars_set11, effect:stars_set12, effect:stars_set13, effect:stars_set14, effect:stars_set15, effect:stars_set16, effect:stars_set2, effect:stars_set3, effect:stars_set4, effect:stars_set5, effect:stars_set6, effect:stars_set7, effect:stars_set8, effect:stars_set9 ,effect:stars_set17 .
+effect:stars_set0 :device dev:q1; :deviceAttr :quantumGoboChoice; :value "http://light9.bigasterisk.com/stars" .
+effect:stars_set1 :device dev:q1; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:stars_set10 :device dev:q2; :deviceAttr :zoom; :value 0.183 .
+effect:stars_set11 :device dev:q3; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/stars" .
+effect:stars_set12 :device dev:q3; :deviceAttr :focus; :value 0.536 .
+effect:stars_set13 :device dev:q3; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:stars_set14 :device dev:q3; :deviceAttr :rx; :value 0.764 .
+effect:stars_set15 :device dev:q3; :deviceAttr :ry; :value 0.376 .
+effect:stars_set16 :device dev:q3; :deviceAttr :zoom; :value 0.393 .
+effect:stars_set17 :device dev:q1; :deviceAttr :zoom; :value 0.369 .
+effect:stars_set2 :device dev:q1; :deviceAttr :focus; :value 0.526 .
+effect:stars_set3 :device dev:q1; :deviceAttr :rx; :value 0.206 .
+effect:stars_set4 :device dev:q1; :deviceAttr :ry; :value 0.664 .
+effect:stars_set5 :device dev:q2; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:stars_set6 :device dev:q2; :deviceAttr :quantumGoboChoice; :value "http://light9.bigasterisk.com/stars" .
+effect:stars_set7 :device dev:q2; :deviceAttr :focus; :value 0.542 .
+effect:stars_set8 :device dev:q2; :deviceAttr :rx; :value 0.500 .
+effect:stars_set9 :device dev:q2; :deviceAttr :ry; :value 0.451 .

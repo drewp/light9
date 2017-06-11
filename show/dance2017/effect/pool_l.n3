@@ -9,7 +9,8 @@
 
 
 effect:pool_l a :Effect; rdfs:label "pool_l"; :publishAttr :strength;
-     :setting effect:pool_l_set0, effect:pool_l_set1, effect:pool_l_set2 .
+     :setting effect:pool_l_set0, effect:pool_l_set1, effect:pool_l_set2 ,effect:pool_l_set3 .
 effect:pool_l_set0 :device dev:q1; :deviceAttr :color; :scaledValue "#ffffff" .
 effect:pool_l_set1 :device dev:q1; :deviceAttr :zoom; :value 0.834 .
 effect:pool_l_set2 :device dev:q1; :deviceAttr :ry; :value 0.376 .
+effect:pool_l_set3 :device dev:q1; :deviceAttr :rx; :value 0.308 .
