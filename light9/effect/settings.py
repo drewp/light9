@@ -11,6 +11,7 @@ from light9.namespaces import RDF, L9, DEV
 from light9.rdfdb.patch import Patch
 import logging
 log = logging.getLogger('settings')
+from light9.collector.device import resolve
 
 def parseHex(h):
     if h[0] != '#': raise ValueError(h)
@@ -76,6 +77,7 @@ class _Settings(object):
 
     @classmethod
     def fromList(cls, graph, others):
+        """note that others may have multiple values for an attr"""
         out = cls(graph, [])
         for s in others:
             if not isinstance(s, cls):
@@ -83,7 +85,11 @@ class _Settings(object):
             for row in s.asList(): # could work straight from s._compiled
                 if row[0] is None:
                     raise TypeError('bad row %r' % (row,))
-                out._compiled.setdefault(row[0], {})[row[1]] = row[2]
+                dev, devAttr, value = row
+                devDict = out._compiled.setdefault(dev, {})
+                if devAttr in devDict:
+                    value = resolve(dev, devAttr, [devDict[devAttr], value])
+                devDict[devAttr] = value
         out._delZeros()
         return out
 

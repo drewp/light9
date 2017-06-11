@@ -43,6 +43,8 @@ def resolve(deviceType, deviceAttr, values):
     """
     return one value to use for this attr, given a set of them that
     have come in simultaneously. len(values) >= 1.
+
+    bug: some callers are passing a device instance for 1st arg
     """
     if len(values) == 1:
         return values[0]
