@@ -9,7 +9,7 @@
 
 
 effect:q1_3boost a :Effect; rdfs:label "q1_3boost"; :publishAttr :strength;
-     :setting effect:q1_3boost_set0, effect:q1_3boost_set1, effect:q1_3boost_set2, effect:q1_3boost_set3, effect:q1_3boost_set4, effect:q1_3boost_set5, effect:q1_3boost_set6, effect:q1_3boost_set7, effect:q1_3boost_set8 .
+     :setting effect:q1_3boost_set0, effect:q1_3boost_set1, effect:q1_3boost_set2, effect:q1_3boost_set3, effect:q1_3boost_set4, effect:q1_3boost_set5, effect:q1_3boost_set6, effect:q1_3boost_set7, effect:q1_3boost_set8, effect:q1_3boost_set9 .
 effect:q1_3boost_set0 :device dev:q1; :deviceAttr :color; :scaledValue "#fee9e2" .
 effect:q1_3boost_set1 :device dev:q3; :deviceAttr :color; :scaledValue "#fff5f2" .
 effect:q1_3boost_set2 :device dev:q1; :deviceAttr :rx; :value 0.343 .
@@ -19,3 +19,5 @@ effect:q1_3boost_set5 :device dev:q3; :deviceAttr :focus; :value 0.297 .
 effect:q1_3boost_set6 :device dev:q3; :deviceAttr :rx; :value 0.667 .
 effect:q1_3boost_set7 :device dev:q1; :deviceAttr :ry; :value 0.436 .
 effect:q1_3boost_set8 :device dev:q3; :deviceAttr :zoom; :value 0.207 .
+effect:q1_3boost_set9 :device dev:q3; :deviceAttr :ry; :value 0.436 .
+

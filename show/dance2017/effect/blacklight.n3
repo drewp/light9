@@ -7,7 +7,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 effect:blacklight a :Effect; rdfs:label "blacklight";
-     :publishAttr :strength; :setting effect:blacklight_set0, effect:blacklight_set1, effect:blacklight_set10, effect:blacklight_set11, effect:blacklight_set12, effect:blacklight_set13, effect:blacklight_set14, effect:blacklight_set15, effect:blacklight_set2, effect:blacklight_set3, effect:blacklight_set4, effect:blacklight_set5, effect:blacklight_set6, effect:blacklight_set7, effect:blacklight_set8, effect:blacklight_set9 .
+     :publishAttr :strength; :setting effect:blacklight_set0, effect:blacklight_set1, effect:blacklight_set10, effect:blacklight_set11, effect:blacklight_set12, effect:blacklight_set13, effect:blacklight_set14, effect:blacklight_set15, effect:blacklight_set2, effect:blacklight_set3, effect:blacklight_set4, effect:blacklight_set5, effect:blacklight_set6, effect:blacklight_set7, effect:blacklight_set8, effect:blacklight_set9 , effect:blacklight_set20, effect:blacklight_set21, effect:blacklight_set22, effect:blacklight_set23, effect:blacklight_set24, effect:blacklight_set25. 
 effect:blacklight_set0 :device dev:down2; :deviceAttr :uv;
      :scaledValue 0.988 .
 effect:blacklight_set1 :device dev:down3; :deviceAttr :uv;
@@ -42,9 +42,9 @@ effect:blacklight_set9 :device dev:hexLow3; :deviceAttr :uv;
      :scaledValue 0.008 .
 
  
-#["dev:/upCenter","http://light9.bigasterisk.com/color","#040074"],
-#["dev:/q2","http://light9.bigasterisk.com/color","#0000ff"],
-#["dev:/q2","http://light9.bigasterisk.com/rx",0.485],
-#["dev:/q2","http://light9.bigasterisk.com/ry",0.358],
-#["dev:/q2","http://light9.bigasterisk.com/zoom",0.111],
-#["dev:/q2","http://light9.bigasterisk.com/focus",0.076]]
+effect:blacklight_set20 :device dev:upCenter; :deviceAttr :color; :scaledValue "#040074" .
+effect:blacklight_set21 :device dev:q2; :deviceAttr :color; :scaledValue "#0000ff" .
+effect:blacklight_set22 :device dev:q2; :deviceAttr :rx; :value 0.485 .
+effect:blacklight_set23 :device dev:q2; :deviceAttr :ry; :value 0.358 .
+effect:blacklight_set24 :device dev:q2; :deviceAttr :zoom; :value 0.111 .
+effect:blacklight_set25 :device dev:q2; :deviceAttr :focus; :value 0.076 .
