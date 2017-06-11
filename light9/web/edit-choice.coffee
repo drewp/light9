@@ -44,26 +44,12 @@ Polymer
     properties:
         graph: {type: Object, notify: true},
         uri: {type: String, notify: true},
-        label: {type: String, notify: true}
-
-    observers: [
-      'gotGraph(graph, uri)'
-      ]
 
     ready: ->
       @uri = null
       setupDrop @$.box, @$.box, null, (uri) =>
         @uri=uri
         @updateLabel()
-
-    gotGraph: ->
-      @graph.runHandler(@updateLabel.bind(@), "edit-choice #{@uri}")
-        
-    updateLabel: ->
-      @label = try
-          @graph.stringValue(@uri, RDFS + 'label')
-        catch
-          @uri
 
     unlink: ->
       @uri = null

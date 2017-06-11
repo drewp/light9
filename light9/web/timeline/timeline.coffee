@@ -400,13 +400,13 @@ Polymer
     selection: { type: Object, notify: true }
   observers: [
     'onGraph(graph, dia, setAdjuster, song, zoomInX)'
-    'observedUpdate(song, rowIndex)'
+    'observedUpdate(graph, song, rowIndex)'
     'onZoom(zoomInX)'
     ]
   onGraph: ->
     @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
 
-  observedUpdate: (song, rowIndex) ->
+  observedUpdate: (graph, song, rowIndex) ->
     @update() # old behavior
     #@graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
 
@@ -632,7 +632,6 @@ Polymer
     uri: { type: String, notify: true }  # the Note
     rect: { type: Object, notify: true }
     effect: { type: String, notify: true }
-    effectLabel: { type: String, notify: true }
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
     selection: { type: Object, notify: true }
@@ -679,10 +678,6 @@ Polymer
     #console.time('attrs update')
     U = (x) => @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
-    try
-      @effectLabel = @graph.stringValue(@effect, U('rdfs:label'))
-    catch
-      @effectLabel = @effect.replace(/.*\//, '')
     @noteLabel = @uri.replace(/.*\//, '')
 
     existingColorScaleSetting = null

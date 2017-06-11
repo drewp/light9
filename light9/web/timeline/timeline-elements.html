@@ -243,6 +243,7 @@
                                        selection="{{selection}}"
                                        song="{{song}}"
                                        uri="{{uri}}"
+                                       effect="{{effect}}"
     >
     </light9-timeline-note-inline-attrs>
   </template>
@@ -282,7 +283,7 @@
     <div id="top" style$="left: [[rect.left]]px; top: [[rect.top]]px; width: [[rect.width]]px; height: [[rect.height]]px; display: [[rect.display]]">
       <div>note [[noteLabel]] <button on-click="onDel">del</button></div>
       <table>
-        <tr><th>effect:</th><td><edit-choice uri="{{effect}}" label="{{effectLabel}}"></edit-choice></td></tr>
+        <tr><th>effect:</th><td><edit-choice graph="{{graph}}" uri="{{effect}}"></edit-choice></td></tr>
         <tr><th>colorScale:</th><td>
           <light9-color-picker color="{{colorScale}}"></light9-color-picker>
         </td></tr>
