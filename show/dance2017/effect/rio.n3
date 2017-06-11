@@ -1,0 +1,42 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:rio a :Effect; rdfs:label "rio"; :publishAttr :strength; :setting effect:rio_set0, effect:rio_set1, effect:rio_set10, effect:rio_set11, effect:rio_set12, effect:rio_set13, effect:rio_set14, effect:rio_set15, effect:rio_set16, effect:rio_set17, effect:rio_set18, effect:rio_set19, effect:rio_set2, effect:rio_set20, effect:rio_set21, effect:rio_set22, effect:rio_set23, effect:rio_set24, effect:rio_set25, effect:rio_set26, effect:rio_set27, effect:rio_set28, effect:rio_set29, effect:rio_set3, effect:rio_set30, effect:rio_set4, effect:rio_set5, effect:rio_set6, effect:rio_set7, effect:rio_set8, effect:rio_set9 .
+effect:rio_set0 :device dev:aura1; :deviceAttr :color; :scaledValue "#ffc088" .
+effect:rio_set1 :device dev:aura2; :deviceAttr :color; :scaledValue "#ffb27f" .
+effect:rio_set10 :device dev:aura5; :deviceAttr :zoom; :value 0.280 .
+effect:rio_set11 :device dev:aura1; :deviceAttr :ry; :value 0.090 .
+effect:rio_set12 :device dev:aura2; :deviceAttr :ry; :value 0.010 .
+effect:rio_set13 :device dev:aura2; :deviceAttr :rx; :value 0.584 .
+effect:rio_set14 :device dev:aura4; :deviceAttr :ry; :value 0.035 .
+effect:rio_set15 :device dev:aura3; :deviceAttr :ry; :value 0.068 .
+effect:rio_set16 :device dev:aura5; :deviceAttr :ry; :value 0.045 .
+effect:rio_set17 :device dev:aura5; :deviceAttr :rx; :value 0.591 .
+effect:rio_set18 :device dev:aura4; :deviceAttr :rx; :value 0.618 .
+effect:rio_set19 :device dev:aura3; :deviceAttr :rx; :value 0.537 .
+effect:rio_set2 :device dev:aura4; :deviceAttr :color; :scaledValue "#f8f8f8" .
+effect:rio_set20 :device dev:cycL; :deviceAttr :brightness; :scaledValue 0.540 .
+effect:rio_set21 :device dev:cycR; :deviceAttr :brightness; :scaledValue 0.343 .
+effect:rio_set22 :device dev:down2; :deviceAttr :color; :scaledValue "#f49c7e" .
+effect:rio_set23 :device dev:down4; :deviceAttr :color; :scaledValue "#ffa393" .
+effect:rio_set24 :device dev:down3; :deviceAttr :color; :scaledValue "#ffbc8f" .
+effect:rio_set25 :device dev:q2; :deviceAttr :color; :scaledValue "#ff904f" .
+effect:rio_set26 :device dev:q2; :deviceAttr :focus; :value 0.024 .
+effect:rio_set27 :device dev:q2; :deviceAttr :rx; :value 0.524 .
+effect:rio_set28 :device dev:q2; :deviceAttr :ry; :value 0.277 .
+effect:rio_set29 :device dev:q2; :deviceAttr :zoom; :value 0.473 .
+effect:rio_set3 :device dev:aura5; :deviceAttr :color; :scaledValue "#fab6a6" .
+effect:rio_set30 :device dev:q2; :deviceAttr :prism; :value 0.691 .
+effect:rio_set4 :device dev:aura3; :deviceAttr :color; :scaledValue "#ffd786" .
+effect:rio_set5 :device dev:aura1; :deviceAttr :rx; :value 0.241 .
+effect:rio_set6 :device dev:aura1; :deviceAttr :zoom; :value 0.314 .
+effect:rio_set7 :device dev:aura2; :deviceAttr :zoom; :value 0.265 .
+effect:rio_set8 :device dev:aura3; :deviceAttr :zoom; :value 0.273 .
+effect:rio_set9 :device dev:aura4; :deviceAttr :zoom; :value 0.330 .

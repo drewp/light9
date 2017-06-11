@@ -3,13 +3,12 @@
 @prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-<http://light9.bigasterisk.com/show/dance2017/song16> :note <http://light9.bigasterisk.com/show/dance2017/song16/n0> .
 
-<http://light9.bigasterisk.com/show/dance2017/song16/n0> a :Note;
-     :curve <http://light9.bigasterisk.com/show/dance2017/song16/n0c0>;
+<http://light9.bigasterisk.com/show/dance2017/song16/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song16/n0c0>;
      :effectClass effect:e1; :originTime 137.983 .
 
 <http://light9.bigasterisk.com/show/dance2017/song16/n0c0> a :Curve;
