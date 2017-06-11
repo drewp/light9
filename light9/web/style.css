@@ -156,7 +156,7 @@ a.resource {
     padding: 1px;
     margin: 2px;
     background: rgb(49, 49, 49);
-    display: block;
+    display: inline-block;
     text-shadow: 1px 1px 2px black;
 }
 .resource.minor {
