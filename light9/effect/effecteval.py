@@ -15,7 +15,7 @@ from light9.effect.settings import DeviceSettings
 log = logging.getLogger('effecteval')
 
 def literalColor(rnorm, gnorm, bnorm):
-    return Literal(rgb_to_hex([rnorm * 255, gnorm * 255, bnorm * 255]))
+    return Literal(rgb_to_hex([int(rnorm * 255), int(gnorm * 255), int(bnorm * 255)]))
 
 def literalColorHsv(h, s, v):
     return literalColor(*hsv_to_rgb(h, s, v))
@@ -296,7 +296,7 @@ def effect_Strobe(effectSettings, strength, songTime, noteTime):
     offset = 0
     f = (((songTime + offset) * rate) % 1.0)
     c = (f < duty) * strength
-    col = rgb_to_hex([c * 255, c * 255, c * 255])
+    col = rgb_to_hex([int(c * 255), int(c * 255), int(c * 255)])
     return {(L9['device/colorStrip'], L9['color']): Literal(col)}
 
 def effect_lightning(effectSettings, strength, songTime, noteTime):
@@ -310,7 +310,7 @@ def effect_lightning(effectSettings, strength, songTime, noteTime):
             L9['device/hexLow5'], L9['device/lip1 5'],
             L9['device/postL1'], L9['device/postR1']]
     out = {}
-    col = rgb_to_hex([255 * strength] * 3)
+    col = rgb_to_hex([int(255 * strength)] * 3)
     for i, dev in enumerate(devs):
         n = noise(songTime * 8 + i * 6.543)
         if n > .4:
