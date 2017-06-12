@@ -8,13 +8,38 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song1 :note song:n0 .
+show:song1 :note song:n1, song:n2, song:n3 .
 
-song:n0 a :Note; :curve song:n0c0; :effectClass effect:e3;
-     :originTime 52.219 .
+song:n0 a :Note; :curve song:n0c0; :effectClass effect:e3; :originTime 52.219 .
 
 song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
 song:n0c0p0 :time 0.000; :value 0.000 .
 song:n0c0p1 :time 37.452; :value 1.000 .
 song:n0c0p2 :time 74.904; :value 1.000 .
 song:n0c0p3 :time 112.356; :value 0.000 .
+
+song:n1 a :Note; :curve song:n1c0; :effectClass effect:posts; :originTime 27.949 .
+
+song:n1c0 a :Curve; :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
+song:n1c0p0 :time -24.481; :value 0.000 .
+song:n1c0p1 :time -16.184; :value 1.000 .
+song:n1c0p2 :time 158.529; :value 1.000 .
+song:n1c0p3 :time 161.634; :value 0.000 .
+
+song:n2 a :Note; :curve song:n2c0; :effectClass effect:aurafill; :originTime 50.711;
+     :setting song:n2set0 .
+
+song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
+song:n2c0p0 :time -47.864; :value 0.000 .
+song:n2c0p1 :time -45.204; :value 1.000 .
+song:n2c0p2 :time 135.668; :value 1.000 .
+song:n2c0p3 :time 138.883; :value 0.000 .
+song:n2set0 :effectAttr :colorScale; :value "#ffd9ce" .
+
+song:n3 a :Note; :curve song:n3c0; :effectClass effect:qfill; :originTime 34.204 .
+
+song:n3c0 a :Curve; :attr :strength; :point song:n3c0p0, song:n3c0p1, song:n3c0p2, song:n3c0p3 .
+song:n3c0p0 :time -30.738; :value 0.000 .
+song:n3c0p1 :time -28.823; :value 1.000 .
+song:n3c0p2 :time 152.127; :value 1.000 .
+song:n3c0p3 :time 155.385; :value 0.000 .

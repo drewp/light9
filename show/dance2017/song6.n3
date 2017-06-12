@@ -23,7 +23,7 @@ show:song6 :note <http://light9.bigasterisk.com/show/dance2017/song6/n0>, <http:
 <http://light9.bigasterisk.com/show/dance2017/song6/n0c0p3> :time 190.799;
      :value 0.000 .
 <http://light9.bigasterisk.com/show/dance2017/song6/n0set0> :effectAttr :colorScale;
-     :value "#8b8b8b" .
+     :value "#ffffff" .
 
 <http://light9.bigasterisk.com/show/dance2017/song6/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2017/song6/n1c0>;
      :effectClass effect:tropic; :originTime 0.323 .
