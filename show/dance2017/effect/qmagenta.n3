@@ -1,0 +1,27 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:qmagenta a :Effect; rdfs:label "qmagenta"; :publishAttr :strength;
+     :setting effect:qmagenta_set0, effect:qmagenta_set1, effect:qmagenta_set10, effect:qmagenta_set11, effect:qmagenta_set12, effect:qmagenta_set13, effect:qmagenta_set14, effect:qmagenta_set2, effect:qmagenta_set3, effect:qmagenta_set4, effect:qmagenta_set5, effect:qmagenta_set6, effect:qmagenta_set7, effect:qmagenta_set8, effect:qmagenta_set9 .
+effect:qmagenta_set0 :device dev:q1; :deviceAttr :color; :scaledValue "#a109ff" .
+effect:qmagenta_set1 :device dev:q1; :deviceAttr :focus; :value 0.515 .
+effect:qmagenta_set10 :device dev:q2; :deviceAttr :ry; :value 0.387 .
+effect:qmagenta_set11 :device dev:q3; :deviceAttr :ry; :value 0.121 .
+effect:qmagenta_set12 :device dev:q2; :deviceAttr :zoom; :value 0.439 .
+effect:qmagenta_set13 :device dev:q1; :deviceAttr :zoom; :value 0.335 .
+effect:qmagenta_set14 :device dev:q3; :deviceAttr :zoom; :value 0.435 .
+effect:qmagenta_set2 :device dev:q1; :deviceAttr :rx; :value 0.651 .
+effect:qmagenta_set3 :device dev:q1; :deviceAttr :ry; :value 0.532 .
+effect:qmagenta_set4 :device dev:q3; :deviceAttr :color; :scaledValue "#ea00ff" .
+effect:qmagenta_set5 :device dev:q3; :deviceAttr :focus; :value 0.563 .
+effect:qmagenta_set6 :device dev:q3; :deviceAttr :rx; :value 0.388 .
+effect:qmagenta_set7 :device dev:q2; :deviceAttr :color; :scaledValue "#f700ff" .
+effect:qmagenta_set8 :device dev:q2; :deviceAttr :focus; :value 0.471 .
+effect:qmagenta_set9 :device dev:q2; :deviceAttr :rx; :value 0.533 .

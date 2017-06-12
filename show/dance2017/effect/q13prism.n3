@@ -1,0 +1,14 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:q13prism a :Effect; rdfs:label "q13prism"; :publishAttr :strength;
+     :setting effect:q13prism_set0, effect:q13prism_set1 .
+effect:q13prism_set0 :device dev:q1; :deviceAttr :prism; :value 0.502 .
+effect:q13prism_set1 :device dev:q3; :deviceAttr :prism; :value 0.488 .

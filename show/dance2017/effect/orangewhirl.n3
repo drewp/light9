@@ -1,0 +1,29 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:orangewhirl a :Effect; rdfs:label "orangewhirl"; :publishAttr :strength;
+     :setting effect:orangewhirl_set0, effect:orangewhirl_set1, effect:orangewhirl_set10, effect:orangewhirl_set11, effect:orangewhirl_set12, effect:orangewhirl_set13, effect:orangewhirl_set14, effect:orangewhirl_set15, effect:orangewhirl_set2, effect:orangewhirl_set3, effect:orangewhirl_set4, effect:orangewhirl_set5, effect:orangewhirl_set6, effect:orangewhirl_set7, effect:orangewhirl_set8, effect:orangewhirl_set9 .
+effect:orangewhirl_set0 :device dev:q2; :deviceAttr :color; :scaledValue "#ffd6ca" .
+effect:orangewhirl_set1 :device dev:q2; :deviceAttr :focus; :value 0.537 .
+effect:orangewhirl_set10 :device dev:q3; :deviceAttr :color; :scaledValue "#ff5e00" .
+effect:orangewhirl_set11 :device dev:q3; :deviceAttr :focus; :value 0.574 .
+effect:orangewhirl_set12 :device dev:q3; :deviceAttr :rx; :value 0.708 .
+effect:orangewhirl_set13 :device dev:q3; :deviceAttr :zoom; :value 0.374 .
+effect:orangewhirl_set14 :device dev:q2; :deviceAttr :rx; :value 0.506 .
+effect:orangewhirl_set15 :device dev:q2; :deviceAttr :ry; :value 0.202 .
+effect:orangewhirl_set2 :device dev:q2; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/whirlpool" .
+effect:orangewhirl_set3 :device dev:q2; :deviceAttr :zoom; :value 0.041 .
+effect:orangewhirl_set4 :device dev:q2; :deviceAttr :goboSpeed; :value 0.031 .
+effect:orangewhirl_set5 :device dev:q1; :deviceAttr :color; :scaledValue "#ff5e00" .
+effect:orangewhirl_set6 :device dev:q1; :deviceAttr :focus; :value 0.526 .
+effect:orangewhirl_set7 :device dev:q1; :deviceAttr :rx; :value 0.288 .
+effect:orangewhirl_set8 :device dev:q1; :deviceAttr :ry; :value 0.384 .
+effect:orangewhirl_set9 :device dev:q1; :deviceAttr :zoom; :value 0.190 .

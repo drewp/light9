@@ -1,0 +1,36 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:starstrobe a :Effect; rdfs:label "starstrobe"; :publishAttr :strength;
+     :setting effect:starstrobe_set0, effect:starstrobe_set1, effect:starstrobe_set10, effect:starstrobe_set11, effect:starstrobe_set12, effect:starstrobe_set13, effect:starstrobe_set14, effect:starstrobe_set15, effect:starstrobe_set16, effect:starstrobe_set17, effect:starstrobe_set18, effect:starstrobe_set19, effect:starstrobe_set2, effect:starstrobe_set20, effect:starstrobe_set3, effect:starstrobe_set4, effect:starstrobe_set5, effect:starstrobe_set6, effect:starstrobe_set7, effect:starstrobe_set8, effect:starstrobe_set9 .
+effect:starstrobe_set0 :device dev:q1; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:starstrobe_set1 :device dev:q1; :deviceAttr :focus; :value 0.528 .
+effect:starstrobe_set10 :device dev:q2; :deviceAttr :rx; :value 0.496 .
+effect:starstrobe_set11 :device dev:q2; :deviceAttr :ry; :value 0.464 .
+effect:starstrobe_set12 :device dev:q2; :deviceAttr :zoom; :value 0.038 .
+effect:starstrobe_set13 :device dev:q2; :deviceAttr :strobe; :value 0.921 .
+effect:starstrobe_set14 :device dev:q3; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:starstrobe_set15 :device dev:q3; :deviceAttr :focus; :value 0.539 .
+effect:starstrobe_set16 :device dev:q3; :deviceAttr :rx; :value 0.705 .
+effect:starstrobe_set17 :device dev:q3; :deviceAttr :ry; :value 0.015 .
+effect:starstrobe_set18 :device dev:q3; :deviceAttr :strobe; :value 0.941 .
+effect:starstrobe_set19 :device dev:q3; :deviceAttr :zoom; :value 0.040 .
+effect:starstrobe_set2 :device dev:q1; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/stars" .
+effect:starstrobe_set20 :device dev:q3; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/stars" .
+effect:starstrobe_set3 :device dev:q1; :deviceAttr :rx; :value 0.204 .
+effect:starstrobe_set4 :device dev:q1; :deviceAttr :ry; :value 0.444 .
+effect:starstrobe_set5 :device dev:q1; :deviceAttr :strobe; :value 0.925 .
+effect:starstrobe_set6 :device dev:q1; :deviceAttr :zoom; :value 0.080 .
+effect:starstrobe_set7 :device dev:q2; :deviceAttr :color; :scaledValue "#fffbfc" .
+effect:starstrobe_set8 :device dev:q2; :deviceAttr :focus; :value 0.533 .
+effect:starstrobe_set9 :device dev:q2; :deviceAttr :quantumGoboChoice;
+     :value "http://light9.bigasterisk.com/stars" .
