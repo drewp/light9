@@ -14,9 +14,9 @@ show:song4 :note <http://light9.bigasterisk.com/show/dance2017/song4/n0>, <http:
 
 <http://light9.bigasterisk.com/show/dance2017/song4/n0c0> a :Curve;
      :attr :strength; :point <http://light9.bigasterisk.com/show/dance2017/song4/n0c0p0>, <http://light9.bigasterisk.com/show/dance2017/song4/n0c0p1>, <http://light9.bigasterisk.com/show/dance2017/song4/n0c0p2>, <http://light9.bigasterisk.com/show/dance2017/song4/n0c0p3> .
-<http://light9.bigasterisk.com/show/dance2017/song4/n0c0p0> :time -3.325;
+<http://light9.bigasterisk.com/show/dance2017/song4/n0c0p0> :time -1.058;
      :value 0.000 .
-<http://light9.bigasterisk.com/show/dance2017/song4/n0c0p1> :time -0.619;
+<http://light9.bigasterisk.com/show/dance2017/song4/n0c0p1> :time 2.101;
      :value 1.000 .
 <http://light9.bigasterisk.com/show/dance2017/song4/n0c0p2> :time 259.885;
      :value 1.000 .
