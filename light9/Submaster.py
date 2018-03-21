@@ -7,7 +7,7 @@ from light9.TLUtility import dict_scale, dict_max
 from light9 import showconfig
 from light9.Patch import resolve_name, get_dmx_channel, get_channel_uri, reload_data
 from louie import dispatcher
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 log = logging.getLogger('submaster')
 
 class Submaster(object):

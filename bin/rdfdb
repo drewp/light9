@@ -117,12 +117,12 @@ import cyclone.web, cyclone.httpclient, cyclone.websocket
 sys.path.append(".")
 from light9 import networking, showconfig, prof
 from rdflib import ConjunctiveGraph, URIRef, Graph
-from light9.rdfdb.graphfile import GraphFile
-from light9.rdfdb.patch import Patch, ALLSTMTS
-from light9.rdfdb.rdflibpatch import patchQuads
-from light9.rdfdb.file_vs_uri import correctToTopdirPrefix, fileForUri, uriFromFile
-from light9.rdfdb.patchsender import sendPatch
-from light9.rdfdb.patchreceiver import makePatchEndpointPutMethod
+from rdfdb.graphfile import GraphFile
+from rdfdb.patch import Patch, ALLSTMTS
+from rdfdb.rdflibpatch import patchQuads
+from rdfdb.file_vs_uri import correctToTopdirPrefix, fileForUri, uriFromFile
+from rdfdb.patchsender import sendPatch
+from rdfdb.patchreceiver import makePatchEndpointPutMethod
 
 from twisted.internet.inotify import INotify
 from run_local import log

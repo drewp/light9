@@ -5,7 +5,7 @@ from rdflib import Namespace, URIRef
 
 from light9.namespaces import L9, DEV
 from light9.collector.collector import Collector, outputMap
-from light9.rdfdb.mock_syncedgraph import MockSyncedGraph
+from rdfdb.mock_syncedgraph import MockSyncedGraph
 
 UDMX = Namespace('http://light9.bigasterisk.com/output/udmx/')
 DMX0 = Namespace('http://light9.bigasterisk.com/output/dmx0/')

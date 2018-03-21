@@ -6,7 +6,7 @@ from twisted.internet import reactor
 from rdflib import Literal
 from light9 import showconfig
 from light9.namespaces import L9, RDF, RDFS
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 
 log = logging.getLogger()
 # todo: move to config, consolidate with ascoltami, musicPad, etc

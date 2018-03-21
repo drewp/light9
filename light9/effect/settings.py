@@ -8,7 +8,7 @@ import decimal
 import numpy
 from rdflib import URIRef, Literal
 from light9.namespaces import RDF, L9, DEV
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 import logging
 log = logging.getLogger('settings')
 from light9.collector.device import resolve

@@ -4,7 +4,7 @@ from louie import dispatcher
 import light9.Effects
 from light9 import Submaster, showconfig, prof
 from light9.Patch import get_dmx_channel
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 from light9.namespaces import L9
 log = logging.getLogger()
 

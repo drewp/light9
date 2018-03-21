@@ -13,7 +13,7 @@ import cyclone.web, cyclone.httpclient, cyclone.websocket
 from light9 import networking, showconfig
 from light9.vidref.main import Gui
 from light9.vidref.replay import snapshotDir
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 
  # find replay dirs correctly. show multiple
  # replays. trash. reorder/pin. dump takes that are too short; they're

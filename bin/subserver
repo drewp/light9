@@ -10,8 +10,8 @@ from twisted.internet import reactor, defer
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 from rdflib import RDF, URIRef, Literal
 import pyjade.utils
-from light9.rdfdb.syncedgraph import SyncedGraph
-from light9.rdfdb.patch import Patch
+from rdfdb.syncedgraph import SyncedGraph
+from rdfdb.patch import Patch
 from light9.namespaces import L9, DCTERMS
 from light9 import networking, showconfig
 

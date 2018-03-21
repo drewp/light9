@@ -7,7 +7,7 @@ from rdflib import URIRef
 from light9 import networking
 from light9.editchoicegtk import EditChoice, Local
 from light9.observable import Observable
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 
 win = gtk.Window()
 

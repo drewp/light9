@@ -10,7 +10,7 @@ from rdflib import URIRef
 from twisted.internet import reactor, task
 from light9.curvecalc.client import sendLiveInputPoint
 from light9.namespaces import L9, RDF, RDFS
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 from light9 import networking
 
 import sys

@@ -6,14 +6,14 @@ from __future__ import division
 from run_local import log
 from twisted.internet import reactor
 from light9.greplin_cyclone import StatsForCyclone
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 from light9 import networking, showconfig
 from greplin import scales
 import optparse, sys, logging
 import cyclone.web
 from rdflib import URIRef
 from light9.effect.sequencer import Sequencer, sendToCollector
-from light9.rdfdb import clientsession
+from rdfdb import clientsession
 
 class App(object):
     def __init__(self, show, session):

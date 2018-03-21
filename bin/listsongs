@@ -13,7 +13,7 @@ from twisted.internet import reactor
 from rdflib import RDF
 from light9 import networking
 from light9.namespaces import L9
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 
 graph = SyncedGraph(networking.rdfdb.url, "listsongs")
 

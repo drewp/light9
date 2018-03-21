@@ -9,8 +9,8 @@ import optparse, logging, urllib, time
 from gi.repository import Gtk
 from run_local import log
 from light9 import showconfig, networking
-from light9.rdfdb import clientsession
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb import clientsession
+from rdfdb.syncedgraph import SyncedGraph
 import cyclone.httpclient
 from light9.curvecalc.client import sendLiveInputPoint
 

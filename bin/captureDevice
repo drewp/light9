@@ -17,12 +17,12 @@ from lib.cycloneerr import PrettyErrorHandler
 
 from light9.namespaces import L9, RDF
 from light9 import networking, showconfig
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 from light9.paint.capture import writeCaptureDescription
 from light9.greplin_cyclone import StatsForCyclone
 from light9.effect.settings import DeviceSettings
 from light9.effect.sequencer import sendToCollector
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 
 stats = scales.collection('/webServer', scales.PmfStat('setAttr'))
 

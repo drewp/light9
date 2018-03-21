@@ -32,11 +32,11 @@ from light9 import dmxclient, Submaster, prof, showconfig, networking
 
 from light9.Patch import get_channel_name
 from light9.uihelpers import toplevelat
-from light9.rdfdb.syncedgraph import SyncedGraph
-from light9.rdfdb import clientsession
+from rdfdb.syncedgraph import SyncedGraph
+from rdfdb import clientsession
 from light9.tkdnd import initTkdnd
 from light9.namespaces import L9
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 from light9.observable import Observable
 from light9.editchoice import EditChoice, Local
 from light9.subcomposer import subcomposerweb

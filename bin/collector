@@ -25,7 +25,7 @@ from light9.collector.output import EnttecDmx, Udmx, DummyOutput
 from light9.collector.collector import Collector
 from light9.namespaces import L9
 from light9 import networking
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 from light9.greplin_cyclone import StatsForCyclone
 
 def parseJsonMessage(msg):

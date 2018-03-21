@@ -6,7 +6,7 @@ from light9.namespaces import L9
 from urlparse import urlparse
 from urllib import splitport
 
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.syncedgraph import SyncedGraph
 from twisted.internet import reactor
 
 graph = showconfig.getGraph()

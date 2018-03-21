@@ -3,7 +3,7 @@ import numpy.testing
 import solve
 from rdflib import Namespace
 from light9.namespaces import RDF, L9, DEV
-from light9.rdfdb.localsyncedgraph import LocalSyncedGraph
+from rdfdb.localsyncedgraph import LocalSyncedGraph
 from light9.effect.settings import DeviceSettings
 
 class TestSolve(unittest.TestCase):

@@ -16,8 +16,8 @@ from light9.effect.edit import getMusicStatus, songNotePatch
 from light9.effecteval.effectloop import makeEffectLoop
 from light9.greplin_cyclone import StatsForCyclone
 from light9.namespaces import L9
-from light9.rdfdb.patch import Patch
-from light9.rdfdb.syncedgraph import SyncedGraph
+from rdfdb.patch import Patch
+from rdfdb.syncedgraph import SyncedGraph
 from greplin import scales
 
 from lib.cycloneerr import PrettyErrorHandler

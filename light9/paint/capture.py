@@ -1,7 +1,7 @@
 import os
 from rdflib import URIRef
 from light9 import showconfig
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 from light9.namespaces import L9, RDF
 from light9.paint.solve import loadNumpy
 

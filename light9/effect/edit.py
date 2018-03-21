@@ -5,7 +5,7 @@ from rdflib import URIRef, Literal
 
 from light9 import networking
 from light9.namespaces import L9, RDF, RDFS
-from light9.rdfdb.patch import Patch
+from rdfdb.patch import Patch
 from light9.curvecalc.curve import CurveResource
 
 def clamp(x, lo, hi):
