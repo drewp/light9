@@ -8,6 +8,8 @@ Input can be over http or zmq.
 """
 
 from __future__ import division
+from run_local import log
+
 from rdflib import URIRef, Literal
 from twisted.internet import reactor, utils
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPullConnection
@@ -19,7 +21,6 @@ import traceback
 import cyclone.web, cyclone.websocket
 from greplin import scales
 
-from run_local import log
 from lib.cycloneerr import PrettyErrorHandler
 from light9.collector.output import EnttecDmx, Udmx, DummyOutput
 from light9.collector.collector import Collector

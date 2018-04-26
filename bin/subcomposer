@@ -16,7 +16,12 @@ subcomposer
 
 """
 from __future__ import division, nested_scopes
+
+from run_local import log
 import time, logging
+
+log.setLevel(logging.DEBUG)
+
 from optparse import OptionParser
 import logging, urllib
 import Tkinter as tk
@@ -24,12 +29,8 @@ import louie as dispatcher
 from twisted.internet import reactor, tksupport, task
 from rdflib import URIRef, RDF, RDFS, Literal
 
-from run_local import log
-log.setLevel(logging.DEBUG)
-
 from light9.dmxchanedit import Levelbox
 from light9 import dmxclient, Submaster, prof, showconfig, networking
-
 from light9.Patch import get_channel_name
 from light9.uihelpers import toplevelat
 from rdfdb.syncedgraph import SyncedGraph
