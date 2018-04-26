@@ -3,24 +3,6 @@ RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 Drawing = window.Drawing
 ROW_COUNT = 7
 
-# polymer dom-repeat is happy to shuffle children by swapping their
-# attribute values, and it's hard to correctly setup/teardown your
-# side effects if your attributes are changing before the detach
-# call. This alternative to dom-repeat never reassigns
-# attributes. But, it can't set up property bindings.
-updateChildren = (parent, newUris, makeChild) ->
-  childUris = []
-  childByUri = {}
-  for e in parent.children
-    childUris.push(e.uri)
-    childByUri[e.uri] = e
-
-  for uri in _.difference(childUris, newUris)
-    childByUri[uri].detached()
-    ko.removeNode(childByUri[uri])
-  for uri in _.difference(newUris, childUris)
-    parent.appendChild(makeChild(uri))
-
 
 Polymer
   is: 'light9-timeline-editor'
@@ -287,15 +269,28 @@ Polymer
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
     zoomInX: { type: Object, notify: true }
-    rows: { value: [0...ROW_COUNT] }
     zoom: { type: Object, notify: true, observer: 'onZoom' } # viewState.zoomSpec
     zoomFlattened: { type: Object, notify: true }
+  observers: [
+    'onGraph(graph, dia, setAdjuster, song, zoomInX)'
+  ]
   onZoom: ->
     updateZoomFlattened = ->
       log('updateZoomFlattened')
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
   ready: ->
+
+  onGraph: ->
+    U = (x) => @graph.Uri(x)
+    log('assign rows',@song)
+
+    for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
+      #should only make new ones
+      child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @zoomInX)
+      log('note ',uri)
+    
+    @rows = (new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
 
   attached: ->
     root = @closest('light9-timeline-editor')
@@ -389,24 +384,15 @@ Polymer
   # light9-timeline-editor does our drawing work.
 
 
-Polymer
-  is: 'light9-timeline-graph-row'
-  behaviors: [ Polymer.IronResizableBehavior ]
-  properties:
-    graph: { type: Object, notify: true }
-    dia: { type: Object, notify: true }
-    song:  { type: String, notify: true }
-    zoomInX: { type: Object, notify: true }
-    noteUris: { type: Array, notify: true }
-    rowIndex: { type: Object, notify: true }
-    selection: { type: Object, notify: true }
+class NoteRow
+  constructor: (@graph, @dia, @song, @zoomInX, @noteUris, @rowIndex, @selection) ->
+    @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
+
   observers: [
-    'onGraph(graph, dia, setAdjuster, song, zoomInX)'
     'observedUpdate(graph, song, rowIndex)'
     'onZoom(zoomInX)'
     ]
-  onGraph: ->
-    @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
+
 
   observedUpdate: (graph, song, rowIndex) ->
     @update() # old behavior
@@ -422,26 +408,19 @@ Polymer
         notesForThisRow.push(n)
       i++
 
-    updateChildren @, notesForThisRow, (newUri) =>
-      child = document.createElement('light9-timeline-note')
-      child.graph = @graph
-      child.selection = @selection
-      child.dia = @dia
-      child.uri = newUri
-      child.setAdjuster = @setAdjuster
-      child.song = @song # could change, but all the notes will be rebuilt
-      child.zoomInX = @zoomInX # missing binding; see onZoom
-      return child      
+    for newUri in notesForThisRow
+      #should only make new ones
+      child = new Note(@graph, @selection, @dia, newUri, @setAdjuster, @song, @zoomInX)
 
   onZoom: ->
     for e in @children
       e.zoomInX = @zoomInX
 
-
-Polymer
+class Note
+  constructor: (@graph, @selection, @dia, @uri, @setAdjuster, @song, @zoomInX)->0
   is: 'light9-timeline-note'
   behaviors: [ Polymer.IronResizableBehavior ]
-  listeners: 'iron-resize': 'update'
+  listeners: 'iron-resize': 'update' #move to parent elem
   properties:
     graph: { type: Object, notify: true }
     selection: { type: Object, notify: true }

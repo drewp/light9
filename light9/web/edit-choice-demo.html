@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+  <head>
+    <title></title>
+    <meta charset="utf-8" />
+    <script src="/lib/webcomponentsjs/webcomponents-hi-sd-ce.js"></script>
+    <link rel="import" href="rdfdb-synced-graph.html">
+    <link rel="import" href="edit-choice.html">
+    <script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
+      <script src="/lib/knockout/dist/knockout.js"></script>
+      <script src="/lib/shortcut/index.js"></script>
+      <script src="/lib/async/dist/async.js"></script>
+      <script src="/lib/underscore/underscore-min.js"></script>
+  </head>
+  <body>
+    <dom-bind>
+      <template>
+        <p>
+          <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
+        </p>
+        <p>
+          edit-choice: <edit-choice graph="{{graph}}" uri="http://example.com/hello"></edit-choice>
+        </p>
+        <p>
+          <a href="http://light9.bigasterisk.com/effect/spideredge" >this has a label</a>
+      </template>
+    </dom-bind>
+  </body>
+</html>

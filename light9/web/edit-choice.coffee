@@ -34,7 +34,10 @@ window.setupDrop = (senseElem, highlightElem, coordinateOriginElem, onDrop) ->
       else
         null
 
-    onDrop(uri, pos)
+    try
+      onDrop(uri, pos)
+    catch e
+      console.log(e)
     unhighlight()
 
 

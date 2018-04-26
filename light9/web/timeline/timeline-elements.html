@@ -29,6 +29,9 @@
      light9-timeline-time-zoomed {
          flex-grow: 1;
      }
+     #coveredByDiagram {
+         position: relative;
+     }
      #dia, #adjusters, #cursorCanvas, #adjustersCanvas {
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
@@ -52,24 +55,26 @@
     </div>
     <div id="debug">[[debug]]</div>
     <iron-ajax id="vidrefTime" url="/vidref/time" method="PUT" content-type="application/json"></iron-ajax>
-    <light9-timeline-audio id="audio"
-                           graph="{{graph}}"
-                           show="{{show}}"
-                           song="{{song}}"></light9-timeline-audio>
-    <light9-timeline-time-zoomed id="zoomed"
-                                 graph="{{graph}}"
-                                 selection="{{selection}}"
-                                 dia="{{dia}}"
-                                 set-adjuster="{{setAdjuster}}"
-                                 song="{{song}}"
-                                 show="{{show}}"
-                                 zoom="{{viewState.zoomSpec}}"
-                                 zoom-in-x="{{zoomInX}}">
-    </light9-timeline-time-zoomed>
-    <light9-timeline-diagram-layer id="dia" selection="{{selection}}"></light9-timeline-diagram-layer>
-    <light9-adjusters-canvas id="adjustersCanvas" set-adjuster="{{setAdjuster}}">
-    </light9-adjusters-canvas>
-    <light9-cursor-canvas id="cursorCanvas"></light9-cursor-canvas>
+    <div id="coveredByDiagram">
+      <light9-timeline-audio id="audio"
+                             graph="{{graph}}"
+                             show="{{show}}"
+                             song="{{song}}"></light9-timeline-audio>
+      <light9-timeline-time-zoomed id="zoomed"
+                                   graph="{{graph}}"
+                                   selection="{{selection}}"
+                                   dia="{{dia}}"
+                                   set-adjuster="{{setAdjuster}}"
+                                   song="{{song}}"
+                                   show="{{show}}"
+                                   zoom="{{viewState.zoomSpec}}"
+                                   zoom-in-x="{{zoomInX}}">
+      </light9-timeline-time-zoomed>
+      <light9-timeline-diagram-layer id="dia" selection="{{selection}}"></light9-timeline-diagram-layer>
+      <light9-adjusters-canvas id="adjustersCanvas" set-adjuster="{{setAdjuster}}">
+      </light9-adjusters-canvas>
+      <light9-cursor-canvas id="cursorCanvas"></light9-cursor-canvas>
+    </div>
   </template>
  
 </dom-module>
@@ -107,17 +112,6 @@
                              zoom="{{zoomFlattened}}">
       </light9-timeline-audio>
       <div id="rows">
-        <template is="dom-repeat" items="{{rows}}">
-          <light9-timeline-graph-row graph="{{graph}}"
-                                     selection="{{selection}}"
-                                     dia="{{dia}}"
-                                     set-adjuster="{{setAdjuster}}"
-                                     song="{{song}}"
-                                     zoom-in-x="{{zoomInX}}"
-                                     row-index="{{item}}"
-          >
-          </light9-timeline-graph-row>
-        </template>
       </div>
     </div>
   </template>
@@ -212,19 +206,6 @@
   </template>
 </dom-module>
 
-<!-- one row of notes -->
-<dom-module id="light9-timeline-graph-row">
-  <template>
-    <style>
-     :host {
-         border-top: 1px solid black;
-         display: flex;
-     }
-    </style>
-    <!-- light9-timeline-note repeated here -->
-  </template>
-</dom-module>
-
 <!-- One trapezoid note shape in a row.
      This element has the right Y coords.
      We compute X coords from the zoom setting.
@@ -300,7 +281,7 @@
 <!-- master version -->
 <xxscript src="/lib/N3.js/browser/n3-browser.js"></script>
   
-<script src="/lib/knockout/dist/knockout.debug.js"></script>
+<script src="/lib/knockout/dist/knockout.js"></script>
 <script src="/lib/shortcut/index.js"></script>
 <script src="/lib/async/dist/async.js"></script>
 <script src="/lib/underscore/underscore-min.js"></script>

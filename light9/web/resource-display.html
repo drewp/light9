@@ -54,6 +54,7 @@
            return minor ? 'resource minor' : 'resource';
        },
        onUri: function(graph, uri) {
+           if (!this.graph) return;
            this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri}`);
        },
        setLabel: function() {
