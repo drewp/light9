@@ -68,10 +68,10 @@ tkdnd_build:
 bin/ascoltami2: gst_packages link_to_sys_packages
 
 gst_packages:
-	sudo aptitude install python-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio python-gst0.10 python-gst-1.0 python-pygoocanvas gir1.2-goocanvas-2.0
+	sudo aptitude install python-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio python-gst-1.0 python-pygoocanvas gir1.2-goocanvas-2.0
 
 packages:
-	sudo aptitude install coffeescript normalize-audio audacity python-pygame libffi-dev tix libzmq3-dev python-dev libssl-dev python-opencv python-cairo npm git python-virtualenv nginx
+	sudo aptitude install coffeescript normalize-audio audacity python-pygame libffi-dev tix libzmq3-dev python-dev libssl-dev python-opencv python-cairo npm git python-virtualenv nginx python-tk
 
 
 node_modules/bower/bin/bower:
