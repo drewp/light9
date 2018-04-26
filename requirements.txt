@@ -33,4 +33,4 @@ typing==3.6.1
 watchdog==0.8.3
 web.py==0.38
 webcolors==1.7
-https://projects.bigasterisk.com/rdfdb/rdfdb-0.3.0.tar.gz
+https://projects.bigasterisk.com/rdfdb/rdfdb-0.4.0.tar.gz
