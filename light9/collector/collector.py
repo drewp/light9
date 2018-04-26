@@ -103,7 +103,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
     def _warnOnLateRequests(self, client, now, sendTime):
         requestLag = now - sendTime
-        if requestLag > .1 and now > self.initTime + 5:
+        if requestLag > .1 and now > self.initTime + 10:
             log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
                      client, requestLag * 1000)
 
