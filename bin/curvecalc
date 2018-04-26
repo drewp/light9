@@ -41,7 +41,7 @@ from light9.editchoicegtk import EditChoice, Local
 from light9.gtkpyconsole import togglePyConsole
 from light9.namespaces import L9
 from light9.observable import Observable
-from rdfdb import clientsession
+from light9 import clientsession
 from rdfdb.patch import Patch
 from rdfdb.syncedgraph import SyncedGraph
 from light9.wavelength import wavelength

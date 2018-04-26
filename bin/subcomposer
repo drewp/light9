@@ -34,7 +34,7 @@ from light9 import dmxclient, Submaster, prof, showconfig, networking
 from light9.Patch import get_channel_name
 from light9.uihelpers import toplevelat
 from rdfdb.syncedgraph import SyncedGraph
-from rdfdb import clientsession
+from light9 import clientsession
 from light9.tkdnd import initTkdnd
 from light9.namespaces import L9
 from rdfdb.patch import Patch

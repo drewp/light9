@@ -13,7 +13,7 @@ import optparse, sys, logging
 import cyclone.web
 from rdflib import URIRef
 from light9.effect.sequencer import Sequencer, sendToCollector
-from rdfdb import clientsession
+from light9 import clientsession
 
 class App(object):
     def __init__(self, show, session):

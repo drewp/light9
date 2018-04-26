@@ -17,7 +17,7 @@ from light9 import showconfig, networking, prof
 from light9.uihelpers import toplevelat
 from light9.namespaces import L9, RDF, RDFS
 from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
-from rdfdb import clientsession
+from light9 import clientsession
 from rdfdb.syncedgraph import SyncedGraph
 from light9.effect.sequencer import CodeWatcher
 import light9.effect.effecteval
