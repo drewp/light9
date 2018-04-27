@@ -1,0 +1,138 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title>pixi.js test</title>
+    <style>
+     body {
+	 margin: 0;
+	 padding: 0;
+	 background-color: #000000;
+     }
+     
+     #help{
+	 position: absolute;
+	 z-index: 20;
+	 color: black;
+	 top: 20px;
+	 left: 120px;
+     }
+    </style>
+
+
+    
+    <script src="node_modules/pixi.js/dist/pixi.js"></script>
+  </head>
+  <body>
+    <script>
+     
+     var stage = new PIXI.Container();
+     
+     var renderer = PIXI.autoDetectRenderer(3000,2000, {
+         backgroundColor: 0x606060,
+     });
+     
+     document.body.appendChild(renderer.view);
+     requestAnimFrame =  window.requestAnimationFrame;
+     requestAnimFrame( animate );
+
+     if(1) {
+         var graphics = new PIXI.Graphics();
+
+         // set a fill and line style
+         graphics.beginFill(0xFF3300);
+         graphics.lineStyle(4, 0xffd900, 1);
+         graphics.blendMode = PIXI.BLEND_MODES.LUMINOSITY;
+         graphics.cursor = 'wait';
+
+         // draw a shape
+         graphics.moveTo(50,50);
+         graphics.lineTo(250, 50);
+         graphics.lineTo(100, 100);
+         graphics.lineTo(50, 50);
+         graphics.endFill();
+         graphics.interactive = true;
+         graphics.on('click',  (ev) => {
+             console.log('hit', ev);
+         });
+         
+         stage.addChild(graphics);
+     }
+     
+     objs =  [];
+     const mkdrag = (txt, pos) => {
+         var draggable = new PIXI.Container();
+         
+         var graphics = new PIXI.Graphics();
+         graphics.beginFill(0xeecc00, .6);
+         graphics.lineStyle(2, 0xffd900, 1);
+         graphics.drawRoundedRect(0,0,50,30,5);
+         graphics.endFill();
+
+         draggable.addChild(graphics);
+
+         var style = new PIXI.TextStyle({
+             fontFamily: 'Arial',
+             fontSize: 16,
+             fill: ['#000000'], 
+         });
+         var basicText = new PIXI.Text(txt, style);
+         basicText.x = 3;
+         basicText.y = 9;
+         basicText.scale = new PIXI.Point(.7,1);
+         draggable.addChild(basicText);
+
+         draggable.interactive = true;
+         draggable.on('click',  (ev) => {
+             console.log('d hit', ev);
+         });
+         
+         draggable.position = pos;
+         
+         //   console.log(     draggable.toGlobal(new PIXI.Point(3,  3)));
+         return draggable;
+     };
+
+     for (let x=0; x<3000; x+=30) {
+         for(let i=0; i < 400; i+= 20) {
+             let d = mkdrag('o='+i, new PIXI.Point(i+x, i*2))
+             stage.addChild(d);
+             objs.push(d);
+         }
+     }
+     
+
+     var style = new PIXI.TextStyle({
+         fontFamily: 'Arial',
+         fontSize: 36,
+         fill: ['#ffffff'],
+         stroke: '#4a1850',
+         strokeThickness: 2,
+         dropShadow: true,
+         dropShadowColor: '#000000',
+         dropShadowBlur: 1,
+         dropShadowAngle: Math.PI / 6,
+         dropShadowDistance: 6,
+         //    wordWrap: true,
+         //    wordWrapWidth: 440
+     });
+     var basicText = new PIXI.Text(`num objs = ${objs.length}`, style);
+     basicText.x = 30;
+     basicText.y = 90;
+
+     stage.addChild(basicText);
+
+     function animate() {
+         requestAnimFrame( animate );
+
+         for (let d of objs) {
+             d.rotation = Date.now()  / 2000;
+         }
+         
+         renderer.render(stage);
+     }
+     renderer.render(stage);
+
+    </script>
+
+  </body>
+</html>
