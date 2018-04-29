@@ -72,7 +72,7 @@ tkdnd_build:
 env-mypy/bin/mypy:
 	mkdir -p env-mypy
 	virtualenv -p /usr/bin/python3  env-mypy/
-	env-mypy/bin/pip install mypy==0.510 lxml==3.7.3
+	env-mypy/bin/pip install mypy==0.590 lxml==4.2.1
 
 ### build ###
 
