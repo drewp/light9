@@ -280,6 +280,27 @@ Polymer
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
   ready: ->
+    
+     stage = new PIXI.Container();
+     
+     renderer = PIXI.autoDetectRenderer(300,200, {
+         backgroundColor: 0xff6060,
+     });
+     
+     @$.rows.appendChild(renderer.view);
+     graphics = new PIXI.Graphics();
+
+     graphics.beginFill(0xFF3300);
+     graphics.lineStyle(4, 0xffd900, 1);
+
+     graphics.moveTo(50,50);
+     graphics.lineTo(250, 50);
+     graphics.lineTo(100, 100);
+     graphics.lineTo(50, 50);
+     graphics.endFill();
+     
+     stage.addChild(graphics);
+     renderer.render(stage);
 
   onGraph: ->
     U = (x) => @graph.Uri(x)

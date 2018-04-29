@@ -9,7 +9,8 @@
   "dependencies": {
     "bower": "^1.8.0",
     "chai": "^3.5.0",
-    "mocha": "^2.5.3"
+    "mocha": "^2.5.3",
+    "pixi.js": "^4.7.3"
   },
   "devDependencies": {
     "mocha": "^2.5.3"
