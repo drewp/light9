@@ -6,6 +6,7 @@ log = console.log
 # for mocha
 if require?
   `window = {}`
+  `_ = require('./lib/underscore/underscore-min.js')`
   `N3 = require('../../node_modules/n3/n3-browser.js')`
   `d3 = require('../../node_modules/d3/dist/d3.min.js')`
   `RdfDbClient = require('./rdfdbclient.js').RdfDbClient`
@@ -144,7 +145,7 @@ class window.SyncedGraph
   clearGraph: ->
     # just deletes the statements; watchers are unaffected.
     if @graph?
-      @_applyPatch({addQuads: [], delQuads: @graph.find()})
+      @_applyPatch({addQuads: [], delQuads: @graph.getQuads()})
 
     # if we had a Store already, this lets N3.Store free all its indices/etc
     @graph = N3.Store()
@@ -157,16 +158,21 @@ class window.SyncedGraph
     log('graph: clearGraphOnNewConnection done')
       
   _addPrefixes: (prefixes) ->
-    @graph.addPrefixes(prefixes)
+    for k in (prefixes or {})
+      @prefixes[k] = prefixes[k]
+    @prefixFuncs = N3.Util.prefixes(@prefixes)
         
   Uri: (curie) ->
-    N3.Util.expandPrefixedName(curie, @graph._prefixes)
+    if curie.match(/^http/)
+      return N3.DataFactory.namedNode(curie)
+    part = curie.split(':')
+    return @prefixFuncs(part[0])(part[1])
 
   Literal: (jsValue) ->
-    N3.Util.createLiteral(jsValue)
+    N3.DataFactory.literal(jsValue)
 
   LiteralRoundedFloat: (f) ->
-    N3.Util.createLiteral(d3.format(".3f")(f),
+    N3.DataFactory.literal(d3.format(".3f")(f),
                           "http://www.w3.org/2001/XMLSchema#decimal")
 
   toJs: (literal) ->
@@ -185,7 +191,7 @@ class window.SyncedGraph
                     cb() if cb
                     
   quads: () -> # for debugging
-    [q.subject, q.predicate, q.object, q.graph] for q in @graph.find()
+    [q.subject, q.predicate, q.object, q.graph] for q in @graph.getQuads()
 
   applyAndSendPatch: (patch) ->
     console.time('applyAndSendPatch')
@@ -210,16 +216,16 @@ class window.SyncedGraph
     # This is the only method that writes to @graph!
     @cachedFloatValues.clear()
     for quad in patch.delQuads
-      @graph.removeTriple(quad)
+      @graph.removeQuad(quad)
     for quad in patch.addQuads
-      @graph.addTriple(quad)
+      @graph.addQuad(quad)
     #log('applied patch locally', patchSizeSummary(patch))
     @_autoDeps.graphChanged(patch)
 
   getObjectPatch: (s, p, newObject, g) ->
     # make a patch which removes existing values for (s,p,*,c) and
     # adds (s,p,newObject,c). Values in other graphs are not affected.
-    existing = @graph.findByIRI(s, p, null, g)
+    existing = @graph.getQuads(s, p, null, g)
     return {
       delQuads: existing,
       addQuads: [{subject: s, predicate: p, object: newObject, graph: g}]
@@ -244,7 +250,7 @@ class window.SyncedGraph
 
   _singleValue: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
-    quads = @graph.findByIRI(s, p)
+    quads = @graph.getQuads(s, p)
     objs = new Set(q.object for q in quads)
     
     switch objs.size
@@ -281,12 +287,12 @@ class window.SyncedGraph
 
   objects: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
-    quads = @graph.findByIRI(s, p)
+    quads = @graph.getQuads(s, p)
     return (q.object for q in quads)
 
   subjects: (p, o) ->
     @_autoDeps.askedFor(null, p, o, null)
-    quads = @graph.findByIRI(null, p, o)
+    quads = @graph.getQuads(null, p, o)
     return (q.subject for q in quads)
 
   items: (list) ->
@@ -298,8 +304,8 @@ class window.SyncedGraph
         
       @_autoDeps.askedFor(current, null, null, null) # a little loose
 
-      firsts = @graph.findByIRI(current, RDF + 'first', null)
-      rests = @graph.findByIRI(current, RDF + 'rest', null)
+      firsts = @graph.getQuads(current, RDF + 'first', null)
+      rests = @graph.getQuads(current, RDF + 'rest', null)
       if firsts.length != 1
         throw new Error("list node #{current} has #{firsts.length} rdf:first edges")
       out.push(firsts[0].object)
@@ -312,7 +318,7 @@ class window.SyncedGraph
 
   contains: (s, p, o) ->
     @_autoDeps.askedFor(s, p, o, null)
-    return @graph.findByIRI(s, p, o).length > 0
+    return @graph.getQuads(s, p, o).length > 0
 
   nextNumberedResources: (base, howMany) ->
     results = []
@@ -331,7 +337,7 @@ class window.SyncedGraph
   contextsWithPattern: (s, p, o) ->
     @_autoDeps.askedFor(s, p, o, null)
     ctxs = []
-    for q in @graph.find(s, p, o)
+    for q in @graph.getQuads(s, p, o)
       ctxs.push(q.graph)
     return _.unique(ctxs)
 

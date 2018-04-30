@@ -39,7 +39,7 @@ describe 'SyncedGraph', ->
       called = 0
       hand = ->
         called++
-      graph.runHandler(hand)
+      graph.runHandler(hand, 'run')
       assert.equal(1, called)
       
     it 'calls a handler a 2nd time if the graph is patched with relevant data', ->
@@ -47,7 +47,7 @@ describe 'SyncedGraph', ->
       hand = ->
         called++
         graph.uriValue(A1, A2)
-      graph.runHandler(hand)
+      graph.runHandler(hand, 'run')
       graph.applyAndSendPatch({
         delQuads: [quad(A1, A2, A3)], addQuads: [quad(A1, A2, A4)]})
       assert.equal(2, called) 
@@ -60,7 +60,7 @@ describe 'SyncedGraph', ->
         graph.uriValue(A1, A2)
         if called > 1
           objsFound.push(graph.objects(A1, A3))
-      graph.runHandler(hand)
+      graph.runHandler(hand, 'run')
       # first run looked up A1,A2,*
       graph.applyAndSendPatch({
         delQuads: [quad(A1, A2, A3)], addQuads: [quad(A1, A2, A4)]})
