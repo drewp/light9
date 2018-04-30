@@ -1,15 +1,22 @@
 {
   "name": "light9",
   "version": "1.0.0",
+  "repository": "...",
+  "license": "MIT",
   "description": "Mini instructions:",
   "main": "index.js",
   "directories": {
     "test": "test"
   },
   "dependencies": {
+    "@webcomponents/shadycss": "^1.1.3",
+    "@webcomponents/webcomponentsjs": "^1.2.0",
     "bower": "^1.8.0",
+    "browserify": "^16.2.0",
     "chai": "^3.5.0",
+    "d3": "^5.1.0",
     "mocha": "^2.5.3",
+    "n3": "^1.0.0-alpha",
     "pixi.js": "^4.7.3"
   },
   "devDependencies": {

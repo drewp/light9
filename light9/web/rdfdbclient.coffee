@@ -3,7 +3,7 @@ log = console.log
 # for mocha
 if require?
   `window = {}`
-  `N3 = require('./lib/N3.js-pull61/N3.js')`
+  `N3 = require('../../node_modules/n3/n3-browser.js')`
   module.exports = window
 
 

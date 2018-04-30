@@ -3,14 +3,17 @@
   <head>
     <title>light9 home</title>
     <meta charset="utf-8" />
-    <script src="/lib/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
     <link rel="stylesheet" href="/style.css">
-    <link rel="import" href="/lib/polymer/polymer.html">
+    <link rel="import" href="/node_modules/@polymer/polymer/polymer.html">
   </head>
   <body>
     <dom-module id="service-button-row">
       <template>
         <style>
+         a {
+             color: #7d7dec;
+         }
          div {
              display: flex;
              justify-content: space-between;

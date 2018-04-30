@@ -6,8 +6,8 @@ log = console.log
 # for mocha
 if require?
   `window = {}`
-  `N3 = require('./lib/N3.js-pull61/N3.js')`
-  `d3 = require('./lib/d3/build/d3.min.js')`
+  `N3 = require('../../node_modules/n3/n3-browser.js')`
+  `d3 = require('../../node_modules/d3/dist/d3.min.js')`
   `RdfDbClient = require('./rdfdbclient.js').RdfDbClient`
   module.exports = window
 

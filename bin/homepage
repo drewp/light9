@@ -21,11 +21,16 @@ http {
  
  server {
   access_log off;
+  autoindex on;
 
   include "/tmp/light9_nginx_routes.conf";
 
   location / {
     root $ROOT/light9/web;
+  }
+
+  location /node_modules {
+    root $ROOT/;
   }
 
  }

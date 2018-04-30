@@ -76,7 +76,7 @@
       <light9-cursor-canvas id="cursorCanvas"></light9-cursor-canvas>
     </div>
   </template>
- 
+  
 </dom-module>
 
 <!-- the whole section that pans/zooms in time (most of the editor) -->
@@ -273,19 +273,15 @@
   </template>
 </dom-module>
 
-<script src="/lib/sylvester/sylvester.js"></script>
-<script src="/lib/d3/build/d3.min.js"></script>
-
-<!-- version with https://github.com/RubenVerborgh/N3.js/pull/61 -->
-<script src="/lib/N3.js-pull61/browser/n3-browser.js"></script>
-<!-- master version -->
-<xxscript src="/lib/N3.js/browser/n3-browser.js"></script>
-  
+<script src="/lib/async/dist/async.js"></script>
 <script src="/lib/knockout/dist/knockout.js"></script>
 <script src="/lib/shortcut/index.js"></script>
-<script src="/lib/async/dist/async.js"></script>
+<script src="/lib/sylvester/sylvester.js"></script>
 <script src="/lib/underscore/underscore-min.js"></script>
-<script src="/lib/pixi.js/dist/pixi.min.js"></script>
+<script src="/node_modules/d3/dist/d3.min.js"></script>
+<script src="/node_modules/n3/n3-browser.js"></script> 
+<script src="/node_modules/pixi.js/dist/pixi.min.js"></script>
+
 <script src="adjustable.js"></script>
 <script src="drawing.js"></script>
 <script src="timeline.js"></script>

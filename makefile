@@ -51,12 +51,10 @@ bin/node:
 
 bower: node_modules/bower/bin/bower bin/node
 	cd light9/web/lib; nodejs ../../../node_modules/bower/bin/bower install
-	# pixi is fetched with npm
-	ln -s ../../../node_modules/pixi.js light9/web/lib/
 
-	cd light9/web/lib/N3.js; npm install; PATH=../../../../bin:$(PATH) npm run browser
-
-	cd light9/web/lib/d3; PATH=../../../../bin:$(PATH) npm install
+npm:
+	npm install
+	cd node_modules/n3; nodejs ../browserify/bin/cmd.js --standalone N3 --require n3 -o n3-browser.js
 
 bin/ascoltami2: gst_packages link_to_sys_packages
 
