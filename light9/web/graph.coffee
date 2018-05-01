@@ -1,7 +1,7 @@
 log = console.log
 
 # Patch is {addQuads: <quads>, delQuads: <quads>}
-# <quads> is [{subject: s, ...}, ...]
+# <quads> are made with Quad(s,p,o,g)
 
 # for mocha
 if require?
@@ -173,11 +173,13 @@ class window.SyncedGraph
 
   LiteralRoundedFloat: (f) ->
     N3.DataFactory.literal(d3.format(".3f")(f),
-                          "http://www.w3.org/2001/XMLSchema#decimal")
+                          "http://www.w3.org/2001/XMLSchema#double")
+
+  Quad: (s, p, o, g) -> N3.DataFactory.quad(s, p, o, g)
 
   toJs: (literal) ->
     # incomplete
-    parseFloat(N3.Util.getLiteralValue(literal))
+    parseFloat(literal.value)
 
   loadTrig: (trig, cb) -> # for debugging
     patch = {delQuads: [], addQuads: []}
@@ -207,6 +209,8 @@ class window.SyncedGraph
   _validatePatch: (patch) ->
     for qs in [patch.addQuads, patch.delQuads]
       for q in qs
+        if not q.equals
+          throw new Error("doesn't look like a proper Quad")
         if not q.graph?
           throw new Error("corrupt patch: #{JSON.stringify(q)}")
     
@@ -216,7 +220,9 @@ class window.SyncedGraph
     # This is the only method that writes to @graph!
     @cachedFloatValues.clear()
     for quad in patch.delQuads
-      @graph.removeQuad(quad)
+      log("remove #{JSON.stringify(quad)}")      
+      did = @graph.removeQuad(quad)
+      log("removed: #{did}")
     for quad in patch.addQuads
       @graph.addQuad(quad)
     #log('applied patch locally', patchSizeSummary(patch))
@@ -228,7 +234,7 @@ class window.SyncedGraph
     existing = @graph.getQuads(s, p, null, g)
     return {
       delQuads: existing,
-      addQuads: [{subject: s, predicate: p, object: newObject, graph: g}]
+      addQuads: [@Quad(s, p, newObject, g)]
     }
 
   patchObject: (s, p, newObject, g) ->
@@ -251,6 +257,7 @@ class window.SyncedGraph
   _singleValue: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
     quads = @graph.getQuads(s, p)
+    console.log('got',quads)
     objs = new Set(q.object for q in quads)
     
     switch objs.size
@@ -268,12 +275,12 @@ class window.SyncedGraph
     return hit if hit != undefined
     #log('float miss', s, p)
 
-    ret = parseFloat(N3.Util.getLiteralValue(@_singleValue(s, p)))
+    ret = parseFloat(@_singleValue(s, p).value)
     @cachedFloatValues.set(key, ret)
     return ret
     
   stringValue: (s, p) ->
-    N3.Util.getLiteralValue(@_singleValue(s, p))
+    @_singleValue(s, p).value
     
   uriValue: (s, p) ->
     @_singleValue(s, p)
