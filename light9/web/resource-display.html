@@ -14,7 +14,7 @@
          zpadding: 2px;
      }
     </style>
-    <span class$="[[resClasses]]"><a href="{{uri}}">
+    <span class$="[[resClasses]]"><a href="{{uri.value}}">
       <!-- type icon goes here -->
       {{label}}
     </a></span>
@@ -42,7 +42,7 @@
        is: "resource-display",
        properties: {
            graph: { type: Object },
-           uri: { type: String },
+           uri: { type: Object }, // Use .value for the string
            label: { type: String },
            rename: { type: Boolean },
            minor: { type: Boolean },
@@ -55,7 +55,7 @@
        },
        onUri: function(graph, uri) {
            if (!this.graph) return;
-           this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri}`);
+           this.graph.runHandler(this.setLabel.bind(this), `label ${this.uri.value}`);
        },
        setLabel: function() {
            if (!this.uri) {
@@ -69,7 +69,7 @@
                this.label = null;
            }
            if (!this.label) {
-               this.label = this.uri.replace(/.*\//, '');
+               this.label = this.uri.value.replace(/.*\//, '');
            }
        },
        onRename: function() {
@@ -91,7 +91,7 @@
                var label = this.graph.Uri('rdfs:label');
                var ctxs = this.graph.contextsWithPattern(this.uri, label, null);
                if (ctxs.length != 1) {
-                   throw new Error(`${ctxs.length} label stmts for ${this.uri}`);
+                   throw new Error(`${ctxs.length} label stmts for ${this.uri.label}`);
                }
                this.graph.patchObject(this.uri, label,
                                       this.graph.Literal(this.renameTo),
