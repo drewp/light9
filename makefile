@@ -75,7 +75,7 @@ env-mypy/bin/mypy:
 ### build ###
 
 coffee:
-	zsh -c 'coffee -cw light9/web/{.,live,timeline,paint,effects}/*.coffee'
+	zsh -c 'coffee --map -cw light9/web/{.,live,timeline,paint,effects}/*.coffee'
 
 mypy-collector: env-mypy/bin/mypy
 	env-mypy/bin/mypy --py2 --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep bin/collector light9/collector/*.py
