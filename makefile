@@ -75,7 +75,7 @@ env-mypy/bin/mypy:
 ### build ###
 
 coffee:
-	zsh -c 'coffee --map -cw light9/web/{.,live,timeline,paint,effects}/*.coffee'
+	zsh -c 'cd light9/web; ../../node_modules/coffeescript/bin/coffee --map -cw {.,live,timeline,paint,effects}/*.coffee'
 
 mypy-collector: env-mypy/bin/mypy
 	env-mypy/bin/mypy --py2 --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep bin/collector light9/collector/*.py
@@ -126,7 +126,7 @@ test_js_init:
 	npm install
 
 test_js:
-	coffee -c light9/web/*.coffee
+	node_modules/coffeescript/bin/coffee -c light9/web/*.coffee
 	node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register --globals window,N3 light9/web/graph_test.coffee
 
 test_js_watch:
