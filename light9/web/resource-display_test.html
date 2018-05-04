@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+  <head>
+    <title>resource-display test</title>
+    <meta charset="utf-8">
+    <link rel="stylesheet" media="all" href="/node_modules/mocha/mocha.css">
+    <link rel="import" href="edit-choice.html">
+
+  </head>
+  <body>
+    <div id="test" style="margin:70px; background:#555"></div>
+    <div id="mocha"><p><a href=".">Index</a></p></div>
+    <div id="messages"></div>
+    <div id="fixtures"></div>
+    <script src="/node_modules/mocha/mocha.js"></script>
+    <script src="/node_modules/chai/chai.js"></script>
+
+    
+    <script>mocha.setup('bdd')
+     describe("resource-display", () => {
+         let ec;
+         beforeEach(() => {
+             const top = document.querySelector("#test");
+             top.innerHTML = '';
+             ec = document.createElement("edit-choice");
+             top.appendChild(ec);
+         });
+         it("makes a node", () => {
+             assert(ec.tag == "E");
+         });
+     }); 
+     mocha.run();</script>
+  </body>
+</html>
