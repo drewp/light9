@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+  <head>
+    <title>rdfdb-synced-graph test</title>
+    <meta charset="utf-8">
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="/node_modules/mocha/mocha.js"></script>
+    <script src="/node_modules/chai/chai.js"></script>
+    <link rel="stylesheet" media="all" href="/node_modules/mocha/mocha.css">
+    <link rel="import" href="/lib/polymer/lib/elements/dom-bind.html">
+
+    <link rel="import" href="rdfdb-synced-graph.html">
+  </head>
+  <body>
+    <div id="mocha"><p><a href=".">Index</a></p></div>
+    <div id="messages"></div>
+    <div id="fixtures">
+      <dom-bind>
+        <template>
+          <rdfdb-synced-graph id="graph" test-graph="true" graph="{{graph}}"></rdfdb-synced-graph>
+        </template>
+      </dom-bind>
+    </div>
+    
+    <script>
+     mocha.setup('bdd');
+     const assert = chai.assert;
+     
+     describe("rdfdb-synced-graph", () => {
+         let elem;
+         beforeEach(() => {
+             elem = document.querySelector("#graph");
+             window.g = elem;
+             elem.graph.clearGraph();
+         });
+         it("makes a node", () => {
+             assert.equal(elem.tagName, "RDFDB-SYNCED-GRAPH");
+         });
+         it("loads trig", (done) => {
+             elem.graph.loadTrig(`
+                       @prefix : <http://example.com/> .
+                       :a :b :c :d .
+                     `, () => {
+                         assert.equal(elem.graph.quads().length, 1);
+                         done();
+                     });
+         });
+     }); 
+     mocha.run();
+    </script>
+  </body>
+</html>

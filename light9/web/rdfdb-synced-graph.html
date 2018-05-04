@@ -1,9 +1,12 @@
-<link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/polymer/polymer-element.html">
+<script src="/node_modules/n3/n3-browser.js"></script>
+<script src="/lib/async/dist/async.js"></script>
+      <script src="/lib/underscore/underscore-min.js"></script>
 
 <dom-module id="rdfdb-synced-graph">
   <template>
     <style>
-     span {
+     :host {
          display: inline-block;
          border: 1px solid gray;
          width: 18em;
@@ -11,27 +14,37 @@
          color: #4fc1d4;
      }
     </style>
-    <span>[[status]]</span>
+    graph: [[status]]
   </template>
   <script src="rdfdbclient.js"></script>
   <script src="graph.js"></script>
   <script>
-   Polymer({
-       is: "rdfdb-synced-graph",
-       properties: {
-           graph: {type: Object, notify: true},
-           status: {type: String, notify: true}
-       },
-       ready: function() {
-           this.graph = new SyncedGraph('/rdfdb/syncedGraph', {
-               '': 'http://light9.bigasterisk.com/',
-               'dev': 'http://light9.bigasterisk.com/device/',
-               'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-               'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-               'xsd': 'http://www.w3.org/2001/XMLSchema#',
-           }, function(s) { this.status = s; }.bind(this));
+   class RdfdbSyncedGraph extends Polymer.Element {
+       static get is() { return "rdfdb-synced-graph"; }
+       
+       static get properties() {
+           return {
+               graph: {type: Object, notify: true},
+               status: {type: String, notify: true},
+               testGraph: {type: Boolean},
+           }
+       }
+       
+       connectedCallback() {
+           super.connectedCallback();
+           this.graph = new SyncedGraph(
+               this.testGraph ? null : '/rdfdb/syncedGraph',
+               {
+                   '': 'http://light9.bigasterisk.com/',
+                   'dev': 'http://light9.bigasterisk.com/device/',
+                   'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
+                   'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
+                   'xsd': 'http://www.w3.org/2001/XMLSchema#',
+               },
+               function(s) { this.status = s; }.bind(this));
            window.graph = this.graph;
        }
-   });
+   }
+   customElements.define(RdfdbSyncedGraph.is, RdfdbSyncedGraph);
   </script>
 </dom-module>

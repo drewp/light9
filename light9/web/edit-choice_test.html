@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+  <head>
+    <title>edit-choice test</title>
+    <meta charset="utf-8">
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="/node_modules/mocha/mocha.js"></script>
+    <script src="/node_modules/chai/chai.js"></script>
+
+    <link rel="stylesheet" media="all" href="/node_modules/mocha/mocha.css">
+    <link rel="import" href="/lib/polymer/lib/elements/dom-bind.html">
+
+    <link rel="import" href="rdfdb-synced-graph.html">
+    <link rel="import" href="edit-choice.html">
+  </head>
+  <body>
+    <div id="mocha"><p><a href=".">Index</a></p></div>
+    <div id="messages"></div>
+    <div id="fixtures">
+      <dom-bind>
+        <template>
+          <p>
+            <rdfdb-synced-graph id="graph" test-graph="true" graph="{{graph}}"></rdfdb-synced-graph>
+          </p>
+          <p>
+            edit-choice: <edit-choice id="ec" graph="{{graph}}" uri="http://example.com/a"></edit-choice>
+          </p>
+        </template>
+      </dom-bind>
+    </div>
+    
+    <script>
+     mocha.setup('bdd')
+     const assert = chai.assert;
+     
+     describe("resource-display", () => {
+         let ec;
+         let graph;
+         beforeEach((done) => {
+             ec = document.querySelector("#ec");
+             window.ec=ec;
+             graph = document.querySelector("#graph");
+             graph.graph.clearGraph();
+             graph.graph.loadTrig(`
+                       @prefix : <http://example.com/> .
+                       @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+                       :a rdfs:label "label a" :ctx .
+                     `, done);
+         });
+         it("shows the uri as a resource-display");
+         it("accepts a drop event and changes the uri");
+         it("clears uri when you click unlink");
+         
+     }); 
+     mocha.run();
+    </script>
+  </body>
+</html>

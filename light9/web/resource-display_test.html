@@ -3,32 +3,120 @@
   <head>
     <title>resource-display test</title>
     <meta charset="utf-8">
-    <link rel="stylesheet" media="all" href="/node_modules/mocha/mocha.css">
-    <link rel="import" href="edit-choice.html">
-
-  </head>
-  <body>
-    <div id="test" style="margin:70px; background:#555"></div>
-    <div id="mocha"><p><a href=".">Index</a></p></div>
-    <div id="messages"></div>
-    <div id="fixtures"></div>
+    <script src="/node_modules/@webcomponents/webcomponentsjs/webcomponents-lite.js"></script>
     <script src="/node_modules/mocha/mocha.js"></script>
     <script src="/node_modules/chai/chai.js"></script>
 
+    <link rel="stylesheet" media="all" href="/node_modules/mocha/mocha.css">
+    <link rel="import" href="/lib/polymer/lib/elements/dom-bind.html">
+
+    <link rel="import" href="rdfdb-synced-graph.html">
+    <link rel="import" href="resource-display.html">
+  </head>
+  <body>
+    <div id="mocha"><p><a href=".">Index</a></p></div>
+    <div id="messages"></div>
+    <div id="fixtures">
+      <dom-bind>
+        <template>
+          <p>
+            <rdfdb-synced-graph id="graph" test-graph="true" graph="{{graph}}"></rdfdb-synced-graph>
+          </p>
+          <p>
+            resource: <resource-display
+                          id="elem"
+                          graph="{{graph}}"
+                          uri="http://example.com/a"></resource-display>
+          </p>
+        </template>
+      </dom-bind>
+    </div>
     
-    <script>mocha.setup('bdd')
+    <script>
+     mocha.setup('bdd')
+     const assert = chai.assert;
+     
      describe("resource-display", () => {
-         let ec;
-         beforeEach(() => {
-             const top = document.querySelector("#test");
-             top.innerHTML = '';
-             ec = document.createElement("edit-choice");
-             top.appendChild(ec);
+         let elem;
+         let graph;
+         beforeEach((done) => {
+             elem = document.querySelector("#elem");
+             window.elem = elem;
+             graph = document.querySelector("#graph");
+             graph.graph.clearGraph();
+             graph.graph.loadTrig(`
+      @prefix : <http://example.com/> .
+      @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+      :a rdfs:label "label a" :ctx .
+      :b rdfs:label "label b" :ctx .
+      `, done);
          });
-         it("makes a node", () => {
-             assert(ec.tag == "E");
+         const assertLabelTextEquals = (expected) => {
+             assert.equal(elem.shadowRoot.querySelector("#uri").innerText,
+                          expected);
+             
+         };
+         describe('link display', () => {
+         it("says no uri", () => {
+             elem.setAttribute('uri', '');
+             assertLabelTextEquals("<no uri>");
          });
+         it("has no link when there's no uri", () => {
+             elem.setAttribute('uri', '');
+             assert.equal(elem.shadowRoot.querySelector("#uri").href,
+                          'javascript:;');
+         });
+         it("shows uri's label if graph has one", () => {
+             elem.setAttribute('uri', 'http://example.com/a');
+             assertLabelTextEquals("label a");
+         });
+         it("links to uri", () => {
+             elem.setAttribute('uri', 'http://example.com/a');
+             assert.equal(elem.shadowRoot.querySelector("#uri").href,
+                          'http://example.com/a');
+         });
+         it("falls back to uri tail if there's no label", () => {
+             elem.setAttribute('uri', 'http://example.com/nolabel');
+             assertLabelTextEquals("nolabel");
+         });
+         it("falls back to full uri if the tail would be empty", () => {
+             elem.setAttribute('uri', 'http://example.com/');
+             assertLabelTextEquals('http://example.com/');
+
+         });
+         it("changes the label if the graph updates uri's label", () => {
+             const g = graph.graph;
+             elem.setAttribute('uri', 'http://example.com/a');
+
+             g.patchObject(g.Uri('http://example.com/a'),
+                           g.Uri('rdfs:label'),
+                           g.Literal('new label'));
+             assertLabelTextEquals('new label');
+
+         });
+         it("changes the label if the uri changes", (done) => {
+             elem.setAttribute('uri', 'http://example.com/a');
+             setTimeout(() => {
+                 elem.setAttribute('uri', 'http://example.com/b');
+                 assertLabelTextEquals('label b');
+                 done();
+             }, 100);
+         });
+         });
+         describe('type icons', () => {
+             it("omits icon for unknown type");
+             it("uses icon uri from graph and shows the icon");
+         });
+         describe('rename ui', () => {
+             it("shows rename button if caller wants");
+             it("opens dialog when you click rename");
+             it("shows old label in dialog, ready to be replaced");
+             it("does nothing if you cancel");
+             it("patches the graph if you accept a new name");
+         });
+         
      }); 
-     mocha.run();</script>
+     mocha.run();
+    </script>
   </body>
 </html>

@@ -139,8 +139,10 @@ class window.SyncedGraph
     @clearGraph()
 
     if @patchSenderUrl
-      @_client = new RdfDbClient(@patchSenderUrl, @_clearGraphOnNewConnection.bind(@),
-                                 @_applyPatch.bind(@), @setStatus)
+      @_client = new RdfDbClient(@patchSenderUrl,
+                                 @_clearGraphOnNewConnection.bind(@),
+                                 @_applyPatch.bind(@),
+                                 @setStatus)
     
   clearGraph: ->
     # just deletes the statements; watchers are unaffected.
@@ -185,6 +187,8 @@ class window.SyncedGraph
     patch = {delQuads: [], addQuads: []}
     parser = N3.Parser()
     parser.parse trig, (error, quad, prefixes) =>
+                  if error
+                    throw new Error(error)
                   if (quad)
                     patch.addQuads.push(quad)
                   else
@@ -287,10 +291,13 @@ class window.SyncedGraph
 
   labelOrTail: (uri) ->
     try
-      @graph.stringValue(uri, @graph.Uri('rdfs:label'))
+      ret = @stringValue(uri, @Uri('rdfs:label'))
     catch
-      words = uri.split('/')
-      words[words.length-1]
+      words = uri.value.split('/')
+      ret = words[words.length-1]
+    if not ret
+      ret = uri.value
+    return ret
 
   objects: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)

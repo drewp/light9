@@ -42,13 +42,14 @@ window.setupDrop = (senseElem, highlightElem, coordinateOriginElem, onDrop) ->
 
 
 
-Polymer
-    is: "edit-choice",
-    properties:
+class EditChoice extends Polymer.Element
+    @is: "edit-choice",
+    @properties:
         graph: {type: Object, notify: true},
         uri: {type: String, notify: true},
 
-    ready: ->
+    connectedCallback: ->
+      super.connectedCallback()
       @uri = null
       setupDrop @$.box, @$.box, null, (uri) =>
         @uri=uri
@@ -57,3 +58,4 @@ Polymer
     unlink: ->
       @uri = null
 
+customElements.define(EditChoice.is, EditChoice)
