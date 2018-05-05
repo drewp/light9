@@ -4,10 +4,10 @@ Drawing = window.Drawing
 ROW_COUNT = 7
 
 
-Polymer
-  is: 'light9-timeline-editor'
-  behaviors: [ Polymer.IronResizableBehavior ]
-  properties:
+class TimelineEditor extends Polymer.Element
+  @is: 'light9-timeline-editor'
+  @behaviors: [ Polymer.IronResizableBehavior ]
+  @properties:
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
@@ -23,9 +23,9 @@ Polymer
     zoomInX: {type: Object, notify: true}
     selection: {type: Object, notify: true}
   width: ko.observable(1)
-  listeners:
+  @listeners:
     'iron-resize': '_onIronResize'
-  observers: [
+  @observers: [
     'setSong(playerSong, followPlayerSong)'
     ]
   _onIronResize: ->
@@ -38,7 +38,8 @@ Polymer
   setSong: (s) ->
     @song = @playerSong if @followPlayerSong
 
-  ready: ->
+  connectedCallback: ->
+    super.connectedCallback()
     ko.options.deferUpdates = true;
     @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
@@ -56,7 +57,7 @@ Polymer
         pos: ko.observable($V([0,0]))
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
-    @setAdjuster = @$.adjustersCanvas.setAdjuster.bind(@$.adjustersCanvas)
+    #@setAdjuster = @$.adjustersCanvas.setAdjuster.bind(@$.adjustersCanvas)
 
     setInterval(@updateDebugSummary.bind(@), 100)
 
@@ -256,14 +257,15 @@ Polymer
       getValueForPos: valForPos
       }))
       
+customElements.define(TimelineEditor.is, TimelineEditor)
 
 # plan: in here, turn all the notes into simple js objects with all
 # their timing data and whatever's needed for adjusters. From that, do
 # the brick layout. update only changing adjusters.
-Polymer
-  is: 'light9-timeline-time-zoomed'
-  behaviors: [ Polymer.IronResizableBehavior ]
-  properties:
+class TimeZoomed extends Polymer.Element
+  @is: 'light9-timeline-time-zoomed'
+  @behaviors: [ Polymer.IronResizableBehavior ]
+  @properties:
     graph: { type: Object, notify: true }
     selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
@@ -271,7 +273,7 @@ Polymer
     zoomInX: { type: Object, notify: true }
     zoom: { type: Object, notify: true, observer: 'onZoom' } # viewState.zoomSpec
     zoomFlattened: { type: Object, notify: true }
-  observers: [
+  @observers: [
     'onGraph(graph, dia, setAdjuster, song, zoomInX)'
   ]
   onZoom: ->
@@ -279,8 +281,9 @@ Polymer
       log('updateZoomFlattened')
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
-  ready: ->
-    
+  connectedCallback: ->
+     super.connectedCallback()
+     root = @closest('light9-timeline-editor')
      stage = new PIXI.Container();
      
      renderer = PIXI.autoDetectRenderer(300,200, {
@@ -311,10 +314,7 @@ Polymer
       child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @zoomInX)
       log('note ',uri)
     
-    @rows = (new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
-
-  attached: ->
-    root = @closest('light9-timeline-editor')
+    @rows = []#(new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
 
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
@@ -399,11 +399,14 @@ Polymer
       }
     @graph.applyAndSendPatch(patch)
 
-Polymer
-  is: "light9-timeline-time-axis",
+customElements.define(TimeZoomed.is, TimeZoomed)
+
+class TimeAxis extends Polymer.Element
+  @is: "light9-timeline-time-axis",
   # for now since it's just one line calling dia,
   # light9-timeline-editor does our drawing work.
 
+customElements.define(TimeAxis.is, TimeAxis)
 
 class NoteRow
   constructor: (@graph, @dia, @song, @zoomInX, @noteUris, @rowIndex, @selection) ->
@@ -625,10 +628,9 @@ class Note
       $V([0, -30])
     
     
-
-Polymer
-  is: "light9-timeline-note-inline-attrs"
-  properties:
+class InlineAttrs extends Polymer.Element
+  @is: "light9-timeline-note-inline-attrs"
+  @properties:
     graph: { type: Object, notify: true }
     song: { type: String, notify: true }
     uri: { type: String, notify: true }  # the Note
@@ -637,7 +639,7 @@ Polymer
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
     selection: { type: Object, notify: true }
-  observers: [
+  @observers: [
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
     ]
@@ -698,7 +700,7 @@ Polymer
 
   onDel: ->
     deleteNote(@graph, @song, @uri, @selection)
-
+customElements.define(InlineAttrs.is, InlineAttrs)
 
 deleteNote = (graph, song, note, selection) ->
   patch = {delQuads: [{subject: song, predicate: graph.Uri(':note'), object: note, graph: song}], addQuads: []}
@@ -707,17 +709,18 @@ deleteNote = (graph, song, note, selection) ->
     selection.selected(_.without(selection.selected(), note))
   
 
-Polymer
-  is: 'light9-adjusters-canvas'
-  behaviors: [ Polymer.IronResizableBehavior ]
-  properties:
+class AdjustersCanvas extends Polymer.Element
+  @is: 'light9-adjusters-canvas'
+  @behaviors: [ Polymer.IronResizableBehavior ]
+  @properties:
     adjs: { type: Object, notify: true }, # adjId: Adjustable
-  observers: [
+  @observers: [
     'updateAllCoords(adjs)'
   ]
-  listeners:
+  @listeners:
     'iron-resize': 'resizeUpdate'
-  ready: ->
+  connectedCallback: ->
+    super.connectedCallback()
     @adjs = {}
     @ctx = @$.canvas.getContext('2d')
 
@@ -861,17 +864,15 @@ Polymer
     # connector
 
   
-Polymer
+class DiagramLayer extends Polymer.Element
   # note boxes. 
-  is: 'light9-timeline-diagram-layer'
-  properties: {
+  @is: 'light9-timeline-diagram-layer'
+  @properties: {
     selection: {type: Object, notify: true}
   }
-  ready: ->
+  connectedCallback: ->
+    super.connectedCallback()
     @elemById = {}
-
-  attached: ->
-    
 
   setTimeAxis: (width, yTop, scale) ->
     pxPerTick = 50
@@ -965,3 +966,4 @@ Polymer
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)
     #elem.innerHTML = effectLabel;
+customElements.define(DiagramLayer.is, DiagramLayer)
