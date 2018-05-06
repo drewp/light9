@@ -155,3 +155,5 @@
 rgbled/build-nano328/
 ^show/dance..../capture
 ^show/dance2017/networking.n3
+\.js\.map$
+^timelapse/
