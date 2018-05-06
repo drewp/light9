@@ -276,21 +276,28 @@ class TimeZoomed extends Polymer.Element
   @observers: [
     'onGraph(graph, dia, setAdjuster, song, zoomInX)'
   ]
+  @listeners: {'iron-resize': 'update'}
+  update: ->
+    @renderer.resize(@clientWidth, @clientHeight)
+    @renderer.render(@stage);
+
   onZoom: ->
     updateZoomFlattened = ->
       log('updateZoomFlattened')
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
+    
   connectedCallback: ->
      super.connectedCallback()
-     root = @closest('light9-timeline-editor')
-     stage = new PIXI.Container();
+
+     @stage = new PIXI.Container()
      
-     renderer = PIXI.autoDetectRenderer(300,200, {
+     @renderer = PIXI.autoDetectRenderer({
          backgroundColor: 0xff6060,
-     });
+        autoResize: true,
+     })
      
-     @$.rows.appendChild(renderer.view);
+     @$.rows.appendChild(@renderer.view);
      graphics = new PIXI.Graphics();
 
      graphics.beginFill(0xFF3300);
@@ -302,9 +309,11 @@ class TimeZoomed extends Polymer.Element
      graphics.lineTo(50, 50);
      graphics.endFill();
      
-     stage.addChild(graphics);
-     renderer.render(stage);
+     @stage.addChild(graphics);
+     @renderer.render(@stage);
 
+     # iron-resize should be doing this but it never fires
+     setInterval(@update.bind(@), 1000)
   onGraph: ->
     U = (x) => @graph.Uri(x)
     log('assign rows',@song)

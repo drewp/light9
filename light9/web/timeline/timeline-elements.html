@@ -31,16 +31,19 @@
      }
      #coveredByDiagram {
          position: relative;
+         display: flex;
+         flex-direction: column;
+         height: 100%;
      }
      #dia, #adjusters, #cursorCanvas, #adjustersCanvas {
          position: absolute;
          left: 0; top: 0; right: 0; bottom: 0;
      }
      #debug {
-      background: white;
-      font-family: monospace;
-      font-size: 125%;
-      height: 15px;
+         background: white;
+         font-family: monospace;
+         font-size: 125%;
+         height: 15px;
      }
     </style>
     <div>
@@ -86,15 +89,18 @@
      :host {
          display: flex;
          height: 100%;
-     }
-     div {
-         display: flex;
          flex-direction: column;
+     }
+     #top {
+     }
+     #rows {
          height: 100%;
      }
      #rows.dragging {
          background: rgba(126, 52, 245, 0.0784);
-         }
+     }
+     light9-timeline-time-axis {
+     }
      light9-timeline-audio {
          width: 100%;
          height: 100px;
@@ -111,9 +117,8 @@
                              show="{{show}}"
                              zoom="{{zoomFlattened}}">
       </light9-timeline-audio>
-      <div id="rows">
-      </div>
     </div>
+    <div id="rows"></div>
   </template>
 </dom-module>
 
