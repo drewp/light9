@@ -3,7 +3,94 @@ RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 Drawing = window.Drawing
 ROW_COUNT = 7
 
+class Project
+  constructor: (@graph) ->
 
+  makeEffect: (uri) ->
+    U = (x) => @graph.Uri(x)
+    effect = U(uri + '/effect')
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: effect}
+    
+    quads = [
+      quad(effect, U('rdf:type'), U(':Effect')),
+      quad(effect, U(':copiedFrom'), uri),
+      quad(effect, U('rdfs:label'), @graph.Literal(uri.replace(/.*capture\//, ''))),
+      quad(effect, U(':publishAttr'), U(':strength')),
+      ]
+
+    fromSettings = @graph.objects(uri, U(':setting'))
+
+    toSettings = @graph.nextNumberedResources(effect + '_set', fromSettings.length)
+      
+    for fs in fromSettings
+      ts = toSettings.pop()
+      # full copies of these since I may have to delete captures
+      quads.push(quad(effect, U(':setting'), ts))
+      quads.push(quad(ts, U(':device'), @graph.uriValue(fs, U(':device'))))
+      quads.push(quad(ts, U(':deviceAttr'), @graph.uriValue(fs, U(':deviceAttr'))))
+      try
+        quads.push(quad(ts, U(':value'), @graph.uriValue(fs, U(':value'))))
+      catch
+        quads.push(quad(ts, U(':scaledValue'), @graph.uriValue(fs, U(':scaledValue'))))
+
+    @graph.applyAndSendPatch({delQuads: [], addQuads: quads})
+    return effect
+
+  makeNewNote: (effect, dropTime, desiredWidthT) ->
+    U = (x) => @graph.Uri(x)
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
+      
+    newNote = @graph.nextNumberedResource("#{@song}/n")
+    newCurve = @graph.nextNumberedResource("#{newNote}c")
+    points = @graph.nextNumberedResources("#{newCurve}p", 4)
+
+    curveQuads = [
+        quad(@song, U(':note'), newNote)
+        quad(newNote, RDF + 'type', U(':Note'))
+        quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
+        quad(newNote, U(':effectClass'), effect)
+        quad(newNote, U(':curve'), newCurve)
+        quad(newCurve, RDF + 'type', U(':Curve'))
+        quad(newCurve, U(':attr'), U(':strength'))
+      ]        
+    pointQuads = []
+
+   
+    
+    for i in [0...4]
+      pt = points[i]
+      pointQuads.push(quad(newCurve, U(':point'), pt))
+      pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i/3 * desiredWidthT)))
+      pointQuads.push(quad(pt, U(':value'), @graph.LiteralRoundedFloat(i == 1 or i == 2)))
+
+    patch = {
+      delQuads: []
+      addQuads: curveQuads.concat(pointQuads)
+      }
+    @graph.applyAndSendPatch(patch)
+    
+  getCurvePoints: (curve, xOffset) ->
+    worldPts = []
+    uris = @graph.objects(curve, @graph.Uri(':point'))
+    for pt in uris
+      v = $V([xOffset + @graph.floatValue(pt, @graph.Uri(':time')),
+              @graph.floatValue(pt, @graph.Uri(':value'))])
+      v.uri = pt
+      worldPts.push(v)
+    worldPts.sort((a,b) -> a.e(1) > b.e(1))
+    return [uris, worldPts]
+
+  curveWidth: (worldPts) ->
+    tMin = @graph.floatValue(worldPts[0].uri, @graph.Uri(':time'))
+    tMax = @graph.floatValue(worldPts[3].uri, @graph.Uri(':time'))
+    tMax - tMin
+      
+  deleteNote: (song, note, selection) ->
+    patch = {delQuads: [{subject: song, predicate: graph.Uri(':note'), object: note, graph: song}], addQuads: []}
+    @graph.applyAndSendPatch(patch)
+    if note in selection.selected()
+      selection.selected(_.without(selection.selected(), note))
+  
 class TimelineEditor extends Polymer.Element
   @is: 'light9-timeline-editor'
   @behaviors: [ Polymer.IronResizableBehavior ]
@@ -57,7 +144,8 @@ class TimelineEditor extends Polymer.Element
         pos: ko.observable($V([0,0]))
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
-    #@setAdjuster = @$.adjustersCanvas.setAdjuster.bind(@$.adjustersCanvas)
+    @setAdjuster = (adjId, makeAdjustable) =>
+      @$.adjustersCanvas.setAdjuster(adjId, makeAdjustable)
 
     setInterval(@updateDebugSummary.bind(@), 100)
 
@@ -212,7 +300,7 @@ class TimelineEditor extends Polymer.Element
       @$.adjustersCanvas.updateAllCoords()
     shortcut.add 'Delete', =>
       for note in @selection.selected()
-        deleteNote(@graph, @song, note, @selection)
+        @project.deleteNote(@song, note, @selection)
 
   makeZoomAdjs: ->
     yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
@@ -267,6 +355,7 @@ class TimeZoomed extends Polymer.Element
   @behaviors: [ Polymer.IronResizableBehavior ]
   @properties:
     graph: { type: Object, notify: true }
+    project: { type: Object }
     selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
@@ -279,7 +368,7 @@ class TimeZoomed extends Polymer.Element
   @listeners: {'iron-resize': 'update'}
   update: ->
     @renderer.resize(@clientWidth, @clientHeight)
-    @renderer.render(@stage);
+    @renderer.render(@stage)
 
   onZoom: ->
     updateZoomFlattened = ->
@@ -314,6 +403,7 @@ class TimeZoomed extends Polymer.Element
 
      # iron-resize should be doing this but it never fires
      setInterval(@update.bind(@), 1000)
+    
   onGraph: ->
     U = (x) => @graph.Uri(x)
     log('assign rows',@song)
@@ -335,79 +425,18 @@ class TimeZoomed extends Polymer.Element
 
     if not @graph.contains(effect, RDF + 'type', U(':Effect'))
       if @graph.contains(effect, RDF + 'type', U(':LightSample'))
-        effect = @makeEffect(effect)
+        effect = @project.makeEffect(effect)
       else
         log("drop #{effect} is not an effect")
         return
 
     dropTime = @zoomInX.invert(pos.e(1))
-    @makeNewNote(effect, dropTime)
-
-  makeEffect: (uri) ->
-    U = (x) => @graph.Uri(x)
-    effect = U(uri + '/effect')
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: effect}
-    
-    quads = [
-      quad(effect, U('rdf:type'), U(':Effect')),
-      quad(effect, U(':copiedFrom'), uri),
-      quad(effect, U('rdfs:label'), @graph.Literal(uri.replace(/.*capture\//, ''))),
-      quad(effect, U(':publishAttr'), U(':strength')),
-      ]
-
-    fromSettings = @graph.objects(uri, U(':setting'))
-
-    toSettings = @graph.nextNumberedResources(effect + '_set', fromSettings.length)
-      
-    for fs in fromSettings
-      ts = toSettings.pop()
-      # full copies of these since I may have to delete captures
-      quads.push(quad(effect, U(':setting'), ts))
-      quads.push(quad(ts, U(':device'), @graph.uriValue(fs, U(':device'))))
-      quads.push(quad(ts, U(':deviceAttr'), @graph.uriValue(fs, U(':deviceAttr'))))
-      try
-        quads.push(quad(ts, U(':value'), @graph.uriValue(fs, U(':value'))))
-      catch
-        quads.push(quad(ts, U(':scaledValue'), @graph.uriValue(fs, U(':scaledValue'))))
-
-    @graph.applyAndSendPatch({delQuads: [], addQuads: quads})
-    return effect
-        
-  makeNewNote: (effect, dropTime) ->
-    U = (x) => @graph.Uri(x)
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
-      
-    newNote = @graph.nextNumberedResource("#{@song}/n")
-    newCurve = @graph.nextNumberedResource("#{newNote}c")
-    points = @graph.nextNumberedResources("#{newCurve}p", 4)
-
-    curveQuads = [
-        quad(@song, U(':note'), newNote)
-        quad(newNote, RDF + 'type', U(':Note'))
-        quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
-        quad(newNote, U(':effectClass'), effect)
-        quad(newNote, U(':curve'), newCurve)
-        quad(newCurve, RDF + 'type', U(':Curve'))
-        quad(newCurve, U(':attr'), U(':strength'))
-      ]        
-    pointQuads = []
 
     desiredWidthX = @offsetWidth * .3
     desiredWidthT = @zoomInX.invert(desiredWidthX) - @zoomInX.invert(0)
     desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
-    
-    for i in [0...4]
-      pt = points[i]
-      pointQuads.push(quad(newCurve, U(':point'), pt))
-      pointQuads.push(quad(pt, U(':time'), @graph.LiteralRoundedFloat(i/3 * desiredWidthT)))
-      pointQuads.push(quad(pt, U(':value'), @graph.LiteralRoundedFloat(i == 1 or i == 2)))
-
-    patch = {
-      delQuads: []
-      addQuads: curveQuads.concat(pointQuads)
-      }
-    @graph.applyAndSendPatch(patch)
-
+    @project.makeNewNote(effect, dropTime, desiredWidthT)
+        
 customElements.define(TimeZoomed.is, TimeZoomed)
 
 class TimeAxis extends Polymer.Element
@@ -555,22 +584,6 @@ class Note
       @async =>
         @querySelector('light9-timeline-note-inline-attrs')?.displayed()
     
-  _getCurvePoints: (curve, xOffset) ->
-    worldPts = []
-    uris = @graph.objects(curve, @graph.Uri(':point'))
-    for pt in uris
-      v = $V([xOffset + @graph.floatValue(pt, @graph.Uri(':time')),
-              @graph.floatValue(pt, @graph.Uri(':value'))])
-      v.uri = pt
-      worldPts.push(v)
-    worldPts.sort((a,b) -> a.e(1) > b.e(1))
-    return [uris, worldPts]
-
-  _curveWidth: (worldPts) ->
-    tMin = @graph.floatValue(worldPts[0].uri, @graph.Uri(':time'))
-    tMax = @graph.floatValue(worldPts[3].uri, @graph.Uri(':time'))
-    tMax - tMin
-    
   _makeCurvePointAdjusters: (yForV, worldPts, ctx) ->
     for pointNum in [0...worldPts.length]
       @_makePointAdjuster(yForV, worldPts, pointNum, ctx)
@@ -636,12 +649,6 @@ class Note
     else
       $V([0, -30])
     
-    
-deleteNote = (graph, song, note, selection) ->
-  patch = {delQuads: [{subject: song, predicate: graph.Uri(':note'), object: note, graph: song}], addQuads: []}
-  graph.applyAndSendPatch(patch)
-  if note in selection.selected()
-    selection.selected(_.without(selection.selected(), note))
   
   
 class DiagramLayer extends Polymer.Element
