@@ -11,6 +11,9 @@ class Adjustable
   # into stuff or to get out from under your finger.
 
   constructor: (@config) ->
+    @ctor2()
+
+  ctor2: () ->
     # config has:
     #   getTarget -> vec2 of current target position
     #   getSuggestedTargetOffset -> vec2 pixel offset from target
@@ -75,7 +78,8 @@ class window.AdjustableFloatObservable extends Adjustable
     #   observable -> ko.observable we will read and write
     #   getValueForPos(pos) -> what should we set to if the user
     #                          moves target to this coord?
-    super(@config)
+    super()
+    @ctor2()
 
   _getValue: () ->
     @config.observable()
@@ -102,8 +106,8 @@ class window.AdjustableFloatObject extends Adjustable
     #   ctx
     #   getTargetPosForValue(value) -> getTarget result for value
     #   getValueForPos
-
-    super(@config)
+    super()
+    @ctor2()
     if not @config.ctx?
       throw new Error("missing ctx")
     @config.graph.runHandler(@_syncValue.bind(@), "adj sync #{@config.subj}")
@@ -136,12 +140,13 @@ class window.AdjustableFloatObject extends Adjustable
                               
 class window.AdjustableFade extends Adjustable
   constructor: (@yForV, @i0, @i1, @note, offset, ctx) ->
+    super()
     @config = {
       getSuggestedTargetOffset: -> offset
       getTarget: @getTarget.bind(@)
       ctx: ctx
     }
-    super(@config)
+    @ctor2()
 
   getTarget: ->
     mid = @note.worldPts[@i0].x(.5).add(@note.worldPts[@i1].x(.5))
