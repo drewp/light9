@@ -363,7 +363,7 @@ class TimeZoomed extends Polymer.Element
     zoom: { type: Object, notify: true, observer: 'onZoom' } # viewState.zoomSpec
     zoomFlattened: { type: Object, notify: true }
   @observers: [
-    'onGraph(graph, dia, setAdjuster, song, zoomInX)'
+    'onGraph(graph, setAdjuster, song, zoomInX)'
   ]
   @listeners: {'iron-resize': 'update'}
   update: ->
@@ -383,37 +383,55 @@ class TimeZoomed extends Polymer.Element
      
      @renderer = PIXI.autoDetectRenderer({
          backgroundColor: 0xff6060,
-        autoResize: true,
+  
      })
      
      @$.rows.appendChild(@renderer.view);
-     graphics = new PIXI.Graphics();
-
-     graphics.beginFill(0xFF3300);
-     graphics.lineStyle(4, 0xffd900, 1);
-
-     graphics.moveTo(50,50);
-     graphics.lineTo(250, 50);
-     graphics.lineTo(100, 100);
-     graphics.lineTo(50, 50);
-     graphics.endFill();
-     
-     @stage.addChild(graphics);
-     @renderer.render(@stage);
+   
 
      # iron-resize should be doing this but it never fires
      setInterval(@update.bind(@), 1000)
     
   onGraph: ->
+    @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
+  gatherNotes: ->
     U = (x) => @graph.Uri(x)
-    log('assign rows',@song)
+
+    log('assign rows',@song, 'graph has', @graph.quads().length)
+    graphics = new PIXI.Graphics()
 
     for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
       #should only make new ones
+      # 
       child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @zoomInX)
       log('note ',uri)
+      originTime = @graph.floatValue(uri, U(':originTime'))
+      effect = @graph.uriValue(uri, U(':effectClass'))
+      for curve in @graph.objects(uri, U(':curve'))
+        if @graph.uriValue(curve, U(':attr')).equals(U(':strength'))
+
+          [@pointUris, @worldPts] = @project.getCurvePoints(curve, originTime)
+          curveWidthCalc = () => @_curveWidth(@worldPts)
+      
+          screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
+
+
+          graphics.beginFill(0xFF3300);
+          graphics.lineStyle(2, 0xffd900, 1);
+
+          graphics.moveTo(screenPts[0].e(1), screenPts[0].e(2))
+          for p in screenPts
+            graphics.lineTo(p.e(1), p.e(2))
+         graphics.endFill();
     
-    @rows = []#(new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
+     @rows = []#(new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
+
+
+
+     @stage.children.splice(0)
+     @stage.addChild(graphics)
+     @renderer.render(@stage)
+    
 
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
@@ -480,10 +498,10 @@ class NoteRow
 
 class Note
   constructor: (@graph, @selection, @dia, @uri, @setAdjuster, @song, @zoomInX)->0
-  is: 'light9-timeline-note'
-  behaviors: [ Polymer.IronResizableBehavior ]
-  listeners: 'iron-resize': 'update' #move to parent elem
-  properties:
+  @is: 'light9-timeline-note'
+  @behaviors: [ Polymer.IronResizableBehavior ]
+  @listeners: 'iron-resize': 'update' #move to parent elem
+  @properties:
     graph: { type: Object, notify: true }
     selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
@@ -492,7 +510,7 @@ class Note
     setAdjuster: {type: Function, notify: true }
     inlineRect: { type: Object, notify: true }
     song: { type: String, notify: true }
-  observers: [
+  @observers: [
     'onUri(graph, dia, uri, zoomInX, setAdjuster, song)'
     'update(graph, dia, uri, zoomInX, setAdjuster, song)'
     ]
@@ -517,8 +535,7 @@ class Note
       if patch.addQuads.length == patch.delQuads.length == 1
         add = patch.addQuads[0]
         del = patch.delQuads[0]
-        if (add.predicate == del.predicate == @graph.Uri(':time') and
-            add.subject == del.subject)
+        if (add.predicate.equals(del.predicate) and del.predicate.equals(@graph.Uri(':time')) and add.subject.equals(del.subject))
           timeEditFor = add.subject
           if @worldPts and timeEditFor not in @pointUris
             return false
@@ -546,13 +563,12 @@ class Note
     originTime = @graph.floatValue(@uri, U(':originTime'))
     effect = @graph.uriValue(@uri, U(':effectClass'))
     for curve in @graph.objects(@uri, U(':curve'))
-      if @graph.uriValue(curve, U(':attr')) == U(':strength')
+      if @graph.uriValue(curve, U(':attr')).equals(U(':strength'))
 
         [@pointUris, @worldPts] = @_getCurvePoints(curve, originTime)
         curveWidthCalc = () => @_curveWidth(@worldPts)
-    
         screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
-    
+
         @dia.setNote(@uri, screenPts, effect)
         @_updateAdjusters(screenPts, curveWidthCalc, yForV, U(@song))
         @_updateInlineAttrs(screenPts)
