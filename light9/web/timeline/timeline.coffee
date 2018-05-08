@@ -73,8 +73,9 @@ class Project
     worldPts = []
     uris = @graph.objects(curve, @graph.Uri(':point'))
     for pt in uris
-      v = $V([xOffset + @graph.floatValue(pt, @graph.Uri(':time')),
-              @graph.floatValue(pt, @graph.Uri(':value'))])
+      tm = @graph.floatValue(pt, @graph.Uri(':time'))
+      val = @graph.floatValue(pt, @graph.Uri(':value'))
+      v = $V([xOffset + tm, val])
       v.uri = pt
       worldPts.push(v)
     worldPts.sort((a,b) -> a.e(1) > b.e(1))
@@ -98,6 +99,7 @@ class TimelineEditor extends Polymer.Element
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
+    project: {type: Object}
     setAdjuster: {type: Function, notify: true}
     playerSong: {type: String, notify: true}
     followPlayerSong: {type: Boolean, notify: true, value: true}
@@ -113,18 +115,20 @@ class TimelineEditor extends Polymer.Element
   @listeners:
     'iron-resize': '_onIronResize'
   @observers: [
-    'setSong(playerSong, followPlayerSong)'
+    'setSong(playerSong, followPlayerSong)',
+    'onGraph(graph)',
     ]
   _onIronResize: ->
     @width(@offsetWidth)
   _onSongTime: (t) ->
-    @viewState.cursor.t(t)
+    #@viewState.cursor.t(t)
   _onSongDuration: (d) ->
     d = 700 if d < 1 # bug is that asco isn't giving duration, but 0 makes the scale corrupt
-    @viewState.zoomSpec.duration(d)
+    #@viewState.zoomSpec.duration(d)
   setSong: (s) ->
     @song = @playerSong if @followPlayerSong
-
+  onGraph: (graph) ->
+    @project = new Project(graph)
   connectedCallback: ->
     super.connectedCallback()
     ko.options.deferUpdates = true;
@@ -164,13 +168,14 @@ class TimelineEditor extends Polymer.Element
     "
     
   attached: ->
+    super()
     @dia = @$.dia
     ko.computed(@zoomOrLayoutChanged.bind(@))
     ko.computed(@songTimeChanged.bind(@))
 
     @trackMouse()
     @bindKeys()
-    @bindWheelZoom(@dia.querySelector('svg'))
+    @bindWheelZoom(@dia)
     @forwardMouseEventsToAdjustersCanvas()
 
     @makeZoomAdjs()
@@ -363,7 +368,7 @@ class TimeZoomed extends Polymer.Element
     zoom: { type: Object, notify: true, observer: 'onZoom' } # viewState.zoomSpec
     zoomFlattened: { type: Object, notify: true }
   @observers: [
-    'onGraph(graph, setAdjuster, song, zoomInX)'
+    'onGraph(graph, setAdjuster, song, zoomInX, project)'
   ]
   @listeners: {'iron-resize': 'update'}
   update: ->
@@ -375,22 +380,23 @@ class TimeZoomed extends Polymer.Element
       log('updateZoomFlattened')
       @zoomFlattened = ko.toJS(@zoom)
     ko.computed(updateZoomFlattened.bind(@))
-    
-  connectedCallback: ->
-     super.connectedCallback()
 
-     @stage = new PIXI.Container()
-     
-     @renderer = PIXI.autoDetectRenderer({
+  constructor: ->
+    super()
+    @stage = new PIXI.Container()
+    
+    @renderer = PIXI.autoDetectRenderer({
          backgroundColor: 0xff6060,
   
-     })
+    })
      
-     @$.rows.appendChild(@renderer.view);
-   
-
-     # iron-resize should be doing this but it never fires
-     setInterval(@update.bind(@), 1000)
+  connectedCallback: ->
+    super.connectedCallback()
+     
+    @$.rows.appendChild(@renderer.view);
+  
+    # iron-resize should be doing this but it never fires
+    setInterval(@update.bind(@), 1000)
     
   onGraph: ->
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
@@ -398,7 +404,7 @@ class TimeZoomed extends Polymer.Element
     U = (x) => @graph.Uri(x)
 
     log('assign rows',@song, 'graph has', @graph.quads().length)
-    graphics = new PIXI.Graphics()
+    graphics = new PIXI.Graphics({nativeLines: true})
 
     for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
       #should only make new ones
@@ -412,17 +418,17 @@ class TimeZoomed extends Polymer.Element
 
           [@pointUris, @worldPts] = @project.getCurvePoints(curve, originTime)
           curveWidthCalc = () => @_curveWidth(@worldPts)
-      
-          screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
 
+          h = 150 #@offsetHeight
+          screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * h]) for pt in @worldPts)
 
           graphics.beginFill(0xFF3300);
-          graphics.lineStyle(2, 0xffd900, 1);
+          graphics.lineStyle(4, 0xffd900, 1)
 
           graphics.moveTo(screenPts[0].e(1), screenPts[0].e(2))
-          for p in screenPts
+          for p in screenPts.slice(1)
             graphics.lineTo(p.e(1), p.e(2))
-         graphics.endFill();
+         graphics.endFill()
     
      @rows = []#(new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
 
@@ -573,7 +579,8 @@ class Note
         @_updateAdjusters(screenPts, curveWidthCalc, yForV, U(@song))
         @_updateInlineAttrs(screenPts)
         
-  _updateAdjusters: (screenPts, curveWidthCalc, yForV, ctx) ->   
+    return
+  _updateAdjusters: (screenPts, curveWidthCalc, yForV, ctx) ->
     if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
     else
