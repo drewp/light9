@@ -4,23 +4,23 @@
 
 show:dance2017 :networking sh:netHome .
 sh:netHome
-  :webServer        <http://dot:8200/>;
-  :patchReceiverUpdateHost "plus";
-  :captureDevice    <http://dot:8215/>;
-  :curveCalc        <http://dot:8201/>;
-  :collector        <http://plus:8202/>;
-  :collectorZmq     <http://plus:8203/>;
-  :effectEval       <http://dot:8204/>;
-  :effectSequencer  <http://dot:8213/>;
-  :keyboardComposer <http://dot:8205/>;
-  :musicPlayer      <http://dot:8206/>;
-  :oscDmxServer     <udp://dot:8207/>;
-  :paintServer      <http://dot:8214/>;
+  :webServer        <http://localhost:8200/>;
+  :patchReceiverUpdateHost "localhost";
+  :captureDevice    <http://localhost:8215/>;
+  :curveCalc        <http://localhost:8201/>;
+  :collector        <http://localhost:8202/>;
+  :collectorZmq     <http://localhost:8203/>;
+  :effectEval       <http://localhost:8204/>;
+  :effectSequencer  <http://localhost:8213/>;
+  :keyboardComposer <http://localhost:8205/>;
+  :musicPlayer      <http://localhost:8206/>;
+  :oscDmxServer     <udp://localhost:8207/>;
+  :paintServer      <http://localhost:8214/>;
   :picamserve       <http://10.2.0.6:8208/>;
-  :rdfdb            <http://dot:8209/>;
-  :subComposer      <http://dot:8210/>;
-  :subServer        <http://dot:8211/>;
-  :vidref           <http://dot:8212/> .
+  :rdfdb            <http://localhost:8209/>;
+  :subComposer      <http://localhost:8210/>;
+  :subServer        <http://localhost:8211/>;
+  :vidref           <http://localhost:8212/> .
 
 :captureDevice    :urlPath "captureDevice" .
 :curveCalc        :urlPath "curveCalc" .
