@@ -118,20 +118,13 @@ class TimelineEditor extends Polymer.Element
     'setSong(playerSong, followPlayerSong)',
     'onGraph(graph)',
     ]
-  _onIronResize: ->
-    @width(@offsetWidth)
-  _onSongTime: (t) ->
-    #@viewState.cursor.t(t)
-  _onSongDuration: (d) ->
-    d = 700 if d < 1 # bug is that asco isn't giving duration, but 0 makes the scale corrupt
-    #@viewState.zoomSpec.duration(d)
-  setSong: (s) ->
-    @song = @playerSong if @followPlayerSong
-  onGraph: (graph) ->
-    @project = new Project(graph)
+    
   connectedCallback: ->
     super.connectedCallback()
     ko.options.deferUpdates = true;
+
+    @dia = @$.dia
+
     @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
     window.debug_zoomOrLayoutChangedCount = 0
@@ -146,16 +139,49 @@ class TimelineEditor extends Polymer.Element
         t: ko.observable(20)
       mouse:
         pos: ko.observable($V([0,0]))
+    window.viewState = @viewState
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
     @setAdjuster = (adjId, makeAdjustable) =>
-      @$.adjustersCanvas.setAdjuster(adjId, makeAdjustable)
+      ac = @$.adjustersCanvas
+      setTimeout((()=>ac.setAdjuster(adjId, makeAdjustable)),10)
 
-    setInterval(@updateDebugSummary.bind(@), 100)
+    setTimeout =>
+      ko.computed(@zoomOrLayoutChanged.bind(@))
+      ko.computed(@songTimeChanged.bind(@))
+
+      @trackMouse()
+      @bindKeys()
+      @bindWheelZoom(@dia)
+      setTimeout => # depends on child node being ready
+          @forwardMouseEventsToAdjustersCanvas()
+        , 400
+
+      @makeZoomAdjs()
+
+      zoomed = @$.zoomed
+      setupDrop(@$.dia.shadowRoot.querySelector('svg'),
+                zoomed.$.rows, @, zoomed.onDrop.bind(zoomed))
+
+      setInterval(@updateDebugSummary.bind(@), 100)
+    , 500
 
     #if anchor == loadtest
     #  add note and delete it repeatedly
     #  disconnect the graph, make many notes, drag a point over many steps, measure lag somewhere
+
+  _onIronResize: ->
+    @width(@offsetWidth)
+  _onSongTime: (t) ->
+    #@viewState.cursor.t(t)
+  _onSongDuration: (d) ->
+    d = 700 if d < 1 # bug is that asco isn't giving duration, but 0 makes the scale corrupt
+    #@viewState.zoomSpec.duration(d)
+    
+  setSong: (s) ->
+    @song = @playerSong if @followPlayerSong
+  onGraph: (graph) ->
+    @project = new Project(graph)
 
   updateDebugSummary: ->
     elemCount = (tag) -> document.getElementsByTagName(tag).length
@@ -166,23 +192,6 @@ class TimelineEditor extends Polymer.Element
      #{window.debug_adjsCount} adjuster items registered,
      #{window.debug_adjUpdateDisplay} adjuster updateDisplay calls,
     "
-    
-  attached: ->
-    super()
-    @dia = @$.dia
-    ko.computed(@zoomOrLayoutChanged.bind(@))
-    ko.computed(@songTimeChanged.bind(@))
-
-    @trackMouse()
-    @bindKeys()
-    @bindWheelZoom(@dia)
-    @forwardMouseEventsToAdjustersCanvas()
-
-    @makeZoomAdjs()
-
-    zoomed = @$.zoomed
-    setupDrop(@$.dia.querySelector('svg'), zoomed.$.rows, @, zoomed.onDrop.bind(zoomed))
-
 
   zoomOrLayoutChanged: ->
     log('zoomOrLayoutChanged')
@@ -206,14 +215,16 @@ class TimelineEditor extends Polymer.Element
     @zoomInX = zoomInX
 
     # todo: these run a lot of work purely for a time change
-    @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
-    @$.adjustersCanvas.updateAllCoords()
+    if @$.zoomed?.$?.audio?
+      @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
+      @$.adjustersCanvas.updateAllCoords()
 
     # cursor needs update when layout changes, but I don't want
     # zoom/layout to depend on the playback time
     setTimeout(@songTimeChanged.bind(@), 1)
 
   songTimeChanged: ->
+    return unless @$.zoomed?.$?.time?
     @$.cursorCanvas.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                               @$.zoomed.$.time.offsetTop,
                               @$.zoomed.$.time.offsetHeight,
@@ -257,6 +268,7 @@ class TimelineEditor extends Polymer.Element
 
       zs.t1(center - left * scale)
       zs.t2(center + right * scale)
+      log('view to', ko.toJSON(@viewState))
 
   forwardMouseEventsToAdjustersCanvas: ->
     ac = @$.adjustersCanvas
@@ -410,7 +422,6 @@ class TimeZoomed extends Polymer.Element
       #should only make new ones
       # 
       child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @zoomInX)
-      log('note ',uri)
       originTime = @graph.floatValue(uri, U(':originTime'))
       effect = @graph.uriValue(uri, U(':effectClass'))
       for curve in @graph.objects(uri, U(':curve'))
@@ -421,7 +432,6 @@ class TimeZoomed extends Polymer.Element
 
           h = 150 #@offsetHeight
           screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * h]) for pt in @worldPts)
-
           graphics.beginFill(0xFF3300);
           graphics.lineStyle(4, 0xffd900, 1)
 

@@ -52,7 +52,8 @@ class AdjustersCanvas extends Polymer.Element
         @adjs[adjId] = adj
         adj.id = adjId
 
-    @debounce('adj redraw', @redraw.bind(@))
+    #@debounce('adj redraw', @redraw.bind(@))
+    setTimeout((() => @redraw()), 2)
 
     window.debug_adjsCount = Object.keys(@adjs).length
 
@@ -71,9 +72,11 @@ class AdjustersCanvas extends Polymer.Element
     @redraw()
 
   redraw: (adjs) ->
-    @debounce('redraw', @_throttledRedraw.bind(@))
+    @_throttledRedraw(adjs)
+    #@debounce('redraw', @_throttledRedraw.bind(@))
 
   _throttledRedraw: () ->
+    return unless @ctx?
     console.time('adjs redraw')
     @_layoutCenters()
     
@@ -155,3 +158,5 @@ class AdjustersCanvas extends Polymer.Element
     # l/r arrows
     # mouse arrow cursor upon hover, and accent the hovered adjuster
     # connector
+
+customElements.define(AdjustersCanvas.is, AdjustersCanvas)
