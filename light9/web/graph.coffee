@@ -266,7 +266,7 @@ class window.SyncedGraph
     
     switch objs.size
       when 0
-        throw new Error("no value for "+s+" "+p)
+        throw new Error("no value for "+s.value+" "+p.value)
       when 1
         obj = objs.values().next().value
         return obj
@@ -274,7 +274,7 @@ class window.SyncedGraph
         throw new Error("too many different values: " + JSON.stringify(quads))
 
   floatValue: (s, p) ->
-    key = s + '|' + p
+    key = s.value + '|' + p.value
     hit = @cachedFloatValues.get(key)
     return hit if hit != undefined
     #log('float miss', s, p)

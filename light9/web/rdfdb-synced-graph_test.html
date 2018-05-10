@@ -27,24 +27,39 @@
      const assert = chai.assert;
      
      describe("rdfdb-synced-graph", () => {
-         let elem;
-         beforeEach(() => {
-             elem = document.querySelector("#graph");
-             window.g = elem;
-             elem.graph.clearGraph();
-         });
-         it("makes a node", () => {
-             assert.equal(elem.tagName, "RDFDB-SYNCED-GRAPH");
-         });
-         it("loads trig", (done) => {
-             elem.graph.loadTrig(`
-                       @prefix : <http://example.com/> .
+       let elem, U;
+       beforeEach(() => {
+         elem = document.querySelector("#graph");
+         window.g = elem;
+         elem.graph.clearGraph();
+         U = elem.graph.Uri.bind(elem.graph);
+       });
+       it("makes a node", () => {
+         assert.equal(elem.tagName, "RDFDB-SYNCED-GRAPH");
+       });
+       it("loads trig", (done) => {
+         elem.graph.loadTrig(`
+                       @prefix : <http://light9.bigasterisk.com/> .
                        :a :b :c :d .
                      `, () => {
-                         assert.equal(elem.graph.quads().length, 1);
-                         done();
+                       assert.equal(elem.graph.quads().length, 1);
+                       done();
                      });
+       });
+       describe("floatValue read call", () => {
+         it("loads two values without confusing them in a cache", (done) => {
+           elem.graph.loadTrig(`
+               @prefix : <http://light9.bigasterisk.com/> .
+               :s :a 1 :g .
+               :s :b 2 :g .
+             `, () => {
+               assert.equal(elem.graph.floatValue(U(":s"), U(":a")), 1);
+               assert.equal(elem.graph.floatValue(U(":s"), U(":b")), 2);
+               assert.equal(elem.graph.floatValue(U(":s"), U(":a")), 1);
+               done();
+             });
          });
+       });
      }); 
      mocha.run();
     </script>
