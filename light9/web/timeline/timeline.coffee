@@ -101,7 +101,7 @@ class ViewState
       t1: ko.observable(0)
       t2: ko.observable(100)
     @cursor =
-      t: ko.observable(20)
+      t: ko.observable(20) # songTime
     @mouse =
       pos: ko.observable($V([0,0]))
       
@@ -146,6 +146,25 @@ class ViewState
     log('view to', ko.toJSON(@))
 
     
+  animatedZoom: (newT1, newT2, secs) ->
+    fps = 30
+    oldT1 = @zoomSpec.t1()
+    oldT2 = @zoomSpec.t2()
+    lastTime = 0
+    for step in [0..secs * fps]
+      frac = step / (secs * fps)
+      do (frac) =>
+        gotoStep = =>
+          @zoomSpec.t1((1 - frac) * oldT1 + frac * newT1)
+          @zoomSpec.t2((1 - frac) * oldT2 + frac * newT2)
+        delay = frac * secs * 1000
+        setTimeout(gotoStep, delay)
+        lastTime = delay
+    setTimeout(=>
+        @zoomSpec.t1(newT1)
+        @zoomSpec.t2(newT2)
+      , lastTime + 10)  
+    
 class TimelineEditor extends Polymer.Element
   @is: 'light9-timeline-editor'
   @behaviors: [ Polymer.IronResizableBehavior ]
@@ -163,7 +182,6 @@ class TimelineEditor extends Polymer.Element
     songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}
     selection: {type: Object, notify: true}
-  width: ko.observable(1)
   @listeners:
     'iron-resize': '_onIronResize'
   @observers: [
@@ -176,6 +194,7 @@ class TimelineEditor extends Polymer.Element
     ko.options.deferUpdates = true;
 
     @dia = @$.dia
+    
 
     @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
@@ -213,12 +232,13 @@ class TimelineEditor extends Polymer.Element
     #  disconnect the graph, make many notes, drag a point over many steps, measure lag somewhere
 
   _onIronResize: ->
-    @width(@offsetWidth)
+    log('set w to',   @offsetWidth)
+    @viewState.width(@offsetWidth)
   _onSongTime: (t) ->
-    #@viewState.cursor.t(t)
+    @viewState.cursor.t(t)
   _onSongDuration: (d) ->
     d = 700 if d < 1 # bug is that asco isn't giving duration, but 0 makes the scale corrupt
-    #@viewState.zoomSpec.duration(d)
+    @viewState.zoomSpec.duration(d)
     
   setSong: (s) ->
     @song = @playerSong if @followPlayerSong
@@ -242,7 +262,7 @@ class TimelineEditor extends Polymer.Element
   
     # todo: these run a lot of work purely for a time change
     if @$.zoomed?.$?.audio?
-      @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
+      @dia.setTimeAxis(vs.width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
       @$.adjustersCanvas.updateAllCoords()
 
     # cursor needs update when layout changes, but I don't want
@@ -292,34 +312,15 @@ class TimelineEditor extends Polymer.Element
     @addEventListener('mousemove', ac.onMove.bind(ac))
     @addEventListener('mouseup', ac.onUp.bind(ac))
 
-  animatedZoom: (newT1, newT2, secs) ->
-    fps = 30
-    oldT1 = @viewState.zoomSpec.t1()
-    oldT2 = @viewState.zoomSpec.t2()
-    lastTime = 0
-    for step in [0..secs * fps]
-      frac = step / (secs * fps)
-      do (frac) =>
-        gotoStep = =>
-          @viewState.zoomSpec.t1((1 - frac) * oldT1 + frac * newT1)
-          @viewState.zoomSpec.t2((1 - frac) * oldT2 + frac * newT2)
-        delay = frac * secs * 1000
-        setTimeout(gotoStep, delay)
-        lastTime = delay
-    setTimeout(=>
-        @viewState.zoomSpec.t1(newT1)
-        @viewState.zoomSpec.t2(newT2)
-      , lastTime + 10)  
-    
   bindKeys: ->
     shortcut.add "Ctrl+P", (ev) =>
       @$.music.seekPlayOrPause(@latestMouseTime())
 
     zoomAnimSec = .1
     shortcut.add "Ctrl+Escape", =>
-      @animatedZoom(0, @viewState.zoomSpec.duration(), zoomAnimSec)
+      @viewState.animatedZoom(0, @viewState.zoomSpec.duration(), zoomAnimSec)
     shortcut.add "Shift+Escape", =>
-      @animatedZoom(@songTime - 2, @viewState.zoomSpec.duration(), zoomAnimSec)
+      @viewState.animatedZoom(@songTime - 2, @viewState.zoomSpec.duration(), zoomAnimSec)
     shortcut.add "Escape", =>
       zs = @viewState.zoomSpec
       visSeconds = zs.t2() - zs.t1()
@@ -327,8 +328,8 @@ class TimelineEditor extends Polymer.Element
       # buggy: really needs t1/t2 to limit their ranges
       if @songTime < zs.t1() or @songTime > zs.t2() - visSeconds * .6
         newCenter = @songTime + margin
-        @animatedZoom(newCenter - visSeconds / 2,
-                      newCenter + visSeconds / 2, zoomAnimSec)
+        @viewState.animatedZoom(newCenter - visSeconds / 2,
+                                newCenter + visSeconds / 2, zoomAnimSec)
     shortcut.add "L", =>
       @$.adjustersCanvas.updateAllCoords()
     shortcut.add 'Delete', =>
@@ -435,7 +436,7 @@ class TimeZoomed extends Polymer.Element
     for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
       #should only make new ones
       # 
-      child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @viewState.zoomInX)
+      #child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @viewState.zoomInX)
       originTime = @graph.floatValue(uri, U(':originTime'))
       effect = @graph.uriValue(uri, U(':effectClass'))
       for curve in @graph.objects(uri, U(':curve'))
