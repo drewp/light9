@@ -20,10 +20,10 @@ Polymer
     @mouseY = pos.e(2)
     @redraw()
 
-  setCursor: (y1, h1, y2, h2, fullZoomX, zoomInX, cursor) ->
+  setCursor: (y1, h1, y2, h2, viewState) ->
     
-    xZoomedOut = fullZoomX(cursor.t())
-    xZoomedIn = zoomInX(cursor.t())
+    xZoomedOut = viewState.fullZoomX(viewState.latestMouseTime())
+    xZoomedIn = viewState.mouse.pos().e(1)
 
     @cursorPath = {
       top0: $V([xZoomedOut, y1])

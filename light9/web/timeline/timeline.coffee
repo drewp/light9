@@ -91,7 +91,61 @@ class Project
     @graph.applyAndSendPatch(patch)
     if note in selection.selected()
       selection.selected(_.without(selection.selected(), note))
-  
+
+class ViewState
+  constructor: () ->
+    # caller updates all these observables
+    @width = ko.observable(500)
+    @zoomSpec =
+      duration: ko.observable(100) # current song duration
+      t1: ko.observable(0)
+      t2: ko.observable(100)
+    @cursor =
+      t: ko.observable(20)
+    @mouse =
+      pos: ko.observable($V([0,0]))
+      
+    @fullZoomX = d3.scaleLinear()
+    @zoomInX = d3.scaleLinear()
+
+    ko.computed(@zoomOrLayoutChanged.bind(@))    
+    
+  zoomOrLayoutChanged: () ->
+    log('zoomOrLayoutChanged')
+    # not for cursor updates
+
+    window.debug_zoomOrLayoutChangedCount++
+
+    if @zoomSpec.t1() < 0
+      @zoomSpec.t1(0)
+    if @zoomSpec.duration() and @zoomSpec.t2() > @zoomSpec.duration()
+      @zoomSpec.t2(@zoomSpec.duration())
+
+    @fullZoomX.domain([0, @zoomSpec.duration()])
+    @fullZoomX.range([0, @width()])
+
+    # had trouble making notes update when this changes
+    zoomInX = d3.scaleLinear()
+    zoomInX.domain([@zoomSpec.t1(), @zoomSpec.t2()])
+    zoomInX.range([0, @width()])
+    @zoomInX = zoomInX
+    
+  latestMouseTime: ->
+    @zoomInX.invert(@mouse.pos().e(1))
+
+  onMouseWheel: (deltaY) ->
+    zs = @zoomSpec
+
+    center = @latestMouseTime()
+    left = center - zs.t1()
+    right = zs.t2() - center
+    scale = Math.pow(1.005, deltaY)
+
+    zs.t1(center - left * scale)
+    zs.t2(center + right * scale)
+    log('view to', ko.toJSON(@))
+
+    
 class TimelineEditor extends Polymer.Element
   @is: 'light9-timeline-editor'
   @behaviors: [ Polymer.IronResizableBehavior ]
@@ -108,8 +162,6 @@ class TimelineEditor extends Polymer.Element
     songTime: {type: Number, notify: true, observer: '_onSongTime'}
     songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}
-    fullZoomX: {type: Object, notify: true}
-    zoomInX: {type: Object, notify: true}
     selection: {type: Object, notify: true}
   width: ko.observable(1)
   @listeners:
@@ -130,18 +182,8 @@ class TimelineEditor extends Polymer.Element
     window.debug_zoomOrLayoutChangedCount = 0
     window.debug_adjUpdateDisplay = 0
     
-    @viewState =
-      zoomSpec:
-        duration: ko.observable(100) # current song duration
-        t1: ko.observable(0) # need validation to stay in bounds and not go too close
-        t2: ko.observable(100)
-      cursor:
-        t: ko.observable(20)
-      mouse:
-        pos: ko.observable($V([0,0]))
+    @viewState = new ViewState()
     window.viewState = @viewState
-    @fullZoomX = d3.scaleLinear()
-    @zoomInX = d3.scaleLinear()
     @setAdjuster = (adjId, makeAdjustable) =>
       ac = @$.adjustersCanvas
       setTimeout((()=>ac.setAdjuster(adjId, makeAdjustable)),10)
@@ -194,29 +236,13 @@ class TimelineEditor extends Polymer.Element
     "
 
   zoomOrLayoutChanged: ->
-    log('zoomOrLayoutChanged')
-    # not for cursor updates
-
+  
     vs = @viewState
     
-    if vs.zoomSpec.t1() < 0
-      vs.zoomSpec.t1(0)
-    if vs.zoomSpec.duration() and vs.zoomSpec.t2() > vs.zoomSpec.duration()
-      vs.zoomSpec.t2(vs.zoomSpec.duration())
-
-    window.debug_zoomOrLayoutChangedCount++
-    @fullZoomX.domain([0, vs.zoomSpec.duration()])
-    @fullZoomX.range([0, @width()])
-
-    # had trouble making notes update when this changes
-    zoomInX = d3.scaleLinear()
-    zoomInX.domain([vs.zoomSpec.t1(), vs.zoomSpec.t2()])
-    zoomInX.range([0, @width()])
-    @zoomInX = zoomInX
-
+  
     # todo: these run a lot of work purely for a time change
     if @$.zoomed?.$?.audio?
-      @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, @zoomInX)
+      @dia.setTimeAxis(@width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
       @$.adjustersCanvas.updateAllCoords()
 
     # cursor needs update when layout changes, but I don't want
@@ -228,7 +254,7 @@ class TimelineEditor extends Polymer.Element
     @$.cursorCanvas.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                               @$.zoomed.$.time.offsetTop,
                               @$.zoomed.$.time.offsetHeight,
-                              @fullZoomX, @zoomInX, @viewState.cursor)
+                              @viewState)
     
   trackMouse: ->
     # not just for show- we use the mouse pos sometimes
@@ -254,21 +280,11 @@ class TimelineEditor extends Polymer.Element
       @$.vidrefTime.generateRequest()
       @$.vidrefLastSent = now
 
-  latestMouseTime: ->
-    @zoomInX.invert(@viewState.mouse.pos().e(1))
+  
 
   bindWheelZoom: (elem) ->
     elem.addEventListener 'mousewheel', (ev) =>
-      zs = @viewState.zoomSpec
-
-      center = @latestMouseTime()
-      left = center - zs.t1()
-      right = zs.t2() - center
-      scale = Math.pow(1.005, ev.deltaY)
-
-      zs.t1(center - left * scale)
-      zs.t2(center + right * scale)
-      log('view to', ko.toJSON(@viewState))
+      @viewState.onMouseWheel(ev.deltaY)
 
   forwardMouseEventsToAdjustersCanvas: ->
     ac = @$.adjustersCanvas
@@ -376,11 +392,10 @@ class TimeZoomed extends Polymer.Element
     selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
-    zoomInX: { type: Object, notify: true }
-    zoom: { type: Object, notify: true, observer: 'onZoom' } # viewState.zoomSpec
-    zoomFlattened: { type: Object, notify: true }
+    viewState: { type: Object, notify: true }
   @observers: [
-    'onGraph(graph, setAdjuster, song, zoomInX, project)'
+    'onGraph(graph, setAdjuster, song, viewState, project)',
+    'onZoom(viewState)',
   ]
   @listeners: {'iron-resize': 'update'}
   update: ->
@@ -390,7 +405,7 @@ class TimeZoomed extends Polymer.Element
   onZoom: ->
     updateZoomFlattened = ->
       log('updateZoomFlattened')
-      @zoomFlattened = ko.toJS(@zoom)
+      @zoomFlattened = ko.toJS(@viewState.zoomSpec)
     ko.computed(updateZoomFlattened.bind(@))
 
   constructor: ->
@@ -399,7 +414,6 @@ class TimeZoomed extends Polymer.Element
     
     @renderer = PIXI.autoDetectRenderer({
          backgroundColor: 0xff6060,
-  
     })
      
   connectedCallback: ->
@@ -421,7 +435,7 @@ class TimeZoomed extends Polymer.Element
     for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
       #should only make new ones
       # 
-      child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @zoomInX)
+      child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @viewState.zoomInX)
       originTime = @graph.floatValue(uri, U(':originTime'))
       effect = @graph.uriValue(uri, U(':effectClass'))
       for curve in @graph.objects(uri, U(':curve'))
@@ -431,7 +445,7 @@ class TimeZoomed extends Polymer.Element
           curveWidthCalc = () => @_curveWidth(@worldPts)
 
           h = 150 #@offsetHeight
-          screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * h]) for pt in @worldPts)
+          screenPts = ($V([@viewState.zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * h]) for pt in @worldPts)
           graphics.beginFill(0xFF3300);
           graphics.lineStyle(4, 0xffd900, 1)
 
@@ -442,13 +456,10 @@ class TimeZoomed extends Polymer.Element
     
      @rows = []#(new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
 
-
-
      @stage.children.splice(0)
      @stage.addChild(graphics)
      @renderer.render(@stage)
     
-
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
 
@@ -464,10 +475,10 @@ class TimeZoomed extends Polymer.Element
         log("drop #{effect} is not an effect")
         return
 
-    dropTime = @zoomInX.invert(pos.e(1))
+    dropTime = @viewState.zoomInX.invert(pos.e(1))
 
     desiredWidthX = @offsetWidth * .3
-    desiredWidthT = @zoomInX.invert(desiredWidthX) - @zoomInX.invert(0)
+    desiredWidthT = @viewState.zoomInX.invert(desiredWidthX) - @viewState.zoomInX.invert(0)
     desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
     @project.makeNewNote(effect, dropTime, desiredWidthT)
         
