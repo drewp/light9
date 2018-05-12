@@ -95,7 +95,6 @@ class Project
 class ViewState
   constructor: () ->
     # caller updates all these observables
-    @width = ko.observable(500)
     @zoomSpec =
       duration: ko.observable(100) # current song duration
       t1: ko.observable(0)
@@ -104,21 +103,26 @@ class ViewState
       t: ko.observable(20) # songTime
     @mouse =
       pos: ko.observable($V([0,0]))
+    @width = ko.observable(500)
+    @audioY = ko.observable(0)
+    @audioH = ko.observable(0)
+    @zoomedTimeY = ko.observable(0)
+    @zoomedTimeH = ko.observable(0)
       
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()
 
-    ko.computed(@zoomOrLayoutChanged.bind(@))    
+    @zoomAnimSec = .1
+
+    ko.computed(@maintainZoomLimitsAndScales.bind(@))    
  
   setWidth: (w) ->
     @width(w)
-    @zoomOrLayoutChanged() # before other handleers run
+    @maintainZoomLimitsAndScales() # before other handlers run
     
-  zoomOrLayoutChanged: () ->
-    log('zoomOrLayoutChanged')
+  maintainZoomLimitsAndScales: () ->
+    log('maintainZoomLimitsAndScales')
     # not for cursor updates
-
-    window.debug_zoomOrLayoutChangedCount++
 
     if @zoomSpec.t1() < 0
       @zoomSpec.t1(0)
@@ -130,7 +134,6 @@ class ViewState
 
     @zoomInX.domain([@zoomSpec.t1(), @zoomSpec.t2()])
     @zoomInX.range([0, @width()])
-    log('update zoomInX')
     
   latestMouseTime: ->
     @zoomInX.invert(@mouse.pos().e(1))
@@ -147,7 +150,19 @@ class ViewState
     zs.t2(center + right * scale)
     log('view to', ko.toJSON(@))
 
-    
+  frameCursor: ->
+    zs = @zoomSpec
+    visSeconds = zs.t2() - zs.t1()
+    margin = visSeconds * .4
+    # buggy: really needs t1/t2 to limit their ranges
+    if @cursor.t() < zs.t1() or @cursor.t() > zs.t2() - visSeconds * .6
+      newCenter = @cursor.t() + margin
+      @animatedZoom(newCenter - visSeconds / 2,
+                    newCenter + visSeconds / 2, @zoomAnimSec)
+  frameToEnd: ->
+    @animatedZoom(@cursor.t() - 2, @zoomSpec.duration(), @zoomAnimSec)
+  frameAll: ->
+    @animatedZoom(0, @zoomSpec.duration(), @zoomAnimSec)
   animatedZoom: (newT1, newT2, secs) ->
     fps = 30
     oldT1 = @zoomSpec.t1()
@@ -209,7 +224,6 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
 
     ko.computed(@zoomOrLayoutChanged.bind(@))
     setTimeout =>
-      ko.computed(@songTimeChanged.bind(@))
 
       @trackMouse()
       @bindKeys()
@@ -228,7 +242,7 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
     , 500
 
     @addEventListener('iron-resize', @_onIronResize.bind(@))
-    @_onIronResize()
+    setTimeout(@_onIronResize.bind(@), 1000) # when children are packed
     
     #if anchor == loadtest
     #  add note and delete it repeatedly
@@ -236,8 +250,12 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
 
   _onIronResize: ->
     @viewState.setWidth(@offsetWidth)
-
-    log('changed width')
+    @viewState.audioY(@$.audio.offsetTop)
+    @viewState.audioH(@$.audio.offsetHeight)
+    @viewState.zoomedTimeY(@$.zoomed.$.time.offsetTop) if @$.zoomed?.$?.time?
+    @viewState.zoomedTimeH(30) #@$.zoomed.$.time.offsetHeight)
+      
+    log('editor resized')
   _onSongTime: (t) ->
     @viewState.cursor.t(t)
   _onSongDuration: (d) ->
@@ -260,9 +278,8 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
     "
 
   zoomOrLayoutChanged: ->
-  
     vs = @viewState
-    
+    vs.width()
   
     # todo: these run a lot of work purely for a time change
     if @$.zoomed?.$?.audio?
@@ -270,17 +287,6 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
       #@dia.setTimeAxis(vs.width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
       @$.adjustersCanvas.updateAllCoords()
 
-    # cursor needs update when layout changes, but I don't want
-    # zoom/layout to depend on the playback time
-    setTimeout(@songTimeChanged.bind(@), 1)
-
-  songTimeChanged: ->
-    return unless @$.zoomed?.$?.time?
-    @$.cursorCanvas.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
-                              @$.zoomed.$.time.offsetTop,
-                              30,#@$.zoomed.$.time.offsetHeight,
-                              @viewState)
-    
   trackMouse: ->
     # not just for show- we use the mouse pos sometimes
     for evName in ['mousemove', 'touchmove']
@@ -294,7 +300,6 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
         root = @$.cursorCanvas.getBoundingClientRect()
         @viewState.mouse.pos($V([ev.pageX - root.left, ev.pageY - root.top]))
 
-        @$.cursorCanvas.setMouse(@viewState.mouse.pos())
         # should be controlled by a checkbox next to follow-player-song-choice
         @sendMouseToVidref() unless window.location.hash.match(/novidref/)
 
@@ -304,8 +309,6 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
       @$.vidrefTime.body = {t: @latestMouseTime(), source: 'timeline'}
       @$.vidrefTime.generateRequest()
       @$.vidrefLastSent = now
-
-  
 
   bindWheelZoom: (elem) ->
     elem.addEventListener 'mousewheel', (ev) =>
@@ -320,21 +323,9 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
   bindKeys: ->
     shortcut.add "Ctrl+P", (ev) =>
       @$.music.seekPlayOrPause(@latestMouseTime())
-
-    zoomAnimSec = .1
-    shortcut.add "Ctrl+Escape", =>
-      @viewState.animatedZoom(0, @viewState.zoomSpec.duration(), zoomAnimSec)
-    shortcut.add "Shift+Escape", =>
-      @viewState.animatedZoom(@songTime - 2, @viewState.zoomSpec.duration(), zoomAnimSec)
-    shortcut.add "Escape", =>
-      zs = @viewState.zoomSpec
-      visSeconds = zs.t2() - zs.t1()
-      margin = visSeconds * .4
-      # buggy: really needs t1/t2 to limit their ranges
-      if @songTime < zs.t1() or @songTime > zs.t2() - visSeconds * .6
-        newCenter = @songTime + margin
-        @viewState.animatedZoom(newCenter - visSeconds / 2,
-                                newCenter + visSeconds / 2, zoomAnimSec)
+    shortcut.add "Ctrl+Escape", => @viewState.frameAll()
+    shortcut.add "Shift+Escape", => @viewState.frameToEnd()
+    shortcut.add "Escape", => @viewState.frameCursor()
     shortcut.add "L", =>
       @$.adjustersCanvas.updateAllCoords()
     shortcut.add 'Delete', =>
@@ -343,7 +334,6 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
 
   makeZoomAdjs: ->
     yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
-    dur = @viewState.zoomSpec.duration
     
     valForPos = (pos) =>
         x = pos.e(1)

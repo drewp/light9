@@ -3,41 +3,42 @@ Polymer
   is: 'light9-cursor-canvas'
   behaviors: [ Polymer.IronResizableBehavior ]
   listeners: 'iron-resize': 'update'
-
+  properties:
+    viewState: { type: Object, notify: true, observer: "onViewState" }
   ready: ->
     @mouseX = 0
     @mouseY = 0
     @cursorPath = null
     @ctx = @$.canvas.getContext('2d')
 
+  onViewState: ->
+    ko.computed(@redrawCursor.bind(@))
+
   update: (ev) ->
     @$.canvas.width = ev.target.offsetWidth
     @$.canvas.height = ev.target.offsetHeight
     @redraw()
 
-  setMouse: (pos) ->
-    @mouseX = pos.e(1)
-    @mouseY = pos.e(2)
-    @redraw()
-
-  setCursor: (y1, h1, y2, h2, viewState) ->
-    
-    xZoomedOut = viewState.fullZoomX(viewState.latestMouseTime())
-    xZoomedIn = viewState.mouse.pos().e(1)
+  redrawCursor: ->
+    vs = @viewState
+    dependOn = [vs.zoomSpec.t1(), vs.zoomSpec.t2()]
+    xZoomedOut = vs.fullZoomX(vs.latestMouseTime())
+    xZoomedIn = vs.mouse.pos().e(1)
 
     @cursorPath = {
-      top0: $V([xZoomedOut, y1])
-      top1: $V([xZoomedOut, y1 + h1])
-      mid0: $V([xZoomedIn + 2, y2 + h2])
-      mid1: $V([xZoomedIn - 2, y2 + h2])
-      mid2: $V([xZoomedOut - 1, y1 + h1])
-      mid3: $V([xZoomedOut + 1, y1 + h1])
-      bot0: $V([xZoomedIn, y2 + h2])
+      top0: $V([xZoomedOut, vs.audioY()])
+      top1: $V([xZoomedOut, vs.audioY() + vs.audioH()])
+      mid0: $V([xZoomedIn + 2, vs.zoomedTimeY() + vs.zoomedTimeH()])
+      mid1: $V([xZoomedIn - 2, vs.zoomedTimeY() + vs.zoomedTimeH()])
+      mid2: $V([xZoomedOut - 1, vs.audioY() + vs.audioH()])
+      mid3: $V([xZoomedOut + 1, vs.audioY() + vs.audioH()])
+      bot0: $V([xZoomedIn, vs.zoomedTimeY() + vs.zoomedTimeH()])
       bot1: $V([xZoomedIn, @offsetParent.offsetHeight])
     }
     @redraw()
 
   redraw: ->
+    return unless @ctx
     @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
 
     @ctx.strokeStyle = '#fff'
