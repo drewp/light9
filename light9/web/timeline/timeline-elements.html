@@ -110,7 +110,7 @@
      }
     </style>
     <div id="top">
-      <light9-timeline-time-axis id="time"></light9-timeline-time-axis>
+      <light9-timeline-time-axis id="time" view-state="{{viewState}}"></light9-timeline-time-axis>
       <light9-timeline-audio id="audio"
                              graph="{{graph}}"
                              song="{{song}}"
@@ -136,17 +136,16 @@
 <dom-module id="light9-timeline-diagram-layer">
   <template>
     <style>
-      :host {
-      }
-      svg {
-      width: 100%;
-      height: 100%;
-      }
-      #notes > path {
-      
-      stroke:#000000;
-      stroke-width:1.5;
-      }
+     :host {
+     }
+     svg {
+         width: 100%;
+         height: 100%;
+     }
+     #notes > path {
+         stroke:#000000;
+         stroke-width:1.5;
+     }
      #notes > path.hover {
          stroke-width: 1.5;
          stroke: #888;
@@ -167,7 +166,7 @@
             y="631.3988"
             id="text4290"
             sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4292" x="-338.38403" y="631.3988">spotchase</tspan></text>
-        <g id="timeAxis" transform="translate(0,40)"></g>
+        <g id="zzztimeAxis" transform="translate(0,40)"></g>
         <g id="mouse"></g>
         <g id="notes"></g>
       </g>
@@ -202,12 +201,18 @@
 <dom-module id="light9-timeline-time-axis">
   <template>
     <style>
-     div {
-         width: 100%;
-         height: 31px;
-     }
+      div {
+          width: 100%;
+          height: 31px;
+      }
+      svg {
+          width: 100%;
+          height: 30px;
+      }
     </style>
-    <div></div>
+    <svg id="timeAxis" xmlns="http://www.w3.org/2000/svg">
+      <g id="axis" transform="translate(0,30)"></g>    
+    </svg>
   </template>
 </dom-module>
 

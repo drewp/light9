@@ -109,6 +109,10 @@ class ViewState
     @zoomInX = d3.scaleLinear()
 
     ko.computed(@zoomOrLayoutChanged.bind(@))    
+ 
+  setWidth: (w) ->
+    @width(w)
+    @zoomOrLayoutChanged() # before other handleers run
     
   zoomOrLayoutChanged: () ->
     log('zoomOrLayoutChanged')
@@ -124,11 +128,9 @@ class ViewState
     @fullZoomX.domain([0, @zoomSpec.duration()])
     @fullZoomX.range([0, @width()])
 
-    # had trouble making notes update when this changes
-    zoomInX = d3.scaleLinear()
-    zoomInX.domain([@zoomSpec.t1(), @zoomSpec.t2()])
-    zoomInX.range([0, @width()])
-    @zoomInX = zoomInX
+    @zoomInX.domain([@zoomSpec.t1(), @zoomSpec.t2()])
+    @zoomInX.range([0, @width()])
+    log('update zoomInX')
     
   latestMouseTime: ->
     @zoomInX.invert(@mouse.pos().e(1))
@@ -165,9 +167,8 @@ class ViewState
         @zoomSpec.t2(newT2)
       , lastTime + 10)  
     
-class TimelineEditor extends Polymer.Element
+class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-timeline-editor'
-  @behaviors: [ Polymer.IronResizableBehavior ]
   @properties:
     viewState: { type: Object }
     debug: {type: String}
@@ -178,12 +179,10 @@ class TimelineEditor extends Polymer.Element
     followPlayerSong: {type: Boolean, notify: true, value: true}
     song: {type: String, notify: true}
     show: {value: 'http://light9.bigasterisk.com/show/dance2017'}
-    songTime: {type: Number, notify: true, observer: '_onSongTime'}
-    songDuration: {type: Number, notify: true, observer: '_onSongDuration'}
+    songTime: {type: Number, notify: true},#, observer: '_onSongTime'}
+    songDuration: {type: Number, notify: true},#, observer: '_onSongDuration'}
     songPlaying: {type: Boolean, notify: true}
     selection: {type: Object, notify: true}
-  @listeners:
-    'iron-resize': '_onIronResize'
   @observers: [
     'setSong(playerSong, followPlayerSong)',
     'onGraph(graph)',
@@ -191,8 +190,9 @@ class TimelineEditor extends Polymer.Element
     
   connectedCallback: ->
     super.connectedCallback()
+    
     ko.options.deferUpdates = true;
-
+    
     @dia = @$.dia
     
 
@@ -207,8 +207,8 @@ class TimelineEditor extends Polymer.Element
       ac = @$.adjustersCanvas
       setTimeout((()=>ac.setAdjuster(adjId, makeAdjustable)),10)
 
+    ko.computed(@zoomOrLayoutChanged.bind(@))
     setTimeout =>
-      ko.computed(@zoomOrLayoutChanged.bind(@))
       ko.computed(@songTimeChanged.bind(@))
 
       @trackMouse()
@@ -227,13 +227,17 @@ class TimelineEditor extends Polymer.Element
       setInterval(@updateDebugSummary.bind(@), 100)
     , 500
 
+    @addEventListener('iron-resize', @_onIronResize.bind(@))
+    @_onIronResize()
+    
     #if anchor == loadtest
     #  add note and delete it repeatedly
     #  disconnect the graph, make many notes, drag a point over many steps, measure lag somewhere
 
   _onIronResize: ->
-    log('set w to',   @offsetWidth)
-    @viewState.width(@offsetWidth)
+    @viewState.setWidth(@offsetWidth)
+
+    log('changed width')
   _onSongTime: (t) ->
     @viewState.cursor.t(t)
   _onSongDuration: (d) ->
@@ -262,7 +266,8 @@ class TimelineEditor extends Polymer.Element
   
     # todo: these run a lot of work purely for a time change
     if @$.zoomed?.$?.audio?
-      @dia.setTimeAxis(vs.width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
+      vs.zoomSpec.t1()
+      #@dia.setTimeAxis(vs.width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
       @$.adjustersCanvas.updateAllCoords()
 
     # cursor needs update when layout changes, but I don't want
@@ -273,7 +278,7 @@ class TimelineEditor extends Polymer.Element
     return unless @$.zoomed?.$?.time?
     @$.cursorCanvas.setCursor(@$.audio.offsetTop, @$.audio.offsetHeight,
                               @$.zoomed.$.time.offsetTop,
-                              @$.zoomed.$.time.offsetHeight,
+                              30,#@$.zoomed.$.time.offsetHeight,
                               @viewState)
     
   trackMouse: ->
@@ -286,8 +291,8 @@ class TimelineEditor extends Polymer.Element
         if ev.touches?.length
           ev = ev.touches[0]
 
-        @root = @getBoundingClientRect()
-        @viewState.mouse.pos($V([ev.pageX - @root.left, ev.pageY - @root.top]))
+        root = @$.cursorCanvas.getBoundingClientRect()
+        @viewState.mouse.pos($V([ev.pageX - root.left, ev.pageY - root.top]))
 
         @$.cursorCanvas.setMouse(@viewState.mouse.pos())
         # should be controlled by a checkbox next to follow-player-song-choice
@@ -384,7 +389,7 @@ customElements.define(TimelineEditor.is, TimelineEditor)
 # plan: in here, turn all the notes into simple js objects with all
 # their timing data and whatever's needed for adjusters. From that, do
 # the brick layout. update only changing adjusters.
-class TimeZoomed extends Polymer.Element
+class TimeZoomed extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-timeline-time-zoomed'
   @behaviors: [ Polymer.IronResizableBehavior ]
   @properties:
@@ -398,7 +403,6 @@ class TimeZoomed extends Polymer.Element
     'onGraph(graph, setAdjuster, song, viewState, project)',
     'onZoom(viewState)',
   ]
-  @listeners: {'iron-resize': 'update'}
   update: ->
     @renderer.resize(@clientWidth, @clientHeight)
     @renderer.render(@stage)
@@ -420,11 +424,11 @@ class TimeZoomed extends Polymer.Element
   connectedCallback: ->
     super.connectedCallback()
      
+    @addEventListener('iron-resize', @update.bind(@))
+    @update()
+    
     @$.rows.appendChild(@renderer.view);
   
-    # iron-resize should be doing this but it never fires
-    setInterval(@update.bind(@), 1000)
-    
   onGraph: ->
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
   gatherNotes: ->
@@ -487,8 +491,14 @@ customElements.define(TimeZoomed.is, TimeZoomed)
 
 class TimeAxis extends Polymer.Element
   @is: "light9-timeline-time-axis",
-  # for now since it's just one line calling dia,
-  # light9-timeline-editor does our drawing work.
+  @properties:
+    viewState: { type: Object, notify: true, observer: "onViewState" }
+  onViewState: ->
+    ko.computed =>
+      dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2()]
+      pxPerTick = 50
+      axis = d3.axisTop(@viewState.zoomInX).ticks(@viewState.width() / pxPerTick)
+      d3.select(@$.axis).call(axis)
 
 customElements.define(TimeAxis.is, TimeAxis)
 
@@ -706,11 +716,7 @@ class DiagramLayer extends Polymer.Element
     super.connectedCallback()
     @elemById = {}
 
-  setTimeAxis: (width, yTop, scale) ->
-    pxPerTick = 50
-    axis = d3.axisTop(scale).ticks(width / pxPerTick)
-    d3.select(@$.timeAxis).attr('transform', 'translate(0,'+yTop+')').call(axis)
-
+ 
   getOrCreateElem: (uri, groupId, tag, attrs, moreBuild) ->
     elem = @elemById[uri]
     if !elem
