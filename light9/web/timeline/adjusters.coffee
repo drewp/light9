@@ -2,15 +2,14 @@ log = console.log
 Drawing = window.Drawing
 
 
-class AdjustersCanvas extends Polymer.Element
+coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-adjusters-canvas'
-  @behaviors: [ Polymer.IronResizableBehavior ]
-  @properties:
+  @getter_properties:
     adjs: { type: Object, notify: true }, # adjId: Adjustable
-  @observers: [
+  @getter_observers: [
     'updateAllCoords(adjs)'
   ]
-  @listeners:
+  @getter_listeners:
     'iron-resize': 'resizeUpdate'
   connectedCallback: ->
     super.connectedCallback()
@@ -158,5 +157,4 @@ class AdjustersCanvas extends Polymer.Element
     # l/r arrows
     # mouse arrow cursor upon hover, and accent the hovered adjuster
     # connector
-
-customElements.define(AdjustersCanvas.is, AdjustersCanvas)
+)

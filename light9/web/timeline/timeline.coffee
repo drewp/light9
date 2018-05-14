@@ -181,10 +181,11 @@ class ViewState
         @zoomSpec.t1(newT1)
         @zoomSpec.t2(newT2)
       , lastTime + 10)  
+
     
-class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
+coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-timeline-editor'
-  @properties:
+  @getter_properties:
     viewState: { type: Object }
     debug: {type: String}
     graph: {type: Object, notify: true}
@@ -194,23 +195,23 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
     followPlayerSong: {type: Boolean, notify: true, value: true}
     song: {type: String, notify: true}
     show: {value: 'http://light9.bigasterisk.com/show/dance2017'}
-    songTime: {type: Number, notify: true},#, observer: '_onSongTime'}
-    songDuration: {type: Number, notify: true},#, observer: '_onSongDuration'}
+    songTime: {type: Number, notify: true}
+    songDuration: {type: Number, notify: true}
     songPlaying: {type: Boolean, notify: true}
     selection: {type: Object, notify: true}
-  @observers: [
+  @getter_observers: [
     'setSong(playerSong, followPlayerSong)',
     'onGraph(graph)',
-    ]
-    
+    '_onSongDuration(songDuration, viewState)',
+    '_onSongTime(songTime, viewState)',
+  ]
   connectedCallback: ->
     super.connectedCallback()
     
     ko.options.deferUpdates = true;
     
     @dia = @$.dia
-    
-
+     
     @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
     window.debug_zoomOrLayoutChangedCount = 0
@@ -373,36 +374,25 @@ class TimelineEditor extends Polymer.mixinBehaviors([Polymer.IronResizableBehavi
       getSuggestedTargetOffset: () => $V([0, 0])
       getValueForPos: valForPos
       }))
-      
-customElements.define(TimelineEditor.is, TimelineEditor)
+)
+
 
 # plan: in here, turn all the notes into simple js objects with all
 # their timing data and whatever's needed for adjusters. From that, do
 # the brick layout. update only changing adjusters.
-class TimeZoomed extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
+coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-timeline-time-zoomed'
-  @behaviors: [ Polymer.IronResizableBehavior ]
-  @properties:
+  @getter_properties:
     graph: { type: Object, notify: true }
     project: { type: Object }
     selection: { type: Object, notify: true }
     dia: { type: Object, notify: true }
     song: { type: String, notify: true }
     viewState: { type: Object, notify: true }
-  @observers: [
+  @getter_observers: [
     'onGraph(graph, setAdjuster, song, viewState, project)',
     'onZoom(viewState)',
   ]
-  update: ->
-    @renderer.resize(@clientWidth, @clientHeight)
-    @renderer.render(@stage)
-
-  onZoom: ->
-    updateZoomFlattened = ->
-      log('updateZoomFlattened')
-      @zoomFlattened = ko.toJS(@viewState.zoomSpec)
-    ko.computed(updateZoomFlattened.bind(@))
-
   constructor: ->
     super()
     @stage = new PIXI.Container()
@@ -419,8 +409,19 @@ class TimeZoomed extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior],
     
     @$.rows.appendChild(@renderer.view);
   
+  update: ->
+    @renderer.resize(@clientWidth, @clientHeight)
+    @renderer.render(@stage)
+
+  onZoom: ->
+    updateZoomFlattened = ->
+      log('updateZoomFlattened')
+      @zoomFlattened = ko.toJS(@viewState.zoomSpec)
+    ko.computed(updateZoomFlattened.bind(@))
+  
   onGraph: ->
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
+    
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
 
@@ -476,12 +477,12 @@ class TimeZoomed extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior],
     desiredWidthT = @viewState.zoomInX.invert(desiredWidthX) - @viewState.zoomInX.invert(0)
     desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
     @project.makeNewNote(effect, dropTime, desiredWidthT)
-        
-customElements.define(TimeZoomed.is, TimeZoomed)
+)
 
-class TimeAxis extends Polymer.Element
+
+coffeeElementSetup(class TimeAxis extends Polymer.Element
   @is: "light9-timeline-time-axis",
-  @properties:
+  @getter_properties:
     viewState: { type: Object, notify: true, observer: "onViewState" }
   onViewState: ->
     ko.computed =>
@@ -489,8 +490,8 @@ class TimeAxis extends Polymer.Element
       pxPerTick = 50
       axis = d3.axisTop(@viewState.zoomInX).ticks(@viewState.width() / pxPerTick)
       d3.select(@$.axis).call(axis)
+)
 
-customElements.define(TimeAxis.is, TimeAxis)
 
 class NoteRow
   constructor: (@graph, @dia, @song, @zoomInX, @noteUris, @rowIndex, @selection) ->
@@ -500,7 +501,6 @@ class NoteRow
     'observedUpdate(graph, song, rowIndex)'
     'onZoom(zoomInX)'
     ]
-
 
   observedUpdate: (graph, song, rowIndex) ->
     @update() # old behavior
@@ -696,10 +696,10 @@ class Note
     
   
   
-class DiagramLayer extends Polymer.Element
+coffeeElementSetup(class DiagramLayer extends Polymer.Element
   # note boxes. 
   @is: 'light9-timeline-diagram-layer'
-  @properties: {
+  @getter_properties: {
     selection: {type: Object, notify: true}
   }
   connectedCallback: ->
@@ -794,4 +794,4 @@ class DiagramLayer extends Polymer.Element
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)
     #elem.innerHTML = effectLabel;
-customElements.define(DiagramLayer.is, DiagramLayer)
+)

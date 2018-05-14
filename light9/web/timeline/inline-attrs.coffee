@@ -1,8 +1,8 @@
 log = console.log
 
-class InlineAttrs extends Polymer.Element
+coffeeElementSetup(class InlineAttrs extends Polymer.Element
   @is: "light9-timeline-note-inline-attrs"
-  @properties:
+  @getter_properties:
     graph: { type: Object, notify: true }
     song: { type: String, notify: true }
     uri: { type: String, notify: true }  # the Note
@@ -11,7 +11,7 @@ class InlineAttrs extends Polymer.Element
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
     selection: { type: Object, notify: true }
-  @observers: [
+  @getter_observers: [
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
     ]
@@ -72,4 +72,4 @@ class InlineAttrs extends Polymer.Element
 
   onDel: ->
     deleteNote(@graph, @song, @uri, @selection)
-customElements.define(InlineAttrs.is, InlineAttrs)
+)

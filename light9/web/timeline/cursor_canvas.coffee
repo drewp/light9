@@ -1,11 +1,10 @@
-
-Polymer
-  is: 'light9-cursor-canvas'
-  behaviors: [ Polymer.IronResizableBehavior ]
-  listeners: 'iron-resize': 'update'
-  properties:
+coffeeElementSetup(class CursorCanvas extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
+  @is: 'light9-cursor-canvas'
+  @getter_properties:
     viewState: { type: Object, notify: true, observer: "onViewState" }
-  ready: ->
+  @getter_listeners: 'iron-resize': 'update'
+  connectedCallback: ->
+    super.connectedCallback()
     @mouseX = 0
     @mouseY = 0
     @cursorPath = null
@@ -67,4 +66,4 @@ Polymer
       @ctx.beginPath()
       Drawing.line(@ctx, @cursorPath.bot0, @cursorPath.bot1, '#ff0303', '3px')
       @ctx.stroke()
-    
+)

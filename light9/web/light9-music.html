@@ -1,4 +1,4 @@
-<link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/polymer/polymer-element.html">
 <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
 
 <!-- remote control of ascoltami -->
@@ -14,12 +14,13 @@
          font-size: 12px;
      }
     </style>
-    <iron-ajax id="getTime" url="/ascoltami/time"></iron-ajax>
+    <iron-ajax id="getTime" on-response="onResponse" on-error="onError" url="/ascoltami/time"></iron-ajax>
     <iron-ajax id="seek"
                method="POST"
                url="/ascoltami/seekPlayOrPause"
                content-type="application/json"></iron-ajax>
     <span>[[status]][[turboSign]]</span>
   </template>
+  <script src="coffee_element.js"></script>
   <script src="light9-music.js"></script>
 </dom-module>

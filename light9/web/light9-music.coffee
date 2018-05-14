@@ -1,9 +1,9 @@
 log = console.log
 
 # port of light9/curvecalc/musicaccess.py
-Polymer
-  is: "light9-music",
-  properties:
+coffeeElementSetup(class Music extends Polymer.Element
+  @is: "light9-music",
+  @getter_properties:
     status: { type: String, notify: true }
     statusTitle: { type: String, notify: true }
     turboSign: { type: String, notify: true }
@@ -16,15 +16,16 @@ Polymer
     t: { type: Number, notify: true }
     
   ready: ->
+    super.ready()
     @turboUntil = 0
-    @$.getTime.addEventListener('response', @onResponse.bind(@))
-    @$.getTime.addEventListener 'error', (e) =>
-      req = @$.getTime.lastRequest
-      @status = "✘"
-      @statusTitle = "GET "+req.url+ " -> " + req.status + " " + req.statusText
-      setTimeout(@poll.bind(@), 2000)
     @poll()
     setInterval(@estimateTimeLoop.bind(@), 30)
+
+  onError: (e) ->
+    req = @$.getTime.lastRequest
+    @status = "✘"
+    @statusTitle = "GET "+req.url+ " -> " + req.status + " " + req.statusText
+    setTimeout(@poll.bind(@), 2000)
     
   estimateTimeLoop: ->
     if @playing
@@ -33,6 +34,9 @@ Polymer
       @t = @remoteT
     
   poll: ->
+    if not @$?.getTime?
+      setTimeout(@poll.bind(@), 200)
+      return
     clearTimeout(@nextPoll) if @nextPoll
     @$.getTime.generateRequest()
     @status = "♫"
@@ -65,4 +69,5 @@ Polymer
     
     @turboUntil = Date.now() + 1000
     @poll()
-    
+)
+

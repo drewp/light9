@@ -42,9 +42,9 @@ window.setupDrop = (senseElem, highlightElem, coordinateOriginElem, onDrop) ->
 
 
 
-class EditChoice extends Polymer.Element
+coffeeElementSetup(class EditChoice extends Polymer.Element
     @is: "edit-choice",
-    @properties:
+    @getter_properties:
         graph: {type: Object, notify: true},
         uri: {type: String, notify: true},
 
@@ -57,5 +57,4 @@ class EditChoice extends Polymer.Element
 
     unlink: ->
       @uri = null
-
-customElements.define(EditChoice.is, EditChoice)
+)
