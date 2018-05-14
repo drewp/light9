@@ -2,21 +2,22 @@ coffeeElementSetup(class CursorCanvas extends Polymer.mixinBehaviors([Polymer.Ir
   @is: 'light9-cursor-canvas'
   @getter_properties:
     viewState: { type: Object, notify: true, observer: "onViewState" }
-  @getter_listeners: 'iron-resize': 'update'
-  connectedCallback: ->
-    super.connectedCallback()
+  ready: ->
+    super.ready()
     @mouseX = 0
     @mouseY = 0
     @cursorPath = null
     @ctx = @$.canvas.getContext('2d')
+    @onResize()
+    @addEventListener('iron-resize', @onResize.bind(@))
 
   onViewState: ->
     ko.computed(@redrawCursor.bind(@))
 
-  update: (ev) ->
-    @$.canvas.width = ev.target.offsetWidth
-    @$.canvas.height = ev.target.offsetHeight
-    @redraw()
+  onResize: (ev) ->
+    @$.canvas.width = @offsetWidth
+    @$.canvas.height = @offsetHeight
+    @redrawCursor()
 
   redrawCursor: ->
     vs = @viewState
@@ -32,7 +33,7 @@ coffeeElementSetup(class CursorCanvas extends Polymer.mixinBehaviors([Polymer.Ir
       mid2: $V([xZoomedOut - 1, vs.audioY() + vs.audioH()])
       mid3: $V([xZoomedOut + 1, vs.audioY() + vs.audioH()])
       bot0: $V([xZoomedIn, vs.zoomedTimeY() + vs.zoomedTimeH()])
-      bot1: $V([xZoomedIn, @offsetParent.offsetHeight])
+      bot1: $V([xZoomedIn, @offsetHeight])
     }
     @redraw()
 

@@ -205,8 +205,8 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     '_onSongDuration(songDuration, viewState)',
     '_onSongTime(songTime, viewState)',
   ]
-  connectedCallback: ->
-    super.connectedCallback()
+  ready: ->
+    super.ready()
     
     ko.options.deferUpdates = true;
     
@@ -401,8 +401,8 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
          backgroundColor: 0xff6060,
     })
      
-  connectedCallback: ->
-    super.connectedCallback()
+  ready: ->
+    super.ready()
      
     @addEventListener('iron-resize', @update.bind(@))
     @update()
@@ -528,7 +528,6 @@ class Note
   constructor: (@graph, @selection, @dia, @uri, @setAdjuster, @song, @zoomInX)->0
   @is: 'light9-timeline-note'
   @behaviors: [ Polymer.IronResizableBehavior ]
-  @listeners: 'iron-resize': 'update' #move to parent elem
   @properties:
     graph: { type: Object, notify: true }
     selection: { type: Object, notify: true }
@@ -544,6 +543,7 @@ class Note
     ]
   ready: ->
     @adjusterIds = {} # id : true
+    @addEventListener('iron-resize', @update)
 
   detached: ->
     log('detatch', @uri)
@@ -702,8 +702,8 @@ coffeeElementSetup(class DiagramLayer extends Polymer.Element
   @getter_properties: {
     selection: {type: Object, notify: true}
   }
-  connectedCallback: ->
-    super.connectedCallback()
+  ready: ->
+    super.ready()
     @elemById = {}
 
  

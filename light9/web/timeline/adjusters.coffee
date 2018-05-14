@@ -9,10 +9,9 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
   @getter_observers: [
     'updateAllCoords(adjs)'
   ]
-  @getter_listeners:
-    'iron-resize': 'resizeUpdate'
-  connectedCallback: ->
-    super.connectedCallback()
+  ready: ->
+    super.ready()
+    @addEventListener('iron-resize', @resizeUpdate.bind(@))
     @adjs = {}
     @ctx = @$.canvas.getContext('2d')
 

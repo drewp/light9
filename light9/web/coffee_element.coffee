@@ -1,5 +1,5 @@
 # Polymer seems to need static getters for 'observers' and
-# 'listeners', not just static attributes, though I don't know how it
+# 'properties', not just static attributes, though I don't know how it
 # can even tell the difference.
 #
 # This workaround is to use names like '@getter_properties' in the
@@ -7,7 +7,7 @@
 # 
 # Also see http://coffeescript.org/#unsupported-get-set
 window.coffeeElementSetup = (cls) ->
-  for attr in ['properties', 'observers', 'listeners']
+  for attr in ['properties', 'observers']
     val = cls['getter_' + attr]
     if val?
       do (val) ->
