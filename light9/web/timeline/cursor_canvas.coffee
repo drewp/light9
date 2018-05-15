@@ -4,8 +4,6 @@ coffeeElementSetup(class CursorCanvas extends Polymer.mixinBehaviors([Polymer.Ir
     viewState: { type: Object, notify: true, observer: "onViewState" }
   ready: ->
     super.ready()
-    @mouseX = 0
-    @mouseY = 0
     @cursorPath = null
     @ctx = @$.canvas.getContext('2d')
     @onResize()
@@ -22,8 +20,8 @@ coffeeElementSetup(class CursorCanvas extends Polymer.mixinBehaviors([Polymer.Ir
   redrawCursor: ->
     vs = @viewState
     dependOn = [vs.zoomSpec.t1(), vs.zoomSpec.t2()]
-    xZoomedOut = vs.fullZoomX(vs.latestMouseTime())
-    xZoomedIn = vs.mouse.pos().e(1)
+    xZoomedOut = vs.fullZoomX(vs.cursor.t())
+    xZoomedIn = vs.zoomInX(vs.cursor.t())
 
     @cursorPath = {
       top0: $V([xZoomedOut, vs.audioY()])
@@ -44,8 +42,9 @@ coffeeElementSetup(class CursorCanvas extends Polymer.mixinBehaviors([Polymer.Ir
     @ctx.strokeStyle = '#fff'
     @ctx.lineWidth = 0.5
     @ctx.beginPath()
-    Drawing.line(@ctx, $V([0, @mouseY]), $V([@$.canvas.width, @mouseY]))
-    Drawing.line(@ctx, $V([@mouseX, 0]), $V([@mouseX, @$.canvas.height]))
+    mouse = @viewState.mouse.pos()
+    Drawing.line(@ctx, $V([0, mouse.e(2)]), $V([@$.canvas.width, mouse.e(2)]))
+    Drawing.line(@ctx, $V([mouse.e(1), 0]), $V([mouse.e(1), @$.canvas.height]))
     @ctx.stroke()
 
     if @cursorPath

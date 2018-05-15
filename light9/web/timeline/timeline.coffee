@@ -233,7 +233,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
 
   bindKeys: ->
     shortcut.add "Ctrl+P", (ev) =>
-      @$.music.seekPlayOrPause(@latestMouseTime())
+      @$.music.seekPlayOrPause(@viewState.latestMouseTime())
     shortcut.add "Ctrl+Escape", => @viewState.frameAll()
     shortcut.add "Shift+Escape", => @viewState.frameToEnd()
     shortcut.add "Escape", => @viewState.frameCursor()
