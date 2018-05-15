@@ -110,8 +110,8 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     songPlaying: {type: Boolean, notify: true}
     selection: {type: Object, notify: true}
   @getter_observers: [
-    'setSong(playerSong, followPlayerSong)',
-    'onGraph(graph)',
+    '_onSong(playerSong, followPlayerSong)',
+    '_onGraph(graph)',
     '_onSongDuration(songDuration, viewState)',
     '_onSongTime(songTime, viewState)',
   ]
@@ -134,48 +134,42 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       setTimeout((()=>ac.setAdjuster(adjId, makeAdjustable)),10)
 
     ko.computed(@zoomOrLayoutChanged.bind(@))
-    setTimeout =>
 
-      @trackMouse()
-      @bindKeys()
-      @bindWheelZoom(@dia)
-      setTimeout => # depends on child node being ready
-          @forwardMouseEventsToAdjustersCanvas()
-        , 400
+    @trackMouse()
+    @bindKeys()
+    @bindWheelZoom(@dia)
 
-      @makeZoomAdjs()
+    @forwardMouseEventsToAdjustersCanvas()
 
-      zoomed = @$.zoomed
-      setupDrop(@$.dia.shadowRoot.querySelector('svg'),
-                zoomed.$.rows, @, zoomed.onDrop.bind(zoomed))
-
-      setInterval(@updateDebugSummary.bind(@), 100)
-    , 500
+    @makeZoomAdjs()
+    setInterval(@updateDebugSummary.bind(@), 100)
 
     @addEventListener('iron-resize', @_onIronResize.bind(@))
-    setTimeout(@_onIronResize.bind(@), 1000) # when children are packed
-    
-    #if anchor == loadtest
-    #  add note and delete it repeatedly
-    #  disconnect the graph, make many notes, drag a point over many steps, measure lag somewhere
+    Polymer.RenderStatus.afterNextRender(this, @_onIronResize.bind(@))
 
+    #zoomed = @$.zoomed 
+    #setupDrop(@dia.shadowRoot.querySelector('svg'),
+    #          zoomed.$.rows, @, zoomed.onDrop.bind(zoomed))
+            
   _onIronResize: ->
     @viewState.setWidth(@offsetWidth)
     @viewState.audioY(@$.audio.offsetTop)
     @viewState.audioH(@$.audio.offsetHeight)
-    @viewState.zoomedTimeY(@$.zoomed.$.time.offsetTop) if @$.zoomed?.$?.time?
-    @viewState.zoomedTimeH(30) #@$.zoomed.$.time.offsetHeight)
-      
-    log('editor resized')
+    if @$.zoomed?.$?.time?
+      @viewState.zoomedTimeY(@$.zoomed.$.time.offsetTop)
+      @viewState.zoomedTimeH(@$.zoomed.$.time.offsetHeight)
+    
   _onSongTime: (t) ->
     @viewState.cursor.t(t)
+    
   _onSongDuration: (d) ->
     d = 700 if d < 1 # bug is that asco isn't giving duration, but 0 makes the scale corrupt
     @viewState.zoomSpec.duration(d)
     
-  setSong: (s) ->
+  _onSong: (s) ->
     @song = @playerSong if @followPlayerSong
-  onGraph: (graph) ->
+    
+  _onGraph: (graph) ->
     @project = new Project(graph)
 
   updateDebugSummary: ->
@@ -190,11 +184,12 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
 
   zoomOrLayoutChanged: ->
     vs = @viewState
-    vs.width()
+    dependOn = [vs.zoomSpec.t1(), vs.zoomSpec.t2(), vs.width()]
+
+    @$.zoomed.gatherNotes() if @$.zoomed?.gatherNotes?
   
     # todo: these run a lot of work purely for a time change
     if @$.zoomed?.$?.audio?
-      vs.zoomSpec.t1()
       #@dia.setTimeAxis(vs.width(), @$.zoomed.$.audio.offsetTop, vs.zoomInX)
       @$.adjustersCanvas.updateAllCoords()
 
@@ -248,11 +243,11 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     
     valForPos = (pos) =>
         x = pos.e(1)
-        t = @fullZoomX.invert(x)
+        t = @viewState.fullZoomX.invert(x)
     @setAdjuster('zoom-left', => new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
-        $V([@fullZoomX(@viewState.zoomSpec.t1()), yMid()])
+        $V([@viewState.fullZoomX(@viewState.zoomSpec.t1()), yMid()])
       getSuggestedTargetOffset: () => $V([50, 0])
       getValueForPos: valForPos
     }))
@@ -260,7 +255,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     @setAdjuster('zoom-right', => new AdjustableFloatObservable({
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
-        $V([@fullZoomX(@viewState.zoomSpec.t2()), yMid()])
+        $V([@viewState.fullZoomX(@viewState.zoomSpec.t2()), yMid()])
       getSuggestedTargetOffset: () => $V([-50, 0])
       getValueForPos: valForPos
     }))
@@ -315,7 +310,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     super.ready()
      
     @addEventListener('iron-resize', @update.bind(@))
-    @update()
+    Polymer.RenderStatus.afterNextRender(this, @update.bind(@))
     
     @$.rows.appendChild(@renderer.view);
   
@@ -331,6 +326,8 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   
   onGraph: ->
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
+    # not working- worked around in zoomOrLayoutChanged
+    #ko.computed(@gatherNotes.bind(@))
     
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
@@ -351,6 +348,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
           curveWidthCalc = () => @_curveWidth(@worldPts)
 
           h = 150 #@offsetHeight
+          dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
           screenPts = ($V([@viewState.zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * h]) for pt in @worldPts)
           graphics.beginFill(0xFF3300);
           graphics.lineStyle(4, 0xffd900, 1)

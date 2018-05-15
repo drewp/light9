@@ -1,4 +1,5 @@
 <link rel="import" href="/lib/polymer/polymer.html">
+<link rel="import" href="/lib/polymer/lib/utils/render-status.html">
 <link rel="import" href="/lib/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
 <link rel="import" href="light9-timeline-audio.html">
@@ -201,6 +202,9 @@
 <dom-module id="light9-timeline-time-axis">
   <template>
     <style>
+     :host {
+         display: block;
+     }
       div {
           width: 100%;
           height: 31px;
