@@ -9,12 +9,16 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
   @getter_observers: [
     'updateAllCoords(adjs)'
   ]
+  constructor: ->
+    super()
+    @redraw = _.throttle(@_throttledRedraw.bind(@), 30, {leading: false})
+    @adjs = {}
+    
   ready: ->
     super.ready()
     @addEventListener('iron-resize', @resizeUpdate.bind(@))
-    @adjs = {}
     @ctx = @$.canvas.getContext('2d')
-
+    
     @redraw()
    
   onDown: (ev) ->
@@ -68,10 +72,6 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @$.canvas.width = ev.target.offsetWidth
     @$.canvas.height = ev.target.offsetHeight
     @redraw()
-
-  redraw: (adjs) ->
-    @_throttledRedraw(adjs)
-    #@debounce('redraw', @_throttledRedraw.bind(@))
 
   _throttledRedraw: () ->
     return unless @ctx?
