@@ -12,14 +12,14 @@ toJsonPatch = (jsPatch, cb) ->
 
   writeDels = (cb) ->
     writer = N3.Writer({ format: 'N-Quads' })
-    writer.addTriples(jsPatch.delQuads)
+    writer.addQuads(jsPatch.delQuads)
     writer.end((err, result) ->
       out.patch.deletes = result
       cb())
 
   writeAdds = (cb) ->
     writer = N3.Writer({ format: 'N-Quads' })
-    writer.addTriples(jsPatch.addQuads)
+    writer.addQuads(jsPatch.addQuads)
     writer.end((err, result) ->
       out.patch.adds = result
       cb())

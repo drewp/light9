@@ -297,7 +297,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     @stage = new PIXI.Container()
     
     @renderer = PIXI.autoDetectRenderer({
-         backgroundColor: 0xff6060,
+         backgroundColor: 0x606060,
     })
      
   ready: ->
@@ -327,36 +327,15 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     U = (x) => @graph.Uri(x)
 
     log('assign rows',@song, 'graph has', @graph.quads().length)
-    graphics = new PIXI.Graphics({nativeLines: true})
 
+    @stage.children.splice(0)
+    noteNum = 0
     for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
-      #should only make new ones
-      # 
-      #child = new Note(@graph, @selection, @dia, uri, @setAdjuster, @song, @viewState.zoomInX)
-      originTime = @graph.floatValue(uri, U(':originTime'))
-      effect = @graph.uriValue(uri, U(':effectClass'))
-      for curve in @graph.objects(uri, U(':curve'))
-        if @graph.uriValue(curve, U(':attr')).equals(U(':strength'))
-
-          [@pointUris, @worldPts] = @project.getCurvePoints(curve, originTime)
-          curveWidthCalc = () => @_curveWidth(@worldPts)
-
-          h = 150 #@offsetHeight
-          dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
-          screenPts = ($V([@viewState.zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * h]) for pt in @worldPts)
-          graphics.beginFill(0xFF3300);
-          graphics.lineStyle(4, 0xffd900, 1)
-
-          graphics.moveTo(screenPts[0].e(1), screenPts[0].e(2))
-          for p in screenPts.slice(1)
-            graphics.lineTo(p.e(1), p.e(2))
-         graphics.endFill()
-    
-     @rows = []#(new NoteRow(@graph, @dia, @song, @zoomInX, @noteUris, i, @selection) for i in [0...ROW_COUNT])
-
-     @stage.children.splice(0)
-     @stage.addChild(graphics)
-     @renderer.render(@stage)
+      note = new Note(@project, @graph, @selection, uri, @setAdjuster, @song, @viewState, @stage, @offsetTop + 150 * (noteNum % 4))
+      note.draw()
+      noteNum = noteNum + 1
+ 
+    @renderer.render(@stage)
     
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
@@ -395,61 +374,15 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 )
 
 
-class NoteRow
-  constructor: (@graph, @dia, @song, @zoomInX, @noteUris, @rowIndex, @selection) ->
-    @graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
-
-  observers: [
-    'observedUpdate(graph, song, rowIndex)'
-    'onZoom(zoomInX)'
-    ]
-
-  observedUpdate: (graph, song, rowIndex) ->
-    @update() # old behavior
-    #@graph.runHandler(@update.bind(@), "row notes #{@rowIndex}")
-
-  update: (patch) ->
-    U = (x) => @graph.Uri(x)
-
-    notesForThisRow = []
-    i = 0
-    for n in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
-      if (i % ROW_COUNT) == @rowIndex
-        notesForThisRow.push(n)
-      i++
-
-    for newUri in notesForThisRow
-      #should only make new ones
-      child = new Note(@graph, @selection, @dia, newUri, @setAdjuster, @song, @zoomInX)
-
-  onZoom: ->
-    for e in @children
-      e.zoomInX = @zoomInX
-
+# Maintains a pixi object and some adjusters corresponding to a note
+# in the graph.
 class Note
-  constructor: (@graph, @selection, @dia, @uri, @setAdjuster, @song, @zoomInX)->0
-  @is: 'light9-timeline-note'
-  @behaviors: [ Polymer.IronResizableBehavior ]
-  @properties:
-    graph: { type: Object, notify: true }
-    selection: { type: Object, notify: true }
-    dia: { type: Object, notify: true }
-    uri: { type: String, notify: true }
-    zoomInX: { type: Object, notify: true }
-    setAdjuster: {type: Function, notify: true }
-    inlineRect: { type: Object, notify: true }
-    song: { type: String, notify: true }
-  @observers: [
-    'onUri(graph, dia, uri, zoomInX, setAdjuster, song)'
-    'update(graph, dia, uri, zoomInX, setAdjuster, song)'
-    ]
-  ready: ->
+  constructor: (@project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @stage, @rowTopY) ->
     @adjusterIds = {} # id : true
-    @addEventListener('iron-resize', @update)
 
-  detached: ->
-    log('detatch', @uri)
-    @dia.clearNote(@uri)
+  destroy: ->
+    log('destroy', @uri)
+    # pixi rm
     @isDetached = true
     @clearAdjusters()
 
@@ -457,6 +390,33 @@ class Note
     for i in Object.keys(@adjusterIds)
       @setAdjuster(i, null)
 
+  draw: ->
+    U = (x) => @graph.Uri(x)
+    originTime = @graph.floatValue(@uri, U(':originTime'))
+    effect = @graph.uriValue(@uri, U(':effectClass'))
+    graphics = new PIXI.Graphics({nativeLines: true})
+
+    for curve in @graph.objects(@uri, U(':curve'))
+      if @graph.uriValue(curve, U(':attr')).equals(U(':strength'))
+
+        [pointUris, worldPts] = @project.getCurvePoints(curve, originTime)
+        curveWidthCalc = () => @project.curveWidth(worldPts)
+
+        h = 150 #@offsetHeight
+        yForV = (v) => @rowTopY + (1 - v) * h
+        dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
+        screenPts = ($V([@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))]) for pt in worldPts)
+        graphics.beginFill(0xFF3300)
+        graphics.lineStyle(4, 0xffd900, 1)
+
+        graphics.moveTo(screenPts[0].e(1), screenPts[0].e(2))
+        for p in screenPts.slice(1)
+          graphics.lineTo(p.e(1), p.e(2))
+       graphics.endFill()
+       @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
+       @_updateInlineAttrs(screenPts)
+    @stage.addChild(graphics)
+    
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
 
@@ -484,33 +444,13 @@ class Note
 
     @_updateDisplay()
 
-  _updateDisplay: ->
-    U = (x) => @graph.Uri(x)
-
-    # @offsetTop causes some CSS layout to run!
-    yForV = (v) => @offsetTop + (1 - v) * @offsetHeight
-
-    originTime = @graph.floatValue(@uri, U(':originTime'))
-    effect = @graph.uriValue(@uri, U(':effectClass'))
-    for curve in @graph.objects(@uri, U(':curve'))
-      if @graph.uriValue(curve, U(':attr')).equals(U(':strength'))
-
-        [@pointUris, @worldPts] = @_getCurvePoints(curve, originTime)
-        curveWidthCalc = () => @_curveWidth(@worldPts)
-        screenPts = ($V([@zoomInX(pt.e(1)), @offsetTop + (1 - pt.e(2)) * @offsetHeight]) for pt in @worldPts)
-
-        @dia.setNote(@uri, screenPts, effect)
-        @_updateAdjusters(screenPts, curveWidthCalc, yForV, U(@song))
-        @_updateInlineAttrs(screenPts)
-        
-    return
-  _updateAdjusters: (screenPts, curveWidthCalc, yForV, ctx) ->
+  _updateAdjusters: (screenPts, worldPts, curveWidthCalc, yForV, ctx) ->
     if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
       @clearAdjusters()
     else
       @_makeOffsetAdjuster(yForV, curveWidthCalc, ctx)
-      @_makeCurvePointAdjusters(yForV, @worldPts, ctx)
-      @_makeFadeAdjusters(yForV, ctx)
+      @_makeCurvePointAdjusters(yForV, worldPts, ctx)
+      #@_makeFadeAdjusters(yForV, ctx)
 
   _updateInlineAttrs: (screenPts) ->
     leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].e(1) + 5)
@@ -547,10 +487,10 @@ class Note
         pred: U(':time')
         ctx: ctx
         getTargetPosForValue: (value) =>
-          $V([@zoomInX(value), yForV(worldPts[pointNum].e(2))])
+          $V([@viewState.zoomInX(value), yForV(worldPts[pointNum].e(2))])
         getValueForPos: (pos) =>
           origin = @graph.floatValue(@uri, U(':originTime'))
-          (@zoomInX.invert(pos.e(1)) - origin)
+          (@viewState.zoomInX.invert(pos.e(1)) - origin)
         getSuggestedTargetOffset: () => @_suggestedOffset(worldPts[pointNum]),
       })
       adj._getValue = (=>
@@ -574,9 +514,9 @@ class Note
         getDisplayValue: (v, dv) => "o=#{dv}"
         getTargetPosForValue: (value) =>
           # display bug: should be working from pt[0].t, not from origin
-          $V([@zoomInX(value + curveWidthCalc() / 2), yForV(.5)])
+          $V([@viewState.zoomInX(value + curveWidthCalc() / 2), yForV(.5)])
         getValueForPos: (pos) =>
-          @zoomInX.invert(pos.e(1)) - curveWidthCalc() / 2
+          @viewState.zoomInX.invert(pos.e(1)) - curveWidthCalc() / 2
         getSuggestedTargetOffset: () => $V([-10, 0])
       })
       adj
@@ -598,58 +538,6 @@ class Note
     
   
   
-coffeeElementSetup(class DiagramLayer extends Polymer.Element
-  # note boxes. 
-  @is: 'light9-timeline-diagram-layer'
-  @getter_properties: {
-    selection: {type: Object, notify: true}
-  }
-  ready: ->
-    super.ready()
-    @elemById = {}
-
- 
-  getOrCreateElem: (uri, groupId, tag, attrs, moreBuild) ->
-    elem = @elemById[uri]
-    if !elem
-      elem = @elemById[uri] = document.createElementNS("http://www.w3.org/2000/svg", tag)
-      @$[groupId].appendChild(elem)
-      elem.setAttribute('id', uri)
-      for k,v of attrs
-        elem.setAttribute(k, v)
-      if moreBuild
-        moreBuild(elem)
-    return elem
-
-  _clearElem: (uri, suffixes) ->
-    for suff in suffixes
-      elem = @elemById[uri+suff]
-      if elem
-        ko.removeNode(elem)
-        delete @elemById[uri+suff]
-
-  _anyPointsInView: (pts) ->
-    for pt in pts
-      # wrong:
-      if pt.e(1) > -100 && pt.e(1) < 2500
-        return true
-    return false
-    
-  setNote: (uri, curvePts, effect) ->
-    @debounce("setNote #{uri}", () => @_setNoteThrottle(uri, curvePts, effect))
-    
-  _setNoteThrottle: (uri, curvePts, effect) ->
-    areaId = uri + '/area'
-    if not @_anyPointsInView(curvePts)
-      @clearNote(uri)
-      return
-
-    attrs = @_noteAttrs(effect)
-    elem = @getOrCreateElem areaId, 'notes', 'path', attrs, (elem) =>
-      @_addNoteListeners(elem, uri)
-    elem.setAttribute('d', Drawing.svgPathFromPoints(curvePts))
-    @_updateNotePathClasses(uri, elem)
-
   _addNoteListeners: (elem, uri) ->
     elem.addEventListener 'mouseenter', =>
       @selection.hover(uri)
@@ -680,9 +568,6 @@ coffeeElementSetup(class DiagramLayer extends Polymer.Element
 
     {style: "fill:hsla(#{hue}, #{sat}%, 58%, 0.313);"}
 
-  clearNote: (uri) ->
-    @_clearElem(uri, ['/area'])
-
   _noteInDiagram: (uri) ->
     return !!@elemById[uri + '/area']
 
@@ -696,4 +581,3 @@ coffeeElementSetup(class DiagramLayer extends Polymer.Element
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)
     #elem.innerHTML = effectLabel;
-)
