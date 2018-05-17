@@ -5,7 +5,7 @@ Drawing = window.Drawing
 coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-adjusters-canvas'
   @getter_properties:
-    adjs: { type: Object, notify: true }, # adjId: Adjustable
+    setAdjuster: {type: Function, notify: true }
   @getter_observers: [
     'updateAllCoords(adjs)'
   ]
@@ -20,6 +20,11 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @ctx = @$.canvas.getContext('2d')
     
     @redraw()
+    @setAdjuster = @_setAdjuster.bind(@)
+
+    @addEventListener('mousedown', @onDown.bind(@))
+    @addEventListener('mousemove', @onMove.bind(@))
+    @addEventListener('mouseup', @onUp.bind(@))
    
   onDown: (ev) ->
     if ev.buttons == 1
@@ -41,7 +46,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @currentDrag.adj.endDrag()
     @currentDrag = null
     
-  setAdjuster: (adjId, makeAdjustable) ->
+  _setAdjuster: (adjId, makeAdjustable) ->
     # callers register/unregister the Adjustables they want us to make
     # adjuster elements for. Caller invents adjId.  makeAdjustable is
     # a function returning the Adjustable or it is null to clear any
@@ -54,8 +59,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
         @adjs[adjId] = adj
         adj.id = adjId
 
-    #@debounce('adj redraw', @redraw.bind(@))
-    setTimeout((() => @redraw()), 2)
+    @redraw()
 
     window.debug_adjsCount = Object.keys(@adjs).length
 

@@ -114,7 +114,13 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     '_onGraph(graph)',
     '_onSongDuration(songDuration, viewState)',
     '_onSongTime(songTime, viewState)',
+    '_onSetAdjuster(setAdjuster)',
   ]
+  constructor: ->
+    super()
+    @viewState = new ViewState()
+    window.viewState = @viewState
+    
   ready: ->
     super.ready()
     
@@ -127,21 +133,12 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     window.debug_zoomOrLayoutChangedCount = 0
     window.debug_adjUpdateDisplay = 0
     
-    @viewState = new ViewState()
-    window.viewState = @viewState
-    @setAdjuster = (adjId, makeAdjustable) =>
-      ac = @$.adjustersCanvas
-      setTimeout((()=>ac.setAdjuster(adjId, makeAdjustable)),10)
-
     ko.computed(@zoomOrLayoutChanged.bind(@))
 
     @trackMouse()
     @bindKeys()
-    @bindWheelZoom(@dia)
+    @bindWheelZoom(@$.adjustersCanvas)
 
-    @forwardMouseEventsToAdjustersCanvas()
-
-    @makeZoomAdjs()
     setInterval(@updateDebugSummary.bind(@), 100)
 
     @addEventListener('iron-resize', @_onIronResize.bind(@))
@@ -172,6 +169,9 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
   _onGraph: (graph) ->
     @project = new Project(graph)
 
+  _onSetAdjuster: () ->
+    @makeZoomAdjs()
+    
   updateDebugSummary: ->
     elemCount = (tag) -> document.getElementsByTagName(tag).length
     @debug = "#{window.debug_zoomOrLayoutChangedCount} layout change,
@@ -219,12 +219,6 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
   bindWheelZoom: (elem) ->
     elem.addEventListener 'mousewheel', (ev) =>
       @viewState.onMouseWheel(ev.deltaY)
-
-  forwardMouseEventsToAdjustersCanvas: ->
-    ac = @$.adjustersCanvas
-    @addEventListener('mousedown', ac.onDown.bind(ac))
-    @addEventListener('mousemove', ac.onMove.bind(ac))
-    @addEventListener('mouseup', ac.onUp.bind(ac))
 
   bindKeys: ->
     shortcut.add "Ctrl+P", (ev) =>
@@ -275,7 +269,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       emptyBox: true
       # fullzoom is not right- the sides shouldn't be able to go
       # offscreen
-      getTarget: () => $V([@fullZoomX(panObs()), yMid()])
+      getTarget: () => $V([@viewState.fullZoomX(panObs()), yMid()])
       getSuggestedTargetOffset: () => $V([0, 0])
       getValueForPos: valForPos
       }))
