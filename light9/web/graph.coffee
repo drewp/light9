@@ -224,9 +224,9 @@ class window.SyncedGraph
     # This is the only method that writes to @graph!
     @cachedFloatValues.clear()
     for quad in patch.delQuads
-      log("remove #{JSON.stringify(quad)}")      
+      #log("remove #{JSON.stringify(quad)}")      
       did = @graph.removeQuad(quad)
-      log("removed: #{did}")
+      #log("removed: #{did}")
     for quad in patch.addQuads
       @graph.addQuad(quad)
     #log('applied patch locally', patchSizeSummary(patch))
@@ -261,7 +261,6 @@ class window.SyncedGraph
   _singleValue: (s, p) ->
     @_autoDeps.askedFor(s, p, null, null)
     quads = @graph.getQuads(s, p)
-    console.log('got',quads)
     objs = new Set(q.object for q in quads)
     
     switch objs.size
