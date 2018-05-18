@@ -150,6 +150,8 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
             
   _onIronResize: ->
     @viewState.setWidth(@offsetWidth)
+    @viewState.coveredByDiagramTop(@$.coveredByDiagram.offsetTop)
+    @viewState.rowsY(@$.zoomed.$.rows.offsetTop) if @$.zoomed?.$?.rows?
     @viewState.audioY(@$.audio.offsetTop)
     @viewState.audioH(@$.audio.offsetHeight)
     if @$.zoomed?.$?.time?
@@ -285,54 +287,57 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     graph: { type: Object, notify: true }
     project: { type: Object }
     selection: { type: Object, notify: true }
-    dia: { type: Object, notify: true }
     song: { type: String, notify: true }
     viewState: { type: Object, notify: true }
   @getter_observers: [
-    'onGraph(graph, setAdjuster, song, viewState, project)',
-    'onZoom(viewState)',
+    '_onGraph(graph, setAdjuster, song, viewState, project)',
   ]
   constructor: ->
     super()
+    @notes = []
     @stage = new PIXI.Container()
     
     @renderer = PIXI.autoDetectRenderer({
          backgroundColor: 0x606060,
+        antialias: true,
+        forceCanvas: true,
     })
      
   ready: ->
     super.ready()
      
-    @addEventListener('iron-resize', @update.bind(@))
-    Polymer.RenderStatus.afterNextRender(this, @update.bind(@))
+    @addEventListener('iron-resize', @_onResize.bind(@))
+    Polymer.RenderStatus.afterNextRender(this, @_onResize.bind(@))
     
     @$.rows.appendChild(@renderer.view);
-  
-  update: ->
+
+    ko.computed =>
+      @stage.setTransform(0, -(@viewState.rowsY()), 1, 1, 0, 0, 0, 0, 0)
+      
+  _onResize: ->
     @renderer.resize(@clientWidth, @clientHeight)
     @renderer.render(@stage)
-
-  onZoom: ->
-    updateZoomFlattened = ->
-      log('updateZoomFlattened')
-      @zoomFlattened = ko.toJS(@viewState.zoomSpec)
-    ko.computed(updateZoomFlattened.bind(@))
   
-  onGraph: ->
+  _onGraph: ->
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
-    # not working- worked around in zoomOrLayoutChanged
-    #ko.computed(@gatherNotes.bind(@))
     
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
 
-    log('assign rows',@song, 'graph has', @graph.quads().length)
+    log('assign rows',@song)
 
-    @stage.children.splice(0)
+    @stage.removeChildren()
+    n.destroy() for n in @notes
+    @notes = []
+    
     noteNum = 0
-    for uri in _.sortBy(@graph.objects(@song, U(':note')), 'uri')
-      note = new Note(@project, @graph, @selection, uri, @setAdjuster, @song, @viewState, @stage, @offsetTop + 150 * (noteNum % 4))
-      note.draw()
+    for uri in _.sortBy(@graph.objects(@song, U(':note')), 'id')
+      con = new PIXI.Container()
+      @stage.addChild(con)
+      row = noteNum % 6
+      rowTop = @viewState.rowsY() + 20 + 150 * row
+      note = new Note(con, @project, @graph, @selection, uri, @setAdjuster, @song, @viewState, rowTop, rowTop + 140)
+      @notes.push(note)
       noteNum = noteNum + 1
  
     @renderer.render(@stage)
@@ -377,12 +382,12 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 # Maintains a pixi object and some adjusters corresponding to a note
 # in the graph.
 class Note
-  constructor: (@project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @stage, @rowTopY) ->
+  constructor: (@container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
     @adjusterIds = {} # id : true
+    @draw()
 
   destroy: ->
-    log('destroy', @uri)
-    # pixi rm
+    log('destroy', @uri.value)
     @isDetached = true
     @clearAdjusters()
 
@@ -390,32 +395,42 @@ class Note
     for i in Object.keys(@adjusterIds)
       @setAdjuster(i, null)
 
+  getCurvePoints: (subj, curveAttr) ->
+    U = (x) => @graph.Uri(x)
+    originTime = @graph.floatValue(subj, U(':originTime'))
+
+    for curve in @graph.objects(subj, U(':curve'))
+      if @graph.uriValue(curve, U(':attr')).equals(curveAttr)
+
+        return @project.getCurvePoints(curve, originTime)
+    throw new Error("curve #{@uri.value} has no attr #{curveAttr.value}")
+
   draw: ->
     U = (x) => @graph.Uri(x)
-    originTime = @graph.floatValue(@uri, U(':originTime'))
+    [pointUris, worldPts] = @getCurvePoints(@uri, U(':strength'))
     effect = @graph.uriValue(@uri, U(':effectClass'))
-    graphics = new PIXI.Graphics({nativeLines: true})
+    
+    yForV = (v) => @rowBotY + (@rowTopY - @rowBotY) * v
+    dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
+    screenPts = (new PIXI.Point(@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))) for pt in worldPts)
 
-    for curve in @graph.objects(@uri, U(':curve'))
-      if @graph.uriValue(curve, U(':attr')).equals(U(':strength'))
+    @container.removeChildren()    
+    graphics = new PIXI.Graphics({nativeLines: false})
+    @container.addChild(graphics)
 
-        [pointUris, worldPts] = @project.getCurvePoints(curve, originTime)
-        curveWidthCalc = () => @project.curveWidth(worldPts)
+    shape = new PIXI.Polygon(screenPts)
+    graphics.beginFill(@_noteColor(effect), .313)
+    graphics.drawShape(shape)
+    graphics.endFill()
 
-        h = 150 #@offsetHeight
-        yForV = (v) => @rowTopY + (1 - v) * h
-        dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
-        screenPts = ($V([@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))]) for pt in worldPts)
-        graphics.beginFill(0xFF3300)
-        graphics.lineStyle(4, 0xffd900, 1)
-
-        graphics.moveTo(screenPts[0].e(1), screenPts[0].e(2))
-        for p in screenPts.slice(1)
-          graphics.lineTo(p.e(1), p.e(2))
-       graphics.endFill()
-       @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
-       @_updateInlineAttrs(screenPts)
-    @stage.addChild(graphics)
+    graphics.lineStyle(2, 0xffd900, 1)
+    graphics.moveTo(screenPts[0].x, screenPts[0].y)
+    for p in screenPts.slice(1)
+      graphics.lineTo(p.x, p.y)
+    
+    curveWidthCalc = () => @project.curveWidth(worldPts)
+    @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
+    @_updateInlineAttrs(screenPts)
     
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
@@ -445,16 +460,16 @@ class Note
     @_updateDisplay()
 
   _updateAdjusters: (screenPts, worldPts, curveWidthCalc, yForV, ctx) ->
-    if screenPts[screenPts.length - 1].e(1) - screenPts[0].e(1) < 100
+    if screenPts[screenPts.length - 1].x - screenPts[0].x < 100
       @clearAdjusters()
     else
       @_makeOffsetAdjuster(yForV, curveWidthCalc, ctx)
       @_makeCurvePointAdjusters(yForV, worldPts, ctx)
-      #@_makeFadeAdjusters(yForV, ctx)
+      @_makeFadeAdjusters(yForV, ctx, worldPts)
 
   _updateInlineAttrs: (screenPts) ->
-    leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].e(1) + 5)
-    rightX = screenPts[Math.min(2, screenPts.length - 1)].e(1) - 5
+    leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].x + 5)
+    rightX = screenPts[Math.min(2, screenPts.length - 1)].x - 5
     if screenPts.length < 3
       rightX = leftX + 120
     w = 250
@@ -478,7 +493,7 @@ class Note
   _makePointAdjuster: (yForV, worldPts, pointNum, ctx) ->
     U = (x) => @graph.Uri(x)
 
-    adjId = @uri + '/p' + pointNum
+    adjId = @uri.value + '/p' + pointNum
     @adjusterIds[adjId] = true
     @setAdjuster adjId, =>
       adj = new AdjustableFloatObject({
@@ -503,7 +518,7 @@ class Note
   _makeOffsetAdjuster: (yForV, curveWidthCalc, ctx) ->
     U = (x) => @graph.Uri(x)
 
-    adjId = @uri + '/offset'
+    adjId = @uri.value + '/offset'
     @adjusterIds[adjId] = true
     @setAdjuster adjId, => 
       adj = new AdjustableFloatObject({
@@ -521,12 +536,14 @@ class Note
       })
       adj
 
-  _makeFadeAdjusters: (yForV, ctx) ->
-    @_makeFadeAdjuster(yForV, ctx, @uri + '/fadeIn', 0, 1, $V([-50, -10]))
-    n = @worldPts.length
-    @_makeFadeAdjuster(yForV, ctx, @uri + '/fadeOut', n - 2, n - 1, $V([50, -10]))
+  _makeFadeAdjusters: (yForV, ctx, worldPts) ->
+    U = (x) => @graph.Uri(x)
+    @_makeFadeAdjuster(yForV, ctx, @uri.value + '/fadeIn', 0, 1, $V([-50, -10]))
+    n = worldPts.length
+    @_makeFadeAdjuster(yForV, ctx, @uri.value + '/fadeOut', n - 2, n - 1, $V([50, -10]))
 
   _makeFadeAdjuster: (yForV, ctx, adjId, i0, i1, offset) ->
+    return # not ready- AdjustableFade looks in Note object
     @adjusterIds[adjId] = true
     @setAdjuster adjId, => new AdjustableFade(yForV, i0, i1, @, offset, ctx)
     
@@ -554,7 +571,8 @@ class Note
     elem.addEventListener 'mouseleave', =>
       @selection.hover(null)
 
-  _noteAttrs: (effect) ->
+  _noteColor: (effect) ->
+    effect = effect.value
     if effect in ['http://light9.bigasterisk.com/effect/blacklight',
       'http://light9.bigasterisk.com/effect/strobewarm']
       hue = 0
@@ -566,10 +584,10 @@ class Note
       hue = (hash * 8) % 360
       sat = 40 + (hash % 20) # don't conceal colorscale too much
 
-    {style: "fill:hsla(#{hue}, #{sat}%, 58%, 0.313);"}
+    return parseInt(tinycolor.fromRatio({h: hue / 360, s: sat / 100, l: .58}).toHex(), 16)
 
   _noteInDiagram: (uri) ->
-    return !!@elemById[uri + '/area']
+    return !!@elemById[uri.value + '/area']
 
   _updateNotePathClasses: (uri, elem) ->
     ko.computed =>

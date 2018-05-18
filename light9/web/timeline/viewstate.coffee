@@ -10,10 +10,13 @@ class window.ViewState
     @mouse =
       pos: ko.observable($V([0,0]))
     @width = ko.observable(500)
+    @coveredByDiagramTop = ko.observable(0) # page coords
+    # all these are relative to #coveredByDiagram:
     @audioY = ko.observable(0)
     @audioH = ko.observable(0)
     @zoomedTimeY = ko.observable(0)
     @zoomedTimeH = ko.observable(0)
+    @rowsY = ko.observable(0)
       
     @fullZoomX = d3.scaleLinear()
     @zoomInX = d3.scaleLinear()

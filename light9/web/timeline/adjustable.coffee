@@ -110,7 +110,7 @@ class window.AdjustableFloatObject extends Adjustable
     @ctor2()
     if not @config.ctx?
       throw new Error("missing ctx")
-    @config.graph.runHandler(@_syncValue.bind(@), "adj sync #{@config.subj}")
+    @config.graph.runHandler(@_syncValue.bind(@), "adj sync #{@config.subj.value}")
 
   _syncValue: () ->
     @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)

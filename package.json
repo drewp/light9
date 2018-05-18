@@ -18,7 +18,8 @@
     "d3": "^5.1.0",
     "mocha": "^2.5.3",
     "n3": "^1.0.0-alpha",
-    "pixi.js": "^4.7.3"
+    "pixi.js": "^4.7.3",
+    "tinycolor2": "^1.4.1"
   },
   "devDependencies": {
     "mocha": "^2.5.3"

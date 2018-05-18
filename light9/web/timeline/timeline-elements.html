@@ -68,13 +68,11 @@
                                    graph="{{graph}}"
                                    project="{{project}}"
                                    selection="{{selection}}"
-                                   dia="{{dia}}"
                                    set-adjuster="{{setAdjuster}}"
                                    song="{{song}}"
                                    show="{{show}}"
                                    view-state="{{viewState}}">
       </light9-timeline-time-zoomed>
-      <light9-timeline-diagram-layer id="dia" selection="{{selection}}"></light9-timeline-diagram-layer>
       <light9-adjusters-canvas id="adjustersCanvas" set-adjuster="{{setAdjuster}}">
       </light9-adjusters-canvas>
       <light9-cursor-canvas id="cursorCanvas" view-state="{{viewState}}"></light9-cursor-canvas>
@@ -272,6 +270,7 @@
 <script src="/node_modules/d3/dist/d3.min.js"></script>
 <script src="/node_modules/n3/n3-browser.js"></script> 
 <script src="/node_modules/pixi.js/dist/pixi.min.js"></script>
+<script src="/node_modules/tinycolor2/dist/tinycolor-min.js"></script>
 
 <script src="drawing.js"></script>
 <script src="../coffee_element.js"></script>
