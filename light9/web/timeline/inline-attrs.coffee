@@ -8,6 +8,7 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
     config: { type: Object } # just for setup
     uri: { type: Object, notify: true }  # the Note
     effect: { type: Object, notify: true }
+    effectStr: { type: String, notify: true }
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
     selection: { type: Object, notify: true }
@@ -15,14 +16,21 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
     '_onConfig(config)'
+    '_effectToStr(effect)'
+    '_effectToUri(effectStr, graph)'
     ]
+  _effectToStr: (effect) ->
+    @effectStr = @effect?.value
+    log('now str is', @effectStr)
+  _effectToUri: (effectStr, graph) ->
+    if @effectStr
+      @effect = @graph.Uri(@effectStr)
+    else
+      @effect = null
   _onConfig: ->
     @uri = @config.uri
     for side in ['top', 'left', 'width', 'height']
       @.style[side] = @config[side] + 'px'
-
-  displayed: ->
-    @querySelector('light9-color-picker').displayed()
     
   onColorScale: ->
     return
@@ -36,7 +44,7 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
     if not song?
       log("can't edit inline attr yet, no song")
       return
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: song}
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: U(song)}
 
     existingColorScaleSetting = null
     for setting in @graph.objects(note, U(':setting'))
@@ -45,9 +53,9 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
         existingColorScaleSetting = setting
         
     if existingColorScaleSetting
-      @graph.patchObject(existingColorScaleSetting, U(':value'), value, song)
+      @graph.patchObject(existingColorScaleSetting, U(':value'), value, U(song))
     else
-      setting = @graph.nextNumberedResource(note + 'set')
+      setting = @graph.nextNumberedResource(note.value + 'set')
       patch = {delQuads: [], addQuads: [
         quad(note, U(':setting'), setting)
         quad(setting, U(':effectAttr'), attr)
@@ -56,15 +64,16 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
       @graph.applyAndSendPatch(patch)
     
   addHandler: ->
-    return
-    @graph.runHandler(@update.bind(@), "update inline attrs #{@uri}")
+    return unless @uri
+    @graph.runHandler(@update.bind(@), "update inline attrs #{@uri.value}")
     
   update: ->
-    #console.time('attrs update')
+    return unless @uri?
+    console.time('attrs update')
     U = (x) => @graph.Uri(x)
     @effect = @graph.uriValue(@uri, U(':effectClass'))
-    @noteLabel = @uri.replace(/.*\//, '')
-
+    @noteLabel = @uri.value.replace(/.*\//, '')
+    return
     existingColorScaleSetting = null
     for setting in @graph.objects(@uri, U(':setting'))
       ea = @graph.uriValue(setting, U(':effectAttr'))
@@ -76,7 +85,7 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
     if existingColorScaleSetting == null
       @colorScaleFromGraph = '#ffffff'
       @colorScale = '#ffffff'
-    #console.timeEnd('attrs update')
+    console.timeEnd('attrs update')
 
 
   onDel: ->
