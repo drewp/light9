@@ -292,6 +292,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     selection: { type: Object, notify: true }
     song: { type: String, notify: true }
     viewState: { type: Object, notify: true }
+    inlineAttrConfigs: { type: Array, value: [] } # only for inlineattrs that should be displayed
   @getter_observers: [
     '_onGraph(graph, setAdjuster, song, viewState, project)',
   ]
@@ -302,7 +303,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     @stage.interactive=true
     
     @renderer = PIXI.autoDetectRenderer({
-         backgroundColor: 0x606060,
+        backgroundColor: 0x606060,
         antialias: true,
         forceCanvas: true,
     })
@@ -352,7 +353,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
       
       row = noteNum % 6
       rowTop = @viewState.rowsY() + 20 + 150 * row
-      note = new Note(con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
+      note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
       @notes.push(note)
       noteNum = noteNum + 1
  
@@ -379,6 +380,23 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     desiredWidthT = @viewState.zoomInX.invert(desiredWidthX) - @viewState.zoomInX.invert(0)
     desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
     @project.makeNewNote(effect, dropTime, desiredWidthT)
+
+  updateInlineAttrs: (note, config) ->
+    if not config?
+      index = 0
+      for c in @inlineAttrConfigs
+        if c.uri.equals(note)
+          @splice('inlineAttrConfigs', index)
+          return
+        index += 1
+    else
+      index = 0
+      for c in @inlineAttrConfigs
+        if c.uri.equals(note)
+          @splice('inlineAttrConfigs', index, 1, config)
+          return
+        index += 1
+      @push('inlineAttrConfigs', config)
 )
 
 
@@ -395,10 +413,10 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 )
 
 
-# Maintains a pixi object and some adjusters corresponding to a note
+# Maintains a pixi object, some adjusters, and inlineattrs corresponding to a note
 # in the graph.
 class Note
-  constructor: (@container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
+  constructor: (@parentElem, @container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
     @adjusterIds = {} # id : true
     @graph.runHandler(@draw.bind(@), 'note draw')
 
@@ -439,20 +457,26 @@ class Note
     graphics.drawShape(shape)
     graphics.endFill()
 
+    # stroke should vary with @selection.hover() == @uri and with @uri in @selection.selected()
+    # 
+    # #notes > path.hover {stroke-width: 1.5; stroke: #888;}
+    # #notes > path.selected {stroke-width: 5; stroke: red;}
     graphics.lineStyle(2, 0xffd900, 1)
     graphics.moveTo(screenPts[0].x, screenPts[0].y)
     for p in screenPts.slice(1)
       graphics.lineTo(p.x, p.y)
 
-    graphics.on 'mousedown', =>
+    graphics.on 'mousedown', (ev) =>
       log('down gfx', @uri.value)
+      @_onMouseDown(ev)
 
     graphics.on 'mouseover', =>
       log('hover', @uri.value)
+      @selection.hover(@uri)
 
     graphics.on 'mouseout', =>
       log('hoverout', @uri.value)
-      
+      @selection.hover(null)
 
     @graphics = graphics
     curveWidthCalc = () => @project.curveWidth(worldPts)
@@ -495,23 +519,26 @@ class Note
       @_makeFadeAdjusters(yForV, ctx, worldPts)
 
   _updateInlineAttrs: (screenPts) ->
+    w = 280
+    
     leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].x + 5)
     rightX = screenPts[Math.min(2, screenPts.length - 1)].x - 5
     if screenPts.length < 3
-      rightX = leftX + 120
-    w = 250
-    h = 110
-    wasHidden = @inlineRect?.display == 'none'
-    @inlineRect = {
+      rightX = leftX + w
+
+    if rightX - leftX < w or rightX < w or leftX > @parentElem.offsetWidth
+      @parentElem.updateInlineAttrs(@uri, null)
+      return
+
+    config = {
+      uri: @uri,
       left: leftX,
-      top: @offsetTop + @offsetHeight - h - 5,
+      top: @rowTopY + 5,
       width: w,
-      height: h,
-      display: if rightX - leftX > w then 'block' else 'none'
+      height: @rowBotY - @rowTopY - 15,
       }
-    if wasHidden and @inlineRect.display != 'none'
-      @async =>
-        @querySelector('light9-timeline-note-inline-attrs')?.displayed()
+
+    @parentElem.updateInlineAttrs(@uri, config)
     
   _makeCurvePointAdjusters: (yForV, worldPts, ctx) ->
     for pointNum in [0...worldPts.length]
@@ -579,24 +606,17 @@ class Note
       $V([0, 30])
     else
       $V([0, -30])
-    
   
-  
-  _addNoteListeners: (elem, uri) ->
-    elem.addEventListener 'mouseenter', =>
-      @selection.hover(uri)
-    elem.addEventListener 'mousedown', (ev) =>
-      sel = @selection.selected()
-      if ev.getModifierState('Control')
-        if uri in sel
-          sel = _.without(sel, uri)
-        else
-          sel.push(uri)
+  _onMouseDown: (ev) ->
+    sel = @selection.selected()
+    if ev.data.originalEvent.ctrlKey
+      if @uri in sel
+        sel = _.without(sel, @uri)
       else
-        sel = [uri]
-      @selection.selected(sel)
-    elem.addEventListener 'mouseleave', =>
-      @selection.hover(null)
+        sel.push(@uri)
+    else
+      sel = [@uri]
+    @selection.selected(sel)
 
   _noteColor: (effect) ->
     effect = effect.value
@@ -613,15 +633,6 @@ class Note
 
     return parseInt(tinycolor.fromRatio({h: hue / 360, s: sat / 100, l: .58}).toHex(), 16)
 
-  _noteInDiagram: (uri) ->
-    return !!@elemById[uri.value + '/area']
-
-  _updateNotePathClasses: (uri, elem) ->
-    ko.computed =>
-      return if not @_noteInDiagram(uri)
-      classes = 'light9-timeline-diagram-layer ' + (if @selection.hover() == uri then 'hover' else '') + ' '  + (if uri in @selection.selected() then 'selected' else '')
-      elem.setAttribute('class', classes)
-    
     #elem = @getOrCreateElem(uri+'/label', 'noteLabels', 'text', {style: "font-size:13px;line-height:125%;font-family:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"})
     #elem.setAttribute('x', curvePts[0].e(1)+20)
     #elem.setAttribute('y', curvePts[0].e(2)-10)

@@ -5,19 +5,27 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
   @getter_properties:
     graph: { type: Object, notify: true }
     song: { type: String, notify: true }
-    uri: { type: String, notify: true }  # the Note
-    rect: { type: Object, notify: true }
-    effect: { type: String, notify: true }
+    config: { type: Object } # just for setup
+    uri: { type: Object, notify: true }  # the Note
+    effect: { type: Object, notify: true }
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
     selection: { type: Object, notify: true }
   @getter_observers: [
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
+    '_onConfig(config)'
     ]
+  _onConfig: ->
+    @uri = @config.uri
+    for side in ['top', 'left', 'width', 'height']
+      @.style[side] = @config[side] + 'px'
+
   displayed: ->
     @querySelector('light9-color-picker').displayed()
+    
   onColorScale: ->
+    return
     U = (x) => @graph.Uri(x)
     if @colorScale == @colorScaleFromGraph
       return
@@ -48,6 +56,7 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
       @graph.applyAndSendPatch(patch)
     
   addHandler: ->
+    return
     @graph.runHandler(@update.bind(@), "update inline attrs #{@uri}")
     
   update: ->

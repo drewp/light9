@@ -119,60 +119,12 @@
       </light9-timeline-audio>
     </div>
     <div id="rows"></div>
-  </template>
-</dom-module>
-
-
-<!--
-     SVG or canvas that draws these:
-       - background grids
-       - zoom arcs
-       - notes
-     
-     This element is not responsible for any hit detection. Things you click (rows,
-     notes, adjusters, etc) are caught on their respective elements. (But is that
-     wrong in the case of notes?)
-   -->
-<dom-module id="light9-timeline-diagram-layer">
-  <template>
-    <style>
-     :host {
-         pointer-events: none;
-     }
-     svg {
-         pointer-events: none;
-         width: 100%;
-         height: 100%;
-     }
-     #notes > path {
-         stroke:#000000;
-         stroke-width:1.5;
-     }
-     #notes > path.hover {
-         stroke-width: 1.5;
-         stroke: #888;
-     }
-     #notes > path.selected {
-         stroke-width: 5;
-         stroke: red;
-     }
-    </style>
-    <svg xmlns="http://www.w3.org/2000/svg"
-         xmlns:svg="http://www.w3.org/2000/svg"
-         xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" >
-      <g id="layer1">
-        <text
-            xml:space="preserve"
-            style="font-size:13px;line-height:125%;font-family:'Verana Sans';-inkscape-font-specification:'Verana Sans';text-align:start;text-anchor:start;fill:#000000;"
-            x="-338.38403"
-            y="631.3988"
-            id="text4290"
-            sodipodi:linespacing="125%" ><tspan sodipodi:role="line" id="tspan4292" x="-338.38403" y="631.3988">spotchase</tspan></text>
-        <g id="zzztimeAxis" transform="translate(0,40)"></g>
-        <g id="mouse"></g>
-        <g id="notes"></g>
-      </g>
-    </svg>
+    <template is="dom-repeat" items="{{inlineAttrConfigs}}">
+      <light9-timeline-note-inline-attrs graph="{{graph}}"
+                                         song="{{song}}"
+                                         config="{{item}}"
+      ></light9-timeline-note-inline-attrs>
+    </template>
   </template>
 </dom-module>
 
