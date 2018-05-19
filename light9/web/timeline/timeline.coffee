@@ -295,6 +295,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     inlineAttrConfigs: { type: Array, value: [] } # only for inlineattrs that should be displayed
   @getter_observers: [
     '_onGraph(graph, setAdjuster, song, viewState, project)',
+    'onZoom(viewState)',
   ]
   constructor: ->
     super()
@@ -334,7 +335,12 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   _onGraph: (graph, setAdjuster, song, viewState, project)->
     return unless @song # polymer will call again
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
-    
+  onZoom: ->
+    updateZoomFlattened = ->
+      log('updateZoomFlattened')
+      @zoomFlattened = ko.toJS(@viewState.zoomSpec)
+    ko.computed(updateZoomFlattened.bind(@))
+
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
     return unless @song?
