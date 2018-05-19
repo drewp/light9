@@ -123,7 +123,10 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     
   ready: ->
     super.ready()
-    
+    @addEventListener 'mousedown', (ev) => @$.adjustersCanvas.onDown(ev)
+    @addEventListener 'mousemove', (ev) => @$.adjustersCanvas.onMove(ev)
+    @addEventListener 'mouseup', (ev) => @$.adjustersCanvas.onUp(ev)
+
     ko.options.deferUpdates = true
     
     @selection = {hover: ko.observable(null), selected: ko.observable([])}
@@ -135,7 +138,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
 
     @trackMouse()
     @bindKeys()
-    @bindWheelZoom(@$.adjustersCanvas)
+    @bindWheelZoom(@)
 
     setInterval(@updateDebugSummary.bind(@), 100)
 
@@ -296,6 +299,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     super()
     @notes = []
     @stage = new PIXI.Container()
+    @stage.interactive=true
     
     @renderer = PIXI.autoDetectRenderer({
          backgroundColor: 0x606060,
@@ -305,30 +309,37 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
      
   ready: ->
     super.ready()
-     
+
     @addEventListener('iron-resize', @_onResize.bind(@))
     Polymer.RenderStatus.afterNextRender(this, @_onResize.bind(@))
     
     @$.rows.appendChild(@renderer.view)
 
-    ko.computed =>
-      @stage.setTransform(0, -(@viewState.rowsY()), 1, 1, 0, 0, 0, 0, 0)
+    # This works for display, but pixi hit events didn't correctly
+    # move with the objects, so as a workaround, I extended the top of
+    # the canvas in _onResize.
+    # 
+    #ko.computed =>
+    #  @stage.setTransform(0, -(@viewState.rowsY()), 1, 1, 0, 0, 0, 0, 0)
       
   _onResize: ->
-    @renderer.resize(@clientWidth, @clientHeight)
+    @$.rows.firstChild.style.position = 'relative'
+    @$.rows.firstChild.style.top = -@viewState.rowsY() + 'px'
+
+    @renderer.resize(@clientWidth, @clientHeight + @viewState.rowsY())
+    
     @renderer.render(@stage)
   
-  _onGraph: ->
+  _onGraph: (graph, setAdjuster, song, viewState, project)->
+    return unless @song # polymer will call again
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
     
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
     return unless @song?
-    log('assign rows', @song)
 
     songNotes = @graph.objects(U(@song), U(':note'))
     
-
     @stage.removeChildren()
     n.destroy() for n in @notes
     @notes = []
@@ -336,7 +347,9 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     noteNum = 0
     for uri in _.sortBy(songNotes, 'id')
       con = new PIXI.Container()
+      con.interactive=true
       @stage.addChild(con)
+      
       row = noteNum % 6
       rowTop = @viewState.rowsY() + 20 + 150 * row
       note = new Note(con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
@@ -387,7 +400,7 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 class Note
   constructor: (@container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
     @adjusterIds = {} # id : true
-    Polymer.RenderStatus.afterNextRender(this, @graph.runHandler(@draw.bind(@), 'note draw'))
+    @graph.runHandler(@draw.bind(@), 'note draw')
 
   destroy: ->
     log('destroy', @uri.value)
@@ -404,7 +417,6 @@ class Note
 
     for curve in @graph.objects(subj, U(':curve'))
       if @graph.uriValue(curve, U(':attr')).equals(curveAttr)
-
         return @project.getCurvePoints(curve, originTime)
     throw new Error("curve #{@uri.value} has no attr #{curveAttr.value}")
 
@@ -419,6 +431,7 @@ class Note
 
     @container.removeChildren()    
     graphics = new PIXI.Graphics({nativeLines: false})
+    graphics.interactive = true
     @container.addChild(graphics)
 
     shape = new PIXI.Polygon(screenPts)
@@ -430,7 +443,18 @@ class Note
     graphics.moveTo(screenPts[0].x, screenPts[0].y)
     for p in screenPts.slice(1)
       graphics.lineTo(p.x, p.y)
-    
+
+    graphics.on 'mousedown', =>
+      log('down gfx', @uri.value)
+
+    graphics.on 'mouseover', =>
+      log('hover', @uri.value)
+
+    graphics.on 'mouseout', =>
+      log('hoverout', @uri.value)
+      
+
+    @graphics = graphics
     curveWidthCalc = () => @project.curveWidth(worldPts)
     @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
     @_updateInlineAttrs(screenPts)

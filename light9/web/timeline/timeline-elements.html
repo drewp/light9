@@ -94,6 +94,7 @@
      }
      #rows {
          height: 100%;
+         overflow: hidden;
      }
      #rows.dragging {
          background: rgba(126, 52, 245, 0.0784);
@@ -189,7 +190,7 @@
 <dom-module id="light9-adjusters-canvas">
   <template>
     <style>
-     #canvas {
+     :host {
          pointer-events: none;
      }
     </style>

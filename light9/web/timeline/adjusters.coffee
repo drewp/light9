@@ -22,16 +22,17 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @redraw()
     @setAdjuster = @_setAdjuster.bind(@)
 
+    # These don't fire; TimelineEditor calls the handlers for us.
     @addEventListener('mousedown', @onDown.bind(@))
     @addEventListener('mousemove', @onMove.bind(@))
     @addEventListener('mouseup', @onUp.bind(@))
    
   onDown: (ev) ->
     if ev.buttons == 1
-      ev.stopPropagation()
       start = $V([ev.x, ev.y])
       adj = @_adjAtPoint(start)
       if adj
+        ev.stopPropagation()
         @currentDrag = {start: start, adj: adj}
         adj.startDrag()
 
@@ -68,7 +69,9 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
 
   _adjAtPoint: (pt) ->
     nearest = @qt.find(pt.e(1), pt.e(2))
-    if not nearest? or nearest.distanceFrom(pt) > 50
+    if nearest?
+      log('near', nearest.distanceFrom(pt))
+    if not nearest? or nearest.distanceFrom(pt) > 70
       return null
     return nearest?.adj
 
