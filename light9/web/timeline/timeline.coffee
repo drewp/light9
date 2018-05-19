@@ -40,9 +40,9 @@ class Project
     U = (x) => @graph.Uri(x)
     quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
       
-    newNote = @graph.nextNumberedResource("#{@song}/n")
-    newCurve = @graph.nextNumberedResource("#{newNote}c")
-    points = @graph.nextNumberedResources("#{newCurve}p", 4)
+    newNote = @graph.nextNumberedResource("#{@song.value}/n")
+    newCurve = @graph.nextNumberedResource("#{newNote.value}c")
+    points = @graph.nextNumberedResources("#{newCurve.value}p", 4)
 
     curveQuads = [
         quad(@song, U(':note'), newNote)
@@ -104,7 +104,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     playerSong: {type: String, notify: true}
     followPlayerSong: {type: Boolean, notify: true, value: true}
     song: {type: String, notify: true}
-    show: {value: 'http://light9.bigasterisk.com/show/dance2017'}
+    show: {type: String, notify: true}
     songTime: {type: Number, notify: true}
     songDuration: {type: Number, notify: true}
     songPlaying: {type: Boolean, notify: true}
@@ -124,10 +124,8 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
   ready: ->
     super.ready()
     
-    ko.options.deferUpdates = true;
+    ko.options.deferUpdates = true
     
-    @dia = @$.dia
-     
     @selection = {hover: ko.observable(null), selected: ko.observable([])}
 
     window.debug_zoomOrLayoutChangedCount = 0
@@ -170,6 +168,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     
   _onGraph: (graph) ->
     @project = new Project(graph)
+    @show = 'http://light9.bigasterisk.com/show/dance2017'
 
   _onSetAdjuster: () ->
     @makeZoomAdjs()
@@ -188,6 +187,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     vs = @viewState
     dependOn = [vs.zoomSpec.t1(), vs.zoomSpec.t2(), vs.width()]
 
+    # shouldn't need this- deps should get it
     @$.zoomed.gatherNotes() if @$.zoomed?.gatherNotes?
   
     # todo: these run a lot of work purely for a time change
@@ -232,7 +232,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       @$.adjustersCanvas.updateAllCoords()
     shortcut.add 'Delete', =>
       for note in @selection.selected()
-        @project.deleteNote(@song, note, @selection)
+        @project.deleteNote(@graph.Uri(@song), note, @selection)
 
   makeZoomAdjs: ->
     yMid = => @$.audio.offsetTop + @$.audio.offsetHeight / 2
@@ -309,7 +309,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     @addEventListener('iron-resize', @_onResize.bind(@))
     Polymer.RenderStatus.afterNextRender(this, @_onResize.bind(@))
     
-    @$.rows.appendChild(@renderer.view);
+    @$.rows.appendChild(@renderer.view)
 
     ko.computed =>
       @stage.setTransform(0, -(@viewState.rowsY()), 1, 1, 0, 0, 0, 0, 0)
@@ -323,20 +323,23 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
+    return unless @song?
+    log('assign rows', @song)
 
-    log('assign rows',@song)
+    songNotes = @graph.objects(U(@song), U(':note'))
+    
 
     @stage.removeChildren()
     n.destroy() for n in @notes
     @notes = []
     
     noteNum = 0
-    for uri in _.sortBy(@graph.objects(@song, U(':note')), 'id')
+    for uri in _.sortBy(songNotes, 'id')
       con = new PIXI.Container()
       @stage.addChild(con)
       row = noteNum % 6
       rowTop = @viewState.rowsY() + 20 + 150 * row
-      note = new Note(con, @project, @graph, @selection, uri, @setAdjuster, @song, @viewState, rowTop, rowTop + 140)
+      note = new Note(con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
       @notes.push(note)
       noteNum = noteNum + 1
  
@@ -384,7 +387,7 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 class Note
   constructor: (@container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
     @adjusterIds = {} # id : true
-    @draw()
+    Polymer.RenderStatus.afterNextRender(this, @graph.runHandler(@draw.bind(@), 'note draw'))
 
   destroy: ->
     log('destroy', @uri.value)

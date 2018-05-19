@@ -165,6 +165,8 @@ class window.SyncedGraph
     @prefixFuncs = N3.Util.prefixes(@prefixes)
         
   Uri: (curie) ->
+    if not curie?
+      throw new Error("no uri")
     if curie.match(/^http/)
       return N3.DataFactory.namedNode(curie)
     part = curie.split(':')
@@ -175,7 +177,7 @@ class window.SyncedGraph
 
   LiteralRoundedFloat: (f) ->
     N3.DataFactory.literal(d3.format(".3f")(f),
-                          "http://www.w3.org/2001/XMLSchema#double")
+                          @Uri("http://www.w3.org/2001/XMLSchema#double"))
 
   Quad: (s, p, o, g) -> N3.DataFactory.quad(s, p, o, g)
 
@@ -215,7 +217,7 @@ class window.SyncedGraph
       for q in qs
         if not q.equals
           throw new Error("doesn't look like a proper Quad")
-        if not q.graph?
+        if not q.subject.id or not q.graph.id?
           throw new Error("corrupt patch: #{JSON.stringify(q)}")
     
   _applyPatch: (patch) ->
@@ -334,6 +336,8 @@ class window.SyncedGraph
     return @graph.getQuads(s, p, o).length > 0
 
   nextNumberedResources: (base, howMany) ->
+    # base is NamedNode or string
+    base = base.id if base.id
     results = []
     # we could cache [base,lastSerial]
     for serial in [0..1000]

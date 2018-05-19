@@ -220,30 +220,6 @@
   </template>
 </dom-module>
 
-<!-- One trapezoid note shape in a row.
-     This element has the right Y coords.
-     We compute X coords from the zoom setting.
-     diagram-layer draws the note body. -->
-<dom-module id="light9-timeline-note">
-  <template>
-    <style>
-     :host {
-         display: block;
-         background: green;
-         /* outline: 2px solid red; */
-     }
-    </style>
-    <light9-timeline-note-inline-attrs rect="{{inlineRect}}"
-                                       graph="{{graph}}"
-                                       selection="{{selection}}"
-                                       song="{{song}}"
-                                       uri="{{uri}}"
-                                       effect="{{effect}}"
-    >
-    </light9-timeline-note-inline-attrs>
-  </template>
-</dom-module>
-
 <!-- All the adjusters you can edit or select. Tells a light9-adjusters-canvas how to draw them. Probabaly doesn't need to be an element.
      This element manages their layout and suppresion.
      Owns the selection.
@@ -256,7 +232,6 @@
      :host {
          pointer-events: none; /* restored on the individual adjusters */
      }
-
     </style>
   </template>
 </dom-module>
