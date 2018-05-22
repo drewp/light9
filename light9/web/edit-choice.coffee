@@ -48,13 +48,14 @@ coffeeElementSetup(class EditChoice extends Polymer.Element
         graph: {type: Object, notify: true},
         uri: {type: String, notify: true},
 
+    _setUri: (u) ->
+      @uri = u
+      @dispatchEvent(new CustomEvent('edited'))
+
     connectedCallback: ->
       super.connectedCallback()
-      @uri = null
-      setupDrop @$.box, @$.box, null, (uri) =>
-        @uri=uri
-        @updateLabel()
+      setupDrop(@$.box, @$.box, null, @_setUri.bind(@))
 
     unlink: ->
-      @uri = null
+      @_setUri(null)
 )

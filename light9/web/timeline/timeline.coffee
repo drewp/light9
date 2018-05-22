@@ -36,16 +36,16 @@ class Project
     @graph.applyAndSendPatch({delQuads: [], addQuads: quads})
     return effect
 
-  makeNewNote: (effect, dropTime, desiredWidthT) ->
+  makeNewNote: (song, effect, dropTime, desiredWidthT) ->
     U = (x) => @graph.Uri(x)
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: @song}
+    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: song}
       
     newNote = @graph.nextNumberedResource("#{@song.value}/n")
     newCurve = @graph.nextNumberedResource("#{newNote.value}c")
     points = @graph.nextNumberedResources("#{newCurve.value}p", 4)
 
     curveQuads = [
-        quad(@song, U(':note'), newNote)
+        quad(song, U(':note'), newNote)
         quad(newNote, RDF + 'type', U(':Note'))
         quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
         quad(newNote, U(':effectClass'), effect)
@@ -87,7 +87,7 @@ class Project
     tMax - tMin
       
   deleteNote: (song, note, selection) ->
-    patch = {delQuads: [{subject: song, predicate: graph.Uri(':note'), object: note, graph: song}], addQuads: []}
+    patch = {delQuads: [@graph.Quad(song, graph.Uri(':note'), note, song)], addQuads: []}
     @graph.applyAndSendPatch(patch)
     if note in selection.selected()
       selection.selected(_.without(selection.selected(), note))
@@ -385,7 +385,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     desiredWidthX = @offsetWidth * .3
     desiredWidthT = @viewState.zoomInX.invert(desiredWidthX) - @viewState.zoomInX.invert(0)
     desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
-    @project.makeNewNote(effect, dropTime, desiredWidthT)
+    @project.makeNewNote(U(@song), effect, dropTime, desiredWidthT)
 
   updateInlineAttrs: (note, config) ->
     if not config?
@@ -430,6 +430,7 @@ class Note
     log('destroy', @uri.value)
     @isDetached = true
     @clearAdjusters()
+    @parentElem.updateInlineAttrs(@uri, null)
 
   clearAdjusters: ->
     for i in Object.keys(@adjusterIds)

@@ -4,33 +4,33 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
   @is: "light9-timeline-note-inline-attrs"
   @getter_properties:
     graph: { type: Object, notify: true }
+    project: { type: Object, notify: true }
     song: { type: String, notify: true }
     config: { type: Object } # just for setup
     uri: { type: Object, notify: true }  # the Note
-    effect: { type: Object, notify: true }
     effectStr: { type: String, notify: true }
     colorScale: { type: String, notify: true }
     noteLabel: { type: String, notify: true }
     selection: { type: Object, notify: true }
   @getter_observers: [
+    '_onConfig(config)'
     'addHandler(graph, uri)'
     'onColorScale(graph, uri, colorScale)'
-    '_onConfig(config)'
-    '_effectToStr(effect)'
-    '_effectToUri(effectStr, graph)'
     ]
-  _effectToStr: (effect) ->
-    @effectStr = @effect?.value
-    log('now str is', @effectStr)
-  _effectToUri: (effectStr, graph) ->
-    if @effectStr
-      @effect = @graph.Uri(@effectStr)
-    else
-      @effect = null
+
+  ready: ->
+    super.ready()
+    @$.effect.addEventListener 'edited', =>
+      @graph.patchObject(@uri, @graph.Uri(':effectClass'), @graph.Uri(@effectStr), @graph.Uri(@song))
+      
   _onConfig: ->
     @uri = @config.uri
     for side in ['top', 'left', 'width', 'height']
       @.style[side] = @config[side] + 'px'
+    
+  addHandler: ->
+    return unless @uri
+    @graph.runHandler(@update.bind(@), "update inline attrs #{@uri.value}")
     
   onColorScale: ->
     return
@@ -63,17 +63,11 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
         ]}
       @graph.applyAndSendPatch(patch)
     
-  addHandler: ->
-    return unless @uri
-    @graph.runHandler(@update.bind(@), "update inline attrs #{@uri.value}")
-    
   update: ->
-    return unless @uri?
     console.time('attrs update')
     U = (x) => @graph.Uri(x)
-    @effect = @graph.uriValue(@uri, U(':effectClass'))
+    @effectStr = @graph.uriValue(@uri, U(':effectClass'))?.value
     @noteLabel = @uri.value.replace(/.*\//, '')
-    return
     existingColorScaleSetting = null
     for setting in @graph.objects(@uri, U(':setting'))
       ea = @graph.uriValue(setting, U(':effectAttr'))
@@ -87,7 +81,6 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
       @colorScale = '#ffffff'
     console.timeEnd('attrs update')
 
-
   onDel: ->
-    deleteNote(@graph, @song, @uri, @selection)
+    @project.deleteNote(@graph.Uri(@song), @uri, @selection)
 )

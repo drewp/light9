@@ -121,6 +121,8 @@
     <div id="rows"></div>
     <template is="dom-repeat" items="{{inlineAttrConfigs}}">
       <light9-timeline-note-inline-attrs graph="{{graph}}"
+                                         project="{{project}}"
+                                         selection="{{selection}}"
                                          song="{{song}}"
                                          config="{{item}}">
       </light9-timeline-note-inline-attrs>
