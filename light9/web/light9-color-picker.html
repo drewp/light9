@@ -1,6 +1,60 @@
 <link rel="import" href="/lib/polymer/polymer.html">
 <link rel="import" href="/lib/paper-slider/paper-slider.html">
 
+<dom-module id="light9-color-picker-float">
+  <template>
+    <style>
+     :host {
+         z-index: 10;
+         position: fixed;
+     }
+     #largeCrosshair {
+         position: absolute;
+         left: -60px;
+         top: -62px;
+         pointer-events: none;
+     }
+     #largeCrosshair {
+         background: url(/colorpick_crosshair_large.svg);
+         width: 1000px; 
+         height: 1000px;
+     }
+    #largeRainbowComp {
+         display: inline-block;
+         overflow: hidden;
+         position: relative;
+     }
+     #largeRainbowComp {
+         position: absolute;
+         border: 4px solid #545454;
+         box-shadow: 8px 11px 40px 0px rgba(0, 0, 0, 0.74);
+         left: 0x;
+         top: 0;
+     }
+     #largeRainbow {
+         background: url(/colorpick_rainbow_large.png);
+         width: 400px; 
+         height: 200px;
+         user-select: none;
+     }
+    </style>
+    <div id="largeRainbowComp">
+      <div id="largeRainbow"
+           on-mousemove="onCanvasMove"
+           on-mouseup="hideLarge"
+           on-mouseleave="hideLarge"></div>
+      <div id="largeCrosshair"></div>
+    </div>
+  </template>
+  <script>
+   class Light9ColorPickerFloat extends Polymer.Element {
+       static get is() { return "light9-color-picker-float"; }
+       // more methods get added by Light9ColorPicker
+   }
+   customElements.define(Light9ColorPickerFloat.is, Light9ColorPickerFloat);
+  </script>
+</dom-module>
+
 <dom-module id="light9-color-picker">
   <template>
     <style>
@@ -10,7 +64,7 @@
          align-items: center;
          flex-wrap: wrap;
      }
-     #smallRainbowComp, #largeRainbowComp {
+     #smallRainbowComp {
          display: inline-block;
          overflow: hidden;
          position: relative;
@@ -20,13 +74,8 @@
          width: 150px; 
          height: 30px;
      }
-     #largeRainbow {
-         background: url(/colorpick_rainbow_large.png);
-         width: 400px; 
-         height: 200px;
-         user-select: none;
-     }
-     #smallCrosshair, #largeCrosshair {
+     
+     #smallCrosshair {
          position: absolute;
          left: -60px;
          top: -62px;
@@ -39,23 +88,11 @@
          width: 400px; 
          height: 60px;
      }
-     #largeCrosshair {
-         background: url(/colorpick_crosshair_large.svg);
-         width: 1000px; 
-         height: 1000px;
-     }
+     
      #smallRainbowComp {
          margin-right: 3px;
      }
-     #largeRainbowComp {
-         display: none;
-         position: absolute;
-         border: 4px solid #545454;
-         box-shadow: 8px 11px 40px 0px rgba(0, 0, 0, 0.74);
-         z-index: 10;
-         left: -50px;
-         top: -110px;
-     }
+     
      paper-slider {
          width: 170px;
      }
@@ -63,26 +100,26 @@
          display: flex;
          align-items: center;
      }
-    </style>
-    <div id="smallRainbowComp">
-      <div id="smallRainbow" on-mouseenter="onEnterSmall"></div>
-      <div id="smallCrosshair"></div>
-    </div>
-    <span id="vee">
-      V:
-      <paper-slider min="0"
-                    max="255"
-                    step="1"
-                    value="{{sliderWriteValue}}"
-                    immediate-value="{{value}}"></paper-slider>
-    </span>
-    <div id="largeRainbowComp">
-      <div id="largeRainbow"
-           on-mousemove="onCanvasMove"
-           on-mouseup="hideLarge"
-           on-mouseleave="hideLarge"></div>
-      <div id="largeCrosshair"></div>
-    </div>
+     #large {
+         display: none;
+     }
+     </style>
+     <div id="smallRainbowComp">
+     <div id="smallRainbow" on-mouseenter="onEnterSmall"></div>
+     <div id="smallCrosshair"></div>
+     </div>
+     <span id="vee">
+     V:
+       <paper-slider min="0"
+                     max="255"
+                     step="1"
+                     value="{{sliderWriteValue}}"
+                     immediate-value="{{value}}"></paper-slider>
+     </span>
+     <!--  Large might span multiple columns, and chrome won't
+      send events for those parts. Workaround: take it out of
+      the columns. -->
+     <light9-color-picker-float id="large"></light9-color-picker-float>
   </template>
   <script src="/lib/color/one-color.js"></script>
   <script>
@@ -167,28 +204,27 @@
            throw new Error('no match');
        }
    }
+
    
-   Polymer({
-       is: "light9-color-picker",
-       properties: {
-           color: {
-               type: String,
-               notify: true,
-           },
-           hueSatColor: { type: String, notify: true, value: '#000000' },
+   class Light9ColorPicker extends Polymer.Element {
+       static get is() { return "light9-color-picker"; }
+       static get properties() { return {
+           color: { type: String, notify: true },
+           hueSatColor: { type: String, notify: true, value: null },
            value: { type: Number, notify: true }, // 0..255
            sliderWriteValue: { type: Number, notify: true },
-       },
-       observers: [
+       }; }
+       static get observers() { return [
            'readColor(color)',
            'onValue(value)',
            'writeColor(hueSatColor, value)'
-       ],
-       displayed: function() {
+       ]; }
+       displayed() {
            // call this when the smallcrosshair first has a size
            this._updateSmallCrosshair();
-       },
-       attached: function() {
+       }
+       ready() {
+           super.ready();
            if (!window.pickerCanvases) {
                window.pickerCanvases = {
                    large: new RainbowCanvas(
@@ -203,27 +239,41 @@
                // color may have been set before our image came
                this._updateSmallCrosshair();
            }.bind(this));
-       },
-       onValue: function(value) {
+           this.$.large.onCanvasMove = this.onCanvasMove.bind(this);
+           this.$.large.hideLarge = this.hideLarge.bind(this);
+           document.body.append(this.$.large);
+           this.$.large.style.display = 'none';
+       }
+       disconnectedCallback() {
+           super.disconnectedCallback();
+           document.body.removeChild(this.$.large);
+       }
+       onValue(value) {
            let neverBlack = .1 + .9 * value / 255;
            this.$.smallRainbow.style.filter = `brightness(${neverBlack})`;
-       },
-       writeColor: function(hueSatColor, value) {
+       }
+       writeColor(hueSatColor, value) {
+           if (hueSatColor === null || this.pauseWrites) { return; }
            this.color = one.color(hueSatColor).value(value / 255).hex();
-       },
-       readColor: function(color) {
-           if (this.$.largeRainbowComp.style.display == 'block') {
+       }
+       readColor(color) {
+           if (this.$.large.style.display == 'block') {
                // for performance, don't do color searches on covered widget
                return;
            }
-           
+
+           this.pauseWrites = true;
            var colorValue = one.color(color).value() * 255;
            // writing back to immediate-value doesn't work on paper-slider
            this.sliderWriteValue = colorValue;
-           
+
+           // don't update this if only the value changed, or we desaturate
+           this.hueSatColor = one.color(color).value(1).hex();
+
            this._updateSmallCrosshair();
-       },
-       _updateSmallCrosshair: function() {
+           this.pauseWrites = false;
+       }
+       _updateSmallCrosshair() {
            try {
                var pos = this.small.posFor(this.color);
            } catch(e) {
@@ -231,49 +281,45 @@
                return;
            }
            this.moveSmallCrosshair(pos);
-       },
-       _floatLarge: function() {
-           // Large might span multiple columns, and chrome won't
-           // send events for those parts. Workaround: take it out of
-           // the columns.
-           let large = this.$.largeRainbowComp;
-           let rect = this.$.smallRainbowComp.getBoundingClientRect();
-           document.body.append(large);
-           large.style.position = 'fixed';
-           large.style.left = (rect.left) + 'px';
-           large.style.top = (rect.top - 50) + 'px';
-       },
-       showLarge: function() {
-           this._floatLarge();
-           this.$.largeRainbowComp.style.display = 'block';
+       }
+       showLarge(x, y) {
+           this.$.large.style.display = 'block';
            try {
-               this.moveLargeCrosshair(this.large.posFor(this.color));
+               const pos = this.large.posFor(this.color);
+               this.moveLargeCrosshair(pos);
+               this.$.large.style.left = (x - Math.max(20, Math.min(380, pos[0]))) + 'px';
+               this.$.large.style.top = (y - Math.max(20, Math.min(180, pos[1]))) + 'px';
            } catch(e) {
                this.moveLargeCrosshair([-999, -999]);
+               this.$.large.style.left = (400 / 2) + 'px';
+               this.$.large.style.top = (200 / 2) + 'px';
                return;
            }
-       },
-       hideLarge: function() {
-           this.$.largeRainbowComp.style.display = 'none';
+       }
+       hideLarge() {
+           this.$.large.style.display = 'none';
            this.readColor(this.color);
-       },
-       onEnterSmall: function() {
-           // not if we just closed the large one
-           this.showLarge();
-       },
-       moveLargeCrosshair: function(pos, _elem) {
-           _elem = _elem || this.$.largeCrosshair;
+           this.closeTime = Date.now();
+       }
+       onEnterSmall(ev) {
+           if (this.closeTime && this.closeTime > Date.now() - 500) {
+               return;
+           }
+           this.showLarge(ev.pageX, ev.pageY);
+       }
+       moveLargeCrosshair(pos, _elem) {
+           _elem = _elem || this.$.large.shadowRoot.querySelector("#largeCrosshair");
            _elem.style.left = (pos[0] - _elem.offsetWidth / 2) + 'px';
            _elem.style.top = (pos[1] - _elem.offsetHeight / 2) + 'px';
-       },
-       moveSmallCrosshair: function(pos) {
+       }
+       moveSmallCrosshair(pos) {
            this.moveLargeCrosshair(pos, this.$.smallCrosshair);
-       },
-       onCanvasMove: function(ev) {
+       }
+       onCanvasMove(ev) {
            if (ev.buttons != 1) {
                return;
            }
-           var canvas = this.$.largeRainbow;
+           var canvas = this.$.large.shadowRoot.querySelector('#largeRainbow');
            var pos = [ev.offsetX - canvas.offsetLeft,
                       ev.offsetY - canvas.offsetTop];
            this.moveLargeCrosshair(pos);
@@ -283,8 +329,9 @@
            if (this.value == 0) {
                this.value = 255;
            }
-       },
-   });
+       }
+   }
+   customElements.define(Light9ColorPicker.is, Light9ColorPicker);
   </script>
 </dom-module>
 

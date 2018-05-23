@@ -33,33 +33,34 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
     @graph.runHandler(@update.bind(@), "update inline attrs #{@uri.value}")
     
   onColorScale: ->
-    return
+    return unless @uri? and @colorScale? and @colorScaleFromGraph?
     U = (x) => @graph.Uri(x)
     if @colorScale == @colorScaleFromGraph
       return
-    @editAttr(@song, @uri, U(':colorScale'), @graph.Literal(@colorScale))
+    @editAttr(@uri, U(':colorScale'), @graph.Literal(@colorScale))
 
-  editAttr: (song, note, attr, value) ->
+  editAttr: (note, attr, value) ->
     U = (x) => @graph.Uri(x)
-    if not song?
-      log("can't edit inline attr yet, no song")
+    if not @song?
+      log("inline: can't edit inline attr yet, no song")
       return
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: U(song)}
 
     existingColorScaleSetting = null
     for setting in @graph.objects(note, U(':setting'))
       ea = @graph.uriValue(setting, U(':effectAttr'))
-      if ea == attr
+      if ea.equals(attr)
         existingColorScaleSetting = setting
         
     if existingColorScaleSetting
-      @graph.patchObject(existingColorScaleSetting, U(':value'), value, U(song))
+      log('inline: update setting', existingColorScaleSetting.value)
+      @graph.patchObject(existingColorScaleSetting, U(':value'), value, U(@song))
     else
+      log('inline: new setting')
       setting = @graph.nextNumberedResource(note.value + 'set')
       patch = {delQuads: [], addQuads: [
-        quad(note, U(':setting'), setting)
-        quad(setting, U(':effectAttr'), attr)
-        quad(setting, U(':value'), value)
+        @graph.Quad(note, U(':setting'), setting, U(@song))
+        @graph.Quad(setting, U(':effectAttr'), attr, U(@song))
+        @graph.Quad(setting, U(':value'), value, U(@song))
         ]}
       @graph.applyAndSendPatch(patch)
     
@@ -72,7 +73,7 @@ coffeeElementSetup(class InlineAttrs extends Polymer.Element
     for setting in @graph.objects(@uri, U(':setting'))
       ea = @graph.uriValue(setting, U(':effectAttr'))
       value = @graph.stringValue(setting, U(':value'))
-      if ea == U(':colorScale')
+      if ea.equals(U(':colorScale'))
         @colorScaleFromGraph = value
         @colorScale = value
         existingColorScaleSetting = setting
