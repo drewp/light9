@@ -1,5 +1,4 @@
 log = console.log
-RDF = 'http://www.w3.org/1999/02/22-rdf-syntax-ns#'
 Drawing = window.Drawing
 ROW_COUNT = 7
 
@@ -38,19 +37,19 @@ class Project
 
   makeNewNote: (song, effect, dropTime, desiredWidthT) ->
     U = (x) => @graph.Uri(x)
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: song}
+    quad = (s, p, o) => @graph.Quad(s, p, o, song)
       
-    newNote = @graph.nextNumberedResource("#{@song.value}/n")
+    newNote = @graph.nextNumberedResource("#{song.value}/n")
     newCurve = @graph.nextNumberedResource("#{newNote.value}c")
     points = @graph.nextNumberedResources("#{newCurve.value}p", 4)
 
     curveQuads = [
         quad(song, U(':note'), newNote)
-        quad(newNote, RDF + 'type', U(':Note'))
+        quad(newNote, U('rdf:type'), U(':Note'))
         quad(newNote, U(':originTime'), @graph.LiteralRoundedFloat(dropTime))
         quad(newNote, U(':effectClass'), effect)
         quad(newNote, U(':curve'), newCurve)
-        quad(newCurve, RDF + 'type', U(':Curve'))
+        quad(newCurve, U('rdf:type'), U(':Curve'))
         quad(newCurve, U(':attr'), U(':strength'))
       ]        
     pointQuads = []
@@ -145,9 +144,8 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     @addEventListener('iron-resize', @_onIronResize.bind(@))
     Polymer.RenderStatus.afterNextRender(this, @_onIronResize.bind(@))
 
-    #zoomed = @$.zoomed 
-    #setupDrop(@dia.shadowRoot.querySelector('svg'),
-    #          zoomed.$.rows, @, zoomed.onDrop.bind(zoomed))
+    Polymer.RenderStatus.afterNextRender this, =>
+      setupDrop(@$.zoomed.$.rows, @$.zoomed.$.rows, @, @$.zoomed.onDrop.bind(@$.zoomed))
             
   _onIronResize: ->
     @viewState.setWidth(@offsetWidth)
@@ -373,8 +371,8 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     # we could probably accept some initial overrides right on the
     # effect uri, maybe as query params
 
-    if not @graph.contains(effect, RDF + 'type', U(':Effect'))
-      if @graph.contains(effect, RDF + 'type', U(':LightSample'))
+    if not @graph.contains(effect, U('rdf:type'), U(':Effect'))
+      if @graph.contains(effect, U('rdf:type'), U(':LightSample'))
         effect = @project.makeEffect(effect)
       else
         log("drop #{effect} is not an effect")
@@ -384,8 +382,8 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     desiredWidthX = @offsetWidth * .3
     desiredWidthT = @viewState.zoomInX.invert(desiredWidthX) - @viewState.zoomInX.invert(0)
-    desiredWidthT = Math.min(desiredWidthT, @zoom.duration() - dropTime)
-    @project.makeNewNote(U(@song), effect, dropTime, desiredWidthT)
+    desiredWidthT = Math.min(desiredWidthT, @viewState.zoomSpec.duration() - dropTime)
+    @project.makeNewNote(U(@song), U(effect), dropTime, desiredWidthT)
 
   updateInlineAttrs: (note, config) ->
     if not config?

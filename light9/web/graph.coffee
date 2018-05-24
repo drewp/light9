@@ -217,7 +217,7 @@ class window.SyncedGraph
       for q in qs
         if not q.equals
           throw new Error("doesn't look like a proper Quad")
-        if not q.subject.id or not q.graph.id?
+        if not q.subject.id or not q.graph.id? or not q.predicate.id?
           throw new Error("corrupt patch: #{JSON.stringify(q)}")
     
   _applyPatch: (patch) ->
