@@ -50,7 +50,7 @@ describe 'SyncedGraph', ->
       graph.runHandler(hand, 'run')
       graph.applyAndSendPatch({
         delQuads: [quad(A1, A2, A3)], addQuads: [quad(A1, A2, A4)]})
-      assert.equal(2, called) 
+      assert.equal(2, called)
 
     it 'notices new queries a handler makes upon rerun', ->
       called = 0
@@ -80,7 +80,7 @@ describe 'SyncedGraph', ->
       graph.runHandler(hand, 'run')
       graph.applyAndSendPatch({
         delQuads: [quad(A1, A2, A3)], addQuads: [quad(A1, A2, A4)]})
-      assert.equal(2, called) 
+      assert.equal(2, called)
 
     describe 'works with nested handlers', ->
 
@@ -200,7 +200,7 @@ describe 'SyncedGraph', ->
           values = []
           successes = 0
           hand = ->
-            try 
+            try
               head = graph.uriValue(U('x'), U('y'))
             catch
               # graph goes empty between clearGraph and loadTrig
@@ -212,15 +212,15 @@ describe 'SyncedGraph', ->
             @prefix : <http://example.com/> .
             :ctx { :x :y (:a1 :a2 :a3) } .
           ", () ->
-            graph.runHandler(hand, 'run')
-            graph.clearGraph()
-            graph.loadTrig "
+             graph.runHandler(hand, 'run')
+             graph.clearGraph()
+             graph.loadTrig "
               @prefix : <http://example.com/> .
               :ctx { :x :y (:a1 :a3 :a2) } .
             ", () ->
-              assert.deepEqual([[A1, A2, A3], [A1, A3, A2]], values)
-              assert.equal(2, successes)
-              done()
+               assert.deepEqual([[A1, A2, A3], [A1, A3, A2]], values)
+               assert.equal(2, successes)
+               done()
   
       describe 'contains', ->
         it 'when a new triple is added', ->

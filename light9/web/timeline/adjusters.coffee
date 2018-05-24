@@ -40,7 +40,8 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     pos = $V([ev.x, ev.y])
     if @currentDrag
       @currentDrag.cur = pos
-      @currentDrag.adj.continueDrag(@currentDrag.cur.subtract(@currentDrag.start))
+      @currentDrag.adj.continueDrag(
+        @currentDrag.cur.subtract(@currentDrag.start))
 
   onUp: (ev) ->
     return unless @currentDrag
@@ -159,7 +160,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @ctx.fillText(label, x1 + 5, y2 - 5, x2 - x1 - 10)
 
     # coords from a center that's passed in
-    # # special layout for the thaeter ones with middinh 
+    # # special layout for the thaeter ones with middinh
     # l/r arrows
     # mouse arrow cursor upon hover, and accent the hovered adjuster
     # connector

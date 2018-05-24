@@ -23,7 +23,7 @@ class window.ViewState
 
     @zoomAnimSec = .1
 
-    ko.computed(@maintainZoomLimitsAndScales.bind(@))    
+    ko.computed(@maintainZoomLimitsAndScales.bind(@))
  
   setWidth: (w) ->
     @width(w)
@@ -87,6 +87,6 @@ class window.ViewState
         setTimeout(gotoStep, delay)
         lastTime = delay
     setTimeout(=>
-        @zoomSpec.t1(newT1)
-        @zoomSpec.t2(newT2)
-      , lastTime + 10)  
+      @zoomSpec.t1(newT1)
+      @zoomSpec.t2(newT2)
+    , lastTime + 10)

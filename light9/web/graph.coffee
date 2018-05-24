@@ -28,7 +28,9 @@ class Handler
   
 class AutoDependencies
   constructor: () ->
-    @handlers = new Handler(null) # tree of all known Handlers (at least those with non-empty patterns). Top node is not a handler.
+    # tree of all known Handlers (at least those with non-empty
+    # patterns). Top node is not a handler.
+    @handlers = new Handler(null)
     @handlerStack = [@handlers] # currently running
     
   runHandler: (func, label) ->
@@ -127,7 +129,7 @@ class window.SyncedGraph
   # Main graph object for a browser to use. Syncs both ways with
   # rdfdb. Meant to hide the choice of RDF lib, so we can change it
   # later.
-  # 
+  #
   # Note that _applyPatch is the only method to write to the graph, so
   # it can fire subscriptions.
 
@@ -151,7 +153,7 @@ class window.SyncedGraph
     # if we had a Store already, this lets N3.Store free all its indices/etc
     @graph = N3.Store()
     @_addPrefixes(@prefixes)
-    @cachedFloatValues = new Map();
+    @cachedFloatValues = new Map()
 
   _clearGraphOnNewConnection: -> # must not send a patch to the server!
     log('graph: clearGraphOnNewConnection')
@@ -188,14 +190,14 @@ class window.SyncedGraph
     patch = {delQuads: [], addQuads: []}
     parser = N3.Parser()
     parser.parse trig, (error, quad, prefixes) =>
-                  if error
-                    throw new Error(error)
-                  if (quad)
-                    patch.addQuads.push(quad)
-                  else
-                    @_applyPatch(patch)
-                    @_addPrefixes(prefixes)
-                    cb() if cb
+      if error
+        throw new Error(error)
+      if (quad)
+        patch.addQuads.push(quad)
+      else
+        @_applyPatch(patch)
+        @_addPrefixes(prefixes)
+        cb() if cb
                     
   quads: () -> # for debugging
     [q.subject, q.predicate, q.object, q.graph] for q in @graph.getQuads()
@@ -223,11 +225,11 @@ class window.SyncedGraph
     
   _applyPatch: (patch) ->
     # In most cases you want applyAndSendPatch.
-    # 
+    #
     # This is the only method that writes to @graph!
     @cachedFloatValues.clear()
     for quad in patch.delQuads
-      #log("remove #{JSON.stringify(quad)}")      
+      #log("remove #{JSON.stringify(quad)}")
       did = @graph.removeQuad(quad)
       #log("removed: #{did}")
     for quad in patch.addQuads
@@ -323,11 +325,13 @@ class window.SyncedGraph
       firsts = @graph.getQuads(current, RDF + 'first', null)
       rests = @graph.getQuads(current, RDF + 'rest', null)
       if firsts.length != 1
-        throw new Error("list node #{current} has #{firsts.length} rdf:first edges")
+        throw new Error(
+          "list node #{current} has #{firsts.length} rdf:first edges")
       out.push(firsts[0].object)
 
       if rests.length != 1
-        throw new Error("list node #{current} has #{rests.length} rdf:rest edges")
+        throw new Error(
+          "list node #{current} has #{rests.length} rdf:rest edges")
       current = rests[0].object
     
     return out
@@ -350,7 +354,7 @@ class window.SyncedGraph
     throw new Error("can't make sequential uri with base #{base}")
 
   nextNumberedResource: (base) ->
-    @nextNumberedResources(base, 1)[0]       
+    @nextNumberedResources(base, 1)[0]
 
   contextsWithPattern: (s, p, o) ->
     @_autoDeps.askedFor(s, p, o, null)

@@ -18,7 +18,7 @@ class Adjustable
     #   getTarget -> vec2 of current target position
     #   getSuggestedTargetOffset -> vec2 pixel offset from target
     #   emptyBox -> true if you want no value display
-    
+
     # updated later by layout algoritm
     @centerOffset = $V([0, 0])
 
@@ -26,7 +26,7 @@ class Adjustable
     return '' if @config.emptyBox
     defaultFormat = d3.format(".4g")(@_getValue())
     if @config.getDisplayValue?
-      return @config.getDisplayValue(@_getValue(), defaultFormat) 
+      return @config.getDisplayValue(@_getValue(), defaultFormat)
     defaultFormat
 
   getSuggestedCenter: () ->
@@ -37,7 +37,7 @@ class Adjustable
 
   getTarget: () -> # vec2 of pixels
     @config.getTarget()
-            
+
   subscribe: (onChange) ->
     # change could be displayValue or center or target. This likely
     # calls onChange right away if there's any data yet.
@@ -49,7 +49,7 @@ class Adjustable
   continueDrag: (pos) ->
     ## pos is vec2 of pixels relative to the drag start
     @targetDraggedTo = pos.add(@initialTarget)
-    
+
   endDrag: () ->
     # override
 
@@ -64,13 +64,13 @@ class Adjustable
 
     if ev.touches?.length
       ev = ev.touches[0]
-      
+
     # storing root on the object to remember it across calls in case
     # you drag outside the editor.
     @root = rootElem.getBoundingClientRect() if rootElem
     offsetParentPos = $V([ev.pageX - @root.left, ev.pageY - @root.top])
 
-    return offsetParentPos 
+    return offsetParentPos
 
 class window.AdjustableFloatObservable extends Adjustable
   constructor: (@config) ->
@@ -83,7 +83,7 @@ class window.AdjustableFloatObservable extends Adjustable
 
   _getValue: () ->
     @config.observable()
-    
+
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start.
     super(pos)
@@ -110,12 +110,13 @@ class window.AdjustableFloatObject extends Adjustable
     @ctor2()
     if not @config.ctx?
       throw new Error("missing ctx")
-    @config.graph.runHandler(@_syncValue.bind(@), "adj sync #{@config.subj.value}")
+    @config.graph.runHandler(@_syncValue.bind(@),
+                             "adj sync #{@config.subj.value}")
 
   _syncValue: () ->
     @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)
     @_onChange() if @_onChange
-    
+
   _getValue: () ->
     # this is a big speedup- callers use _getValue about 4x as much as
     # the graph changes and graph.floatValue is slow
@@ -123,7 +124,7 @@ class window.AdjustableFloatObject extends Adjustable
 
   getTarget: () ->
     @config.getTargetPosForValue(@_getValue())
-    
+
   subscribe: (onChange) ->
     # only works on one subscription at a time
     throw new Error('multi subscribe not implemented') if @_onChange
@@ -133,11 +134,11 @@ class window.AdjustableFloatObject extends Adjustable
     # pos is vec2 of pixels relative to the drag start
     super(pos)
     newValue = @config.getValueForPos(@_editorCoordinates())
-    
+
     @config.graph.patchObject(@config.subj, @config.pred,
                               @config.graph.LiteralRoundedFloat(newValue),
                               @config.ctx)
-                              
+
 class window.AdjustableFade extends Adjustable
   constructor: (@yForV, @i0, @i1, @note, offset, ctx) ->
     super()
@@ -156,11 +157,11 @@ class window.AdjustableFade extends Adjustable
     mid = @note.worldPts[@i0].x(.5).add(@note.worldPts[@i1].x(.5))
     mid.e(1)
 
-   continueDrag: (pos) ->
+  continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
     super(pos)
     graph = @note.graph
-    U = (x) => graph.Uri(x)
+    U = (x) -> graph.Uri(x)
 
     goalCenterSec = @note.zoomInX.invert(@initialTarget.e(1) + pos.e(1))
 

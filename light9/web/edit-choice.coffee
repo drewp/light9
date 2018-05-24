@@ -43,19 +43,19 @@ window.setupDrop = (senseElem, highlightElem, coordinateOriginElem, onDrop) ->
 
 
 coffeeElementSetup(class EditChoice extends Polymer.Element
-    @is: "edit-choice",
-    @getter_properties:
-        graph: {type: Object, notify: true},
-        uri: {type: String, notify: true},
+  @is: "edit-choice",
+  @getter_properties:
+    graph: {type: Object, notify: true},
+    uri: {type: String, notify: true},
 
-    _setUri: (u) ->
-      @uri = u
-      @dispatchEvent(new CustomEvent('edited'))
+  _setUri: (u) ->
+    @uri = u
+    @dispatchEvent(new CustomEvent('edited'))
 
-    connectedCallback: ->
-      super.connectedCallback()
-      setupDrop(@$.box, @$.box, null, @_setUri.bind(@))
+  connectedCallback: ->
+    super.connectedCallback()
+    setupDrop(@$.box, @$.box, null, @_setUri.bind(@))
 
-    unlink: ->
-      @_setUri(null)
+  unlink: ->
+    @_setUri(null)
 )

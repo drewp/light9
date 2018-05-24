@@ -25,8 +25,8 @@ toJsonPatch = (jsPatch, cb) ->
       cb())
     
   async.parallel([writeDels, writeAdds], (err) ->
-      cb(JSON.stringify(out))
-    )
+    cb(JSON.stringify(out))
+  )
 
 parseJsonPatch = (jsonPatch, cb) ->
   # note response cb doesn't have an error arg.
@@ -36,23 +36,24 @@ parseJsonPatch = (jsonPatch, cb) ->
   parseAdds = (cb) =>
     parser = N3.Parser()
     parser.parse input.patch.adds, (error, quad, prefixes) =>
-                  if (quad)
-                    patch.addQuads.push(quad)
-                  else
-                    cb()
+      if (quad)
+        patch.addQuads.push(quad)
+      else
+        cb()
   parseDels = (cb) =>
     parser = N3.Parser()
     parser.parse input.patch.deletes, (error, quad, prefixes) =>
-                  if (quad)
-                    patch.delQuads.push(quad)
-                  else
-                    cb()
+      if (quad)
+        patch.delQuads.push(quad)
+      else
+        cb()
 
   async.parallel([parseAdds, parseDels], ((err) => cb(patch)))
 
 class window.RdfDbClient
   # Send and receive patches from rdfdb
-  constructor: (@patchSenderUrl, @clearGraphOnNewConnection, @applyPatch, @setStatus) ->
+  constructor: (@patchSenderUrl, @clearGraphOnNewConnection, @applyPatch,
+                @setStatus) ->
     @_patchesToSend = []
     @_lastPingMs = -1
     @_patchesReceived = 0
@@ -80,7 +81,7 @@ class window.RdfDbClient
     console.log('rdfdbclient: queue patch to server ', patchSizeSummary(patch))
     @_patchesToSend.push(patch)
     @_updateStatus()
-    @_continueSending()           
+    @_continueSending()
 
   _newConnection: ->
     wsOrWss = window.location.protocol.replace('http', 'ws')
@@ -133,15 +134,15 @@ class window.RdfDbClient
     # the dragging cases.
 
     sendOne = (patch, cb) =>
-        toJsonPatch(patch, (json) =>
-          log('rdfdbclient: send patch to server, ' + json.length + ' bytes')
-          @ws.send(json)
-          @_patchesSent++
-          @_updateStatus()
-          cb(null)
+      toJsonPatch(patch, (json) =>
+        log('rdfdbclient: send patch to server, ' + json.length + ' bytes')
+        @ws.send(json)
+        @_patchesSent++
+        @_updateStatus()
+        cb(null)
       )
 
     async.eachSeries(@_patchesToSend, sendOne, () =>
-        @_patchesToSend = []
-        @_updateStatus()
-      )
+      @_patchesToSend = []
+      @_updateStatus()
+    )
