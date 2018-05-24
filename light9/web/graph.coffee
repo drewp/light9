@@ -114,7 +114,6 @@ class AutoDependencies
     rerunInners(@handlers)
 
   askedFor: (s, p, o, g) ->
-    return
     # SyncedGraph is telling us someone did a query that depended on
     # quads in the given pattern.
     current = @handlerStack[@handlerStack.length - 1]
