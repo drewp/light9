@@ -305,6 +305,9 @@
            if (this.closeTime && this.closeTime > Date.now() - 500) {
                return;
            }
+
+           // if scrolling put us here, don't open large. require deliberate entering motion.
+           
            this.showLarge(ev.pageX, ev.pageY);
        }
        moveLargeCrosshair(pos, _elem) {

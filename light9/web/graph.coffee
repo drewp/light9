@@ -204,6 +204,8 @@ class window.SyncedGraph
   applyAndSendPatch: (patch) ->
     console.time('applyAndSendPatch')
     if !Array.isArray(patch.addQuads) || !Array.isArray(patch.delQuads)
+      console.timeEnd('applyAndSendPatch')
+      log('corrupt patch')
       throw new Error("corrupt patch: #{JSON.stringify(patch)}")
 
     @_validatePatch(patch)
