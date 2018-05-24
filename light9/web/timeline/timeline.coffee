@@ -7,8 +7,8 @@ class Project
 
   makeEffect: (uri) ->
     U = (x) => @graph.Uri(x)
-    effect = U(uri + '/effect')
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: effect}
+    effect = U(uri.value + '/effect')
+    quad = (s, p, o) => @graph.Quad(s, p, o, effect)
     
     quads = [
       quad(effect, U('rdf:type'), U(':Effect')),
