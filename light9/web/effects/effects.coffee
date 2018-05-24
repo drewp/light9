@@ -14,21 +14,21 @@ Polymer
   is: "light9-effect-class"
   properties: 
     graph: {type: Object}
-    uri: {type: String}
+    uri: {type: Object}
     
   onAdd: ->
-    @$.songEffects.body = {drop: @uri}
+    @$.songEffects.body = {drop: @uri.value}
     @$.songEffects.generateRequest()
     
   onMomentaryPress: ->
-    @$.songEffects.body = {drop: @uri, event: 'start'}
+    @$.songEffects.body = {drop: @uri.value, event: 'start'}
     @lastPress = @$.songEffects.generateRequest()
     @lastPress.completes.then (request) =>
       @lastMomentaryNote = request.response.note
       
   onMomentaryRelease: ->
     return unless @lastMomentaryNote
-    @$.songEffects.body = {drop: @uri, note: @lastMomentaryNote}
+    @$.songEffects.body = {drop: @uri.value, note: @lastMomentaryNote}
     @lastMomentaryNote = null
     @$.songEffects.generateRequest()
   
