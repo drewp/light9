@@ -1,7 +1,6 @@
 log = console.log
 Drawing = window.Drawing
 
-
 coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-adjusters-canvas'
   @getter_properties:
@@ -11,7 +10,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
   ]
   constructor: ->
     super()
-    @redraw = _.throttle(@_throttledRedraw.bind(@), 30, {leading: false})
+    @redraw = _.throttle(@_throttledRedraw.bind(@), 60, {leading: false})
     @adjs = {}
     
   ready: ->

@@ -306,6 +306,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
       antialias: true,
       forceCanvas: true,
     })
+    @dirty = _.debounce((() => @renderer.render(@stage)), 10)
 
   ready: ->
     super.ready()
@@ -328,11 +329,14 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     @renderer.resize(@clientWidth, @clientHeight + @viewState.rowsY())
 
-    @renderer.render(@stage)
+    @dirty()
 
   _onGraph: (graph, setAdjuster, song, viewState, project)->
     return unless @song # polymer will call again
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
+
+  noteDirty: ->
+    @dirty()
     
   onZoom: ->
     updateZoomFlattened = ->
@@ -501,6 +505,7 @@ class Note
     curveWidthCalc = () => @project.curveWidth(worldPts)
     @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
     @_updateInlineAttrs(screenPts)
+    @parentElem.noteDirty()
 
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
