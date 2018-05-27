@@ -1,6 +1,8 @@
 log = console.log
 Drawing = window.Drawing
 
+maxDist = 60
+
 coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer.IronResizableBehavior], Polymer.Element)
   @is: 'light9-adjusters-canvas'
   @getter_properties:
@@ -71,13 +73,14 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     nearest = @qt.find(pt.e(1), pt.e(2))
     if nearest?
       log('near', nearest.distanceFrom(pt))
-    if not nearest? or nearest.distanceFrom(pt) > 70
+    if not nearest? or nearest.distanceFrom(pt) > maxDist
       return null
     return nearest?.adj
 
   resizeUpdate: (ev) ->
     @$.canvas.width = ev.target.offsetWidth
     @$.canvas.height = ev.target.offsetHeight
+    @canvasCenter = $V([@$.canvas.width / 2, @$.canvas.height / 2])
     @redraw()
 
   _throttledRedraw: () ->
@@ -88,8 +91,10 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @ctx.clearRect(0, 0, @$.canvas.width, @$.canvas.height)
 
     for adjId, adj of @adjs
-      ctr = adj.getCenter()
+      ctr = adj.getHandle()
       target = adj.getTarget()
+      if target.e(1) < 0 or target.e(1) > @$.canvas.width or target.e(2) < 0 or target.e(2) > @$.canvas.height
+        continue
       @_drawConnector(ctr, target)
       
       @_drawAdjuster(adj.getDisplayValue(),
@@ -103,27 +108,33 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     # Todo: don't let their connector lines cross each other
     @qt = d3.quadtree([], ((d)->d.e(1)), ((d)->d.e(2)))
     @qt.extent([[0,0], [8000,8000]])
+
     for _, adj of @adjs
-      desired = adj.getSuggestedCenter()
-      output = desired
-      for tries in [0...4]
-        nearest = @qt.find(output.e(1), output.e(2))
+      adj.handle = adj.getSuggestedHandle()
+      
+    for tries in [0...5]
+      for _, adj of @adjs
+        current = adj.handle
+        @qt.remove(current)
+        nearest = @qt.find(current.e(1), current.e(2), maxDist)
         if nearest
-          dist = output.distanceFrom(nearest)
-          if dist < 60
-            away = output.subtract(nearest).toUnitVector()
-            toScreenCenter = $V([500,200]).subtract(output).toUnitVector()
-            output = output.add(away.x(60).add(toScreenCenter.x(10)))
+          dist = current.distanceFrom(nearest)
+          if dist < maxDist
+            away = current.subtract(nearest).toUnitVector()
+            toScreenCenter = @canvasCenter.subtract(current).toUnitVector()
+            current = current.add(away.x(20).add(toScreenCenter.x(2)))
+            marg = 10
+            current = $V([Math.max(marg, Math.min(@$.canvas.width - marg, current.e(1))),
+                         Math.max(marg, Math.min(@$.canvas.height - marg, current.e(2)))])
+            adj.handle = current
+        current.adj = adj
+        @qt.add(current)
 
-      if -50 < output.e(1) < 20 # mostly for zoom-left
-        output.setElements([
-          Math.max(20, output.e(1)),
-          output.e(2)])
+      #if -50 < output.e(1) < 20 # mostly for zoom-left
+      #  output.setElements([
+      #    Math.max(20, output.e(1)),
+      #    output.e(2)])
         
-      adj.centerOffset = output.subtract(adj.getTarget())
-      output.adj = adj
-      @qt.add(output)
-
   _drawConnector: (ctr, target) ->
     @ctx.strokeStyle = '#aaa'
     @ctx.lineWidth = 2

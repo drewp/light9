@@ -52,10 +52,8 @@ class Project
         quad(newCurve, U('rdf:type'), U(':Curve'))
         quad(newCurve, U(':attr'), U(':strength'))
       ]
+
     pointQuads = []
-
-
-
     for i in [0...4]
       pt = points[i]
       pointQuads.push(quad(newCurve, U(':point'), pt))
@@ -65,7 +63,7 @@ class Project
     patch = {
       delQuads: []
       addQuads: curveQuads.concat(pointQuads)
-      }
+    }
     @graph.applyAndSendPatch(patch)
 
   getCurvePoints: (curve, xOffset) ->
@@ -245,7 +243,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
         $V([@viewState.fullZoomX(@viewState.zoomSpec.t1()), yMid()])
-      getSuggestedTargetOffset: () => $V([50, 0])
+      getSuggestedTargetOffset: () => $V([50, 10])
       getValueForPos: valForPos
     }))
 
@@ -253,7 +251,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
         $V([@viewState.fullZoomX(@viewState.zoomSpec.t2()), yMid()])
-      getSuggestedTargetOffset: () => $V([-50, 0])
+      getSuggestedTargetOffset: () => $V([-50, 10])
       getValueForPos: valForPos
     }))
 

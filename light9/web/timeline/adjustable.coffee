@@ -20,7 +20,7 @@ class Adjustable
     #   emptyBox -> true if you want no value display
 
     # updated later by layout algoritm
-    @centerOffset = $V([0, 0])
+    @handle = $V([0, 0])
 
   getDisplayValue: () ->
     return '' if @config.emptyBox
@@ -29,11 +29,11 @@ class Adjustable
       return @config.getDisplayValue(@_getValue(), defaultFormat)
     defaultFormat
 
-  getSuggestedCenter: () ->
+  getSuggestedHandle: () ->
     @getTarget().add(@config.getSuggestedTargetOffset())
 
-  getCenter: () -> # vec2 of pixels
-    @getTarget().add(@centerOffset)
+  getHandle: () -> # vec2 of pixels
+    @handle
 
   getTarget: () -> # vec2 of pixels
     @config.getTarget()
