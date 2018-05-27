@@ -297,7 +297,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   ]
   constructor: ->
     super()
-    @notes = []
+    @noteByUriStr = new Map()
     @stage = new PIXI.Container()
     @stage.interactive=true
 
@@ -333,6 +333,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   _onGraph: (graph, setAdjuster, song, viewState, project)->
     return unless @song # polymer will call again
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
+    
   onZoom: ->
     updateZoomFlattened = ->
       log('updateZoomFlattened')
@@ -342,27 +343,38 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   gatherNotes: ->
     U = (x) => @graph.Uri(x)
     return unless @song?
-
     songNotes = @graph.objects(U(@song), U(':note'))
 
-    @stage.removeChildren()
-    n.destroy() for n in @notes
-    @notes = []
-
+    toRemove = new Set(@noteByUriStr.keys())
+    
     noteNum = 0
     for uri in _.sortBy(songNotes, 'id')
-      con = new PIXI.Container()
-      con.interactive=true
-      @stage.addChild(con)
-
-      row = noteNum % 6
-      rowTop = @viewState.rowsY() + 20 + 150 * row
-      note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
-      @notes.push(note)
+      had = toRemove.delete(uri.value)
+      if not had
+        @_addNote(uri, noteNum)
       noteNum = noteNum + 1
+
+    toRemove.forEach @_delNote.bind(@)
 
     @renderer.render(@stage)
 
+  _addNote: (uri, noteNum) ->
+    U = (x) => @graph.Uri(x)
+    con = new PIXI.Container()
+    con.interactive=true
+    @stage.addChild(con)
+    
+    row = noteNum % 6
+    rowTop = @viewState.rowsY() + 20 + 150 * row
+    note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
+    @noteByUriStr.set(uri.value, note)
+
+  _delNote: (uriStr) ->
+    n = @noteByUriStr.get(uriStr)
+    @stage.removeChild(n.container)
+    n.destroy()
+    @noteByUriStr.delete(uriStr)
+            
   onDrop: (effect, pos) ->
     U = (x) => @graph.Uri(x)
 
@@ -421,8 +433,9 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 # in the graph.
 class Note
   constructor: (@parentElem, @container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
-    @adjusterIds = {} # id : true
+    @adjusterIds = new Set() # id
     @graph.runHandler(@draw.bind(@), 'note draw')
+    ko.computed @draw.bind(@)
 
   destroy: ->
     log('destroy', @uri.value)
@@ -431,8 +444,9 @@ class Note
     @parentElem.updateInlineAttrs(@uri, null)
 
   clearAdjusters: ->
-    for i in Object.keys(@adjusterIds)
+    for i in @adjusterIds.keys()
       @setAdjuster(i, null)
+    @adjusterIds.clear()
 
   getCurvePoints: (subj, curveAttr) ->
     U = (x) => @graph.Uri(x)
@@ -553,7 +567,7 @@ class Note
     U = (x) => @graph.Uri(x)
 
     adjId = @uri.value + '/p' + pointNum
-    @adjusterIds[adjId] = true
+    @adjusterIds.add(adjId)
     @setAdjuster adjId, =>
       adj = new AdjustableFloatObject({
         graph: @graph
@@ -578,7 +592,7 @@ class Note
     U = (x) => @graph.Uri(x)
 
     adjId = @uri.value + '/offset'
-    @adjusterIds[adjId] = true
+    @adjusterIds.add(adjId)
     @setAdjuster adjId, =>
       adj = new AdjustableFloatObject({
         graph: @graph
@@ -603,7 +617,7 @@ class Note
 
   _makeFadeAdjuster: (yForV, ctx, adjId, i0, i1, offset) ->
     return # not ready- AdjustableFade looks in Note object
-    @adjusterIds[adjId] = true
+    @adjusterIds.add(adjId)
     @setAdjuster adjId, => new AdjustableFade(yForV, i0, i1, @, offset, ctx)
 
   _suggestedOffset: (pt) ->
