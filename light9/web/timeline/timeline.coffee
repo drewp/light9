@@ -446,7 +446,7 @@ class Note
     @parentElem.updateInlineAttrs(@uri, null)
 
   clearAdjusters: ->
-    for i in @adjusterIds.keys()
+    @adjusterIds.forEach (i) =>
       @setAdjuster(i, null)
     @adjusterIds.clear()
 
@@ -533,7 +533,8 @@ class Note
     @_updateDisplay()
 
   _updateAdjusters: (screenPts, worldPts, curveWidthCalc, yForV, ctx) ->
-    if screenPts[screenPts.length - 1].x - screenPts[0].x < 100
+    # todo: allow offset even on more narrow notes
+    if screenPts[screenPts.length - 1].x - screenPts[0].x < 100 or screenPts[0].x > @parentElem.offsetWidth or screenPts[screenPts.length - 1].x < 0
       @clearAdjusters()
     else
       @_makeOffsetAdjuster(yForV, curveWidthCalc, ctx)

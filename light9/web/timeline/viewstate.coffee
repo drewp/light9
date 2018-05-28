@@ -38,11 +38,12 @@ class window.ViewState
     if @zoomSpec.duration() and @zoomSpec.t2() > @zoomSpec.duration()
       @zoomSpec.t2(@zoomSpec.duration())
 
+    rightPad = 2 # don't let time adjuster fall off right edge
     @fullZoomX.domain([0, @zoomSpec.duration()])
-    @fullZoomX.range([0, @width()])
+    @fullZoomX.range([0, @width() - rightPad])
 
     @zoomInX.domain([@zoomSpec.t1(), @zoomSpec.t2()])
-    @zoomInX.range([0, @width()])
+    @zoomInX.range([0, @width() - rightPad])
     
   latestMouseTime: ->
     @zoomInX.invert(@mouse.pos().e(1))
