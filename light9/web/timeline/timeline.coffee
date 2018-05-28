@@ -435,8 +435,8 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 # in the graph.
 class Note
   constructor: (@parentElem, @container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
-    @adjusterIds = new Set() # id
-    @graph.runHandler(@draw.bind(@), 'note draw')
+    @adjusterIds = new Set() # id string
+    @graph.runHandler(@draw.bind(@), "note draw #{@uri.value}")
     ko.computed @draw.bind(@)
 
   destroy: ->
