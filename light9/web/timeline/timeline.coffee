@@ -469,41 +469,45 @@ class Note
     screenPts = (new PIXI.Point(@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))) for pt in worldPts)
 
     @container.removeChildren()
-    graphics = new PIXI.Graphics({nativeLines: false})
-    graphics.interactive = true
-    @container.addChild(graphics)
+    @graphics = new PIXI.Graphics({nativeLines: false})
+    @graphics.interactive = true
+    @container.addChild(@graphics)
+
+    @selection.selected().forEach (s) =>
+      if s.equals(@uri)
+        @_traceBorder(screenPts, 8, 0xff2900)
+    if @uri.equals(@selection.hover())
+      @_traceBorder(screenPts, 6, 0x888888)
 
     shape = new PIXI.Polygon(screenPts)
-    graphics.beginFill(@_noteColor(effect), .313)
-    graphics.drawShape(shape)
-    graphics.endFill()
+    @graphics.beginFill(@_noteColor(effect), .313)
+    @graphics.drawShape(shape)
+    @graphics.endFill()
 
-    # stroke should vary with @selection.hover() == @uri and with @uri in @selection.selected()
-    #
-    # #notes > path.hover {stroke-width: 1.5; stroke: #888;}
-    # #notes > path.selected {stroke-width: 5; stroke: red;}
-    graphics.lineStyle(2, 0xffd900, 1)
-    graphics.moveTo(screenPts[0].x, screenPts[0].y)
-    for p in screenPts.slice(1)
-      graphics.lineTo(p.x, p.y)
+    @_traceBorder(screenPts, 2, 0xffd900)
 
-    graphics.on 'mousedown', (ev) =>
+    @graphics.on 'mousedown', (ev) =>
       log('down gfx', @uri.value)
       @_onMouseDown(ev)
 
-    graphics.on 'mouseover', =>
+    @graphics.on 'mouseover', =>
       log('hover', @uri.value)
       @selection.hover(@uri)
 
-    graphics.on 'mouseout', =>
+    @graphics.on 'mouseout', =>
       log('hoverout', @uri.value)
       @selection.hover(null)
 
-    @graphics = graphics
     curveWidthCalc = () => @project.curveWidth(worldPts)
     @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
     @_updateInlineAttrs(screenPts)
     @parentElem.noteDirty()
+
+  _traceBorder: (screenPts, thick, color) ->
+    @graphics.lineStyle(thick, color, 1)
+    @graphics.moveTo(screenPts[0].x, screenPts[0].y)
+    for p in screenPts.slice(1)
+      @graphics.lineTo(p.x, p.y)
 
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
