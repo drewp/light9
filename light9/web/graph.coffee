@@ -153,7 +153,8 @@ class window.SyncedGraph
     # if we had a Store already, this lets N3.Store free all its indices/etc
     @graph = N3.Store()
     @_addPrefixes(@prefixes)
-    @cachedFloatValues = new Map()
+    @cachedFloatValues = new Map() # s + '|' + p -> number
+    @cachedUriValues = new Map() # s + '|' + p -> Uri
 
   _clearGraphOnNewConnection: -> # must not send a patch to the server!
     log('graph: clearGraphOnNewConnection')
@@ -228,6 +229,7 @@ class window.SyncedGraph
     #
     # This is the only method that writes to @graph!
     @cachedFloatValues.clear()
+    @cachedUriValues.clear()
     for quad in patch.delQuads
       #log("remove #{JSON.stringify(quad)}")
       did = @graph.removeQuad(quad)
@@ -291,7 +293,13 @@ class window.SyncedGraph
     @_singleValue(s, p).value
     
   uriValue: (s, p) ->
-    @_singleValue(s, p)
+    key = s.value + '|' + p.value
+    hit = @cachedUriValues.get(key)
+    return hit if hit != undefined
+
+    ret = @_singleValue(s, p)
+    @cachedUriValues.set(key, ret)
+    return ret
 
   labelOrTail: (uri) ->
     try
