@@ -360,8 +360,13 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     @renderer.render(@stage)
 
+  isActiveNote: (note) ->
+    return @noteByUriStr.has(note.value)
+
   _addNote: (uri, noteNum) ->
     U = (x) => @graph.Uri(x)
+
+    
     con = new PIXI.Container()
     con.interactive=true
     @stage.addChild(con)
@@ -369,7 +374,9 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     row = noteNum % 6
     rowTop = @viewState.rowsY() + 20 + 150 * row
     note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
+    # this must come before the first Note.draw
     @noteByUriStr.set(uri.value, note)
+    note.initWatchers()
 
   _delNote: (uriStr) ->
     n = @noteByUriStr.get(uriStr)
@@ -436,6 +443,8 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 class Note
   constructor: (@parentElem, @container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
     @adjusterIds = new Set() # id string
+
+  initWatchers: ->
     @graph.runHandler(@draw.bind(@), "note draw #{@uri.value}")
     ko.computed @draw.bind(@)
 
@@ -460,6 +469,9 @@ class Note
     throw new Error("curve #{@uri.value} has no attr #{curveAttr.value}")
 
   draw: ->
+    if not @parentElem.isActiveNote(@uri)
+      # stale redraw call
+      return
     U = (x) => @graph.Uri(x)
     [pointUris, worldPts] = @getCurvePoints(@uri, U(':strength'))
     effect = @graph.uriValue(@uri, U(':effectClass'))
