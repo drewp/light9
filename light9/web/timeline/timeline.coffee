@@ -243,7 +243,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       observable: @viewState.zoomSpec.t1,
       getTarget: () =>
         $V([@viewState.fullZoomX(@viewState.zoomSpec.t1()), yMid()])
-      getSuggestedTargetOffset: () => $V([50, 10])
+      getSuggestedTargetOffset: () => $V([-50, 10])
       getValueForPos: valForPos
     }))
 
@@ -251,7 +251,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
       observable: @viewState.zoomSpec.t2,
       getTarget: () =>
         $V([@viewState.fullZoomX(@viewState.zoomSpec.t2()), yMid()])
-      getSuggestedTargetOffset: () => $V([-50, 10])
+      getSuggestedTargetOffset: () => $V([50, 10])
       getValueForPos: valForPos
     }))
 

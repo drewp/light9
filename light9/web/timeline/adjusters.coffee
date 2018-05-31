@@ -12,7 +12,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
   ]
   constructor: ->
     super()
-    @redraw = _.throttle(@_throttledRedraw.bind(@), 60, {leading: false})
+    @redraw = _.throttle(@_throttledRedraw.bind(@), 30, {leading: false})
     @adjs = {}
     
   ready: ->
@@ -93,13 +93,13 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     for adjId, adj of @adjs
       ctr = adj.getHandle()
       target = adj.getTarget()
-      if target.e(1) < 0 or target.e(1) > @$.canvas.width or target.e(2) < 0 or target.e(2) > @$.canvas.height
+      if @_isOffScreen(target)
         continue
       @_drawConnector(ctr, target)
       
       @_drawAdjuster(adj.getDisplayValue(),
-                     Math.floor(ctr.e(1)) - 20, Math.floor(ctr.e(2)) - 10,
-                     Math.floor(ctr.e(1)) + 20, Math.floor(ctr.e(2)) + 10)
+                     ctr.e(1) - 20, ctr.e(2) - 10,
+                     ctr.e(1) + 20, ctr.e(2) + 10)
     console.timeEnd('adjs redraw')
 
   _layoutCenters: ->
@@ -110,9 +110,10 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @qt.extent([[0,0], [8000,8000]])
 
     for _, adj of @adjs
-      adj.handle = adj.getSuggestedHandle()
-      
-    for tries in [0...5]
+      adj.handle = @_clampOnScreen(adj.getSuggestedHandle())
+
+    numTries = 8
+    for tries in [0...numTries]
       for _, adj of @adjs
         current = adj.handle
         @qt.remove(current)
@@ -120,12 +121,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
         if nearest
           dist = current.distanceFrom(nearest)
           if dist < maxDist
-            away = current.subtract(nearest).toUnitVector()
-            toScreenCenter = @canvasCenter.subtract(current).toUnitVector()
-            current = current.add(away.x(20).add(toScreenCenter.x(2)))
-            marg = 10
-            current = $V([Math.max(marg, Math.min(@$.canvas.width - marg, current.e(1))),
-                         Math.max(marg, Math.min(@$.canvas.height - marg, current.e(2)))])
+            current = @_stepAway(current, nearest, 1 / numTries)
             adj.handle = current
         current.adj = adj
         @qt.add(current)
@@ -134,7 +130,21 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
       #  output.setElements([
       #    Math.max(20, output.e(1)),
       #    output.e(2)])
-        
+
+  _stepAway: (current, nearest, dx) ->
+    away = current.subtract(nearest).toUnitVector()
+    toScreenCenter = @canvasCenter.subtract(current).toUnitVector()
+    goalSpacingPx = 20
+    @_clampOnScreen(current.add(away.x(goalSpacingPx * dx)))
+
+  _isOffScreen: (pos) ->
+    pos.e(1) < 0 or pos.e(1) > @$.canvas.width or pos.e(2) < 0 or pos.e(2) > @$.canvas.height
+
+  _clampOnScreen: (pos) ->    
+    marg = 30
+    $V([Math.max(marg, Math.min(@$.canvas.width - marg, pos.e(1))),
+        Math.max(marg, Math.min(@$.canvas.height - marg, pos.e(2)))])
+                        
   _drawConnector: (ctr, target) ->
     @ctx.strokeStyle = '#aaa'
     @ctx.lineWidth = 2
