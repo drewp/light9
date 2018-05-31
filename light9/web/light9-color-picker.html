@@ -124,12 +124,11 @@
   <script src="/lib/color/one-color.js"></script>
   <script>
    class RainbowCanvas {
-     constructor(url, size, onReady) {
+     constructor(url, size) {
        this.size = size;
        var elem = document.createElement('canvas');
        elem.width = size[0];
        elem.height = size[1];
-
        this.ctx = elem.getContext('2d');
 
        this.colorPos = {} // color: pos
@@ -160,13 +159,18 @@
        for (var y = 0; y < this.size[1]; y+=1) {
          for (var x = 0; x < this.size[0]; x+=1) {
            var base = (y * this.size[0] + x) * 4;
-           var c = one.color([data[base + 0],
-                              data[base + 1],
-                              data[base + 2], 255]).hex();
+           let px = [data[base + 0],
+                     data[base + 1],
+                     data[base + 2], 255];
+           if (px[0] == 0 && px[1] == 0 && px[2] == 0) {
+             // (there's no black on the rainbow images)
+             throw new Error(`color picker canvas (${this.size[0]}) returns 0,0,0`);
+           }
+           var c = one.color(px).hex();
            this.colorPos[c] = [x, y];
          }
        }
-     }       
+     }        
      colorAt(pos) {
        var data = this.ctx.getImageData(pos[0], pos[1], 1, 1).data;
        return one.color([data[0], data[1], data[2], 255]).hex();
@@ -285,7 +289,12 @@
      showLarge(x, y) {
        this.$.large.style.display = 'block';
        try {
-         const pos = this.large.posFor(this.color);
+         let pos;
+         try {
+           pos = this.large.posFor(this.color);
+         } catch(e) {
+           pos = [-999, -999];
+         }
          this.moveLargeCrosshair(pos);
          this.$.large.style.left = (x - Math.max(20, Math.min(380, pos[0]))) + 'px';
          this.$.large.style.top = (y - Math.max(20, Math.min(180, pos[1]))) + 'px';
