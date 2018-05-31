@@ -485,11 +485,11 @@ class Note
     @graphics.interactive = true
     @container.addChild(@graphics)
 
+    if @uri.equals(@selection.hover())
+      @_traceBorder(screenPts, 12, 0x888888)
     @selection.selected().forEach (s) =>
       if s.equals(@uri)
-        @_traceBorder(screenPts, 8, 0xff2900)
-    if @uri.equals(@selection.hover())
-      @_traceBorder(screenPts, 6, 0x888888)
+        @_traceBorder(screenPts, 6, 0xff2900)
 
     shape = new PIXI.Polygon(screenPts)
     @graphics.beginFill(@_noteColor(effect), .313)
@@ -498,17 +498,7 @@ class Note
 
     @_traceBorder(screenPts, 2, 0xffd900)
 
-    @graphics.on 'mousedown', (ev) =>
-      log('down gfx', @uri.value)
-      @_onMouseDown(ev)
-
-    @graphics.on 'mouseover', =>
-      log('hover', @uri.value)
-      @selection.hover(@uri)
-
-    @graphics.on 'mouseout', =>
-      log('hoverout', @uri.value)
-      @selection.hover(null)
+    @_addMouseBindings()
 
     curveWidthCalc = () => @project.curveWidth(worldPts)
     @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
@@ -520,6 +510,22 @@ class Note
     @graphics.moveTo(screenPts[0].x, screenPts[0].y)
     for p in screenPts.slice(1)
       @graphics.lineTo(p.x, p.y)
+
+  _addMouseBindings: () ->
+    @graphics.on 'mousedown', (ev) =>
+      @_onMouseDown(ev)
+
+    @graphics.on 'mouseover', =>
+      if @selection.hover() and @selection.hover().equals(@uri)
+        # Hovering causes a redraw, which would cause another
+        # mouseover event.
+        return
+      @selection.hover(@uri)
+
+    # mouseout never fires since we rebuild the graphics on mouseover.
+    @graphics.on 'mousemove', (ev) =>
+      if @selection.hover() and @selection.hover().equals(@uri) and ev.target != @graphics
+        @selection.hover(null)
 
   onUri: ->
     @graph.runHandler(@update.bind(@), "note updates #{@uri}")
