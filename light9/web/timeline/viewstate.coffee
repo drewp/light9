@@ -38,7 +38,7 @@ class window.ViewState
     if @zoomSpec.duration() and @zoomSpec.t2() > @zoomSpec.duration()
       @zoomSpec.t2(@zoomSpec.duration())
 
-    rightPad = 2 # don't let time adjuster fall off right edge
+    rightPad = 5 # don't let time adjuster fall off right edge
     @fullZoomX.domain([0, @zoomSpec.duration()])
     @fullZoomX.range([0, @width() - rightPad])
 

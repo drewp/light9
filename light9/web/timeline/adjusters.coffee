@@ -14,6 +14,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     super()
     @redraw = _.throttle(@_throttledRedraw.bind(@), 30, {leading: false})
     @adjs = {}
+    @hoveringNear = null
     
   ready: ->
     super.ready()
@@ -27,10 +28,13 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @addEventListener('mousedown', @onDown.bind(@))
     @addEventListener('mousemove', @onMove.bind(@))
     @addEventListener('mouseup', @onUp.bind(@))
-   
+
+  _mousePos: (ev) ->
+    $V([ev.clientX, ev.clientY - @offsetParent.offsetTop])
+  
   onDown: (ev) ->
     if ev.buttons == 1
-      start = $V([ev.x, ev.y])
+      start = @_mousePos(ev)
       adj = @_adjAtPoint(start)
       if adj
         ev.stopPropagation()
@@ -38,11 +42,17 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
         adj.startDrag()
 
   onMove: (ev) ->
-    pos = $V([ev.x, ev.y])
+    pos = @_mousePos(ev)
     if @currentDrag
+      @hoveringNear = null
       @currentDrag.cur = pos
       @currentDrag.adj.continueDrag(
         @currentDrag.cur.subtract(@currentDrag.start))
+    else
+      near = @_adjAtPoint(pos)
+      if @hoveringNear != near
+        @hoveringNear = near
+        @redraw()
 
   onUp: (ev) ->
     return unless @currentDrag
@@ -71,8 +81,6 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
 
   _adjAtPoint: (pt) ->
     nearest = @qt.find(pt.e(1), pt.e(2))
-    if nearest?
-      log('near', nearest.distanceFrom(pt))
     if not nearest? or nearest.distanceFrom(pt) > maxDist
       return null
     return nearest?.adj
@@ -99,7 +107,8 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
       
       @_drawAdjuster(adj.getDisplayValue(),
                      ctr.e(1) - 20, ctr.e(2) - 10,
-                     ctr.e(1) + 20, ctr.e(2) + 10)
+                     ctr.e(1) + 20, ctr.e(2) + 10,
+                     adj == @hoveringNear)
     console.timeEnd('adjs redraw')
 
   _layoutCenters: ->
@@ -152,7 +161,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     Drawing.line(@ctx, ctr, target)
     @ctx.stroke()
     
-  _drawAdjuster: (label, x1, y1, x2, y2) ->
+  _drawAdjuster: (label, x1, y1, x2, y2, hover) ->
     radius = 8
 
     @ctx.shadowColor = 'black'
@@ -160,7 +169,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     @ctx.shadowOffsetX = 5
     @ctx.shadowOffsetY = 9
     
-    @ctx.fillStyle = 'rgba(255, 255, 0, 0.5)'
+    @ctx.fillStyle = if hover then '#ffff88' else 'rgba(255, 255, 0, 0.5)'
     @ctx.beginPath()
     Drawing.roundRect(@ctx, x1, y1, x2, y2, radius)
     @ctx.fill()
