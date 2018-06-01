@@ -295,6 +295,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   ]
   constructor: ->
     super()
+    @numRows = 6
     @noteByUriStr = new Map()
     @stage = new PIXI.Container()
     @stage.interactive=true
@@ -304,7 +305,10 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
       antialias: true,
       forceCanvas: true,
     })
-    @dirty = _.debounce((() => @renderer.render(@stage)), 10)
+    @bg = new PIXI.Container()
+    @stage.addChild(@bg)
+
+    @dirty = _.debounce(@_repaint.bind(@), 10)
 
   ready: ->
     super.ready()
@@ -333,8 +337,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     return unless @song # polymer will call again
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
 
-  noteDirty: ->
-    @dirty()
+  noteDirty: -> @dirty()
     
   onZoom: ->
     updateZoomFlattened = ->
@@ -358,22 +361,40 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     toRemove.forEach @_delNote.bind(@)
 
+    @dirty()
+
+  isActiveNote: (note) -> @noteByUriStr.has(note.value)
+
+  _repaint: ->
+    @_drawGrid()  
     @renderer.render(@stage)
 
-  isActiveNote: (note) ->
-    return @noteByUriStr.has(note.value)
+  _drawGrid: ->
+    # maybe someday this has snappable timing markers too
+    @bg.removeChildren()
+    gfx = new PIXI.Graphics()
+    @bg.addChild(gfx)
+
+    gfx.lineStyle(1, 0x222222, 1)
+    for row in [0...@numRows]
+      y = @rowBottom(row)
+      gfx.moveTo(0, y)
+      gfx.lineTo(@clientWidth, y)
+
+  rowTop: (n) -> @viewState.rowsY() + 20 + 150 * n
+
+  rowBottom: (n) -> @rowTop(n) + 140
 
   _addNote: (uri, noteNum) ->
     U = (x) => @graph.Uri(x)
-
     
     con = new PIXI.Container()
     con.interactive=true
     @stage.addChild(con)
     
-    row = noteNum % 6
-    rowTop = @viewState.rowsY() + 20 + 150 * row
-    note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, rowTop, rowTop + 140)
+    row = noteNum % @numRows
+    rowTop = @rowTop(row)
+    note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, @rowTop(row), @rowBottom(row))
     # this must come before the first Note.draw
     @noteByUriStr.set(uri.value, note)
     note.initWatchers()
