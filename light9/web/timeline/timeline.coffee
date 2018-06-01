@@ -489,17 +489,22 @@ class Note
         return @project.getCurvePoints(curve, originTime)
     throw new Error("curve #{@uri.value} has no attr #{curveAttr.value}")
 
+  midPoint: (i0, i1) ->
+    p0 = @worldPts[i0]
+    p1 = @worldPts[i1]
+    p0.x(.5).add(p1.x(.5))
+    
   draw: ->
     if not @parentElem.isActiveNote(@uri)
       # stale redraw call
       return
     U = (x) => @graph.Uri(x)
-    [pointUris, worldPts] = @getCurvePoints(@uri, U(':strength'))
+    [pointUris, @worldPts] = @getCurvePoints(@uri, U(':strength'))
     effect = @graph.uriValue(@uri, U(':effectClass'))
 
     yForV = (v) => @rowBotY + (@rowTopY - @rowBotY) * v
     dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
-    screenPts = (new PIXI.Point(@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))) for pt in worldPts)
+    screenPts = (new PIXI.Point(@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))) for pt in @worldPts)
 
     @container.removeChildren()
     @graphics = new PIXI.Graphics({nativeLines: false})
@@ -521,8 +526,8 @@ class Note
 
     @_addMouseBindings()
 
-    curveWidthCalc = () => @project.curveWidth(worldPts)
-    @_updateAdjusters(screenPts, worldPts, curveWidthCalc, yForV, @song)
+    curveWidthCalc = () => @project.curveWidth(@worldPts)
+    @_updateAdjusters(screenPts, @worldPts, curveWidthCalc, yForV, @viewState.zoomInX, @song)
     @_updateInlineAttrs(screenPts)
     @parentElem.noteDirty()
 
@@ -575,14 +580,14 @@ class Note
 
     @_updateDisplay()
 
-  _updateAdjusters: (screenPts, worldPts, curveWidthCalc, yForV, ctx) ->
+  _updateAdjusters: (screenPts, worldPts, curveWidthCalc, yForV, zoomInX, ctx) ->
     # todo: allow offset even on more narrow notes
     if screenPts[screenPts.length - 1].x - screenPts[0].x < 100 or screenPts[0].x > @parentElem.offsetWidth or screenPts[screenPts.length - 1].x < 0
       @clearAdjusters()
     else
       @_makeOffsetAdjuster(yForV, curveWidthCalc, ctx)
       @_makeCurvePointAdjusters(yForV, worldPts, ctx)
-      @_makeFadeAdjusters(yForV, ctx, worldPts)
+      @_makeFadeAdjusters(yForV, zoomInX, ctx, worldPts)
 
   _updateInlineAttrs: (screenPts) ->
     w = 280
@@ -656,16 +661,16 @@ class Note
       })
       adj
 
-  _makeFadeAdjusters: (yForV, ctx, worldPts) ->
+  _makeFadeAdjusters: (yForV, zoomInX, ctx, worldPts) ->
     U = (x) => @graph.Uri(x)
-    @_makeFadeAdjuster(yForV, ctx, @uri.value + '/fadeIn', 0, 1, $V([-50, -10]))
+    @_makeFadeAdjuster(yForV, zoomInX, ctx, @uri.value + '/fadeIn', 0, 1, $V([-50, -10]))
     n = worldPts.length
-    @_makeFadeAdjuster(yForV, ctx, @uri.value + '/fadeOut', n - 2, n - 1, $V([50, -10]))
+    @_makeFadeAdjuster(yForV, zoomInX, ctx, @uri.value + '/fadeOut', n - 2, n - 1, $V([50, -10]))
 
-  _makeFadeAdjuster: (yForV, ctx, adjId, i0, i1, offset) ->
-    return # not ready- AdjustableFade looks in Note object
+  _makeFadeAdjuster: (yForV, zoomInX, ctx, adjId, i0, i1, offset) ->
     @adjusterIds.add(adjId)
-    @setAdjuster adjId, => new AdjustableFade(yForV, i0, i1, @, offset, ctx)
+    @setAdjuster adjId, =>
+      new AdjustableFade(yForV, zoomInX, i0, i1, @, offset, ctx)
 
   _suggestedOffset: (pt) ->
     if pt.e(2) > .5

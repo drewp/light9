@@ -140,7 +140,7 @@ class window.AdjustableFloatObject extends Adjustable
                               @config.ctx)
 
 class window.AdjustableFade extends Adjustable
-  constructor: (@yForV, @i0, @i1, @note, offset, ctx) ->
+  constructor: (@yForV, @zoomInX, @i0, @i1, @note, offset, ctx) ->
     super()
     @config = {
       getSuggestedTargetOffset: -> offset
@@ -150,12 +150,11 @@ class window.AdjustableFade extends Adjustable
     @ctor2()
 
   getTarget: ->
-    mid = @note.worldPts[@i0].x(.5).add(@note.worldPts[@i1].x(.5))
-    $V([@note.zoomInX(mid.e(1)), @yForV(mid.e(2))])
+    mid = @note.midPoint(@i0, @i1)
+    $V([@zoomInX(mid.e(1)), @yForV(mid.e(2))])
 
   _getValue: ->
-    mid = @note.worldPts[@i0].x(.5).add(@note.worldPts[@i1].x(.5))
-    mid.e(1)
+    @note.midPoint(@i0, @i1).e(1)
 
   continueDrag: (pos) ->
     # pos is vec2 of pixels relative to the drag start
@@ -163,7 +162,7 @@ class window.AdjustableFade extends Adjustable
     graph = @note.graph
     U = (x) -> graph.Uri(x)
 
-    goalCenterSec = @note.zoomInX.invert(@initialTarget.e(1) + pos.e(1))
+    goalCenterSec = @zoomInX.invert(@initialTarget.e(1) + pos.e(1))
 
     diamSec = @note.worldPts[@i1].e(1) - @note.worldPts[@i0].e(1)
     newSec0 = goalCenterSec - diamSec / 2
