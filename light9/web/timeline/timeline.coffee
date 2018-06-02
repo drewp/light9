@@ -276,6 +276,24 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     }))
 )
 
+nr=0
+class BrickLayout
+  constructor: (@viewState, @numRows) ->
+    @noteRow = {} # uristr: row, t0, t1
+  addNote: (n) ->
+    @noteRow[n.uri.value] = {row: nr%6, t0: 0, t1: 0}
+    nr++
+  setNoteSpan: (n, t0, t1) ->
+    @noteRow[n.uri.value].t0 = t0
+    @noteRow[n.uri.value].t1 = t1
+  delNote: (n) ->
+    delete @noteRow[n.uri.value]
+  rowBottom: (row) -> @viewState.rowsY() + 20 + 150 * row + 140
+  yForVFor: (n) ->
+    row = @noteRow[n.uri.value].row
+    rowBottom = @rowBottom(row)
+    rowTop = rowBottom - 140
+    (v) => rowBottom + (rowTop - rowBottom) * v      
 
 # plan: in here, turn all the notes into simple js objects with all
 # their timing data and whatever's needed for adjusters. From that, do
@@ -292,6 +310,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
   @getter_observers: [
     '_onGraph(graph, setAdjuster, song, viewState, project)',
     'onZoom(viewState)',
+    '_onViewState(viewState)',
   ]
   constructor: ->
     super()
@@ -337,6 +356,9 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     return unless @song # polymer will call again
     @graph.runHandler(@gatherNotes.bind(@), 'zoom notes')
 
+  _onViewState: (viewState) ->
+    @brickLayout = new BrickLayout(@viewState, @numRows)
+
   noteDirty: -> @dirty()
     
   onZoom: ->
@@ -352,12 +374,10 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     toRemove = new Set(@noteByUriStr.keys())
     
-    noteNum = 0
     for uri in _.sortBy(songNotes, 'id')
       had = toRemove.delete(uri.value)
       if not had
-        @_addNote(uri, noteNum)
-      noteNum = noteNum + 1
+        @_addNote(uri)
 
     toRemove.forEach @_delNote.bind(@)
 
@@ -377,30 +397,26 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     gfx.lineStyle(1, 0x222222, 1)
     for row in [0...@numRows]
-      y = @rowBottom(row)
+      y = @brickLayout.rowBottom(row)
       gfx.moveTo(0, y)
       gfx.lineTo(@clientWidth, y)
 
-  rowTop: (n) -> @viewState.rowsY() + 20 + 150 * n
-
-  rowBottom: (n) -> @rowTop(n) + 140
-
-  _addNote: (uri, noteNum) ->
+  _addNote: (uri) ->
     U = (x) => @graph.Uri(x)
     
     con = new PIXI.Container()
     con.interactive=true
     @stage.addChild(con)
     
-    row = noteNum % @numRows
-    rowTop = @rowTop(row)
-    note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, @rowTop(row), @rowBottom(row))
+    note = new Note(@, con, @project, @graph, @selection, uri, @setAdjuster, U(@song), @viewState, @brickLayout)
     # this must come before the first Note.draw
     @noteByUriStr.set(uri.value, note)
+    @brickLayout.addNote(note)
     note.initWatchers()
 
   _delNote: (uriStr) ->
     n = @noteByUriStr.get(uriStr)
+    @brickLayout.delNote(n)
     @stage.removeChild(n.container)
     n.destroy()
     @noteByUriStr.delete(uriStr)
@@ -446,6 +462,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 )
 
 
+
 coffeeElementSetup(class TimeAxis extends Polymer.Element
   @is: "light9-timeline-time-axis",
   @getter_properties:
@@ -462,12 +479,12 @@ coffeeElementSetup(class TimeAxis extends Polymer.Element
 # Maintains a pixi object, some adjusters, and inlineattrs corresponding to a note
 # in the graph.
 class Note
-  constructor: (@parentElem, @container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @rowTopY, @rowBotY) ->
+  constructor: (@parentElem, @container, @project, @graph, @selection, @uri, @setAdjuster, @song, @viewState, @brickLayout) ->
     @adjusterIds = new Set() # id string
 
   initWatchers: ->
-    @graph.runHandler(@draw.bind(@), "note draw #{@uri.value}")
-    ko.computed @draw.bind(@)
+    @graph.runHandler(@update.bind(@), "note update #{@uri.value}")
+    ko.computed @update.bind(@)
 
   destroy: ->
     log('destroy', @uri.value)
@@ -493,42 +510,64 @@ class Note
     p0 = @worldPts[i0]
     p1 = @worldPts[i1]
     p0.x(.5).add(p1.x(.5))
-    
-  draw: ->
-    if not @parentElem.isActiveNote(@uri)
-      # stale redraw call
-      return
+
+  _planDrawing: ->
     U = (x) => @graph.Uri(x)
-    [pointUris, @worldPts] = @getCurvePoints(@uri, U(':strength'))
+    [pointUris, worldPts] = @getCurvePoints(@uri, U(':strength'))
     effect = @graph.uriValue(@uri, U(':effectClass'))
 
-    yForV = (v) => @rowBotY + (@rowTopY - @rowBotY) * v
-    dependOn = [@viewState.zoomSpec.t1(), @viewState.zoomSpec.t2(), @viewState.width()]
-    screenPts = (new PIXI.Point(@viewState.zoomInX(pt.e(1)), yForV(pt.e(2))) for pt in @worldPts)
+    yForV = @brickLayout.yForVFor(@)
+    dependOn = [@viewState.zoomSpec.t1(),
+                @viewState.zoomSpec.t2(),
+                @viewState.width()]
+    screenPts = (new PIXI.Point(@viewState.zoomInX(pt.e(1)),
+                                yForV(pt.e(2))) for pt in worldPts)
+    return {
+      yForV: yForV
+      worldPts: worldPts
+      screenPts: screenPts
+      effect: effect
+    }
 
+  redraw: (params) ->
     @container.removeChildren()
     @graphics = new PIXI.Graphics({nativeLines: false})
     @graphics.interactive = true
     @container.addChild(@graphics)
 
     if @uri.equals(@selection.hover())
-      @_traceBorder(screenPts, 12, 0x888888)
+      @_traceBorder(params.screenPts, 12, 0x888888)
     @selection.selected().forEach (s) =>
       if s.equals(@uri)
-        @_traceBorder(screenPts, 6, 0xff2900)
+        @_traceBorder(params.screenPts, 6, 0xff2900)
 
-    shape = new PIXI.Polygon(screenPts)
-    @graphics.beginFill(@_noteColor(effect), .313)
+    shape = new PIXI.Polygon(params.screenPts)
+    @graphics.beginFill(@_noteColor(params.effect), .313)
     @graphics.drawShape(shape)
     @graphics.endFill()
 
-    @_traceBorder(screenPts, 2, 0xffd900)
+    @_traceBorder(params.screenPts, 2, 0xffd900)
+                 
+  update: ->
+    if not @parentElem.isActiveNote(@uri)
+      # stale redraw call
+      return
+
+    if @worldPts
+      @brickLayout.setNoteSpan(@, @worldPts[0].e(1),
+                               @worldPts[@worldPts.length - 1].e(1))
+
+    params = @_planDrawing()
+    @worldPts = params.worldPts
+
+    @redraw(params)
 
     @_addMouseBindings()
 
     curveWidthCalc = () => @project.curveWidth(@worldPts)
-    @_updateAdjusters(screenPts, @worldPts, curveWidthCalc, yForV, @viewState.zoomInX, @song)
-    @_updateInlineAttrs(screenPts)
+    @_updateAdjusters(params.screenPts, @worldPts, curveWidthCalc,
+                      params.yForV, @viewState.zoomInX, @song)
+    @_updateInlineAttrs(params.screenPts, params.yForV)
     @parentElem.noteDirty()
 
   _traceBorder: (screenPts, thick, color) ->
@@ -567,7 +606,7 @@ class Note
             return false
     return true
 
-  update: (patch) ->
+  xupdate: (patch) ->
     # update our note DOM and SVG elements based on the graph
     if not @patchCouldAffectMe(patch)
       # as autodep still fires all handlers on all patches, we just
@@ -589,7 +628,7 @@ class Note
       @_makeCurvePointAdjusters(yForV, worldPts, ctx)
       @_makeFadeAdjusters(yForV, zoomInX, ctx, worldPts)
 
-  _updateInlineAttrs: (screenPts) ->
+  _updateInlineAttrs: (screenPts, yForV) ->
     w = 280
 
     leftX = Math.max(2, screenPts[Math.min(1, screenPts.length - 1)].x + 5)
@@ -604,9 +643,9 @@ class Note
     config = {
       uri: @uri,
       left: leftX,
-      top: @rowTopY + 5,
+      top: yForV(1) + 5,
       width: w,
-      height: @rowBotY - @rowTopY - 15,
+      height: yForV(0) - yForV(1) - 15,
       }
 
     @parentElem.updateInlineAttrs(@uri, config)
