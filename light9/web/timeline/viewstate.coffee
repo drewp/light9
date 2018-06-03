@@ -30,7 +30,6 @@ class window.ViewState
     @maintainZoomLimitsAndScales() # before other handlers run
     
   maintainZoomLimitsAndScales: () ->
-    log('maintainZoomLimitsAndScales')
     # not for cursor updates
 
     if @zoomSpec.t1() < 0
