@@ -163,9 +163,9 @@ class CodeWatcher(object):
         
 
 class Sequencer(object):
-    def __init__(self, graph, sendToCollector, fps=30):
+    def __init__(self, graph, sendToCollector, fps=40):
         self.graph = graph
-        self.fps = 60
+        self.fps = fps
         self.sendToCollector = sendToCollector
         self.music = MusicTime(period=.2, pollCurvecalc=False)
 
