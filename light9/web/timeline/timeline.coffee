@@ -276,18 +276,25 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
     }))
 )
 
-nr=0
+
 class BrickLayout
   constructor: (@viewState, @numRows) ->
     @noteRow = {} # uristr: row, t0, t1
   addNote: (n) ->
-    @noteRow[n.uri.value] = {row: nr%6, t0: 0, t1: 0}
-    nr++
+    @noteRow[n.uri.value] = {row: 0, t0: 0, t1: 0}
+    
   setNoteSpan: (n, t0, t1) ->
     @noteRow[n.uri.value].t0 = t0
     @noteRow[n.uri.value].t1 = t1
+    @_recompute()
   delNote: (n) ->
     delete @noteRow[n.uri.value]
+  _recompute: ->
+    notesByWidth = _.sortBy([{dur: row.t1 - row.t0 + row.t0 * .0001, uri: u} for u, row of @noteRow], 'dur')
+    notesByWidth.reverse()
+    for n in notesByWidth
+      @noteRow[n.uri].row = 0
+    
   rowBottom: (row) -> @viewState.rowsY() + 20 + 150 * row + 140
   yForVFor: (n) ->
     row = @noteRow[n.uri.value].row
