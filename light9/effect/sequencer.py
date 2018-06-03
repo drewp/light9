@@ -26,7 +26,8 @@ from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 log = logging.getLogger('sequencer')
 stats = scales.collection('/sequencer/',
                           scales.PmfStat('update'),
-                          scales.PmfStat('compile'),
+                          scales.PmfStat('compileGraph'),
+                          scales.PmfStat('compileSong'),
                           scales.DoubleStat('recentFps'),
 )
 
@@ -164,7 +165,7 @@ class CodeWatcher(object):
 class Sequencer(object):
     def __init__(self, graph, sendToCollector, fps=30):
         self.graph = graph
-        self.fps = 30
+        self.fps = 60
         self.sendToCollector = sendToCollector
         self.music = MusicTime(period=.2, pollCurvecalc=False)
 
@@ -179,21 +180,27 @@ class Sequencer(object):
         self.codeWatcher = CodeWatcher(
             onChange=lambda: self.graph.addHandler(self.compileGraph))
 
-    @stats.compile.time()
+    @stats.compileGraph.time()
     def compileGraph(self):
         """rebuild our data from the graph"""
-        log.info('compileGraph start')
         t1 = time.time()
         g = self.graph
 
         for song in g.subjects(RDF.type, L9['Song']):
-            # ideally, wrap this (or smaller) in a sub-handler to run less on each patch
-            self.notes[song] = []
-            for note in g.objects(song, L9['note']):
-                self.notes[song].append(Note(g, note, effecteval,
-                                             self.simpleOutputs))
-        log.info('compileGraph done %.2f ms', 1000 * (time.time() - t1))
+            self.graph.addHandler(lambda song=song: self.compileSong(song))
+        log.info('compileGraph took %.2f ms', 1000 * (time.time() - t1))
+        
+    @stats.compileSong.time()
+    def compileSong(self, song):
+        t1 = time.time()
 
+        self.notes[song] = []
+        for note in self.graph.objects(song, L9['note']):
+            self.notes[song].append(Note(self.graph, note, effecteval,
+                                         self.simpleOutputs))
+        log.info('  compile %s took %.2f ms', song, 1000 * (time.time() - t1))
+
+        
     @stats.update.time()
     def update(self):
         now = time.time()
