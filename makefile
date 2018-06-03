@@ -132,3 +132,7 @@ test_js:
 test_js_watch:
 	# have coffee continuously running
 	watch -c node_modules/mocha/bin/mocha --compilers coffee:coffee-script/register --globals window,N3 light9/web/graph_test.coffee --colors
+
+profile_seq:
+	echo in lib, get https://github.com/uber/pyflame.git and https://github.com/brendangregg/FlameGraph.git
+	sudo lib/pyflame/src/pyflame  -s 10 -p `pgrep -f effectsequencer` | perl -lpe 's,/home/drewp/projects-local/light9/,,g; s,env/local/lib/python2.7/site-packages/,,g;' | lib/FlameGraph/flamegraph.pl --width 2500 > /tmp/fl.svg
