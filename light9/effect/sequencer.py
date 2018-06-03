@@ -18,6 +18,7 @@ from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
 from light9.effect import effecteval
 from light9.effect.settings import DeviceSettings
+from light9.effect.simple_outputs import SimpleOutputs
 
 from greplin import scales
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
@@ -25,6 +26,7 @@ from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 log = logging.getLogger('sequencer')
 stats = scales.collection('/sequencer/',
                           scales.PmfStat('update'),
+                          scales.PmfStat('compile'),
                           scales.DoubleStat('recentFps'),
 )
 
@@ -77,11 +79,11 @@ def sendToCollector(client, session, settings, useZmq=True):
 
 
 class Note(object):
-    def __init__(self, graph, uri, effectevalModule, sharedEffectOutputs):
+    def __init__(self, graph, uri, effectevalModule, simpleOutputs):
         g = self.graph = graph
         self.uri = uri
         self.effectEval = effectevalModule.EffectEval(
-            graph, g.value(uri, L9['effectClass']), sharedEffectOutputs)
+            graph, g.value(uri, L9['effectClass']), simpleOutputs)
         self.baseEffectSettings = {}  # {effectAttr: value}
         for s in g.objects(uri, L9['setting']):
             settingValues = dict(g.predicate_objects(s))
@@ -92,16 +94,22 @@ class Note(object):
         originTime = floatVal(uri, L9['originTime'])
         self.points = []
         for curve in g.objects(uri, L9['curve']):
-            po = list(g.predicate_objects(curve))
-            if dict(po).get(L9['attr'], None) != L9['strength']:
-                continue
-            for point in [row[1] for row in po if row[0] == L9['point']]:
-                po2 = dict(g.predicate_objects(point))
-                self.points.append((
-                    originTime + float(po2[L9['time']]),
-                    float(po2[L9['value']])))
-            self.points.sort()
-        
+            self.points.extend(
+                self.getCurvePoints(curve, L9['strength'], originTime))
+        self.points.sort()
+
+    def getCurvePoints(self, curve, attr, originTime):
+        points = []
+        po = list(self.graph.predicate_objects(curve))
+        if dict(po).get(L9['attr'], None) != attr:
+            return []
+        for point in [row[1] for row in po if row[0] == L9['point']]:
+            po2 = dict(self.graph.predicate_objects(point))
+            points.append((
+                originTime + float(po2[L9['time']]),
+                float(po2[L9['value']])))
+        return points
+            
     def activeAt(self, t):
         return self.points[0][0] <= t <= self.points[-1][0]
 
@@ -164,24 +172,26 @@ class Sequencer(object):
         self.lastStatLog = 0
         self._compileGraphCall = None
         self.notes = {} # song: [notes]
+        self.simpleOutputs = SimpleOutputs(self.graph)
         self.graph.addHandler(self.compileGraph)
         self.update()
 
         self.codeWatcher = CodeWatcher(
             onChange=lambda: self.graph.addHandler(self.compileGraph))
 
+    @stats.compile.time()
     def compileGraph(self):
         """rebuild our data from the graph"""
         log.info('compileGraph start')
         t1 = time.time()
         g = self.graph
 
-        sharedEffectOutputs = {}
         for song in g.subjects(RDF.type, L9['Song']):
             # ideally, wrap this (or smaller) in a sub-handler to run less on each patch
             self.notes[song] = []
             for note in g.objects(song, L9['note']):
-                self.notes[song].append(Note(g, note, effecteval, sharedEffectOutputs))
+                self.notes[song].append(Note(g, note, effecteval,
+                                             self.simpleOutputs))
         log.info('compileGraph done %.2f ms', 1000 * (time.time() - t1))
 
     @stats.update.time()

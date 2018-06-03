@@ -10,6 +10,7 @@ from noise import pnoise1
 import logging
 import time
 from light9.effect.settings import DeviceSettings
+from light9.effect.scale import scale
 
 
 log = logging.getLogger('effecteval')
@@ -29,71 +30,16 @@ def lerp(a, b, t):
 def noise(t):
     return pnoise1(t % 1000.0, 2)
 
-def scale(value, strength):
-    if isinstance(value, Literal):
-        value = value.toPython()
-
-    if isinstance(value, Decimal):
-        value = float(value)
-        
-    if isinstance(value, basestring):
-        if value[0] == '#':
-            if strength == '#ffffff':
-                return value
-            r,g,b = hex_to_rgb(value)
-            if isinstance(strength, Literal):
-                strength = strength.toPython()
-            if isinstance(strength, basestring):
-                sr, sg, sb = [v/255 for v in hex_to_rgb(strength)]
-            else:
-                sr = sg = sb = strength
-            return rgb_to_hex([int(r * sr), int(g * sg), int(b * sb)])
-    elif isinstance(value, (int, float)):
-        return value * strength
-
-    raise NotImplementedError("%r,%r" % (value, strength))
-    
 class EffectEval(object):
     """
     runs one effect's code to turn effect attr settings into output
     device settings. No state; suitable for reload().
     """
-    def __init__(self, graph, effect, sharedEffectOutputs):
+    def __init__(self, graph, effect, simpleOutputs):
         self.graph = graph
-        self.effect = effect 
+        self.effect = effect
+        self.simpleOutputs = simpleOutputs
 
-        # effect : [(dev, attr, value, isScaled)]
-        self.effectOutputs = sharedEffectOutputs
-
-        if not self.effectOutputs:
-            self.graph.addHandler(self.updateEffectsFromGraph)
-
-    def updateEffectsFromGraph(self):
-        for effect in self.graph.subjects(RDF.type, L9['Effect']):
-            settings = []
-            for setting in self.graph.objects(effect, L9['setting']):
-                settingValues = dict(self.graph.predicate_objects(setting))
-                try:
-                    d = settingValues.get(L9['device'], None)
-                    a = settingValues.get(L9['deviceAttr'], None)
-                    v = settingValues.get(L9['value'], None)
-                    sv = settingValues.get(L9['scaledValue'], None)
-                    if not (bool(v) ^ bool(sv)):
-                        raise NotImplementedError('no value for %s' % setting)
-                    if d is None:
-                        raise TypeError('no device on %s' % effect)
-                    if a is None:
-                        raise TypeError('no attr on %s' % effect)
-                except Exception:
-                    traceback.print_exc()
-                    continue
-
-                settings.append((d, a, v if v is not None else sv, bool(sv)))
-
-            if settings:
-                self.effectOutputs[effect] = settings
-            # also have to read eff :effectAttr [ :tint x; :tintStrength y ]
-        
     def outputFromEffect(self, effectSettings, songTime, noteTime):
         """
         From effect attr settings, like strength=0.75, to output device
@@ -109,8 +55,8 @@ class EffectEval(object):
 
         out = {} # (dev, attr): value
 
-        out.update(self.simpleOutput(strength,
-                                     effectSettings.get(L9['colorScale'], None)))
+        out.update(self.simpleOutputs.values(
+            self.effect, strength, effectSettings.get(L9['colorScale'], None)))
 
         if self.effect.startswith(L9['effect/']):
             tail = 'effect_' + self.effect[len(L9['effect/']):]
@@ -123,20 +69,7 @@ class EffectEval(object):
 
         outList = [(d, a, v) for (d, a), v in out.iteritems()]
         return DeviceSettings(self.graph, outList)
-                            
-    def simpleOutput(self, strength, colorScale):
-        out = {}
-        for dev, devAttr, value, isScaled in self.effectOutputs.get(self.effect, []):
-            if isScaled:
-                value = scale(value, strength)
-            if colorScale is not None and devAttr == L9['color']:
-                value = scale(value, colorScale)
-            out[(dev, devAttr)] = value
-        return out
-        
-
-
-    
+                  
 
 def effect_Curtain(effectSettings, strength, songTime, noteTime):
     return {
