@@ -12,7 +12,7 @@ from greplin import scales
 import optparse, sys, logging
 import cyclone.web
 from rdflib import URIRef
-from light9.effect.sequencer import Sequencer, sendToCollector
+from light9.effect.sequencer import Sequencer, sendToCollector, Updates
 from light9 import clientsession
 
 class App(object):
@@ -38,9 +38,13 @@ class App(object):
                                              settings))
 
         self.cycloneApp = cyclone.web.Application(handlers=[
+            (r'/()', cyclone.web.StaticFileHandler,
+             {"path" : "light9/effect/", "default_filename" : "sequencer.html"}),
+            (r'/updates', Updates),
             (r'/stats', StatsForCyclone),
         ],
                                                   debug=True,
+                                                  seq=self.seq,
                                                   graph=self.graph,
                                                   stats=self.stats)
         reactor.listenTCP(networking.effectSequencer.port, self.cycloneApp)

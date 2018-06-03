@@ -12,6 +12,7 @@ import math
 import time
 from twisted.internet.inotify import INotify
 from twisted.python.filepath import FilePath
+from louie import dispatcher
 
 from light9 import networking
 from light9.namespaces import L9, RDF
@@ -131,15 +132,21 @@ class Note(object):
         
     def outputSettings(self, t):
         """
-        list of (device, attr, value)
+        list of (device, attr, value), and a report for web
         """
+        report = {'note': str(self.uri)}
         effectSettings = self.baseEffectSettings.copy()
         effectSettings[L9['strength']] = self.evalCurve(t)
-        return self.effectEval.outputFromEffect(
+        report['effectSettings'] = dict(
+            (str(k), str(v))
+            for k,v in sorted(effectSettings.items()))
+        out = self.effectEval.outputFromEffect(
             effectSettings.items(),
             songTime=t,
             # note: not using origin here since it's going away
             noteTime=t - self.points[0][0])
+        print 'out', out.asList()
+        return out, report
 
 
 class CodeWatcher(object):
@@ -207,19 +214,54 @@ class Sequencer(object):
         self.recentUpdateTimes = self.recentUpdateTimes[-20:] + [now]
         stats.recentFps = len(self.recentUpdateTimes) / (self.recentUpdateTimes[-1] - self.recentUpdateTimes[0] + .0001)
         if now > self.lastStatLog + 10:
-            log.info("%.2f fps", stats.recentFps)
+            dispatcher.send('state', update={'recentFps': stats.recentFps})
             self.lastStatLog = now
         
         reactor.callLater(1 / self.fps, self.update)
 
         musicState = self.music.getLatest()
         song = URIRef(musicState['song']) if musicState.get('song') else None
+        dispatcher.send('state', update={'song': str(song)})
         if 't' not in musicState:
             return
         t = musicState['t']
 
         settings = []
-        
-        for note in self.notes.get(song, []):
-            settings.append(note.outputSettings(t))
+        songNotes = sorted(self.notes.get(song, []))
+        noteReports = []
+        for note in songNotes:
+            s, report = note.outputSettings(t)
+            noteReports.append(report)
+            settings.append(s)
+        dispatcher.send('state', update={'songNotes': noteReports})
         self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
+
+import cyclone.sse
+class Updates(cyclone.sse.SSEHandler):
+    def __init__(self, application, request, **kwargs):
+        cyclone.sse.SSEHandler.__init__(self, application, request,
+                                        **kwargs)
+        self.state = {}
+        dispatcher.connect(self.updateState, 'state')
+        self.numConnected = 0
+
+    def updateState(self, update):
+        self.state.update(update)
+        
+    def bind(self):
+        print 'new client', self.settings.seq
+        self.numConnected += 1
+        
+        if self.numConnected == 1:
+            self.loop()
+
+    def loop(self):
+        if self.numConnected == 0:
+            return
+        self.sendEvent(self.state)
+        reactor.callLater(2, self.loop)
+        
+    def unbind(self):
+        self.numConnected -= 1
+        print 'bye', self.numConnected
+    
