@@ -1,8 +1,8 @@
 log = console.log
 
-Polymer
-  is: 'light9-live-control'
-  properties:
+coffeeElementSetup(class Light9LiveControl extends Polymer.Element
+  @is: 'light9-live-control'
+  @getter_properties:
     device: { type: String }
     deviceAttr: { type: Object }
     max: { type: Number, value: 1 }
@@ -11,11 +11,11 @@ Polymer
     immediateSlider: { notify: true, observer: 'onSlider' }
     sliderWriteValue: { type: Number }
     pickedChoice: { observer: 'onChange' }
-  observers: [
+  @getter_observers: [
     'onChange(value)'
     ]
   ready: ->
-    
+    super.ready()
   onSlider: -> @value = @immediateSlider
   goBlack: -> @value = "#000000"
   onChange: (value) ->
@@ -30,27 +30,29 @@ Polymer
       @value = '#000000'
     else
       @value = @immediateSlider = 0
+)
 
-Polymer
-  is: "light9-live-device-control"
-  properties:
+coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
+  @is: "light9-live-device-control"
+  @getter_properties:
     graph: { type: Object, notify: true }
     uri: { type: String, notify: true }
     deviceClass: { type: String, notify: true }
     deviceAttrs: { type: Array, notify: true }
     bgStyle: { type: String, computed: '_bgStyle(deviceClass)' }
-  observers: [
+  @getter_observers: [
     'onGraph(graph)'
     ]
   _bgStyle: (deviceClass) ->
     hash = 0
+    deviceClass = deviceClass.value
     for i in [(deviceClass.length-10)...deviceClass.length]
         hash += deviceClass.charCodeAt(i)
     hue = (hash * 8) % 360
     accent = "hsl(#{hue}, 49%, 22%)"
     "background: linear-gradient(to right, rgba(31,31,31,0) 50%, #{accent} 100%);"
   onGraph: ->
-    @graph.runHandler(@update.bind(@), "#{@uri} update")
+    @graph.runHandler(@update.bind(@), "#{@uri.value} update")
   update: ->
     U = (x) => @graph.Uri(x)
     
@@ -62,12 +64,12 @@ Polymer
       daRow = {
         uri: da
         dataType: dataType
-        showColorPicker: dataType == U(':color')
+        showColorPicker: dataType.equals(U(':color'))
         }
-      if dataType == 'http://light9.bigasterisk.com/color'
+      if dataType.equals(U(':color'))
         daRow.useColor = true
 
-      else if dataType == U(':choice')
+      else if dataType.equals(U(':choice'))
         daRow.useChoice = true
         choiceUris = _.sortBy(@graph.objects(da, U(':choice')))
         daRow.choices = ({uri: x, label: @graph.labelOrTail(x)} for x in choiceUris)
@@ -75,16 +77,16 @@ Polymer
       else
         daRow.useSlider = true
         daRow.max = 1
-        if dataType == U(':angle')
+        if dataType.equals(U(':angle'))
           # varies
           daRow.max = 1
 
       @push('deviceAttrs', daRow)
-
+)
     
-Polymer
-  is: "light9-live-controls"
-  properties:
+coffeeElementSetup(class Light9LiveControls extends Polymer.Element
+  @is: "light9-live-controls"
+  @getter_properties:
     graph: { type: Object, notify: true }
     client: { type: Object, notify: true }
     devices: { type: Array, notify: true }
@@ -92,11 +94,12 @@ Polymer
     effectPreview: { type: String, notify: true }
     newEffectName: { type: String, notify: true }
     effect: { type: String, notify: true } # the one being edited, if any
-  observers: [
+  @getter_observers: [
     'onGraph(graph)'
     'onEffect(effect)'
     ]
   ready: ->
+    super.ready()
     @currentSettings = {}
     @effectPreview = JSON.stringify({})
 
@@ -104,7 +107,7 @@ Polymer
     
     window.gather = (sent) =>
       [dev, devAttr, value] = sent[0]
-      key = dev + " " + devAttr
+      key = dev.value + " " + devAttr.value
       # this is a bug for zoom=0, since collector will default it to
       # stick at the last setting if we don't explicitly send the
       # 0. rx/ry similar though not the exact same deal because of
@@ -149,16 +152,16 @@ Polymer
 
     U = (x) => @graph.Uri(x)
 
-    @effect = U(":effect") + "/#{uriName}"
+    @effect = U(U(":effect").value + "/#{uriName}")
     ctx = U("http://light9.bigasterisk.com/show/dance2017/effect/#{uriName}")
-    quad = (s, p, o) => {subject: s, predicate: p, object: o, graph: ctx}
+    quad = (s, p, o) => @graph.Quad(s, p, o, ctx)
 
     addQuads = [
       quad(@effect, U('rdf:type'), U(':Effect'))
       quad(@effect, U('rdfs:label'), @graph.Literal(@newEffectName))
       quad(@effect, U(':publishAttr'), U(':strength'))
       ]
-    settings = @graph.nextNumberedResources(@effect + '_set', @currentSettingsList().length)
+    settings = @graph.nextNumberedResources(@effect.value + '_set', @currentSettingsList().length)
     for row in @currentSettingsList()
       if row[2] == 0 or row[2] == '#000000'
         continue
@@ -206,3 +209,4 @@ Polymer
       layoutMode: 'masonry',
       containerStyle: null
       })), 2000)
+)
