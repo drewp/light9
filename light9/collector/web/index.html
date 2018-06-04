@@ -25,11 +25,14 @@
          :host {
              display: block;
              break-inside: avoid-column;
+             font-size: 80%;
          }
          h3 {
              margin-top: 12px;
              margin-bottom: 0;
-         }
+          }
+          td { white-space: nowrap; }
+
          td.nonzero {
              background: #310202;
              color: #e25757;
@@ -91,7 +94,7 @@
         <h1>Collector <a href="stats">[stats]</a></h1>
 
         <h2>Devices</h2>
-        <div style="column-width: 18em">
+        <div style="column-width: 12em">
         <template is="dom-repeat" items="{{devices}}">
           <light9-collector-device
               graph="{{graph}}" updates="{{updates}}"

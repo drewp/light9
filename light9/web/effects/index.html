@@ -34,9 +34,11 @@
                    url="/effectEval/songEffects"
                    method="POST"
                    content-type="application/x-www-form-urlencoded"></iron-ajax>
+        <span style="float:right">
           <button on-click="onAdd">Add to current song</button>
           <button on-mousedown="onMomentaryPress"
                   on-mouseup="onMomentaryRelease">Add momentary</button>
+        </span>
 
       </template>
     </dom-module>
