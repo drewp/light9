@@ -163,8 +163,6 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
       ]
     settings = @graph.nextNumberedResources(@effect.value + '_set', @currentSettingsList().length)
     for row in @currentSettingsList()
-      if row[2] == 0 or row[2] == '#000000'
-        continue
       setting = settings.shift()
       addQuads.push(quad(@effect, U(':setting'), setting))
       addQuads.push(quad(setting, U(':device'), row[0]))
