@@ -3,16 +3,14 @@ copies from effectloop.py, which this should replace
 '''
 
 from __future__ import division
-from rdflib import URIRef, Literal
+from louie import dispatcher
+from rdflib import URIRef
 from twisted.internet import reactor, defer
-from webcolors import rgb_to_hex
-import json, logging, bisect
-import treq
-import math
-import time
 from twisted.internet.inotify import INotify
 from twisted.python.filepath import FilePath
-from louie import dispatcher
+import cyclone.sse
+import json, logging, bisect, time
+import treq
 
 from light9 import networking
 from light9.namespaces import L9, RDF
@@ -134,18 +132,21 @@ class Note(object):
         """
         list of (device, attr, value), and a report for web
         """
-        report = {'note': str(self.uri)}
+        report = {'note': str(self.uri),
+                  'effectClass': self.effectEval.effect,
+        }
         effectSettings = self.baseEffectSettings.copy()
         effectSettings[L9['strength']] = self.evalCurve(t)
         report['effectSettings'] = dict(
             (str(k), str(v))
             for k,v in sorted(effectSettings.items()))
-        out = self.effectEval.outputFromEffect(
+        report['nonZero'] = effectSettings[L9['strength']] > 0
+        out, evalReport = self.effectEval.outputFromEffect(
             effectSettings.items(),
             songTime=t,
             # note: not using origin here since it's going away
             noteTime=t - self.points[0][0])
-        print 'out', out.asList()
+        report['devicesAffected'] = len(out.devices())
         return out, report
 
 
@@ -211,23 +212,27 @@ class Sequencer(object):
     @stats.update.time()
     def update(self):
         now = time.time()
-        self.recentUpdateTimes = self.recentUpdateTimes[-20:] + [now]
+        self.recentUpdateTimes = self.recentUpdateTimes[-40:] + [now]
         stats.recentFps = len(self.recentUpdateTimes) / (self.recentUpdateTimes[-1] - self.recentUpdateTimes[0] + .0001)
-        if now > self.lastStatLog + 10:
-            dispatcher.send('state', update={'recentFps': stats.recentFps})
+        if 1 or now > self.lastStatLog + 1:
+            dispatcher.send('state', update={
+                'recentDeltas': sorted([round(t1 - t0, 4) for t0, t1 in
+                                 zip(self.recentUpdateTimes[:-1],
+                                     self.recentUpdateTimes[1:])]),
+                'recentFps': stats.recentFps})
             self.lastStatLog = now
         
         reactor.callLater(1 / self.fps, self.update)
 
         musicState = self.music.getLatest()
         song = URIRef(musicState['song']) if musicState.get('song') else None
-        dispatcher.send('state', update={'song': str(song)})
         if 't' not in musicState:
             return
         t = musicState['t']
+        dispatcher.send('state', update={'song': str(song), 't': t})
 
         settings = []
-        songNotes = sorted(self.notes.get(song, []))
+        songNotes = sorted(self.notes.get(song, []), key=lambda n: n.uri)
         noteReports = []
         for note in songNotes:
             s, report = note.outputSettings(t)
@@ -236,7 +241,6 @@ class Sequencer(object):
         dispatcher.send('state', update={'songNotes': noteReports})
         self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
 
-import cyclone.sse
 class Updates(cyclone.sse.SSEHandler):
     def __init__(self, application, request, **kwargs):
         cyclone.sse.SSEHandler.__init__(self, application, request,
@@ -249,7 +253,6 @@ class Updates(cyclone.sse.SSEHandler):
         self.state.update(update)
         
     def bind(self):
-        print 'new client', self.settings.seq
         self.numConnected += 1
         
         if self.numConnected == 1:
@@ -259,9 +262,9 @@ class Updates(cyclone.sse.SSEHandler):
         if self.numConnected == 0:
             return
         self.sendEvent(self.state)
-        reactor.callLater(2, self.loop)
+        reactor.callLater(.1, self.loop)
         
     def unbind(self):
         self.numConnected -= 1
-        print 'bye', self.numConnected
+
     

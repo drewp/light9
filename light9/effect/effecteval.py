@@ -51,8 +51,9 @@ class EffectEval(object):
 
         strength = float(effectSettings[L9['strength']])
         if strength <= 0:
-            return DeviceSettings(self.graph, [])
+            return DeviceSettings(self.graph, []), {'zero': True}
 
+        report = {}
         out = {} # (dev, attr): value
 
         out.update(self.simpleOutputs.values(
@@ -63,12 +64,12 @@ class EffectEval(object):
             try:
                 func = globals()[tail]
             except KeyError:
-                pass
+                report['error'] = 'effect code not found for %s' % self.effect
             else:
                 out.update(func(effectSettings, strength, songTime, noteTime))
 
         outList = [(d, a, v) for (d, a), v in out.iteritems()]
-        return DeviceSettings(self.graph, outList)
+        return DeviceSettings(self.graph, outList), report
                   
 
 def effect_Curtain(effectSettings, strength, songTime, noteTime):

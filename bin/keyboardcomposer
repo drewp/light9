@@ -460,12 +460,12 @@ class KeyboardComposer(tk.Frame, SubClient):
             strength = _graph.value(setting, L9['level'])
             if strength:
                 now = time.time()
-                outputSettings.append(
-                    self.effectEval[effect].outputFromEffect(
-                        [(L9['strength'], strength)],
-                        songTime=now,
-                        # should be counting from when you bumped up from 0
-                        noteTime=now))
+                out, report = self.effectEval[effect].outputFromEffect(
+                    [(L9['strength'], strength)],
+                    songTime=now,
+                    # should be counting from when you bumped up from 0
+                    noteTime=now)
+                outputSettings.append(out)
 
         return DeviceSettings.fromList(_graph, outputSettings)
 
