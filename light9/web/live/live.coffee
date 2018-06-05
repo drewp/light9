@@ -82,6 +82,10 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
           daRow.max = 1
 
       @push('deviceAttrs', daRow)
+  clear: ->
+    for lc in @shadowRoot.querySelectorAll("light9-live-control")
+      lc.clear()
+    
 )
     
 coffeeElementSetup(class Light9LiveControls extends Polymer.Element
@@ -180,12 +184,14 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
 
   onGraph: ->
     @graph.runHandler(@update.bind(@), 'controls')
+    
   resendAll: ->
     for llc in @getElementsByTagName("light9-live-control")
       llc.resend()
+      
   clearAll: ->
-    for llc in @getElementsByTagName("light9-live-control")
-      llc.clear()
+    for dc in @shadowRoot.querySelectorAll("light9-live-device-control")
+      dc.clear()
     
   update: ->
     U = (x) => @graph.Uri(x)
