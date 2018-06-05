@@ -115,9 +115,15 @@
                  const height = Math.min(40, dt / 0.025 * 20);
                  return `height: ${height}px;`
                });
+
+               const fakeUris = (report.songNotes || []).map((obj) => { return {value: obj.note, orig: obj} });
+               const s = this.graph.sortedUris(fakeUris);
+               report.songNotes = s.map((u) => { return u.orig; });
+               
                (report.songNotes || []).forEach((note) => {
                  note.rowClass = note.nonZero ? 'active' : 'inactive';
                  note.effectSettingsPairs = [];
+
                  const attrs = Object.keys(note.effectSettings);
                  attrs.sort();
                  attrs.forEach((attr) => {

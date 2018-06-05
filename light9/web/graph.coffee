@@ -371,3 +371,12 @@ class window.SyncedGraph
       ctxs.push(q.graph)
     return _.unique(ctxs)
 
+  sortedUris: (uris) ->
+    _.sortBy uris, (u) ->
+      parts = u.value.split(/([0-9]+)/)
+      expanded = parts.map (p) ->
+        f = parseInt(p)
+        return p if isNaN(f)
+        return p.padStart(8, '0')
+      return expanded.join('')
+      

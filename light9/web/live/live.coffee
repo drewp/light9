@@ -59,7 +59,7 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
     @deviceClass = @graph.uriValue(@uri, U('rdf:type'))
     
     @deviceAttrs = []
-    for da in _.unique(_.sortBy(@graph.objects(@deviceClass, U(':deviceAttr'))))
+    for da in _.unique(@graph.sortedUris(@graph.objects(@deviceClass, U(':deviceAttr'))))
       dataType = @graph.uriValue(da, U(':dataType'))
       daRow = {
         uri: da
@@ -71,7 +71,7 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
 
       else if dataType.equals(U(':choice'))
         daRow.useChoice = true
-        choiceUris = _.sortBy(@graph.objects(da, U(':choice')))
+        choiceUris = @graph.sortedUris(@graph.objects(da, U(':choice')))
         daRow.choices = ({uri: x, label: @graph.labelOrTail(x)} for x in choiceUris)
         daRow.choiceSize = Math.min(choiceUris.length + 1, 10)
       else
@@ -191,8 +191,8 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
     U = (x) => @graph.Uri(x)
 
     @set('devices', [])
-    for dc in _.sortBy(@graph.subjects(U('rdf:type'), U(':DeviceClass')))
-      for dev in _.sortBy(@graph.subjects(U('rdf:type'), dc))
+    for dc in @graph.sortedUris(@graph.subjects(U('rdf:type'), U(':DeviceClass')))
+      for dev in @graph.sortedUris(@graph.subjects(U('rdf:type'), dc))
         @push('devices', {uri: dev})
 
     return

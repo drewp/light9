@@ -355,7 +355,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
     toRemove = new Set(@noteByUriStr.keys())
     
-    for uri in _.sortBy(songNotes, 'id')
+    for uri in @graph.sortedUris(songNotes)
       had = toRemove.delete(uri.value)
       if not had
         @_addNote(uri)
