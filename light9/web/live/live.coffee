@@ -132,7 +132,7 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
   valuePred: (attr) ->
     U = (x) => @graph.Uri(x)
     scaledAttributeTypes = [U(':color'), U(':brightness'), U(':uv')]
-    if attr in scaledAttributeTypes then U(':scaledValue') else U(':value')
+    if [attr.equals(x) for x in scaledAttributeTypes].length then U(':scaledValue') else U(':value')
 
   onEffect: ->
     U = (x) => @graph.Uri(x)
@@ -149,6 +149,7 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
         value = @graph.stringValue(s, pred)
       log('got', devAttr, value)
       window.gather([[dev, devAttr, value]])
+      # there's nothing here to set the widgets to these values.
             
   saveNewEffect: ->
     uriName = @newEffectName.replace(/[^a-zA-Z0-9_]/g, '')

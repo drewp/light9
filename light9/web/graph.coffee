@@ -285,7 +285,10 @@ class window.SyncedGraph
     return hit if hit != undefined
     #log('float miss', s, p)
 
-    ret = parseFloat(@_singleValue(s, p).value)
+    v = @_singleValue(s, p).value
+    ret = parseFloat(v)
+    if isNaN(ret)
+      throw new Error("#{s.value} #{p.value} -> #{v} not a float")
     @cachedFloatValues.set(key, ret)
     return ret
     
