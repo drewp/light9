@@ -107,7 +107,9 @@
          this.href = "javascript:;";
          return;
        }
-       if (patch !== null && !SyncedGraph.patchContainsPreds(patch, this.graph.Uri('rdfs:label'))) {
+       if (patch !== null &&
+           !SyncedGraph.patchContainsPreds(patch,
+                                           [this.graph.Uri('rdfs:label')])) {
          return;
        }
        let uri = this.uri;
