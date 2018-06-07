@@ -20,6 +20,28 @@ patchSizeSummary = (patch) ->
 # (sloppily shared to rdfdbclient.coffee too)
 window.patchSizeSummary = patchSizeSummary
 
+patchContainsPreds = (patch, preds) ->
+  if patch._allPreds == undefined
+    patch._allPreds = new Set()
+    for qq in [patch.addQuads, patch.delQuads]
+      for q in qq
+        patch._allPreds.add(q.predicate.value)
+
+  for p in preds
+    if patch._allPreds.has(p.value)
+      return true
+  return false
+
+allPatchSubjs = (patch) ->   # returns subjs as Set of strings
+  out = new Set()
+  if patch._allSubjs == undefined
+    patch._allSubjs = new Set()
+    for qq in [patch.addQuads, patch.delQuads]
+      for q in qq
+        patch._allSubjs.add(q.subject.value)
+
+  return patch._allSubjs
+
 class Handler
   # a function and the quad patterns it cared about
   constructor: (@func, @label) ->
@@ -74,27 +96,17 @@ class AutoDependencies
       for c in h.innerHandlers
         prn(c, depth + 1)
     prn(@handlers, 0)
-
-  _allPatchSubjs: (patch) ->
-
-    allPatchSubjs = []
-    for stmt in patch.addQuads
-      allPatchSubjs.push(stmt.subject)
-    for stmt in patch.delQuads
-      allPatchSubjs.push(stmt.subject)
-    allPatchSubjs = _.uniq(allPatchSubjs)
-    if _.contains(allPatchSubjs, null) or allPatchSubjs.length == 0
-      allPatchSubjs = null
-    log('allPatchSubjs', allPatchSubjs)
     
-  _handlerIsAffected: (child, allPatchSubjs) ->
+  _handlerIsAffected: (child, patchSubjs) ->
     if allPatchSubjs == null
       return true
     if not child.patterns.length
       return false
       
     for stmt in child.patterns
-      if _.contains(allPatchSubjs, stmt[0])
+      if stmt[0] == null # wildcard on subject
+        return true
+      if patchSubjs.has(stmt[0].value)
         return true
 
     return false
@@ -102,7 +114,7 @@ class AutoDependencies
   graphChanged: (patch) ->
     # SyncedGraph is telling us this patch just got applied to the graph.
 
-    #allPatchSubjs = @_allPatchSubjs(patch)
+    subjs = allPatchSubjs(patch)
     
     rerunInners = (cur) =>
       toRun = cur.innerHandlers.slice()
@@ -250,6 +262,12 @@ class window.SyncedGraph
 
   patchObject: (s, p, newObject, g) ->
     @applyAndSendPatch(@getObjectPatch(s, p, newObject, g))
+
+  clearObjects: (s, p, g) ->
+    @applyAndSendPatch({
+      delQuads: @graph.getQuads(s, p, null, g),
+      addQuads: []
+    })
   
   runHandler: (func, label) ->
     # runs your func once, tracking graph calls. if a future patch
@@ -355,11 +373,18 @@ class window.SyncedGraph
     # base is NamedNode or string
     base = base.id if base.id
     results = []
-    # we could cache [base,lastSerial]
-    for serial in [0..1000]
+
+    # @contains is really slow.
+    @_nextNumber = new Map() unless @_nextNumber?
+    start = @_nextNumber.get(base)
+    if start == undefined
+      start = 0
+      
+    for serial in [start..1000]
       uri = @Uri("#{base}#{serial}")
       if not @contains(uri, null, null)
         results.push(uri)
+        @_nextNumber.set(base, serial + 1)
         if results.length >= howMany
           return results
     throw new Error("can't make sequential uri with base #{base}")
@@ -382,4 +407,13 @@ class window.SyncedGraph
         return p if isNaN(f)
         return p.padStart(8, '0')
       return expanded.join('')
-      
+
+  # temporary optimization since autodeps calls too often
+  @patchContainsPreds: (patch, preds) ->
+    patchContainsPreds(patch, preds)
+
+  prettyLiteral: (x) ->
+    if typeof(x) == 'number'
+      @LiteralRoundedFloat(x)
+    else
+      @Literal(x)
