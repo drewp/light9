@@ -64,89 +64,90 @@
   </template>
   <script>
    class ResourceDisplay extends Polymer.Element {
-       static get is() { return "resource-display"; }
-       static get properties() {
-           return {
-               graph: { type: Object },
-               // callers might set this as string or NamedNode.
-               uri: { type: Object }, // Use .value for the string
-               href: { type: String },
-               label: { type: String },
-               rename: { type: Boolean },
-               minor: { type: Boolean },
-               resClasses: { type: String, computed: '_resClasses(minor)', value: 'resource' },
-               renameTo: { type: String, notify: true },
-           };
+     static get is() { return "resource-display"; }
+     static get properties() {
+       return {
+         graph: { type: Object },
+         // callers might set this as string or NamedNode.
+         uri: { type: Object }, // Use .value for the string
+         href: { type: String },
+         label: { type: String },
+         rename: { type: Boolean },
+         minor: { type: Boolean },
+         resClasses: { type: String, computed: '_resClasses(minor)', value: 'resource' },
+         renameTo: { type: String, notify: true },
+       };
+     }
+     static get observers() { return ['onUri(graph, uri)']; }
+     
+     _resClasses(minor) {
+       return minor ? 'resource minor' : 'resource';
+     }
+     
+     onUri(graph, uri) {
+       if (!this.graph) {
+         this.label = "...";
+         this.href = "javascript:;'";
+         return;
        }
-       static get observers() { return ['onUri(graph, uri)']; }
-       
-       _resClasses(minor) {
-           return minor ? 'resource minor' : 'resource';
+       if (!this.uri) {
+         this.setLabel();
+         return;
        }
-       
-       onUri(graph, uri) {
-           if (!this.graph) {
-               this.label = "...";
-               this.href = "javascript:;'";
-               return;
-           }
-           if (!this.uri) {
-               this.setLabel();
-               return;
-           }
-           if (typeof uri === 'string') {
-               uri = this.graph.Uri(uri);
-           }
-           this.graph.runHandler(this.setLabel.bind(this),
-                                 `label ${uri.value}`);
+       if (typeof uri === 'string') {
+         uri = this.graph.Uri(uri);
        }
-       
-       setLabel() {
-           if (!this.uri) {
-               this.label = "<no uri>";
-               this.href = "javascript:;";
-               return;
-           }
-           let uri = this.uri;
-           if (typeof uri === 'string') {
-               uri = this.graph.Uri(uri);
-           }
-           this.label = this.graph.labelOrTail(uri);
-           this.href = uri.value;
+       this.graph.runHandler(this.setLabel.bind(this),
+                             `label ${uri.value}`);
+     }
+     
+     setLabel(patch) {
+       if (!this.uri) {
+         this.label = "<no uri>";
+         this.href = "javascript:;";
+         return;
        }
-       
-       onRename() {
-           this.renameTo = this.label;
-           this.shadowRoot.querySelector("#renameDialog").open();
-           this.shadowRoot.querySelector("#renameTo").setSelectionRange(0, -1);
+
+       let uri = this.uri;
+       if (typeof uri === 'string') {
+         uri = this.graph.Uri(uri);
        }
-       
-       onRenameKey(ev) {
-           if (ev.key == 'Enter') {
-               this.shadowRoot.querySelector("[dialog-confirm]").click();
-           }
-           if (ev.key == 'Escape') {
-               this.shadowRoot.querySelector("[dialog-dismiss]").click();
-           }
+       this.label = this.graph.labelOrTail(uri);
+       this.href = uri.value;
+     }
+     
+     onRename() {
+       this.renameTo = this.label;
+       this.shadowRoot.querySelector("#renameDialog").open();
+       this.shadowRoot.querySelector("#renameTo").setSelectionRange(0, -1);
+     }
+     
+     onRenameKey(ev) {
+       if (ev.key == 'Enter') {
+         this.shadowRoot.querySelector("[dialog-confirm]").click();
        }
-       
-       onRenameClosed() {
-           var dialog = this.shadowRoot.querySelector("#renameDialog");
-           if (dialog.closingReason.confirmed) {
-               var label = this.graph.Uri('rdfs:label');
-               var ctxs = this.graph.contextsWithPattern(this.uri, label, null);
-               if (ctxs.length != 1) {
-                   throw new Error(
-                       `${ctxs.length} label stmts for ${this.uri.label}`);
-               }
-               this.graph.patchObject(
-                   ((typeof this.uri) === 'string' ?
-                    this.graph.Uri(this.uri) : this.uri),
-                   label,
-                   this.graph.Literal(this.renameTo),
-                   ctxs[0]);
-           }
+       if (ev.key == 'Escape') {
+         this.shadowRoot.querySelector("[dialog-dismiss]").click();
        }
+     }
+     
+     onRenameClosed() {
+       var dialog = this.shadowRoot.querySelector("#renameDialog");
+       if (dialog.closingReason.confirmed) {
+         var label = this.graph.Uri('rdfs:label');
+         var ctxs = this.graph.contextsWithPattern(this.uri, label, null);
+         if (ctxs.length != 1) {
+           throw new Error(
+             `${ctxs.length} label stmts for ${this.uri.label}`);
+         }
+         this.graph.patchObject(
+           ((typeof this.uri) === 'string' ?
+            this.graph.Uri(this.uri) : this.uri),
+           label,
+           this.graph.Literal(this.renameTo),
+           ctxs[0]);
+       }
+     }
    }
    customElements.define(ResourceDisplay.is, ResourceDisplay);
   </script>
