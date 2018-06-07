@@ -4,7 +4,6 @@
 <link rel="import" href="/lib/paper-listbox/paper-listbox.html">
 <link rel="import" href="/lib/paper-item/paper-item.html">
 <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
-<link rel="import" href="../light9-collector-client.html">
 
 <link rel="import" href="../rdfdb-synced-graph.html">
 <link rel="import" href="../resource-display.html">
@@ -113,24 +112,24 @@
      
     </style>
 
-    <template is="dom-if" if="{{deviceAttr.useSlider}}">
+    <template is="dom-if" if="{{deviceAttrRow.useSlider}}">
       <paper-slider min="0"
-                    max="{{deviceAttr.max}}"
+                    max="{{deviceAttrRow.max}}"
                     step=".001"
                     editable
                     content-type="application/json"
                     value="{{sliderWriteValue}}"
                     immediate-value="{{immediateSlider}}"></paper-slider>
     </template>
-    <template is="dom-if" if="{{deviceAttr.useColor}}">
+    <template is="dom-if" if="{{deviceAttrRow.useColor}}">
       <div id="colorControls">
         <button on-click="goBlack">0.0</button>
         <light9-color-picker color="{{value}}"></light9-color-picker>
         
       </div>
     </template>
-    <template is="dom-if" if="{{deviceAttr.useChoice}}">
-      <light9-listbox choices="{{deviceAttr.choices}}" value="{{value}}">
+    <template is="dom-if" if="{{deviceAttrRow.useChoice}}">
+      <light9-listbox choices="{{deviceAttrRow.choices}}" value="{{value}}">
       </light9-listbox>
     </template>
 
@@ -186,7 +185,13 @@
       <template is="dom-repeat" items="{{deviceAttrs}}" as="dattr">
         <div class="deviceAttr">
           <span>attr <resource-display minor graph="{{graph}}" uri="{{dattr.uri}}"></resource-display></span>
-          <light9-live-control device="{{uri}}" device-attr="{{dattr}}"></light9-live-control>
+          <light9-live-control
+            graph="{{graph}}"
+            device="{{uri}}"
+            device-attr-row="{{dattr}}"
+            effect="{{effect}}"
+            graph-to-controls="{{graphToControls}}"
+          ></light9-live-control>
         </div>
       </template>
     </div>
@@ -219,9 +224,7 @@
     </style>
     <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
-    <light9-collector-client self="{{client}}"></light9-collector-client>
     <h1>device control
-      <button on-click="resendAll">resend all</button>
       <button on-click="clearAll">clear all</button></h1>
 
     <div id="save">
@@ -235,7 +238,12 @@
 
     <div id="deviceControls">
       <template is="dom-repeat" items="{{devices}}" as="device">
-        <light9-live-device-control graph="{{graph}}" uri="{{device.uri}}"></light9-live-device-control>
+        <light9-live-device-control
+          graph="{{graph}}"
+          uri="{{device.uri}}"
+          effect="{{effect}}"
+          graph-to-controls="{{graphToControls}}"
+        ></light9-live-device-control>
       </template>
     </div>
 
