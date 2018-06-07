@@ -372,6 +372,8 @@ class window.SyncedGraph
 
   nextNumberedResources: (base, howMany) ->
     # base is NamedNode or string
+    # Note this is unsafe before we're synced with the graph. It'll
+    # always return 'name0'.
     base = base.id if base.id
     results = []
 
@@ -400,14 +402,16 @@ class window.SyncedGraph
       ctxs.push(q.graph)
     return _.unique(ctxs)
 
+  sortKey: (uri) ->
+    parts = uri.value.split(/([0-9]+)/)
+    expanded = parts.map (p) ->
+      f = parseInt(p)
+      return p if isNaN(f)
+      return p.padStart(8, '0')
+    return expanded.join('')
+
   sortedUris: (uris) ->
-    _.sortBy uris, (u) ->
-      parts = u.value.split(/([0-9]+)/)
-      expanded = parts.map (p) ->
-        f = parseInt(p)
-        return p if isNaN(f)
-        return p.padStart(8, '0')
-      return expanded.join('')
+    _.sortBy uris, @sortKey
 
   # temporary optimization since autodeps calls too often
   @patchContainsPreds: (patch, preds) ->
