@@ -23,6 +23,7 @@ from light9.effect.sequencer import CodeWatcher
 import light9.effect.effecteval
 from light9.effect.settings import DeviceSettings
 from rdfdb.patch import Patch
+from light9.effect.simple_outputs import SimpleOutputs
 
 from bcf2000 import BCF2000
 
@@ -232,6 +233,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         self.effectEval = {}
         reload(light9.effect.effecteval)
+        simpleOutputs = SimpleOutputs(self.graph)
         for group, order, sortLabel, effect in withgroups:
             if col == 0 or group != last_group:
                 row = self.make_row(group)
@@ -244,8 +246,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
             self.setup_key_nudgers(subbox.scale)
 
-            sharedEffectOutputs = {}
-            self.effectEval[effect] = light9.effect.effecteval.EffectEval(self.graph, effect, sharedEffectOutputs)
+            self.effectEval[effect] = light9.effect.effecteval.EffectEval(self.graph, effect, simpleOutputs)
 
             col = (col + 1) % 8
             last_group = group
