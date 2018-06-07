@@ -224,16 +224,14 @@
     </style>
     <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
-    <h1>device control
-      <button on-click="clearAll">clear all</button></h1>
+    <h1>device control</h1>
 
     <div id="save">
       <div>
-        effect name: <input type="input" value="{{newEffectName::change}}">
-        <button on-click="saveNewEffect">save new effect</button>
-        <edit-choice graph="{{graph}}" uri="{{effect}}"></edit-choice>
+        <button on-click="newEffect">New effect</button>
+        <edit-choice graph="{{graph}}" uri="{{effectChoice}}"></edit-choice>
+        <button on-click="clearAll">clear settings in this effect</button>
       </div>
-      <textarea id="preview" value="{{effectPreview}}"></textarea>
     </div>
 
     <div id="deviceControls">
@@ -246,7 +244,6 @@
         ></light9-live-device-control>
       </template>
     </div>
-
     
   </template>
 </dom-module>
