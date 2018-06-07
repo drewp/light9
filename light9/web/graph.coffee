@@ -119,9 +119,10 @@ class AutoDependencies
     rerunInners = (cur) =>
       toRun = cur.innerHandlers.slice()
       for child in toRun
-        #match = @_handlerIsAffected(child, allPatchSubjs)
+        match = @_handlerIsAffected(child, subjs)
+        continue if not match
         #log('match', child.label, match)
-        #child.innerHandlers = [] # let all children get called again
+        child.innerHandlers = [] # let all children get called again
         
         @_rerunHandler(child, patch)
         rerunInners(child)
