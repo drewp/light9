@@ -253,6 +253,9 @@
        document.body.removeChild(this.$.large);
      }
      onValue(value) {
+       if (this.hueSatColor === null) {
+         this.hueSatColor = '#ffffff';
+       }
        let neverBlack = .1 + .9 * value / 255;
        this.$.smallRainbow.style.filter = `brightness(${neverBlack})`;
      }
