@@ -296,8 +296,8 @@
            pos = [-999, -999];
          }
          this.moveLargeCrosshair(pos);
-         this.$.large.style.left = (x - Math.max(20, Math.min(380, pos[0]))) + 'px';
-         this.$.large.style.top = (y - Math.max(20, Math.min(180, pos[1]))) + 'px';
+         this.$.large.style.left = (x - Math.max(60, Math.min(380, pos[0]))) + 'px';
+         this.$.large.style.top = (y - Math.max(60, Math.min(180, pos[1]))) + 'px';
        } catch(e) {
          this.moveLargeCrosshair([-999, -999]);
          this.$.large.style.left = (400 / 2) + 'px';
