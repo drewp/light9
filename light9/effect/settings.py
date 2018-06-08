@@ -215,10 +215,12 @@ class _Settings(object):
                 
             scaledAttributeTypes = [L9['color'], L9['brightness'], L9['uv']]
             settingType = L9['scaledValue'] if attr in scaledAttributeTypes else L9['value']
+            if not isinstance(val, URIRef):
+                val = Literal(val)
             add.extend([
                 (setting, L9['device'], dev, ctx),
                 (setting, L9['deviceAttr'], attr, ctx),
-                (setting, settingType, Literal(val), ctx),
+                (setting, settingType, val, ctx),
                 ])
             settingsSubgraphCache.add(setting)
             
