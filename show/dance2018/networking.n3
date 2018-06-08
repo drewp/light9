@@ -1,0 +1,38 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2018/> .
+
+show:dance2018 :networking sh:netHome .
+sh:netHome
+  :webServer        <http://plus:8200/>;
+  :patchReceiverUpdateHost "plus";
+  :captureDevice    <http://plus:8215/>;
+  :curveCalc        <http://plus:8201/>;
+  :collector        <http://dot:8202/>;
+  :collectorZmq     <http://dot:8203/>;
+  :effectEval       <http://plus:8204/>;
+  :effectSequencer  <http://dot:8213/>;
+  :keyboardComposer <http://plus:8205/>;
+  :musicPlayer      <http://plus:8206/>;
+  :oscDmxServer     <udp://plus:8207/>;
+  :paintServer      <http://plus:8214/>;
+  :picamserve       <http://10.2.0.6:8208/>;
+  :rdfdb            <http://plus:8209/>;
+  :subComposer      <http://plus:8210/>;
+  :subServer        <http://plus:8211/>;
+  :vidref           <http://plus:8212/> .
+
+:captureDevice    :urlPath "captureDevice" .
+:curveCalc        :urlPath "curveCalc" .
+:dmxServer        :urlPath "dmxServer" .
+:effectEval       :urlPath "effectEval" .
+:keyboardComposer :urlPath "keyboardComposer" .
+:musicPlayer      :urlPath "ascoltami" .
+:picamserve       :urlPath "picamserve" .
+:paintServer      :urlPath "paintServer" .
+:rdfdb            :urlPath "rdfdb" .
+:subComposer      :urlPath "subComposer" .
+:subServer        :urlPath "subServer" .
+:vidref           :urlPath "vidref" .
+:collector        :urlPath "collector" .
+:effectSequencer  :urlPath "effectSequencer" .

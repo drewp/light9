@@ -1,0 +1,53 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+show:dance2018 :musicRoot "show/dance2018/music/pad";
+:spectrogramUrlRoot "/show/dance2018/spectrogram" .
+
+show:dance2018 :playList (
+  sh:song1  sh:song2  sh:song3  sh:song4  sh:song5
+  sh:song6  sh:song7  sh:song8  sh:song9  sh:song10
+  sh:song11 sh:song12 sh:song13 sh:song14 sh:song15
+  sh:song16 sh:song17
+) .
+
+sh:song1   a :Song; rdfs:label "01 open";         :songFilename "01-open.wav" .
+sh:song2   a :Song; rdfs:label "02 swing";        :songFilename "02-swing.wav" .
+sh:song3   a :Song; rdfs:label "03 wild";         :songFilename "03-wild.wav" .
+sh:song4   a :Song; rdfs:label "04 amerpatrol";   :songFilename "04-amerpatrol.wav" .
+sh:song5   a :Song; rdfs:label "05 summer";       :songFilename "05-summer.wav" .
+sh:song6   a :Song; rdfs:label "06 moon";         :songFilename "06-moon.wav" .
+sh:song7   a :Song; rdfs:label "07 chicagomix";   :songFilename "07-chicagomix.wav" .
+sh:song8   a :Song; rdfs:label "08 ham";          :songFilename "08-ham.wav" .
+sh:song9   a :Song; rdfs:label "09 salute";       :songFilename "09-salute.wav" .
+sh:song10  a :Song; rdfs:label "10 jitterbugout"; :songFilename "10-jitterbugout.wav" .
+sh:song11  a :Song; rdfs:label "11 boogie";       :songFilename "11-boogie.wav" .
+sh:song12  a :Song; rdfs:label "12 5678-trim";    :songFilename "12-5678-trim.wav" .
+sh:song13  a :Song; rdfs:label "13 womens";       :songFilename "13-womens.wav" .
+sh:song14  a :Song; rdfs:label "14 civil";        :songFilename "14-civil.wav" .
+sh:song15  a :Song; rdfs:label "15 yankee";       :songFilename "15-yankee.wav" .
+sh:song16  a :Song; rdfs:label "16 disco";        :songFilename "16-disco.wav" .
+sh:song17  a :Song; rdfs:label "17 bugle";        :songFilename "17-bugle.wav" .
+                                                                             
+                                                    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

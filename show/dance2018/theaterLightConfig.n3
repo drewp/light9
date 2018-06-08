@@ -1,0 +1,112 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix dmxA: <http://light9.bigasterisk.com/output/dmxA/> .
+@prefix dmxB: <http://light9.bigasterisk.com/output/dmxB/> .
+
+#dev:colorStrip a :ChauvetColorStrip; rdfs:label "colorStrip"; :dmxUniverse dmxB:; :dmxBase 87 .
+#dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse dmxB:; :dmxBase 4 .
+
+dev:houseSide a :SimpleDimmer; rdfs:label "house-side"; :dmxUniverse dmxA:; :dmxBase 68 .
+dev:house1 a :SimpleDimmer; rdfs:label "house1"; :dmxUniverse dmxA:; :dmxBase 69 .
+dev:house4 a :SimpleDimmer; rdfs:label "house4"; :dmxUniverse dmxA:; :dmxBase 70 .
+dev:house3 a :SimpleDimmer; rdfs:label "house3"; :dmxUniverse dmxA:; :dmxBase 71 .
+dev:house2 a :SimpleDimmer; rdfs:label "house2"; :dmxUniverse dmxA:; :dmxBase 72 .
+
+dev:f1 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 4 .
+dev:f2 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 8 .
+dev:f3 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 10 .
+
+dev:cycR a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 42 .
+dev:cycL a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 44 .
+
+dev:q1 a :MacQuantum; :dmxUniverse dmxB:; :dmxBase 325 .
+dev:q1 :outputAttrRange dev:q1rx . dev:q1rx :outputAttr :rx; :start 0.143; :end 0.271 .
+dev:q1 :outputAttrRange dev:q1ry . dev:q1ry :outputAttr :ry; :start 0.71; :end 0.821 .
+dev:q2 a :MacQuantum; :dmxUniverse dmxB:; :dmxBase 352 .
+dev:q2 :outputAttrRange dev:q2rx . dev:q2rx :outputAttr :rx; :start 0.097; :end 0.227 .
+dev:q2 :outputAttrRange dev:q2ry . dev:q2ry :outputAttr :ry; :start 0.739; :end 0.824 .
+dev:q3 a :MacQuantum; :dmxUniverse dmxB:; :dmxBase 379 .
+dev:q3 :outputAttrRange dev:q3rx . dev:q3rx :outputAttr :rx; :start 0.064; :end 0.198 .
+dev:q3 :outputAttrRange dev:q3ry . dev:q3ry :outputAttr :ry; :start 0.765; :end 0.822 .
+
+dev:aura1 a :MacAura; :dmxUniverse dmxB:; :dmxBase 406 .
+dev:aura2 a :MacAura; :dmxUniverse dmxB:; :dmxBase 420 .
+dev:aura3 a :MacAura; :dmxUniverse dmxB:; :dmxBase 434 .
+dev:aura4 a :MacAura; :dmxUniverse dmxB:; :dmxBase 448 .
+dev:aura5 a :MacAura; :dmxUniverse dmxB:; :dmxBase 462 .
+
+dev:aura1 :outputAttrRange dev:aura1rx . dev:aura1rx :outputAttr :rx; :start 0.145; :end 0.275 .
+dev:aura2 :outputAttrRange dev:aura2rx . dev:aura2rx :outputAttr :rx; :start 0.096; :end 0.259 .
+dev:aura3 :outputAttrRange dev:aura3rx . dev:aura3rx :outputAttr :rx; :start 0.068; :end 0.25 .
+dev:aura4 :outputAttrRange dev:aura4rx . dev:aura4rx :outputAttr :rx; :start 0.065; :end 0.21 .
+dev:aura5 :outputAttrRange dev:aura5rx . dev:aura5rx :outputAttr :rx; :start 0.06; :end 0.194 .
+
+dev:aura1 :outputAttrRange dev:aura1ry . dev:aura1ry :outputAttr :ry; :start 0.239; :end 0.153 .
+dev:aura2 :outputAttrRange dev:aura2ry . dev:aura2ry :outputAttr :ry; :start 0.248; :end 0.148 .
+dev:aura3 :outputAttrRange dev:aura3ry . dev:aura3ry :outputAttr :ry; :start 0.260; :end 0.151 .
+dev:aura4 :outputAttrRange dev:aura4ry . dev:aura4ry :outputAttr :ry; :start 0.250; :end 0.153 .
+dev:aura5 :outputAttrRange dev:aura5ry . dev:aura5ry :outputAttr :ry; :start 0.241; :end 0.151 .
+
+
+dev:auraStage a :MacAura; :dmxUniverse dmxB:; :dmxBase 476; rdfs:comment "rx=.5 ry<.45" .
+
+dev:down2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 157 .
+dev:down3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 193 .
+dev:down4 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 169 .
+dev:down5Edge a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 175 .
+dev:backlight1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 241 .
+dev:backlight2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 247 .
+dev:backlight3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 253 .
+dev:backlight4 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 259 .
+dev:backlight5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 265 .
+dev:hexLow3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 223 .
+dev:hexLow5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 229 .
+dev:hexLowBacklight1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 211 .
+dev:hexLowBacklight6 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 235 .
+dev:hexSlant a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 319 .
+dev:lip1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 121 .
+dev:lip2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 127 .
+dev:lip3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 133 . 
+dev:lip4 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 139 .
+dev:lip5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 145 . 
+dev:postL1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 289 .
+dev:postL2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 295 .
+dev:postL3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 301 .
+dev:postR1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 271 .
+dev:postR2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 277 .
+dev:postR3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 283 .
+dev:upCenter a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 313 .
+dev:veryLow1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 151 .
+dev:veryLow2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 187 .
+dev:veryLow22 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 217 .
+dev:veryLow3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 163 .
+dev:veryLow4 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 199 .
+dev:veryLow5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 205 .
+
+
+dev:lowPattern301 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 1 .
+dev:lowPattern302 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 16 .
+dev:lowPattern303 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 31 .
+dev:lowPattern304 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 46 .
+dev:lowPattern305 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 61 .
+dev:lowPattern306 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 76 .
+dev:lowPattern307 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 91 .
+dev:lowPattern308 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 106 .
+
+# [ :name "oran1"; :output dmx:c21 ] .
+# [ :name "oran2"; :output dmx:c25 ] .
+# [ :name "oran3"; :output dmx:c29 ] .
+# [ :name "oran4"; :output dmx:c33 ] .
+# [ :name "gree1"; :output dmx:c22 ] .
+# [ :name "gree2"; :output dmx:c26 ] .
+# [ :name "gree3"; :output dmx:c30 ] .
+# [ :name "gree4"; :output dmx:c34 ] .
+# [ :name "blue1"; :output dmx:c23 ] .
+# [ :name "blue2"; :output dmx:c27 ] .
+# [ :name "blue3"; :output dmx:c31 ] .
+# [ :name "blue4"; :output dmx:c35 ] .
+# [ :name "red1"; :output dmx:c24 ] .
+# [ :name "red2"; :output dmx:c28 ] .
+# [ :name "red3"; :output dmx:c32 ] .
+# [ :name "red4"; :output dmx:c36 ] .
