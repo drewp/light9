@@ -179,14 +179,20 @@
          color: #9ab8fd;
          text-decoration: initial;
      }
+     .device.selected h2 {
+         outline: 3px solid #ffff0047;
+     }
+     .deviceAttr.selected {
+         background: #cada1829;
+     }
     </style>
-    <div class="device">
-      <h2 style$="[[bgStyle]]">
+    <div class$="device {{devClasses}}">
+      <h2 style$="[[bgStyle]]" on-click="onClick">
         <resource-display id="mainLabel" graph="{{graph}}" uri="{{uri}}"></resource-display>
         a <resource-display minor graph="{{graph}}" uri="{{deviceClass}}"></resource-display>
       </h2>
       <template is="dom-repeat" items="{{deviceAttrs}}" as="dattr">
-        <div class="deviceAttr">
+        <div on-click="onAttrClick" class$="deviceAttr {{dattr.attrClasses}}">
           <span>attr <resource-display minor graph="{{graph}}" uri="{{dattr.uri}}"></resource-display></span>
           <light9-live-control
             graph="{{graph}}"

@@ -99,13 +99,17 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
     graph: { type: Object, notify: true }
     uri: { type: String, notify: true }
     effect: { type: String }
-    deviceClass: { type: String, notify: true }
+    deviceClass: { type: String, notify: true } # the uri str
     deviceAttrs: { type: Array, notify: true }
     graphToControls: { type: Object }
     bgStyle: { type: String, computed: '_bgStyle(deviceClass)' }
+    devClasses: { type: String, value: '' } # the css kind
   @getter_observers: [
     'onGraph(graph)'
     ]
+  constructor: ->
+    super()
+    @selectedAttrs = new Set() # uri strings
   _bgStyle: (deviceClass) ->
     hash = 0
     deviceClass = deviceClass.value
@@ -117,6 +121,16 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
     
   onGraph: ->
     @graph.runHandler(@update.bind(@), "#{@uri.value} update")
+
+  setDeviceSelected: (isSel) ->
+    @devClasses = if isSel then 'selected' else ''
+
+  setAttrSelected: (devAttr, isSel) ->
+    if isSel
+      @selectedAttrs.add(devAttr.value)
+    else
+      @selectedAttrs.delete(devAttr.value)
+    @update()
     
   update: (patch) ->
     U = (x) => @graph.Uri(x)
@@ -134,6 +148,7 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
       uri: devAttr
       dataType: dataType
       showColorPicker: dataType.equals(U(':color'))
+      attrClasses: if @selectedAttrs.has(devAttr.value) then 'selected' else ''
       }
     if dataType.equals(U(':color'))
       daRow.useColor = true
@@ -153,14 +168,19 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
   clear: ->
     for lc in @shadowRoot.querySelectorAll("light9-live-control")
       lc.clear()
-    
+
+  onClick: (ev) ->
+    log('click', @uri)
+    # select, etc
+
+  onAttrClick: (ev) ->
+    log('attr click', @uri, ev.model.dattr.uri)
+    # select
 )
 
 
 class ActiveSettings
-  # Maintains the settings on this effect
   constructor: (@graph) ->
-
     # The settings we're showing (or would like to but the widget
     # isn't registered yet):
     # dev+attr : {setting: Uri, onChangeFunc: f, jsValue: str_or_float}
