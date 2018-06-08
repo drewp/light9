@@ -46,9 +46,9 @@
         <h3><resource-display graph="{{graph}}" uri="{{uri}}"></resource-display></h3>
         <table class="borders">
           <tr>
-            <th>output attr</th>
+            <th>out attr</th>
             <th>value</th>
-            <th>output chan</th>
+            <th>chan</th>
           </tr>
           <template is="dom-repeat" items="{{attrs}}">
             <tr>
@@ -94,7 +94,7 @@
         <h1>Collector <a href="stats">[stats]</a></h1>
 
         <h2>Devices</h2>
-        <div style="column-width: 12em">
+        <div style="column-width: 11em">
         <template is="dom-repeat" items="{{devices}}">
           <light9-collector-device
               graph="{{graph}}" updates="{{updates}}"
