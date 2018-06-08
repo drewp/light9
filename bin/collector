@@ -146,8 +146,8 @@ def launch(graph, doLoadTest=False):
             Udmx(L9['output/dmxA/'], bus=4, numChannels=80),
             Udmx(L9['output/dmxB/'], bus=5, numChannels=510),
         ]
-    except Exception as e:
-        log.error("setting up outputs: %r", e)
+    except Exception:
+        log.error("setting up outputs:")
         traceback.print_exc()
         raise
     listeners = WebListeners()
@@ -192,7 +192,7 @@ def main():
     
     graph = SyncedGraph(networking.rdfdb.url, "collector")
 
-    graph.initiallySynced.addCallback(lambda _: launch(graph, options.loadtest)).addErrback(log.error)
+    graph.initiallySynced.addCallback(lambda _: launch(graph, options.loadtest)).addErrback(lambda e: reactor.crash())
     reactor.run()
 
 if __name__ == '__main__':
