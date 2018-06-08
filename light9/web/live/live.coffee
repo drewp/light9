@@ -193,6 +193,10 @@ class ActiveSettings
 
   addSettingsRow: (device, deviceAttr, setting, value) ->
     key = device.value + " " + deviceAttr.value
+    if @settings.has(key)
+      throw new Error("repeated setting on "+key)
+    if @keyForSetting.has(setting.value)
+      throw new Error("repeated keyForSetting on "+setting.value)
     @settings.set(key, {
       setting: setting,
       onChangeFunc: @onChanged[key],
