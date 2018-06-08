@@ -135,6 +135,7 @@ class Udmx(DmxOutput):
                               scales.IntStat('usbErrors'))
     def __init__(self, uri, bus, numChannels):
         DmxOutput.__init__(self, uri, numChannels)
+        self._shortId = self.uri.rstrip('/')[-1]
         
         from light9.io.udmx import Udmx
         self.dev = Udmx(bus)
@@ -155,7 +156,7 @@ class Udmx(DmxOutput):
     def update(self, values):
         now = time.time()
         if now > self.lastLog + 1:
-            log.info('udmx %s', ' '.join(map(str, values)))
+            log.info('%s %s', self.shortId(), ' '.join(map(str, values)))
             self.lastLog = now
 
         self.currentBuffer = ''.join(map(chr, values))
@@ -174,5 +175,5 @@ class Udmx(DmxOutput):
         Udmx.stats.usbErrors += 1
         
     def shortId(self):
-        return 'udmx' # and something unique from self.dev?
+        return self._shortId
 
