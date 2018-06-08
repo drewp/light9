@@ -242,7 +242,7 @@ class ActiveSettings
 
   clear: ->
     new Map(@settings).forEach (row, key) ->
-      row.onChangeFunc(null)
+      row.onChangeFunc(null) if row.onChangeFunc?
     @settings.clear()
     @keyForSetting.clear()
 
