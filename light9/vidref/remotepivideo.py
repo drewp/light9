@@ -32,8 +32,7 @@ class Pipeline(object):
             return
         
         # this cannot yet survive being called a second time
-        self._startRequest(str(self.picsUrl.replace('/pic', '/pics')) +
-                           '&res=1080&resize=450')
+        self._startRequest(str(self.picsUrl))
         
     def _replaceLiveVideoWidget(self, liveVideo):
         aspectFrame = liveVideo.get_parent()
