@@ -4,8 +4,10 @@
 @prefix dmxA: <http://light9.bigasterisk.com/output/dmxA/> .
 @prefix dmxB: <http://light9.bigasterisk.com/output/dmxB/> .
 
-#dev:colorStrip a :ChauvetColorStrip; rdfs:label "colorStrip"; :dmxUniverse dmxB:; :dmxBase 87 .
-#dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse dmxB:; :dmxBase 4 .
+# dev:colorStrip a :ChauvetColorStrip; rdfs:label "colorStrip"; :dmxUniverse dmxA:; :dmxBase 50 .
+# dev:moving1 a :Mini15; rdfs:label "moving1"; :dmxUniverse dmxB:; :dmxBase 110 .
+# dev:moving1 :outputAttrRange dev:moving1rx . dev:moving1rx :outputAttr :rx; :start 0; :end 540 .
+# dev:moving1 :outputAttrRange dev:moving1ry . dev:moving1ry :outputAttr :ry; :start 0; :end 240 .
 
 dev:houseSide a :SimpleDimmer; rdfs:label "house-side"; :dmxUniverse dmxA:; :dmxBase 68 .
 dev:house1 a :SimpleDimmer; rdfs:label "house1"; :dmxUniverse dmxA:; :dmxBase 69 .
@@ -93,6 +95,8 @@ dev:lowPattern305 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 61 .
 dev:lowPattern306 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 76 .
 dev:lowPattern307 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 91 .
 dev:lowPattern308 a :Source4LedSeries2; :dmxUniverse dmxB:; :dmxBase 106 .
+
+
 
 # [ :name "oran1"; :output dmx:c21 ] .
 # [ :name "oran2"; :output dmx:c25 ] .

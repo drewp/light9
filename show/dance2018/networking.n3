@@ -16,7 +16,7 @@ sh:netHome
   :musicPlayer      <http://plus:8206/>;
   :oscDmxServer     <udp://plus:8207/>;
   :paintServer      <http://plus:8214/>;
-  :picamserve       <http://10.2.0.6:8208/>;
+  :picamserve       <http://10.3.0.8:8208/>;
   :rdfdb            <http://plus:8209/>;
   :subComposer      <http://plus:8210/>;
   :subServer        <http://plus:8211/>;

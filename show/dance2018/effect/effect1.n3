@@ -4,10 +4,10 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
-@prefix show1: <http://light9.bigasterisk.com/show/dance2017/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-<http://light9.bigasterisk.com/show/dance2018> :vidrefCamRequest <http://10.3.0.8:8208/pics?resize=480&res=480&shutter=15000&exposure_mode=fixedfps&awb_mode=fluorescent&brightness=55&redgain=1&bluegain=1&iso=500&exposure_compensation=9&rotation=0&x=.2&y=.38&w=.8&h=.5> .
-
+effect:effect1 a :Effect; rdfs:label "effect1"; :publishAttr :strength;
+     :setting effect:effect1_set0 .
+effect:effect1_set0 :device dev:colorStrip; :deviceAttr :color; :scaledValue "#2e2e2e" .

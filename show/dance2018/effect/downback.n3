@@ -1,0 +1,22 @@
+@prefix ns1: <http://light9.bigasterisk.com/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+
+
+effect:downback a ns1:Effect;
+     rdfs:label "downback"; ns1:publishAttr ns1:strength;
+     ns1:setting effect:downback_set15, effect:downback_set16, effect:downback_set17, effect:downback_set18, effect:downback_set19 .
+effect:downback_set15 ns1:device dev:backlight1;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#aeaeae" .
+effect:downback_set16 ns1:device dev:backlight2;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#f2d5b0" .
+effect:downback_set17 ns1:device dev:backlight3;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#f2d5b0" .
+effect:downback_set18 ns1:device dev:backlight4;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#f2d5b0" .
+effect:downback_set19 ns1:device dev:backlight5;
+     ns1:deviceAttr ns1:color; ns1:scaledValue "#a7a7a7" .

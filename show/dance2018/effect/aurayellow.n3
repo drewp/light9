@@ -1,0 +1,55 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:aurayellow a :Effect; rdfs:label "aurayellow";
+     :publishAttr :strength; :setting effect:aurayellow_set0, effect:aurayellow_set1, effect:aurayellow_set10, effect:aurayellow_set11, effect:aurayellow_set12, effect:aurayellow_set13, effect:aurayellow_set14, effect:aurayellow_set15, effect:aurayellow_set16, effect:aurayellow_set17, effect:aurayellow_set18, effect:aurayellow_set19, effect:aurayellow_set2, effect:aurayellow_set20, effect:aurayellow_set21, effect:aurayellow_set3, effect:aurayellow_set4, effect:aurayellow_set5, effect:aurayellow_set6, effect:aurayellow_set7, effect:aurayellow_set8, effect:aurayellow_set9 .
+effect:aurayellow_set0 :device dev:upCenter; :deviceAttr :color;
+     :scaledValue "#ffffff" .
+effect:aurayellow_set1 :device dev:upCenter; :deviceAttr :uv;
+     :scaledValue 0.666 .
+effect:aurayellow_set10 :device dev:aura2; :deviceAttr :color;
+     :scaledValue "#8f4997" .
+effect:aurayellow_set11 :device dev:aura2; :deviceAttr :rx;
+     :value 0.484 .
+effect:aurayellow_set12 :device dev:aura2; :deviceAttr :ry;
+     :value 0.448 .
+effect:aurayellow_set13 :device dev:aura2; :deviceAttr :zoom;
+     :value 0.616 .
+effect:aurayellow_set14 :device dev:aura4; :deviceAttr :color;
+     :scaledValue "#76396f" .
+effect:aurayellow_set15 :device dev:aura4; :deviceAttr :rx;
+     :value 0.535 .
+effect:aurayellow_set16 :device dev:aura4; :deviceAttr :ry;
+     :value 0.470 .
+effect:aurayellow_set17 :device dev:aura4; :deviceAttr :zoom;
+     :value 0.651 .
+effect:aurayellow_set18 :device dev:aura3; :deviceAttr :zoom;
+     :value 0.652 .
+effect:aurayellow_set19 :device dev:aura3; :deviceAttr :color;
+     :scaledValue "#e3e218" .
+effect:aurayellow_set2 :device dev:aura1; :deviceAttr :color;
+     :scaledValue "#fffe00" .
+effect:aurayellow_set20 :device dev:aura3; :deviceAttr :rx;
+     :value 0.533 .
+effect:aurayellow_set21 :device dev:aura3; :deviceAttr :ry;
+     :value 0.273 .
+effect:aurayellow_set3 :device dev:aura1; :deviceAttr :rx;
+     :value 0.326 .
+effect:aurayellow_set4 :device dev:aura1; :deviceAttr :ry;
+     :value 0.412 .
+effect:aurayellow_set5 :device dev:aura1; :deviceAttr :zoom;
+     :value 0.629 .
+effect:aurayellow_set6 :device dev:aura5; :deviceAttr :color;
+     :scaledValue "#ffef00" .
+effect:aurayellow_set7 :device dev:aura5; :deviceAttr :rx;
+     :value 0.628 .
+effect:aurayellow_set8 :device dev:aura5; :deviceAttr :ry;
+     :value 0.473 .
+effect:aurayellow_set9 :device dev:aura5; :deviceAttr :zoom;
+     :value 0.685 .
