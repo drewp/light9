@@ -124,8 +124,15 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['colorChange']: 0,
             L9['colorSpeed']: 0,
             L9['goboShake']: _8bit(floatAttr(L9['goboShake'])),
-            L9['goboChoose']: choiceAttr(L9['mini15GoboChoice']),
         }
+
+        out[L9['goboChoose']] = {
+            L9['open']: 0,
+            L9['mini15Gobo1']: 10,
+            L9['mini15Gobo2']: 20,
+            L9['mini15Gobo3']: 30,
+            }[deviceAttrSettings.get(L9['mini15GoboChoice'], L9['open'])]
+        
         out[L9['red']], out[L9['green']], out[L9['blue']] = rgbAttr(L9['color'])
         out[L9['xRotation']], out[L9['xFine']] = fine16Attr(L9['rx'], 1/540)
         out[L9['yRotation']], out[L9['yFine']] = fine16Attr(L9['ry'], 1/240)
