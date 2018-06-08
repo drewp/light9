@@ -33,7 +33,8 @@ coffeeElementSetup(class Light9LiveControl extends Polymer.Element
     graph: { type: Object, notify: true }
     device: { type: Object }
     deviceAttrRow: { type: Object } # object returned from attrRow, below
-    value: { type: Object, notify: true }
+    value: { type: Object, notify: true } # null, Uri, float, str
+    choiceValue: { type: Object }
     
     immediateSlider: { notify: true, observer: 'onSlider' }
     sliderWriteValue: { type: Number }
@@ -43,6 +44,7 @@ coffeeElementSetup(class Light9LiveControl extends Polymer.Element
   @getter_observers: [
     'onChange(value)'
     'onGraphToControls(graphToControls)'
+    'onChoice(choiceValue)'
     ]
   constructor: ->
     super()
@@ -57,17 +59,27 @@ coffeeElementSetup(class Light9LiveControl extends Polymer.Element
     log('change: control gets', v)
     @enableChange = false
     if v == null
-      if @deviceAttrRow.useColor
-        v = '#000000'
-      else
-        v = 0
-    @value = v
+      @clear()
+    else
+      @value = v
     @sliderWriteValue = v if @deviceAttrRow.useSlider
+    @choiceValue = (if v == null then v else v.value) if @deviceAttrRow.useChoice
     @enableChange = true
+
+  onChoice: (value) ->
+    return unless @graphToControls? and @enableChange
+    if value?
+      value = @graph.Uri(value)
+    else
+      value = null
+    @graphToControls.controlChanged(@device, @deviceAttrRow.uri, value)
     
   onChange: (value) ->
     return unless @graphToControls? and @enableChange
+    return if typeof value == "number" and isNaN(value) # let onChoice do it
     #log('change: control tells graph', @deviceAttrRow.uri.value, value)
+    if value == undefined
+      value = null
     @graphToControls.controlChanged(@device, @deviceAttrRow.uri, value)
 
   clear: ->
@@ -128,7 +140,7 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
     else if dataType.equals(U(':choice'))
       daRow.useChoice = true
       choiceUris = @graph.sortedUris(@graph.objects(devAttr, U(':choice')))
-      daRow.choices = ({uri: x, label: @graph.labelOrTail(x)} for x in choiceUris)
+      daRow.choices = ({uri: x.value, label: @graph.labelOrTail(x)} for x in choiceUris)
       daRow.choiceSize = Math.min(choiceUris.length + 1, 10)
     else
       daRow.useSlider = true
@@ -144,20 +156,83 @@ coffeeElementSetup(class Light9LiveDeviceControl extends Polymer.Element
     
 )
 
-class GraphToControls
-  # More efficient bridge between liveControl widgets and graph edits,
-  # as opposed to letting each widget scan the graph and push lots of
-  # tiny patches to it.
-  constructor: (@graph) ->
 
-    # Registered graphValueChanged funcs, by dev+attr
-    @onChanged = {}
+class ActiveSettings
+  # Maintains the settings on this effect
+  constructor: (@graph) ->
 
     # The settings we're showing (or would like to but the widget
     # isn't registered yet):
     # dev+attr : {setting: Uri, onChangeFunc: f, jsValue: str_or_float}
     @settings = new Map()
+    @keyForSetting = new Map() # setting uri str -> dev+attr
 
+    # Registered graphValueChanged funcs, by dev+attr. Kept even when
+    # settings are deleted.
+    @onChanged = new Map()
+
+  addSettingsRow: (device, deviceAttr, setting, value) ->
+    key = device.value + " " + deviceAttr.value
+    @settings.set(key, {
+      setting: setting,
+      onChangeFunc: @onChanged[key],
+      jsValue: value
+    })
+    @keyForSetting.set(setting.value, key)
+    if @onChanged[key]?
+      @onChanged[key](value)
+
+  has: (setting) ->
+    @keyForSetting.has(setting.value)
+
+  setValue: (setting, value) ->
+    row = @settings.get(@keyForSetting.get(setting.value))
+    row.jsValue = value
+    row.onChangeFunc(value) if row.onChangeFunc?
+
+  registerWidget: (device, deviceAttr, graphValueChanged) ->
+    key = device.value + " " + deviceAttr.value
+    @onChanged[key] = graphValueChanged
+    
+    if @settings.has(key)
+      row = @settings.get(key)
+      row.onChangeFunc = graphValueChanged
+      row.onChangeFunc(row.jsValue)
+
+  effectSettingLookup: (device, attr) ->
+    key = device.value + " " + attr.value
+    if @settings.has(key)
+      return @settings.get(key).setting
+
+    return null
+
+  deleteSetting: (setting) ->
+    key = @keyForSetting.get(setting.value)
+    row = @settings.get(key)
+    row.onChangeFunc(null) if row?.onChangeFunc?
+    @settings.delete(key)
+    @keyForSetting.delete(setting)
+
+  clear: ->
+    new Map(@settings).forEach (row, key) ->
+      row.onChangeFunc(null)
+    @settings.clear()
+    @keyForSetting.clear()
+
+  forAll: (cb) ->
+    all = Array.from(@keyForSetting.keys())
+    for s in all
+      cb(@graph.Uri(s))
+
+  allSettingsStr: ->
+    @keyForSetting.keys()
+
+class GraphToControls
+  # More efficient bridge between liveControl widgets and graph edits,
+  # as opposed to letting each widget scan the graph and push lots of
+  # tiny patches to it.
+  constructor: (@graph) ->
+    @activeSettings = new ActiveSettings(@graph)
     @effect = null
 
   ctxForEffect: (effect) ->
@@ -190,67 +265,45 @@ class GraphToControls
     @graph.applyAndSendPatch(patch)
     return effect
 
-  addSettingsRow: (device, deviceAttr, setting, value) ->
-    key = device.value + " " + deviceAttr.value
-    @settings.set(key, {
-      setting: setting,
-      onChangeFunc: @onChanged[key],
-      jsValue: value
-    })
-                                                                              
   syncFromGraph: ->
     U = (x) => @graph.Uri(x)
     return if not @effect
     
-    toClear = new Map(@settings)
+    toClear = new Set(@activeSettings.allSettingsStr())
     
     for setting in @graph.objects(@effect, U(':setting'))
       dev = @graph.uriValue(setting, U(':device'))
       devAttr = @graph.uriValue(setting, U(':deviceAttr'))
-      key = dev.value + " " + devAttr.value
 
       pred = valuePred(@graph, devAttr)
       try
-        value = @graph.floatValue(setting, pred)
+        value = @graph.uriValue(setting, pred)
+        if not value.id.match(/^http/)
+          throw new Error("not uri")
       catch
-        value = @graph.stringValue(setting, pred)
+        try
+          value = @graph.floatValue(setting, pred)
+        catch
+          value = @graph.stringValue(setting, pred)
       log('change: graph contains', devAttr, value)
 
-      if @settings.has(key)
-        @settings.get(key).jsValue = value
-        @settings.get(key).onChangeFunc(value)
-        toClear.delete(key)
+      if @activeSettings.has(setting)
+        @activeSettings.setValue(setting, value)
+        toClear.delete(setting.value)
       else
-        @addSettingsRow(dev, devAttr, setting, value)
-        if @onChanged[key]?
-          @onChanged[key](value)
+        @activeSettings.addSettingsRow(dev, devAttr, setting, value)
           
-    for key, row of toClear
-      row.onChangeFunc(null)      
-      @settings.delete(key)
+    for settingStr in Array.from(toClear)
+      @activeSettings.deleteSetting(U(settingStr))
 
   clearSettings: ->
-    @settings.forEach (row, key) =>
-      row.onChangeFunc(null) if row.onChangeFunc?
-
-    @settings.clear()
+    @activeSettings.clear()
 
   effectSettingLookup: (device, attr) ->
-    key = device.value + " " + attr.value
-    if @settings.has(key)
-      return @settings.get(key).setting
-
-    return null
+    @activeSettings.effectSettingLookup(device, attr)
 
   register: (device, deviceAttr, graphValueChanged) ->
-    key = device.value + " " + deviceAttr.value
-
-    @onChanged[key] = graphValueChanged
-
-    if @settings.has(key)
-      row = @settings.get(key)
-      row.onChangeFunc = graphValueChanged
-      row.onChangeFunc(row.jsValue)
+    @activeSettings.registerWidget(device, deviceAttr, graphValueChanged)
 
   shouldBeStored: (deviceAttr, value) ->
     # this is a bug for zoom=0, since collector will default it to
@@ -260,13 +313,11 @@ class GraphToControls
     return value? and value != 0 and value != '#000000'
 
   emptyEffect: ->
-    new Map(@settings).forEach (row, key) =>
-      row.onChangeFunc(null)
-      @_removeEffectSetting(row.setting)
+    @activeSettings.forAll(@_removeEffectSetting.bind(@))
 
   controlChanged: (device, deviceAttr, value) ->
     # value is float or #color or (Uri or null)
-    if (value == undefined or (typeof value == "number" and isNaN(value)) or (not value.id and typeof value == "object"))
+    if (value == undefined or (typeof value == "number" and isNaN(value)) or (typeof value == "object" and value != null and not value.id))
       throw new Error("controlChanged sent bad value " + value)
     effectSetting = @effectSettingLookup(device, deviceAttr)
     if @shouldBeStored(deviceAttr, value)
@@ -287,7 +338,7 @@ class GraphToControls
     U = (x) => @graph.Uri(x)
     quad = (s, p, o) => @graph.Quad(s, p, o, @ctx)
     effectSetting = @graph.nextNumberedResource(@effect.value + '_set')
-    @addSettingsRow(device, deviceAttr, effectSetting, value)
+    @activeSettings.addSettingsRow(device, deviceAttr, effectSetting, value)
     addQuads = [
       quad(@effect, U(':setting'), effectSetting),
       quad(effectSetting, U(':device'),  device),
@@ -300,17 +351,19 @@ class GraphToControls
 
   _patchExistingEffectSetting: (effectSetting, deviceAttr, value) ->
     log('change: patch existing', effectSetting.value)
+    @activeSettings.setValue(effectSetting, value)
     @graph.patchObject(effectSetting, valuePred(@graph, deviceAttr), @_nodeForValue(value), @ctx)
 
   _removeEffectSetting: (effectSetting) ->
-    log('change: _removeEffectSetting', effectSetting.value)
-     U = (x) => @graph.Uri(x)
+    U = (x) => @graph.Uri(x)
     quad = (s, p, o) => @graph.Quad(s, p, o, @ctx)
     if effectSetting?
+      log('change: _removeEffectSetting', effectSetting.value)
       toDel = [quad(@effect, U(':setting'), effectSetting, @ctx)]
       for q in @graph.graph.getQuads(effectSetting)
         toDel.push(q)
       @graph.applyAndSendPatch({delQuads: toDel, addQuads: []})
+      @activeSettings.deleteSetting(effectSetting)
     
     
 coffeeElementSetup(class Light9LiveControls extends Polymer.Element

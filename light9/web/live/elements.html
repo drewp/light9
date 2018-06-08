@@ -30,6 +30,9 @@
              background: #0b1d0b;
          }
      }
+     paper-item.iron-selected {
+         background: #7b7b4a;
+     }
     </style>
     <paper-listbox id="list"
                    selected="{{value}}"
@@ -129,7 +132,7 @@
       </div>
     </template>
     <template is="dom-if" if="{{deviceAttrRow.useChoice}}">
-      <light9-listbox choices="{{deviceAttrRow.choices}}" value="{{value}}">
+      <light9-listbox choices="{{deviceAttrRow.choices}}" value="{{choiceValue}}">
       </light9-listbox>
     </template>
 
