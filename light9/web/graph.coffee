@@ -98,7 +98,7 @@ class AutoDependencies
     prn(@handlers, 0)
     
   _handlerIsAffected: (child, patchSubjs) ->
-    if allPatchSubjs == null
+    if patchSubjs == null
       return true
     if not child.patterns.length
       return false
