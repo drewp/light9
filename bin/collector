@@ -142,8 +142,9 @@ def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
         outputs = [
-            EnttecDmx(L9['output/dmx0/'], '/dev/dmx3', 80),
-            Udmx(L9['output/udmx/'], 510),
+            # EnttecDmx(L9['output/dmx0/'], '/dev/dmx3', 80),
+            Udmx(L9['output/dmxA/'], bus=4, numChannels=80),
+            Udmx(L9['output/dmxB/'], bus=5, numChannels=510),
         ]
     except Exception as e:
         log.error("setting up outputs: %r", e)
