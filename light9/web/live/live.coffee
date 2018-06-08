@@ -75,6 +75,8 @@ coffeeElementSetup(class Light9LiveControl extends Polymer.Element
     @sliderWriteValue = 0
     if @deviceAttrRow.useColor
       @value = '#000000'
+    else if @deviceAttrRow.useChoice
+      @value = @pickedChoice = null
     else
       @value = @immediateSlider = 0
 )
@@ -255,7 +257,7 @@ class GraphToControls
     # stick at the last setting if we don't explicitly send the
     # 0. rx/ry similar though not the exact same deal because of
     # their remap.
-    return value != 0 and value != '#000000'
+    return value? and value != 0 and value != '#000000'
 
   emptyEffect: ->
     new Map(@settings).forEach (row, key) =>
@@ -263,7 +265,8 @@ class GraphToControls
       @_removeEffectSetting(row.setting)
 
   controlChanged: (device, deviceAttr, value) ->
-    if not value? or (typeof value == "number" and isNaN(value))
+    # value is float or #color or (Uri or null)
+    if (value == undefined or (typeof value == "number" and isNaN(value)) or (not value.id and typeof value == "object"))
       throw new Error("controlChanged sent bad value " + value)
     effectSetting = @effectSettingLookup(device, deviceAttr)
     if @shouldBeStored(deviceAttr, value)
@@ -274,7 +277,13 @@ class GraphToControls
     else
       @_removeEffectSetting(effectSetting)
 
+  _nodeForValue: (value) ->
+    if value.id?
+      return value
+    return @graph.prettyLiteral(value)
+
   _addEffectSetting: (device, deviceAttr, value) ->
+    log('change: _addEffectSetting', deviceAttr.value, value)
     U = (x) => @graph.Uri(x)
     quad = (s, p, o) => @graph.Quad(s, p, o, @ctx)
     effectSetting = @graph.nextNumberedResource(@effect.value + '_set')
@@ -283,18 +292,19 @@ class GraphToControls
       quad(@effect, U(':setting'), effectSetting),
       quad(effectSetting, U(':device'),  device),
       quad(effectSetting, U(':deviceAttr'), deviceAttr),
-      quad(effectSetting, valuePred(@graph, deviceAttr), @graph.prettyLiteral(value))
+      quad(effectSetting, valuePred(@graph, deviceAttr), @_nodeForValue(value))
     ]
     patch = {addQuads: addQuads, delQuads: []}
     log('save', patch)
     @graph.applyAndSendPatch(patch)
 
   _patchExistingEffectSetting: (effectSetting, deviceAttr, value) ->
-    log('patch existing', effectSetting.value)
-    @graph.patchObject(effectSetting, valuePred(@graph, deviceAttr), @graph.prettyLiteral(value), @ctx)
+    log('change: patch existing', effectSetting.value)
+    @graph.patchObject(effectSetting, valuePred(@graph, deviceAttr), @_nodeForValue(value), @ctx)
 
   _removeEffectSetting: (effectSetting) ->
-    U = (x) => @graph.Uri(x)
+    log('change: _removeEffectSetting', effectSetting.value)
+     U = (x) => @graph.Uri(x)
     quad = (s, p, o) => @graph.Quad(s, p, o, @ctx)
     if effectSetting?
       toDel = [quad(@effect, U(':setting'), effectSetting, @ctx)]
@@ -328,6 +338,10 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
   onGraph: ->
     @graphToControls = new GraphToControls(@graph)
     @graph.runHandler(@update.bind(@), 'Light9LiveControls update')
+
+    effect = new URL(window.location.href).searchParams.get('effect')
+    if effect?
+      @effectChoice = effect
 
   effectSettingLookup: (device, attr) ->
     if @graphToControls == null
