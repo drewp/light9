@@ -537,6 +537,7 @@ class Note
     @_traceBorder(params.screenPts, 2, 0xffd900)
 
     @_addMouseBindings()
+    
                  
   update: ->
     if not @parentElem.isActiveNote(@uri)

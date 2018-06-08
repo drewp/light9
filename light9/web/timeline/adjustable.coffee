@@ -110,8 +110,9 @@ class window.AdjustableFloatObject extends Adjustable
     @ctor2()
     if not @config.ctx?
       throw new Error("missing ctx")
+    # this seems to not fire enough.
     @config.graph.runHandler(@_syncValue.bind(@),
-                             "adj sync #{@config.subj.value}")
+                             "adj sync #{@config.subj.value} #{@config.pred.value}")
 
   _syncValue: () ->
     @_currentValue = @config.graph.floatValue(@config.subj, @config.pred)
@@ -138,6 +139,7 @@ class window.AdjustableFloatObject extends Adjustable
     @config.graph.patchObject(@config.subj, @config.pred,
                               @config.graph.LiteralRoundedFloat(newValue),
                               @config.ctx)
+    #@_syncValue()
 
 class window.AdjustableFade extends Adjustable
   constructor: (@yForV, @zoomInX, @i0, @i1, @note, offset, ctx) ->

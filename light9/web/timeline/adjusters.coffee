@@ -48,6 +48,7 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
       @currentDrag.cur = pos
       @currentDrag.adj.continueDrag(
         @currentDrag.cur.subtract(@currentDrag.start))
+      @redraw()
     else
       near = @_adjAtPoint(pos)
       if @hoveringNear != near
@@ -64,13 +65,14 @@ coffeeElementSetup(class AdjustersCanvas extends Polymer.mixinBehaviors([Polymer
     # adjuster elements for. Caller invents adjId.  makeAdjustable is
     # a function returning the Adjustable or it is null to clear any
     # adjusters with this id.
-    if not @adjs[adjId] or not makeAdjustable?
-      if not makeAdjustable?
+    if not makeAdjustable?
+      if @adjs[adjId]
         delete @adjs[adjId]
-      else
-        adj = makeAdjustable()
-        @adjs[adjId] = adj
-        adj.id = adjId
+    else
+      # this might be able to reuse an existing one a bit
+      adj = makeAdjustable()
+      @adjs[adjId] = adj
+      adj.id = adjId
 
     @redraw()
 
