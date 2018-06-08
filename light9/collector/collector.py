@@ -164,9 +164,12 @@ class Collector(Generic[ClientType, ClientSessionType]):
             except KeyError:
                 log.warn("request for output to unconfigured device %s" % d)
                 continue
-            outputAttrs[d] = toOutputAttrs(devType, deviceAttrs.get(d, {}))
-            if self.listeners:
-                self.listeners.outputAttrsSet(d, outputAttrs[d], self.outputMap)
+            try:
+                outputAttrs[d] = toOutputAttrs(devType, deviceAttrs.get(d, {}))
+                if self.listeners:
+                    self.listeners.outputAttrsSet(d, outputAttrs[d], self.outputMap)
+            except Exception as e:
+                log.error('failing toOutputAttrs on %s: %r', d, e)
         
         pendingOut = {} # output : values
         for out in self.outputs:

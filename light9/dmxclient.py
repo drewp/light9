@@ -21,7 +21,9 @@ class TwistedZmqClient(object):
     def __init__(self, service):
         zf = ZmqFactory()
         e = ZmqEndpoint('connect', 'tcp://%s:%s' % (service.host, service.port))
-        self.conn = ZmqPushConnection(zf, e)
+        class Push(ZmqPushConnection):
+            highWaterMark = 3
+        self.conn = Push(zf, e)
         
     def send(self, clientid, levellist):
         self.conn.push(json.dumps({'clientid': clientid, 'levellist': levellist}))
