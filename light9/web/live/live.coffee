@@ -231,8 +231,11 @@ class ActiveSettings
     return null
 
   deleteSetting: (setting) ->
+    log('deleteSetting ' + setting.value)
     key = @keyForSetting.get(setting.value)
     row = @settings.get(key)
+    if row? and not row.setting.equals(setting)
+      throw new Error('corrupt row for ' + setting.value)
     row.onChangeFunc(null) if row?.onChangeFunc?
     @settings.delete(key)
     @keyForSetting.delete(setting)
@@ -323,9 +326,6 @@ class GraphToControls
   clearSettings: ->
     @activeSettings.clear()
 
-  effectSettingLookup: (device, attr) ->
-    @activeSettings.effectSettingLookup(device, attr)
-
   register: (device, deviceAttr, graphValueChanged) ->
     @activeSettings.registerWidget(device, deviceAttr, graphValueChanged)
 
@@ -343,7 +343,7 @@ class GraphToControls
     # value is float or #color or (Uri or null)
     if (value == undefined or (typeof value == "number" and isNaN(value)) or (typeof value == "object" and value != null and not value.id))
       throw new Error("controlChanged sent bad value " + value)
-    effectSetting = @effectSettingLookup(device, deviceAttr)
+    effectSetting = @activeSettings.effectSettingLookup(device, deviceAttr)
     if @shouldBeStored(deviceAttr, value)
       if not effectSetting?
         @_addEffectSetting(device, deviceAttr, value)
@@ -416,14 +416,13 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
     @graphToControls = new GraphToControls(@graph)
     @graph.runHandler(@update.bind(@), 'Light9LiveControls update')
 
+    # need graph to be loaded, so we don't make double settings? not sure.
+    setTimeout(@setFromUrl.bind(@), 1)
+
+  setFromUrl: ->
     effect = new URL(window.location.href).searchParams.get('effect')
     if effect?
       @effectChoice = effect
-
-  effectSettingLookup: (device, attr) ->
-    if @graphToControls == null
-      throw new Error('not ready')
-    return @graphToControls.effectSettingLookup(device, attr)
 
   newEffect: ->
     @effectChoice = @graphToControls.newEffect().value
