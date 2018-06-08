@@ -8,7 +8,7 @@ Polymer
 
   getClasses: ->
     U = (x) => @graph.Uri(x)
-    @effectClasses = _.sortBy(@graph.subjects(U('rdf:type'), U(':Effect')))
+    @effectClasses = @graph.sortedUris(@graph.subjects(U('rdf:type'), U(':Effect')))
 
 Polymer
   is: "light9-effect-class"
