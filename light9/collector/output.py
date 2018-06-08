@@ -133,11 +133,11 @@ class Udmx(DmxOutput):
                               scales.PmfStat('update'),
                               scales.PmfStat('write'),
                               scales.IntStat('usbErrors'))
-    def __init__(self, uri, numChannels):
+    def __init__(self, uri, bus, numChannels):
         DmxOutput.__init__(self, uri, numChannels)
         
         from light9.io.udmx import Udmx
-        self.dev = Udmx()
+        self.dev = Udmx(bus)
         self.currentBuffer = ''
         self.lastSentBuffer = None
         self.lastLog = 0

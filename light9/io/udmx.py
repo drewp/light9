@@ -24,8 +24,14 @@ or https://github.com/markusb/uDMX-linux/blob/master/uDMX.c
 cmd_SetChannelRange = 0x0002
 
 class Udmx(object):
-    def __init__(self):
-        self.dev = usb.core.find(idVendor=0x16c0, idProduct=0x05dc)
+    def __init__(self, bus):
+        self.dev = None
+        for dev in usb.core.find(idVendor=0x16c0, idProduct=0x05dc, find_all=True):
+            print "udmx device at %r" % dev.bus
+            if bus is None or bus == dev.bus:
+                self.dev = dev
+        if not self.dev:
+            raise IOError('no matching udmx device found for requested bus %r' % bus)
         log.info('found udmx at %r', self.dev)
         
     def SendDMX(self, buf):
