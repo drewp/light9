@@ -161,7 +161,7 @@ class GraphToControls
   ctxForEffect: (effect) ->
     @graph.Uri(effect.value.replace(
       "light9.bigasterisk.com/effect",
-      "light9.bigasterisk.com/show/dance2017/effect"))
+      "light9.bigasterisk.com/show/dance2018/effect"))
       
   setEffect: (effect) ->
     @clearSettings()
