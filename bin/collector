@@ -66,7 +66,7 @@ class WebListeners(object):
         
     def addClient(self, client):
         self.clients.append([client, {}]) # seen = {dev: attrs}
-        log.info('added client %s %s', len(clients), client)
+        log.info('added client %s %s', len(self.clients), client)
 
     def delClient(self, client):
         self.clients = [[c, t] for c, t in self.clients if c != client]
