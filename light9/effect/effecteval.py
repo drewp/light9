@@ -12,6 +12,8 @@ import time
 from light9.effect.settings import DeviceSettings
 from light9.effect.scale import scale
 import random
+random.seed(0)
+print "reload effecteval"
 
 log = logging.getLogger('effecteval')
 
@@ -198,6 +200,29 @@ def effect_qsweep(effectSettings, strength, songTime, noteTime):
             })
     return out
 
+def effect_qsweepusa(effectSettings, strength, songTime, noteTime):
+    out = {}
+    period = float(effectSettings.get(L9['period'], 2))
+
+    colmap = {
+        1: '#ff0000',
+        2: '#888888',
+        3: '#5050ff',
+    }
+    
+    for n in range(1, 3+1):
+        dev = L9['device/q%s' % n]
+        out.update({
+            (dev, L9['color']): scale(colmap[n], effectSettings.get(L9['strength'], 1)),
+            (dev, L9['zoom']): effectSettings.get(L9['zoom'], .5),
+            })
+        out.update({
+            (dev, L9['rx']):
+            lerp(.3, .8, nsin(songTime / period + n / 4)),
+            (dev, L9['ry']): effectSettings.get(L9['ry'], .5),
+            })
+    return out
+
 chase1_members = [
         DEV['backlight1'],
         DEV['lip1'],
@@ -242,7 +267,7 @@ def effect_chase2(effectSettings, strength, songTime, noteTime):
     members = chase2_members
     
     out = {}
-    period = float(effectSettings.get(L9['period'], 2 / len(members)))
+    period = float(effectSettings.get(L9['period'], 0.3))
 
     for i, dev in enumerate(members):
         cursor = (songTime / period) % float(len(members))

@@ -56,3 +56,5 @@ show:song10 :note <http://light9.bigasterisk.com/show/dance2018/song10/n0>, <htt
      :value 0e+00 .
 <http://light9.bigasterisk.com/show/dance2018/song10/n2set0> :effectAttr :colorScale;
      :value "#3a3c3a" .
+
+effect:qsweepusa a :Effect; :publishAttr :strength ; :group "anim".

@@ -23,6 +23,7 @@ effect:pulseRainbow a :Effect; rdfs:label "pulseRainbow"; :publishAttr :strength
 
 effect:orangeSearch a :Effect; :publishAttr :strength ; :group "anim".
 effect:qsweep a :Effect; :publishAttr :strength ; :group "anim".
+effect:qsweepusa a :Effect; :publishAttr :strength ; :group "anim".
 effect:chase1 a :Effect; :publishAttr :strength ; :group "anim".
 effect:chase2 a :Effect; :publishAttr :strength ; :group "anim".
 
