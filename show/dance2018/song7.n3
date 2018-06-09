@@ -54,7 +54,7 @@ show:song7 :note <http://light9.bigasterisk.com/show/dance2018/song7/n0>, <http:
      :value "#ff5246" .
 
 <http://light9.bigasterisk.com/show/dance2018/song7/n3> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song7/n3c0>;
-     :effectClass effect:aurayellow; :originTime 2.49082e+02 .
+     :effectClass effect:aurayellow; :originTime 2.49082e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song7/n3set0> .
 
 <http://light9.bigasterisk.com/show/dance2018/song7/n3c0> a :Curve;
      :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p0>, <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p1>, <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p2>, <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p3> .
@@ -66,3 +66,5 @@ show:song7 :note <http://light9.bigasterisk.com/show/dance2018/song7/n0>, <http:
      :value 1e+00 .
 <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p3> :time 1.12366e+02;
      :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n3set0> :effectAttr :colorScale;
+     :value "#ff140c" .

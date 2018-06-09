@@ -33,7 +33,7 @@ dev:q2 :outputAttrRange dev:q2rx . dev:q2rx :outputAttr :rx; :start 0.097; :end 
 dev:q2 :outputAttrRange dev:q2ry . dev:q2ry :outputAttr :ry; :start 0.739; :end 0.824 .
 dev:q3 a :MacQuantum; :dmxUniverse dmxB:; :dmxBase 379 .
 dev:q3 :outputAttrRange dev:q3rx . dev:q3rx :outputAttr :rx; :start 0.064; :end 0.198 .
-dev:q3 :outputAttrRange dev:q3ry . dev:q3ry :outputAttr :ry; :start 0.765; :end 0.822 .
+dev:q3 :outputAttrRange dev:q3ry . dev:q3ry :outputAttr :ry; :start 0.705; :end 0.822 .
 
 dev:aura1 a :MacAura; :dmxUniverse dmxB:; :dmxBase 406 .
 dev:aura2 a :MacAura; :dmxUniverse dmxB:; :dmxBase 420 .

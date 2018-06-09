@@ -8,10 +8,5 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect0 a :Effect; rdfs:label "effect0"; :publishAttr :strength;
-     :setting effect:effect0_set1, effect:effect0_set21, effect:effect0_set22, effect:effect0_set23, effect:effect0_set24 .
-effect:effect0_set1 :device dev:dim41; :deviceAttr :brightness; :scaledValue 5.53e-01 .
-effect:effect0_set21 :device dev:dim43; :deviceAttr :brightness; :scaledValue 4.73e-01 .
-effect:effect0_set22 :device dev:dim45; :deviceAttr :brightness; :scaledValue 7.07e-01 .
-effect:effect0_set23 :device dev:dim44; :deviceAttr :brightness; :scaledValue 7.08e-01 .
-effect:effect0_set24 :device dev:dim42; :deviceAttr :brightness; :scaledValue 5.33e-01 .
+effect:effect0 a :Effect; rdfs:label "effect0"; :publishAttr :strength .
+effect:effect0_set19 :value 4.65e-01 .

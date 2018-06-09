@@ -1,0 +1,40 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+show:song1 :note <http://light9.bigasterisk.com/show/dance2018/song1/n1> .
+
+<http://light9.bigasterisk.com/show/dance2018/song1/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song1/n0c0>;
+     :effectClass effect:allwide; :originTime 2.1079e+01; :setting <http://light9.bigasterisk.com/show/dance2018/song1/n0set0> .
+
+<http://light9.bigasterisk.com/show/dance2018/song1/n0c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song1/n0c0p0>, <http://light9.bigasterisk.com/show/dance2018/song1/n0c0p1>, <http://light9.bigasterisk.com/show/dance2018/song1/n0c0p2>, <http://light9.bigasterisk.com/show/dance2018/song1/n0c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song1/n0c0p0> :time -1.7756e+01;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n0c0p1> :time -1.244e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n0c0p2> :time 1.88979e+02;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n0c0p3> :time 1.91622e+02;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n0set0> :effectAttr :colorScale;
+     :value "#ffffff" .
+
+<http://light9.bigasterisk.com/show/dance2018/song1/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song1/n1c0>;
+     :effectClass effect:song01b; :originTime 1.24363e+02 .
+
+<http://light9.bigasterisk.com/show/dance2018/song1/n1c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song1/n1c0p0>, <http://light9.bigasterisk.com/show/dance2018/song1/n1c0p1>, <http://light9.bigasterisk.com/show/dance2018/song1/n1c0p2>, <http://light9.bigasterisk.com/show/dance2018/song1/n1c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song1/n1c0p0> :time -1.2249e+02;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n1c0p1> :time -1.17748e+02;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n1c0p2> :time 8.5951e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song1/n1c0p3> :time 8.7761e+01;
+     :value 0e+00 .

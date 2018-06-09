@@ -1,0 +1,33 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/whirls3/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:whirls3 a :Effect; rdfs:label "whirls3"; :publishAttr :strength;
+     :setting eff:set1664388, eff:set2039773, eff:set303911, eff:set3050030, eff:set305271, eff:set3094458, eff:set3427708, eff:set4468697, eff:set4809550, eff:set5058139, eff:set5616592, eff:set5954089, eff:set6756130, eff:set716575, eff:set7338692, eff:set8421183, eff:set8713318, eff:set9234937, eff:set9680690, eff:set9771769 .
+eff:set1664388 :device dev:q3; :deviceAttr :quantumGoboChoice; :value :whirlpool .
+eff:set2039773 :device dev:q1; :deviceAttr :goboSpeed; :value 3.1e-02 .
+eff:set303911 :device dev:q1; :deviceAttr :zoom; :value 3.7e-02 .
+eff:set3050030 :device dev:q3; :deviceAttr :goboSpeed; :value 4.2e-02 .
+eff:set305271 :device dev:q1; :deviceAttr :color; :scaledValue "#ff898d" .
+eff:set3094458 :device dev:q3; :deviceAttr :ry; :value 4.6e-02 .
+eff:set3427708 :device dev:dim42; :deviceAttr :brightness; :scaledValue 5.33e-01 .
+eff:set4468697 :device dev:dim45; :deviceAttr :brightness; :scaledValue 7.07e-01 .
+eff:set4809550 :device dev:q3; :deviceAttr :rx; :value 4.35e-01 .
+eff:set5058139 :device dev:q3; :deviceAttr :focus; :value 5.46e-01 .
+eff:set5616592 :device dev:q1; :deviceAttr :rx; :value 5.5e-01 .
+eff:set5954089 :device dev:dim41; :deviceAttr :brightness; :scaledValue 5.53e-01 .
+eff:set6756130 :device dev:q1; :deviceAttr :ry; :value 5.15e-01 .
+eff:set716575 :device dev:q3; :deviceAttr :zoom; :value 9.5e-02 .
+eff:set7338692 :device dev:dim43; :deviceAttr :brightness; :scaledValue 4.73e-01 .
+eff:set8421183 :device dev:q1; :deviceAttr :focus; :value 5.4e-01 .
+eff:set8713318 :device dev:q3; :deviceAttr :color; :scaledValue "#f78dff" .
+eff:set9234937 :device dev:q1; :deviceAttr :quantumGoboChoice; :value :whirlpool .
+eff:set9680690 :device dev:dim44; :deviceAttr :brightness; :scaledValue 7.08e-01 .
+eff:set9771769 :device dev:q2; :deviceAttr :quantumGoboChoice; :value :whirlpool .
