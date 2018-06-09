@@ -11,7 +11,7 @@ import logging
 import time
 from light9.effect.settings import DeviceSettings
 from light9.effect.scale import scale
-
+import random
 
 log = logging.getLogger('effecteval')
 
@@ -198,9 +198,7 @@ def effect_qsweep(effectSettings, strength, songTime, noteTime):
             })
     return out
 
-
-def effect_chase1(effectSettings, strength, songTime, noteTime):
-    members = [
+chase1_members = [
         DEV['backlight1'],
         DEV['lip1'],
         DEV['backlight2'],
@@ -217,8 +215,11 @@ def effect_chase1(effectSettings, strength, songTime, noteTime):
         DEV['lip5'],
         #DEV['upCenter'],
         ]
+chase2_members = chase1_members * 10
+random.shuffle(chase2_members)
 
-    members = members + members[-2:0:-1]
+def effect_chase1(effectSettings, strength, songTime, noteTime):
+    members = chase1_members + chase1_members[-2:0:-1]
     
     out = {}
     period = float(effectSettings.get(L9['period'], 2 / len(members)))
@@ -237,6 +238,25 @@ def effect_chase1(effectSettings, strength, songTime, noteTime):
             })
     return out
 
+def effect_chase2(effectSettings, strength, songTime, noteTime):
+    members = chase2_members
+    
+    out = {}
+    period = float(effectSettings.get(L9['period'], 2 / len(members)))
+
+    for i, dev in enumerate(members):
+        cursor = (songTime / period) % float(len(members))
+        dist = abs(i - cursor)
+        radius = 3
+        if dist < radius:
+            col = effectSettings.get(L9['colorScale'], '#ffffff')
+            col = scale(col, effectSettings.get(L9['strength'], 1))
+            col = scale(col, (1 - dist / radius))
+        
+            out.update({
+                (dev, L9['color']): col,
+            })
+    return out
     
 def effect_orangeSearch(effectSettings, strength, songTime, noteTime):
     dev = L9['device/auraStage']
