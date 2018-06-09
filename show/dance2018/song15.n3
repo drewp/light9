@@ -1,0 +1,84 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+show:song15 :note <http://light9.bigasterisk.com/show/dance2018/song15/n0>, <http://light9.bigasterisk.com/show/dance2018/song15/n1>, <http://light9.bigasterisk.com/show/dance2018/song15/n2>, <http://light9.bigasterisk.com/show/dance2018/song15/n3> .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n4> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song15/n4c0>;
+     :effectClass effect:bow; :originTime 1.70321e+02 .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song15/n0c0>;
+     :effectClass effect:allcolor; :originTime 6.599e+00 .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n0c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song15/n0c0p0>, <http://light9.bigasterisk.com/show/dance2018/song15/n0c0p1>, <http://light9.bigasterisk.com/show/dance2018/song15/n0c0p2>, <http://light9.bigasterisk.com/show/dance2018/song15/n0c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song15/n0c0p0> :time -1.997e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n0c0p1> :time 9.672e+00;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n0c0p2> :time 9.6171e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n0c0p3> :time 9.6858e+01;
+     :value 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song15/n1c0>;
+     :effectClass effect:aurasuperwide; :originTime 1.46381e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song15/n1set0> .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n1c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p0>, <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p1>, <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p2>, <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song15/n1c0p0> :time 1.1736e+01;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n1c0p1> :time 1.2648e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n1c0p2> :time 4.3175e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n1c0p3> :time 4.4583e+01;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n1set0> :effectAttr :colorScale;
+     :value "#ffb1b5" .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n2> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song15/n2c0>;
+     :effectClass effect:qsweepusa; :originTime 1.59636e+02 .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n2c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song15/n2c0p0>, <http://light9.bigasterisk.com/show/dance2018/song15/n2c0p1>, <http://light9.bigasterisk.com/show/dance2018/song15/n2c0p2>, <http://light9.bigasterisk.com/show/dance2018/song15/n2c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song15/n2c0p0> :time -5.706e+01;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n2c0p1> :time -5.6622e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n2c0p2> :time -3.241e+00;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n2c0p3> :time -4.99e-01;
+     :value 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n3> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song15/n3c0>;
+     :effectClass effect:aurasuperwide; :originTime 1.25042e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song15/n3set0> .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n3c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song15/n3c0p0>, <http://light9.bigasterisk.com/show/dance2018/song15/n3c0p1>, <http://light9.bigasterisk.com/show/dance2018/song15/n3c0p2>, <http://light9.bigasterisk.com/show/dance2018/song15/n3c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song15/n3c0p0> :time -8.941e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n3c0p1> :time -1.533e+00;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n3c0p2> :time 6.3894e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n3c0p3> :time 6.5913e+01;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n3set0> :effectAttr :colorScale;
+     :value "#cfa1a2" .
+
+<http://light9.bigasterisk.com/show/dance2018/song15/n4c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song15/n4c0p0>, <http://light9.bigasterisk.com/show/dance2018/song15/n4c0p1>, <http://light9.bigasterisk.com/show/dance2018/song15/n4c0p2>, <http://light9.bigasterisk.com/show/dance2018/song15/n4c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song15/n4c0p0> :time 6.943e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n4c0p1> :time 7.878e+00;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n4c0p2> :time 1.2581e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song15/n4c0p3> :time 1.4083e+01;
+     :value 0e+00 .
