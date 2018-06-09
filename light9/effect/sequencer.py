@@ -6,10 +6,12 @@ from __future__ import division
 from louie import dispatcher
 from rdflib import URIRef
 from twisted.internet import reactor
+from twisted.internet import defer
 from twisted.internet.inotify import INotify
 from twisted.python.filepath import FilePath
 import cyclone.sse
 import logging, bisect, time
+import traceback
 
 from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
@@ -160,6 +162,7 @@ class Sequencer(object):
 
 
     def updateLoop(self):
+        # print "updateLoop"
         now = time.time()
         self.recentUpdateTimes = self.recentUpdateTimes[-40:] + [now]
         stats.recentFps = len(self.recentUpdateTimes) / (self.recentUpdateTimes[-1] - self.recentUpdateTimes[0] + .0001)
@@ -172,7 +175,11 @@ class Sequencer(object):
             self.lastStatLog = now
 
         def done(sec):
-            reactor.callLater(max(0, time.time() - (now + 1 / self.fps)), self.updateLoop)
+            # print "sec", sec
+            # delay = max(0, time.time() - (now + 1 / self.fps))
+            # print 'cl', delay
+            delay = 0.005
+            reactor.callLater(delay, self.updateLoop)
         def err(e):
             log.warn('updateLoop: %r', e)
             reactor.callLater(2, self.updateLoop)
@@ -182,22 +189,27 @@ class Sequencer(object):
         
     @stats.update.time()
     def update(self):
-        musicState = self.music.getLatest()
-        song = URIRef(musicState['song']) if musicState.get('song') else None
-        if 't' not in musicState:
-            return
-        t = musicState['t']
-        dispatcher.send('state', update={'song': str(song), 't': t})
+        # print "update"
+        try:
+            musicState = self.music.getLatest()
+            song = URIRef(musicState['song']) if musicState.get('song') else None
+            if 't' not in musicState:
+                return defer.succeed(0)
+            t = musicState['t']
+            dispatcher.send('state', update={'song': str(song), 't': t})
 
-        settings = []
-        songNotes = sorted(self.notes.get(song, []), key=lambda n: n.uri)
-        noteReports = []
-        for note in songNotes:
-            s, report = note.outputSettings(t)
-            noteReports.append(report)
-            settings.append(s)
-        dispatcher.send('state', update={'songNotes': noteReports})
-        return self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
+            settings = []
+            songNotes = sorted(self.notes.get(song, []), key=lambda n: n.uri)
+            noteReports = []
+            for note in songNotes:
+                s, report = note.outputSettings(t)
+                noteReports.append(report)
+                settings.append(s)
+            dispatcher.send('state', update={'songNotes': noteReports})
+            return self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
+        except Exception:
+            traceback.print_exc()
+            raise
 
 class Updates(cyclone.sse.SSEHandler):
     def __init__(self, application, request, **kwargs):
