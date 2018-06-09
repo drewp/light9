@@ -1,0 +1,27 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/whirls2/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:whirls2 a :Effect; rdfs:label "whirls2"; :publishAttr :strength;
+     :setting eff:set1664388, eff:set2479710, eff:set3654185, eff:set3852995, eff:set3923493, eff:set4197403, eff:set4232466, eff:set4481468, eff:set4581095, eff:set4678848, eff:set6103665, eff:set8169104, eff:set917713, eff:set9771769 .
+eff:set1664388 :device dev:q3; :deviceAttr :quantumGoboChoice; :value :whirlpool .
+eff:set2479710 :device dev:q2; :deviceAttr :rx; :value 5.64e-01 .
+eff:set3654185 :device dev:q2; :deviceAttr :ry; :value 3.76e-01 .
+eff:set3852995 :device dev:q3; :deviceAttr :ry; :value 1.26e-01 .
+eff:set3923493 :device dev:q2; :deviceAttr :color; :scaledValue "#c77ffe" .
+eff:set4197403 :device dev:q2; :deviceAttr :goboSpeed; :value 3.9e-02 .
+eff:set4232466 :device dev:q3; :deviceAttr :zoom; :value 7.4e-02 .
+eff:set4481468 :device dev:q2; :deviceAttr :zoom; :value 6.7e-02 .
+eff:set4581095 :device dev:q3; :deviceAttr :rx; :value 4.97e-01 .
+eff:set4678848 :device dev:q3; :deviceAttr :focus; :value 5.58e-01 .
+eff:set6103665 :device dev:q3; :deviceAttr :color; :scaledValue "#fb7d16" .
+eff:set8169104 :device dev:q2; :deviceAttr :focus; :value 5.19e-01 .
+eff:set917713 :device dev:q3; :deviceAttr :goboSpeed; :value 3.7e-02 .
+eff:set9771769 :device dev:q2; :deviceAttr :quantumGoboChoice; :value :whirlpool .

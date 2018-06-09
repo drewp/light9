@@ -4,7 +4,8 @@
 @prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
-@prefix show: <http://light9.bigasterisk.com/show/dance2017/> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix show1: <http://light9.bigasterisk.com/show/dance2017/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
@@ -13,7 +14,7 @@ effect:allwide a :Effect; rdfs:label "allwide"; :publishAttr :strength;
      :setting eff:set1221215, eff:set1336182, eff:set1767835, eff:set2190596, eff:set2785726, eff:set2860082, eff:set3270897, eff:set3880400, eff:set4027558, eff:set4071630, eff:set4287203, eff:set4491079, eff:set524414, eff:set5629954, eff:set6127440, eff:set6274829, eff:set6430654, eff:set6468348, eff:set6510639, eff:set6512093, eff:set6619580, eff:set6986505, eff:set7133623, eff:set7201437, eff:set7322423, eff:set7368166, eff:set7587193, eff:set7609684, eff:set7657931, eff:set7684257, eff:set8169620, eff:set8173712, eff:set8201166, eff:set8398391, eff:set8632732, eff:set8900244, eff:set9010219, eff:set913807, eff:set91410, eff:set9725281, eff:set9949789 .
 eff:set1221215 :device dev:aura3; :deviceAttr :color; :scaledValue "#ffffff" .
 eff:set1336182 :device dev:aura4; :deviceAttr :zoom; :value 0.419 .
-eff:set1767835 :device dev:aura1; :deviceAttr :rx; :value 0.153 .
+eff:set1767835 :device dev:aura1; :deviceAttr :rx; :value 2.38e-01 .
 eff:set2190596 :device dev:q1; :deviceAttr :color; :scaledValue "#f2a58f" .
 eff:set2785726 :device dev:f2; :deviceAttr :brightness; :scaledValue 1e+00 .
 eff:set2860082 :device dev:q1; :deviceAttr :zoom; :value 0.319 .
@@ -43,9 +44,9 @@ eff:set7657931 :device dev:q1; :deviceAttr :ry; :value 0.475 .
 eff:set7684257 :device dev:aura3; :deviceAttr :rx; :value 0.557 .
 eff:set8169620 :device dev:aura1; :deviceAttr :zoom; :value 0.435 .
 eff:set8173712 :device dev:aura2; :deviceAttr :zoom; :value 0.425 .
-eff:set8201166 :device dev:aura2; :deviceAttr :rx; :value 0.368 .
+eff:set8201166 :device dev:aura2; :deviceAttr :rx; :value 5.22e-01 .
 eff:set8398391 :device dev:aura3; :deviceAttr :zoom; :value 0.435 .
-eff:set8632732 :device dev:aura5; :deviceAttr :rx; :value 0.820 .
+eff:set8632732 :device dev:aura5; :deviceAttr :rx; :value 7.29e-01 .
 eff:set8900244 :device dev:q2; :deviceAttr :ry; :value 0.482 .
 eff:set9010219 :device dev:q2; :deviceAttr :rx; :value 0.513 .
 eff:set913807 :device dev:q1; :deviceAttr :rx; :value 0.248 .

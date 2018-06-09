@@ -19,8 +19,11 @@ dev:f1 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 4 .
 dev:f2 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 8 .
 dev:f3 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 10 .
 
-dev:cycR a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 42 .
-dev:cycL a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 44 .
+dev:cyc1 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 41 .
+dev:cyc2 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 42 .
+dev:cyc3 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 43 .
+dev:cyc4 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 44 .
+dev:cyc5 a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 45 .
 
 dev:q1 a :MacQuantum; :dmxUniverse dmxB:; :dmxBase 325 .
 dev:q1 :outputAttrRange dev:q1rx . dev:q1rx :outputAttr :rx; :start 0.143; :end 0.271 .
@@ -61,7 +64,7 @@ dev:backlight1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 241 .
 dev:backlight2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 247 .
 dev:backlight3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 253 .
 dev:backlight4 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 259 .
-dev:backlight5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 265 .
+#dev:backlight5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 265 .
 dev:hexLow3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 223 .
 dev:hexLow5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 229 .
 dev:hexLowBacklight1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 211 .
@@ -72,12 +75,12 @@ dev:lip2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 127 .
 dev:lip3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 133 . 
 dev:lip4 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 139 .
 dev:lip5 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 145 . 
-dev:postL1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 289 .
-dev:postL2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 295 .
-dev:postL3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 301 .
-dev:postR1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 271 .
-dev:postR2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 277 .
-dev:postR3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 283 .
+dev:postR1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 289 .
+dev:postR2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 295 .
+dev:postR3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 301 .
+dev:postL1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 271 .
+dev:postL2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 277 .
+dev:postL3 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 283 .
 dev:upCenter a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 313 .
 dev:veryLow1 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 151 .
 dev:veryLow2 a :ChauvetHex12; :dmxUniverse dmxB:; :dmxBase 187 .

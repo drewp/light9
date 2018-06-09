@@ -7,7 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song7 :note <http://light9.bigasterisk.com/show/dance2018/song7/n0>, <http://light9.bigasterisk.com/show/dance2018/song7/n1> .
+show:song7 :note <http://light9.bigasterisk.com/show/dance2018/song7/n0>, <http://light9.bigasterisk.com/show/dance2018/song7/n1>, <http://light9.bigasterisk.com/show/dance2018/song7/n2>, <http://light9.bigasterisk.com/show/dance2018/song7/n3> .
 
 <http://light9.bigasterisk.com/show/dance2018/song7/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song7/n0c0>;
      :effectClass effect:effect0; :originTime 3.0927e+01 .
@@ -35,4 +35,34 @@ show:song7 :note <http://light9.bigasterisk.com/show/dance2018/song7/n0>, <http:
 <http://light9.bigasterisk.com/show/dance2018/song7/n1c0p2> :time 2.0124e+01;
      :value 1e+00 .
 <http://light9.bigasterisk.com/show/dance2018/song7/n1c0p3> :time 3.7501e+01;
+     :value 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2018/song7/n2> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song7/n2c0>;
+     :effectClass effect:aurayellow; :originTime 1.13269e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song7/n2set0> .
+
+<http://light9.bigasterisk.com/show/dance2018/song7/n2c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song7/n2c0p0>, <http://light9.bigasterisk.com/show/dance2018/song7/n2c0p1>, <http://light9.bigasterisk.com/show/dance2018/song7/n2c0p2>, <http://light9.bigasterisk.com/show/dance2018/song7/n2c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song7/n2c0p0> :time 0e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n2c0p1> :time 1.5868e+01;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n2c0p2> :time 1.58789e+02;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n2c0p3> :time 1.65809e+02;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n2set0> :effectAttr :colorScale;
+     :value "#ff5246" .
+
+<http://light9.bigasterisk.com/show/dance2018/song7/n3> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song7/n3c0>;
+     :effectClass effect:aurayellow; :originTime 2.49082e+02 .
+
+<http://light9.bigasterisk.com/show/dance2018/song7/n3c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p0>, <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p1>, <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p2>, <http://light9.bigasterisk.com/show/dance2018/song7/n3c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song7/n3c0p0> :time -2.46957e+02;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n3c0p1> :time -2.37666e+02;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n3c0p2> :time 1.08647e+02;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song7/n3c0p3> :time 1.12366e+02;
      :value 0e+00 .

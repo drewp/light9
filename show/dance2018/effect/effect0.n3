@@ -9,23 +9,9 @@
 
 
 effect:effect0 a :Effect; rdfs:label "effect0"; :publishAttr :strength;
-     :setting effect:effect0_set0, effect:effect0_set10, effect:effect0_set11, effect:effect0_set12, effect:effect0_set16, effect:effect0_set2, effect:effect0_set21, effect:effect0_set22, effect:effect0_set23, effect:effect0_set24, effect:effect0_set25, effect:effect0_set26, effect:effect0_set27, effect:effect0_set3, effect:effect0_set30, effect:effect0_set4, effect:effect0_set5, effect:effect0_set7, effect:effect0_set9 .
-effect:effect0_set0 :device dev:moving1; :deviceAttr :color; :scaledValue "#ebebeb" .
-effect:effect0_set10 :device dev:house4; :deviceAttr :brightness; :scaledValue 6.92e-01 .
-effect:effect0_set11 :device dev:house2; :deviceAttr :brightness; :scaledValue 1e+00 .
-effect:effect0_set12 :device dev:f3; :deviceAttr :brightness; :scaledValue 1e+00 .
-effect:effect0_set16 :device dev:down2; :deviceAttr :uv; :scaledValue 8.96e-01 .
-effect:effect0_set2 :device dev:house1; :deviceAttr :brightness; :scaledValue 1e+00 .
-effect:effect0_set21 :device dev:f2; :deviceAttr :brightness; :scaledValue 1e+00 .
-effect:effect0_set22 :device dev:f1; :deviceAttr :brightness; :scaledValue 1e+00 .
-effect:effect0_set23 :device dev:q3; :deviceAttr :focus; :value 6.04e-01 .
-effect:effect0_set24 :device dev:q2; :deviceAttr :color; :scaledValue "#f3f3f3" .
-effect:effect0_set25 :device dev:q1; :deviceAttr :color; :scaledValue "#ffffff" .
-effect:effect0_set26 :device dev:q1; :deviceAttr :rx; :value 6.72e-01 .
-effect:effect0_set27 :device dev:q1; :deviceAttr :ry; :value 5.07e-01 .
-effect:effect0_set3 :device dev:moving1; :deviceAttr :rx; :value 2.65e-01 .
-effect:effect0_set30 :device dev:q1; :deviceAttr :zoom; :value 6.5e-02 .
-effect:effect0_set4 :device dev:moving1; :deviceAttr :ry; :value 6.99e-01 .
-effect:effect0_set5 :device dev:q3; :deviceAttr :color; :scaledValue "#ffffff" .
-effect:effect0_set7 :device dev:cycL; :deviceAttr :brightness; :scaledValue 7.96e-01 .
-effect:effect0_set9 :device dev:cycR; :deviceAttr :brightness; :scaledValue 7.08e-01 .
+     :setting effect:effect0_set1, effect:effect0_set21, effect:effect0_set22, effect:effect0_set23, effect:effect0_set24 .
+effect:effect0_set1 :device dev:dim41; :deviceAttr :brightness; :scaledValue 5.53e-01 .
+effect:effect0_set21 :device dev:dim43; :deviceAttr :brightness; :scaledValue 4.73e-01 .
+effect:effect0_set22 :device dev:dim45; :deviceAttr :brightness; :scaledValue 7.07e-01 .
+effect:effect0_set23 :device dev:dim44; :deviceAttr :brightness; :scaledValue 7.08e-01 .
+effect:effect0_set24 :device dev:dim42; :deviceAttr :brightness; :scaledValue 5.33e-01 .

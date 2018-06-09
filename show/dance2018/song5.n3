@@ -1,0 +1,18 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix song: <http://light9.bigasterisk.com/show/dance2018/song5/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+song:n1 a :Note; :curve song:n1c1; :effectClass effect:cyc; :originTime 9.048746e+01 .
+
+song:n1c1 a :Curve; :attr :strength; :point song:n1c1p1, song:n1c1p2, song:n1c1p3, song:n1c1p4 .
+song:n1c1p1 :time -2e+00; :value 0e+00 .
+song:n1c1p2 :time 0e+00; :value 1e+00 .
+song:n1c1p3 :time 2e+01; :value 1e+00 .
+song:n1c1p4 :time 2.2e+01; :value 0e+00 .
