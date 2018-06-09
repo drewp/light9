@@ -1,0 +1,124 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix song: <http://light9.bigasterisk.com/show/dance2018/song8/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+show:song8 :note song:n0, song:n1, song:n10, song:n11, song:n12, song:n2, song:n3, song:n5, song:n7, song:n9 .
+
+song:n4 a :Note; :curve song:n4c0; :effectClass effect:centerSpot;
+     :originTime 2.31818e+02 .
+
+song:n6 a :Note; :curve song:n6c1; :effectClass effect:aurawash; :originTime 1.471959e+02 .
+
+song:n8 a :Note; :curve song:n8c1; :effectClass effect:aurawash; :originTime 6.667509e+01 .
+
+song:n0 a :Note; :curve song:n0c0; :effectClass effect:qcenter; :originTime 2.30777e+02;
+     :setting song:n0set0 .
+
+song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
+song:n0c0p0 :time -6.184e+00; :value 0e+00 .
+song:n0c0p1 :time -6.182e+00; :value 1e+00 .
+song:n0c0p2 :time 1.986e+00; :value 1e+00 .
+song:n0c0p3 :time 2.778e+00; :value 0e+00 .
+song:n0set0 :effectAttr :colorScale; :value "#ffa9ca" .
+
+song:n1 a :Note; :curve song:n1c1; :effectClass effect:qfill; :originTime 3.141738e+01 .
+
+song:n10 a :Note; :curve song:n10c1; :effectClass effect:auracoolspread;
+     :originTime 1.21052e+02; :setting song:n10set0 .
+
+song:n10c1 a :Curve; :attr :strength; :point song:n10c1p1, song:n10c1p2, song:n10c1p3, song:n10c1p4 .
+song:n10c1p1 :time -2e+00; :value 0e+00 .
+song:n10c1p2 :time 0e+00; :value 1e+00 .
+song:n10c1p3 :time 3.254e+01; :value 1e+00 .
+song:n10c1p4 :time 3.454e+01; :value 0e+00 .
+song:n10set0 :effectAttr :colorScale; :value "#ff7d3c" .
+
+song:n11 a :Note; :curve song:n11c0; :effectClass effect:qsweep; :originTime 1.9085e+02 .
+
+song:n11c0 a :Curve; :attr :strength; :point song:n11c0p0, song:n11c0p1, song:n11c0p2, song:n11c0p3 .
+song:n11c0p0 :time -1.549e+00; :value 0e+00 .
+song:n11c0p1 :time -1.494e+00; :value 1e+00 .
+song:n11c0p2 :time 1.953e+00; :value 1e+00 .
+song:n11c0p3 :time 1.982e+00; :value 0e+00 .
+
+song:n12 a :Note; :curve song:n12c0; :effectClass effect:qsweep; :originTime 1.98904e+02 .
+
+song:n12c0 a :Curve; :attr :strength; :point song:n12c0p0, song:n12c0p1, song:n12c0p2, song:n12c0p3 .
+song:n12c0p0 :time -3.6e+00; :value 0e+00 .
+song:n12c0p1 :time -3.551e+00; :value 1e+00 .
+song:n12c0p2 :time -5.66e-01; :value 1e+00 .
+song:n12c0p3 :time -5.53e-01; :value 0e+00 .
+
+song:n1c1 a :Curve; :attr :strength; :point song:n1c1p1, song:n1c1p2, song:n1c1p3, song:n1c1p4 .
+song:n1c1p1 :time -2.7494e+01; :value 0e+00 .
+song:n1c1p2 :time -2.5494e+01; :value 1e+00 .
+song:n1c1p3 :time 1.93166e+02; :value 1e+00 .
+song:n1c1p4 :time 1.93171e+02; :value 0e+00 .
+
+song:n2 a :Note; :curve song:n2c1; :effectClass effect:down; :originTime 1.10537e+02 .
+
+song:n2c1 a :Curve; :attr :strength; :point song:n2c1p1, song:n2c1p2, song:n2c1p3, song:n2c1p4 .
+song:n2c1p1 :time -5.0741e+01; :value 0e+00 .
+song:n2c1p2 :time -4.8741e+01; :value 1e+00 .
+song:n2c1p3 :time -4.1759e+01; :value 1e+00 .
+song:n2c1p4 :time -3.9759e+01; :value 0e+00 .
+
+song:n3 a :Note; :curve song:n3c1; :effectClass effect:qsweep; :originTime 2.08909e+02 .
+
+song:n3c1 a :Curve; :attr :strength; :point song:n3c1p1, song:n3c1p2, song:n3c1p3, song:n3c1p4 .
+song:n3c1p1 :time -3.48e-01; :value 0e+00 .
+song:n3c1p2 :time 1.652e+00; :value 1e+00 .
+song:n3c1p3 :time 1.5686e+01; :value 1e+00 .
+song:n3c1p4 :time 1.5688e+01; :value 0e+00 .
+
+song:n4c0 a :Curve; :attr :strength; :point song:n4c0p0, song:n4c0p1, song:n4c0p2, song:n4c0p3 .
+song:n4c0p0 :time 0e+00; :value 0e+00 .
+song:n4c0p1 :time 1.405e+00; :value 1e+00 .
+song:n4c0p2 :time 2.811e+00; :value 1e+00 .
+song:n4c0p3 :time 4.216e+00; :value 0e+00 .
+
+song:n5 a :Note; :curve song:n5c1; :effectClass effect:qsweep; :originTime 3.1886e+01 .
+
+song:n5c1 a :Curve; :attr :strength; :point song:n5c1p1, song:n5c1p2, song:n5c1p3, song:n5c1p4 .
+song:n5c1p1 :time -3.861e+00; :value 0e+00 .
+song:n5c1p2 :time -1.861e+00; :value 1e+00 .
+song:n5c1p3 :time 1.7826e+01; :value 1e+00 .
+song:n5c1p4 :time 2.0461e+01; :value 0e+00 .
+
+song:n6c1 a :Curve; :attr :strength; :point song:n6c1p1, song:n6c1p2, song:n6c1p3, song:n6c1p4 .
+song:n6c1p1 :time -2e+00; :value 0e+00 .
+song:n6c1p2 :time 0e+00; :value 1e+00 .
+song:n6c1p3 :time 2e+01; :value 1e+00 .
+song:n6c1p4 :time 2.2e+01; :value 0e+00 .
+
+song:n7 a :Note; :curve song:n7c1; :effectClass effect:auracoolspread;
+     :originTime 1.578184e+02; :setting song:n7set0 .
+
+song:n7c1 a :Curve; :attr :strength; :point song:n7c1p1, song:n7c1p2, song:n7c1p3, song:n7c1p4 .
+song:n7c1p1 :time -2e+00; :value 0e+00 .
+song:n7c1p2 :time 0e+00; :value 1e+00 .
+song:n7c1p3 :time 4.8998e+01; :value 1e+00 .
+song:n7c1p4 :time 5.15e+01; :value 0e+00 .
+song:n7set0 :effectAttr :colorScale; :value "#878787" .
+
+song:n8c1 a :Curve; :attr :strength; :point song:n8c1p1, song:n8c1p2, song:n8c1p3, song:n8c1p4 .
+song:n8c1p1 :time -2e+00; :value 0e+00 .
+song:n8c1p2 :time 0e+00; :value 1e+00 .
+song:n8c1p3 :time 2e+01; :value 1e+00 .
+song:n8c1p4 :time 2.2e+01; :value 0e+00 .
+
+song:n9 a :Note; :curve song:n9c1; :effectClass effect:auracoolspread;
+     :originTime 8.326608e+01; :setting song:n9set0 .
+
+song:n9c1 a :Curve; :attr :strength; :point song:n9c1p1, song:n9c1p2, song:n9c1p3, song:n9c1p4 .
+song:n9c1p1 :time -3.1773e+01; :value 0e+00 .
+song:n9c1p2 :time -2.9773e+01; :value 1e+00 .
+song:n9c1p3 :time 2.1705e+01; :value 1e+00 .
+song:n9c1p4 :time 2.3705e+01; :value 0e+00 .
+song:n9set0 :effectAttr :colorScale; :value "#6675ff" .

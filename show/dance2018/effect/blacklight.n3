@@ -9,7 +9,7 @@
 
 
 effect:blacklight a :Effect; rdfs:label "blacklight"; :publishAttr :strength;
-     :setting effect:blacklight_set0, effect:blacklight_set1, effect:blacklight_set10, effect:blacklight_set11, effect:blacklight_set12, effect:blacklight_set13, effect:blacklight_set14, effect:blacklight_set15, effect:blacklight_set16, effect:blacklight_set2, effect:blacklight_set20, effect:blacklight_set21, effect:blacklight_set22, effect:blacklight_set23, effect:blacklight_set24, effect:blacklight_set25, effect:blacklight_set3, effect:blacklight_set4, effect:blacklight_set5, effect:blacklight_set6, effect:blacklight_set7, effect:blacklight_set8, effect:blacklight_set9 .
+     :setting effect:blacklight_set0, effect:blacklight_set1, effect:blacklight_set10, effect:blacklight_set11, effect:blacklight_set12, effect:blacklight_set13, effect:blacklight_set14, effect:blacklight_set15, effect:blacklight_set17, effect:blacklight_set18, effect:blacklight_set19, effect:blacklight_set2, effect:blacklight_set20, effect:blacklight_set21, effect:blacklight_set22, effect:blacklight_set23, effect:blacklight_set24, effect:blacklight_set25, effect:blacklight_set26, effect:blacklight_set27, effect:blacklight_set28, effect:blacklight_set29, effect:blacklight_set3, effect:blacklight_set30, effect:blacklight_set31, effect:blacklight_set32, effect:blacklight_set37, effect:blacklight_set4, effect:blacklight_set5, effect:blacklight_set6, effect:blacklight_set7, effect:blacklight_set8, effect:blacklight_set9 .
 effect:blacklight_set0 :device dev:down2; :deviceAttr :uv; :scaledValue 0.988 .
 effect:blacklight_set1 :device dev:down3; :deviceAttr :uv; :scaledValue 1.000 .
 effect:blacklight_set10 :device dev:upCenter; :deviceAttr :uv; :scaledValue 1.000 .
@@ -18,16 +18,25 @@ effect:blacklight_set12 :device dev:lip2; :deviceAttr :uv; :scaledValue 1.000 .
 effect:blacklight_set13 :device dev:lip3; :deviceAttr :uv; :scaledValue 1.000 .
 effect:blacklight_set14 :device dev:lip4; :deviceAttr :uv; :scaledValue 1.000 .
 effect:blacklight_set15 :device dev:lip5; :deviceAttr :uv; :scaledValue 1.000 .
-effect:blacklight_set16 :device dev:q2; :deviceAttr :quantumGoboChoice;
-     :value :whirlpool .
+effect:blacklight_set17 :device dev:q1; :deviceAttr :color; :scaledValue "#0000ff" .
+effect:blacklight_set18 :device dev:q1; :deviceAttr :focus; :value 5.16e-01 .
+effect:blacklight_set19 :device dev:q1; :deviceAttr :rx; :value 2.48e-01 .
 effect:blacklight_set2 :device dev:down4; :deviceAttr :uv; :scaledValue 1.000 .
-effect:blacklight_set20 :device dev:upCenter; :deviceAttr :color; :scaledValue "#040074" .
-effect:blacklight_set21 :device dev:q2; :deviceAttr :color; :scaledValue "#0000ff" .
+effect:blacklight_set20 :device dev:upCenter; :deviceAttr :color; :scaledValue "#0000ff" .
+effect:blacklight_set21 :device dev:q2; :deviceAttr :color; :scaledValue "#0000b0" .
 effect:blacklight_set22 :device dev:q2; :deviceAttr :rx; :value 0.485 .
-effect:blacklight_set23 :device dev:q2; :deviceAttr :ry; :value 0.358 .
-effect:blacklight_set24 :device dev:q2; :deviceAttr :zoom; :value 0.111 .
+effect:blacklight_set23 :device dev:q2; :deviceAttr :ry; :value 3.99e-01 .
+effect:blacklight_set24 :device dev:q2; :deviceAttr :zoom; :value 5.99e-01 .
 effect:blacklight_set25 :device dev:q2; :deviceAttr :focus; :value 0.076 .
+effect:blacklight_set26 :device dev:q1; :deviceAttr :ry; :value 4.71e-01 .
+effect:blacklight_set27 :device dev:q1; :deviceAttr :zoom; :value 5.86e-01 .
+effect:blacklight_set28 :device dev:q3; :deviceAttr :color; :scaledValue "#0000ff" .
+effect:blacklight_set29 :device dev:q3; :deviceAttr :focus; :value 4.13e-01 .
 effect:blacklight_set3 :device dev:down5Edge; :deviceAttr :uv; :scaledValue 1.000 .
+effect:blacklight_set30 :device dev:q3; :deviceAttr :rx; :value 7.43e-01 .
+effect:blacklight_set31 :device dev:q3; :deviceAttr :ry; :value 4.14e-01 .
+effect:blacklight_set32 :device dev:q3; :deviceAttr :zoom; :value 4.25e-01 .
+effect:blacklight_set37 :device dev:down4; :deviceAttr :color; :scaledValue "#020404" .
 effect:blacklight_set4 :device dev:backlight1; :deviceAttr :uv; :scaledValue 1.000 .
 effect:blacklight_set5 :device dev:backlight2; :deviceAttr :uv; :scaledValue 0.999 .
 effect:blacklight_set6 :device dev:backlight3; :deviceAttr :uv; :scaledValue 0.996 .

@@ -34,7 +34,7 @@ eff:set6510639 :device dev:cycL; :deviceAttr :brightness; :scaledValue 4.1e-01 .
 eff:set6512093 :device dev:f3; :deviceAttr :brightness; :scaledValue 6.42e-01 .
 eff:set6619580 :device dev:down4; :deviceAttr :color; :scaledValue "#f2d5b0" .
 eff:set6986505 :device dev:down3; :deviceAttr :color; :scaledValue "#f2d5b0" .
-eff:set7133623 :device dev:q3; :deviceAttr :ry; :value 0.032 .
+eff:set7133623 :device dev:q3; :deviceAttr :ry; :value 4.19e-01 .
 eff:set7201437 :device dev:aura4; :deviceAttr :color; :scaledValue "#ffffff" .
 eff:set7322423 :device dev:q3; :deviceAttr :zoom; :value 0.395 .
 eff:set7368166 :device dev:aura2; :deviceAttr :ry; :value 0.173 .
