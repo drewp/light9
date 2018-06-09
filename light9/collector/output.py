@@ -85,11 +85,12 @@ class DmxOutput(Output):
                 self.countError()
             else:
                 self.lastSentBuffer = sendingBuffer
-            reactor.callLater(max(0, start + 0.050 - time.time()),
+            reactor.callLater(max(0, start + 1/20 - time.time()),
                               self._loop)
 
         d = threads.deferToThread(self.sendDmx, sendingBuffer)
         d.addCallback(done)
+        
 
 class EnttecDmx(DmxOutput):
     stats = scales.collection('/output/enttecDmx',
@@ -156,7 +157,7 @@ class Udmx(DmxOutput):
     def update(self, values):
         now = time.time()
         if now > self.lastLog + 1:
-            log.info('%s %s', self.shortId(), ' '.join(map(str, values)))
+            log.debug('%s %s', self.shortId(), ' '.join(map(str, values)))
             self.lastLog = now
 
         self.currentBuffer = ''.join(map(chr, values))
@@ -164,10 +165,15 @@ class Udmx(DmxOutput):
     def sendDmx(self, buf):
         with Udmx.stats.write.time():
             try:
+                if not buf:
+                    print "skip empty msg"
+                    return True
                 self.dev.SendDMX(buf)
                 return True
-            except usb.core.USBError:
+            except usb.core.USBError as e:
                 # not in main thread
+                msg = 'usb: sending %s bytes to %r; error %r' % (len(buf), self.uri, e)
+                print msg
                 return False
 
     def countError(self):

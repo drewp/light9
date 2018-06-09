@@ -149,9 +149,10 @@ def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
         outputs = [
-            # EnttecDmx(L9['output/dmx0/'], '/dev/dmx3', 80),
-            Udmx(L9['output/dmxA/'], bus=4, numChannels=80),
-            Udmx(L9['output/dmxB/'], bus=5, numChannels=510),
+            # EnttecDmx(L9['output/dmxA/'], '/dev/dmx3', 80),
+             Udmx(L9['output/dmxA/'], bus=5, numChannels=80),
+            #DummyOutput(L9['output/dmxA/'], 80),
+            Udmx(L9['output/dmxB/'], bus=7, numChannels=500),
         ]
     except Exception:
         log.error("setting up outputs:")
