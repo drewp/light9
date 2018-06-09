@@ -1,0 +1,40 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song05a/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song05a a :Effect; rdfs:label "song05a"; :publishAttr :strength;
+     :setting eff:set1005222, eff:set1072907, eff:set1628592, eff:set1754995, eff:set2686211, eff:set2687434, eff:set2713761, eff:set2839508, eff:set3050457, eff:set3331303, eff:set3929104, eff:set4947607, eff:set5016932, eff:set5351882, eff:set6035780, eff:set6519208, eff:set6724524, eff:set6834595, eff:set6990932, eff:set7076991, eff:set8412307, eff:set8465894, eff:set9014445, eff:set9182811, eff:set9496328, eff:set9695901, eff:set9788257 .
+eff:set1005222 :device dev:lip1; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set1072907 :device dev:lip3; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set1628592 :device dev:aura1; :deviceAttr :zoom; :value 0.607 .
+eff:set1754995 :device dev:aura1; :deviceAttr :rx; :value 0.303 .
+eff:set2686211 :device dev:aura4; :deviceAttr :zoom; :value 0.670 .
+eff:set2687434 :device dev:aura3; :deviceAttr :ry; :value 0.495 .
+eff:set2713761 :device dev:aura4; :deviceAttr :rx; :value 0.675 .
+eff:set2839508 :device dev:aura2; :deviceAttr :ry; :value 0.257 .
+eff:set3050457 :device dev:aura4; :deviceAttr :color; :scaledValue "#ffc27c" .
+eff:set3331303 :device dev:aura2; :deviceAttr :rx; :value 0.425 .
+eff:set3929104 :device dev:aura5; :deviceAttr :ry; :value 0.351 .
+eff:set4947607 :device dev:lip5; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set5016932 :device dev:aura2; :deviceAttr :zoom; :value 0.638 .
+eff:set5351882 :device dev:lip4; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set6035780 :device dev:aura4; :deviceAttr :ry; :value 0.428 .
+eff:set6519208 :device dev:aura3; :deviceAttr :rx; :value 0.554 .
+eff:set6724524 :device dev:q2; :deviceAttr :ry; :value 0.314 .
+eff:set6834595 :device dev:aura1; :deviceAttr :ry; :value 0.295 .
+eff:set6990932 :device dev:q2; :deviceAttr :color; :scaledValue "#c5ae7f" .
+eff:set7076991 :device dev:aura5; :deviceAttr :rx; :value 0.652 .
+eff:set8412307 :device dev:aura1; :deviceAttr :color; :scaledValue "#ffb79f" .
+eff:set8465894 :device dev:aura3; :deviceAttr :color; :scaledValue "#ffb3ab" .
+eff:set9014445 :device dev:aura5; :deviceAttr :color; :scaledValue "#ffdfcd" .
+eff:set9182811 :device dev:aura2; :deviceAttr :color; :scaledValue "#ffc198" .
+eff:set9496328 :device dev:lip2; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set9695901 :device dev:aura5; :deviceAttr :zoom; :value 0.696 .
+eff:set9788257 :device dev:aura3; :deviceAttr :zoom; :value 0.655 .

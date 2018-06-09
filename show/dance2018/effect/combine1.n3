@@ -37,7 +37,7 @@ eff:set5629954 :device dev:q2; :deviceAttr :focus; :value 0.971 .
 eff:set627777 :device dev:aura4; :deviceAttr :rx; :value 0.535 .
 eff:set6512093 :device dev:f3; :deviceAttr :brightness; :scaledValue 6.42e-01 .
 eff:set6561949 :device dev:aura2; :deviceAttr :ry; :value 0.448 .
-eff:set7133623 :device dev:q3; :deviceAttr :ry; :value 0.032 .
+eff:set7133623 :device dev:q3; :deviceAttr :ry; :value 4.88e-01 .
 eff:set7263273 :device dev:aura1; :deviceAttr :color; :scaledValue "#fffe00" .
 eff:set7322423 :device dev:q3; :deviceAttr :zoom; :value 0.395 .
 eff:set7419473 :device dev:aura1; :deviceAttr :zoom; :value 0.629 .
