@@ -49,7 +49,7 @@ def startZmq(port, collector):
     log.info('creating zmq endpoint at %r', addr)
     e = ZmqEndpoint('bind', addr)
     class Pull(ZmqPullConnection):
-        highWaterMark = 3
+        #highWaterMark = 3
         def onPull(self, message):
             with stats.setAttr.time():
                 # todo: new compressed protocol where you send all URIs up

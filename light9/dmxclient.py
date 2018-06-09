@@ -22,7 +22,7 @@ class TwistedZmqClient(object):
         zf = ZmqFactory()
         e = ZmqEndpoint('connect', 'tcp://%s:%s' % (service.host, service.port))
         class Push(ZmqPushConnection):
-            highWaterMark = 3
+            pass # highWaterMark = 3000
         self.conn = Push(zf, e)
         
     def send(self, clientid, levellist):
