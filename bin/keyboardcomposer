@@ -454,7 +454,7 @@ class KeyboardComposer(tk.Frame, SubClient):
             for uri, box in self.subbox.items()])
 
     def get_output_settings(self, _graph=None):
-        _graph = _graph or graph
+        _graph = _graph or self.graph
         outputSettings = []
         for setting in _graph.objects(self.session, L9['subSetting']):
             effect = _graph.value(setting, L9['sub'])
@@ -472,7 +472,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
     def save_current_stage(self, subname):
         log.info("saving current levels as %s", subname)
-        with graph.currentState() as g:
+        with self.graph.currentState() as g:
             ds = self.get_output_settings(_graph=g)
         effect = L9['effect/%s' % subname]
         ctx = URIRef(showconfig.showUri() + '/effect/' + subname)
@@ -483,16 +483,10 @@ class KeyboardComposer(tk.Frame, SubClient):
             (effect, L9['publishAttr'], L9['strength'], ctx),
             ])
 
-        graph.suggestPrefixes(ctx, {'eff': effect + '/'})
-        graph.patch(Patch(addQuads=stmts, delQuads=[]))
+        self.graph.suggestPrefixes(ctx, {'eff': effect + '/'})
+        self.graph.patch(Patch(addQuads=stmts, delQuads=[]))
               
         self.sub_name.delete(0, tk.END)
-
-    def send_frequent_updates(self):
-        """called when we get a fade -- send events as quickly as possible"""
-        if time.time() <= self.stop_frequent_update_time:
-            self.send_levels()
-            self.after(10, self.send_frequent_updates)
 
     def alltozero(self):
         for uri, subbox in self.subbox.items():

@@ -14,15 +14,15 @@ class SubClient:
         object."""
 
     def send_levels(self):
-        # shouldn't be handler- should be immediate mode!
-        self.graph.addHandler(self._send_sub)
+        self._send_sub()
 
     def send_levels_loop(self, delay=1000):
-        task.LoopingCall(lambda: self.graph.addHandler(self.send_levels)).start(delay)
+        task.LoopingCall(self.send_levels).start(delay)
 
     def _send_sub(self):
         try:
-            outputSettings = self.get_output_settings()
+            with self.graph.currentState() as g:
+                outputSettings = self.get_output_settings(_graph=g)
         except:
             traceback.print_exc()
             return
