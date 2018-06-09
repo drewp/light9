@@ -5,14 +5,12 @@ copies from effectloop.py, which this should replace
 from __future__ import division
 from louie import dispatcher
 from rdflib import URIRef
-from twisted.internet import reactor, defer
+from twisted.internet import reactor
 from twisted.internet.inotify import INotify
 from twisted.python.filepath import FilePath
 import cyclone.sse
-import json, logging, bisect, time
-import treq
+import logging, bisect, time
 
-from light9 import networking
 from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
 from light9.effect import effecteval
@@ -20,7 +18,6 @@ from light9.effect.settings import DeviceSettings
 from light9.effect.simple_outputs import SimpleOutputs
 
 from greplin import scales
-from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 
 log = logging.getLogger('sequencer')
 stats = scales.collection('/sequencer/',
@@ -29,53 +26,6 @@ stats = scales.collection('/sequencer/',
                           scales.PmfStat('compileSong'),
                           scales.DoubleStat('recentFps'),
 )
-
-_zmqClient=None
-class TwistedZmqClient(object):
-    def __init__(self, service):
-        zf = ZmqFactory()
-        e = ZmqEndpoint('connect', 'tcp://%s:%s' % (service.host, service.port))
-        self.conn = ZmqPushConnection(zf, e)
-        
-    def send(self, msg):
-        self.conn.push(msg)
-
-
-def toCollectorJson(client, session, settings):
-    assert isinstance(settings, DeviceSettings)
-    return json.dumps({'settings': settings.asList(),
-                       'client': client,
-                       'clientSession': session,
-                       'sendTime': time.time(),
-                  })
-        
-def sendToCollectorZmq(msg):
-    global _zmqClient
-    if _zmqClient is None:
-        _zmqClient = TwistedZmqClient(networking.collectorZmq)
-    _zmqClient.send(msg)
-    return defer.succeed(0)
-        
-def sendToCollector(client, session, settings, useZmq=True):
-    """deferred to the time in seconds it took to get a response from collector"""
-    sendTime = time.time()
-    msg = toCollectorJson(client, session, settings)
-
-    if useZmq:
-        d = sendToCollectorZmq(msg)
-    else:
-        d = treq.put(networking.collector.path('attrs'), data=msg)
-    
-    def onDone(result):
-        dt = time.time() - sendTime
-        if dt > .1:
-            log.warn('sendToCollector request took %.1fms', dt * 1000)
-        return dt
-    d.addCallback(onDone)
-    def onErr(err):
-        log.warn('sendToCollector failed: %r', err)
-    d.addErrback(onErr)
-    return d
 
 
 class Note(object):
@@ -183,7 +133,7 @@ class Sequencer(object):
         self.notes = {} # song: [notes]
         self.simpleOutputs = SimpleOutputs(self.graph)
         self.graph.addHandler(self.compileGraph)
-        self.update()
+        self.updateLoop()
 
         self.codeWatcher = CodeWatcher(
             onChange=lambda: self.graph.addHandler(self.compileGraph))
@@ -208,22 +158,30 @@ class Sequencer(object):
                                          self.simpleOutputs))
         log.info('  compile %s took %.2f ms', song, 1000 * (time.time() - t1))
 
-        
-    @stats.update.time()
-    def update(self):
+
+    def updateLoop(self):
         now = time.time()
         self.recentUpdateTimes = self.recentUpdateTimes[-40:] + [now]
         stats.recentFps = len(self.recentUpdateTimes) / (self.recentUpdateTimes[-1] - self.recentUpdateTimes[0] + .0001)
-        if 1 or now > self.lastStatLog + 1:
+        if now > self.lastStatLog + .2:
             dispatcher.send('state', update={
                 'recentDeltas': sorted([round(t1 - t0, 4) for t0, t1 in
                                  zip(self.recentUpdateTimes[:-1],
                                      self.recentUpdateTimes[1:])]),
                 'recentFps': stats.recentFps})
             self.lastStatLog = now
-        
-        reactor.callLater(1 / self.fps, self.update)
 
+        def done(sec):
+            reactor.callLater(max(0, time.time() - (now + 1 / self.fps)), self.updateLoop)
+        def err(e):
+            log.warn('updateLoop: %r', e)
+            reactor.callLater(2, self.updateLoop)
+            
+        d = self.update()
+        d.addCallbacks(done, err)
+        
+    @stats.update.time()
+    def update(self):
         musicState = self.music.getLatest()
         song = URIRef(musicState['song']) if musicState.get('song') else None
         if 't' not in musicState:
@@ -239,7 +197,7 @@ class Sequencer(object):
             noteReports.append(report)
             settings.append(s)
         dispatcher.send('state', update={'songNotes': noteReports})
-        self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
+        return self.sendToCollector(DeviceSettings.fromList(self.graph, settings))
 
 class Updates(cyclone.sse.SSEHandler):
     def __init__(self, application, request, **kwargs):

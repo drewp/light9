@@ -21,7 +21,7 @@ from rdfdb.syncedgraph import SyncedGraph
 from light9.paint.capture import writeCaptureDescription
 from light9.greplin_cyclone import StatsForCyclone
 from light9.effect.settings import DeviceSettings
-from light9.effect.sequencer import sendToCollector
+from light9.collector.collector_client import sendToCollector
 from rdfdb.patch import Patch
 
 stats = scales.collection('/webServer', scales.PmfStat('setAttr'))

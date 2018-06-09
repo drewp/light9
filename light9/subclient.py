@@ -1,6 +1,7 @@
-from light9.effect.sequencer import sendToCollector
+from light9.collector.collector_client import sendToCollector
 from twisted.internet import reactor, task
 import traceback
+import time
 import logging
 log = logging.getLogger()
 
@@ -17,7 +18,17 @@ class SubClient:
         self._send_sub()
 
     def send_levels_loop(self, delay=1000):
-        task.LoopingCall(self.send_levels).start(delay)
+        now = time.time()
+        def done(sec):
+            reactor.callLater(max(0, time.time() - (now + delay)),
+                              self.send_levels_loop)
+        def err(e):
+            log.warn('subclient loop: %r', e)
+            reactor.callLater(2, self.send_levels_loop)
+            
+        d = self._send_sub()
+        d.addCallbacks(done, err)
+
 
     def _send_sub(self):
         try:
@@ -26,4 +37,4 @@ class SubClient:
         except:
             traceback.print_exc()
             return
-        sendToCollector('subclient', self.session, outputSettings)
+        return sendToCollector('subclient', self.session, outputSettings)
