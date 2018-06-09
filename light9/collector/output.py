@@ -54,9 +54,9 @@ class Output(object):
         raise NotImplementedError
 
 class DummyOutput(Output):
-    def __init__(self, uri, *args):
+    def __init__(self, uri, numChannels=1, **kw):
         self.uri = uri
-        self.numChannels = args[-1]
+        self.numChannels = numChannels
     
     def update(self, values):
         pass
