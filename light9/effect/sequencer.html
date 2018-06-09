@@ -112,7 +112,7 @@
                report.roundT = Math.floor((report.t || 0) * 1000) / 1000;
                report.recentFps = Math.floor((report.recentFps || 0) * 10) / 10;
                report.recentDeltasStyle = (report.recentDeltas || []).map((dt) => {
-                 const height = Math.min(40, dt / 0.025 * 20);
+                 const height = Math.min(40, dt / 0.085 * 20);
                  return `height: ${height}px;`
                });
 
