@@ -172,8 +172,9 @@ class Udmx(DmxOutput):
                 return True
             except usb.core.USBError as e:
                 # not in main thread
-                msg = 'usb: sending %s bytes to %r; error %r' % (len(buf), self.uri, e)
-                print msg
+                if e.errno != 75:
+                  msg = 'usb: sending %s bytes to %r; error %r' % (len(buf), self.uri, e)
+                  print msg
                 return False
 
     def countError(self):
