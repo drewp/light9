@@ -113,8 +113,7 @@ def effect_auraSparkles(effectSettings, strength, songTime, noteTime):
     tr, tg, tb = hex_to_rgb(tint)
     for n in range(1, 5+1):
         scl = strength * ((int(songTime * 10) % n) < 1)
-        col = scale('#ffffff', scl)
-        print n, 'scl', col
+        col = literalColorHsv((songTime + (n / 5)) % 1, 1, scl)
 
         dev = L9['device/aura%s' % n]
         out.update({
@@ -123,8 +122,8 @@ def effect_auraSparkles(effectSettings, strength, songTime, noteTime):
             })
         ang = songTime * 4
         out.update({
-        (dev, L9['rx']): lerp(.27, .7, (n-1)/4) + .8 * math.sin(ang+n),
-        (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .8 * math.cos(ang+n),
+        (dev, L9['rx']): lerp(.27, .8, (n-1)/4) + .2 * math.sin(ang+n),
+        (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .4 * math.cos(ang+n),
             })
     return out
 
