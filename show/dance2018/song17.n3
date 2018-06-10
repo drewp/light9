@@ -7,7 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song17 :note <http://light9.bigasterisk.com/show/dance2018/song17/n0>, <http://light9.bigasterisk.com/show/dance2018/song17/n1>, <http://light9.bigasterisk.com/show/dance2018/song17/n3> .
+show:song17 :note <http://light9.bigasterisk.com/show/dance2018/song17/n0>, <http://light9.bigasterisk.com/show/dance2018/song17/n1>, <http://light9.bigasterisk.com/show/dance2018/song17/n3>, <http://light9.bigasterisk.com/show/dance2018/song17/n4>, <http://light9.bigasterisk.com/show/dance2018/song17/n5> .
 
 <http://light9.bigasterisk.com/show/dance2018/song17/n2> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song17/n2c0>;
      :effectClass effect:lightning; :originTime 2.10965e+02 .
@@ -60,11 +60,43 @@ show:song17 :note <http://light9.bigasterisk.com/show/dance2018/song17/n0>, <htt
 
 <http://light9.bigasterisk.com/show/dance2018/song17/n3c0> a :Curve;
      :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song17/n3c0p0>, <http://light9.bigasterisk.com/show/dance2018/song17/n3c0p1>, <http://light9.bigasterisk.com/show/dance2018/song17/n3c0p2>, <http://light9.bigasterisk.com/show/dance2018/song17/n3c0p3> .
-<http://light9.bigasterisk.com/show/dance2018/song17/n3c0p0> :time -1.3314e+01;
+<http://light9.bigasterisk.com/show/dance2018/song17/n3c0p0> :time -1.3625e+01;
      :value 0e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song17/n3c0p1> :time -4.017e+00;
+<http://light9.bigasterisk.com/show/dance2018/song17/n3c0p1> :time -5.961e+00;
      :value 1e+00 .
 <http://light9.bigasterisk.com/show/dance2018/song17/n3c0p2> :time 3.8973e+01;
      :value 1e+00 .
 <http://light9.bigasterisk.com/show/dance2018/song17/n3c0p3> :time 4.1162e+01;
      :value 0e+00 .
+
+<http://light9.bigasterisk.com/show/dance2018/song17/n4> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song17/n4c0>;
+     :effectClass effect:cyc; :originTime 2.62479e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song17/n4set0> .
+
+<http://light9.bigasterisk.com/show/dance2018/song17/n4c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song17/n4c0p0>, <http://light9.bigasterisk.com/show/dance2018/song17/n4c0p1>, <http://light9.bigasterisk.com/show/dance2018/song17/n4c0p2>, <http://light9.bigasterisk.com/show/dance2018/song17/n4c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song17/n4c0p0> :time -4.718e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n4c0p1> :time -2.605e+00;
+     :value 0.5 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n4c0p2> :time 4.29e+00;
+     :value 0.5 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n4c0p3> :time 5.494e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n4set0> :effectAttr :colorScale;
+     :value "#ffffff" .
+
+<http://light9.bigasterisk.com/show/dance2018/song17/n5> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song17/n5c0>;
+     :effectClass effect:hexfill; :originTime 2.62787e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song17/n5set0> .
+
+<http://light9.bigasterisk.com/show/dance2018/song17/n5c0> a :Curve;
+     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song17/n5c0p0>, <http://light9.bigasterisk.com/show/dance2018/song17/n5c0p1>, <http://light9.bigasterisk.com/show/dance2018/song17/n5c0p2>, <http://light9.bigasterisk.com/show/dance2018/song17/n5c0p3> .
+<http://light9.bigasterisk.com/show/dance2018/song17/n5c0p0> :time -4.963e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n5c0p1> :time -2.913e+00;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n5c0p2> :time 4.202e+00;
+     :value 1e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n5c0p3> :time 5.378e+00;
+     :value 0e+00 .
+<http://light9.bigasterisk.com/show/dance2018/song17/n5set0> :effectAttr :colorScale;
+     :value "#ffff87" .

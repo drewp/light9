@@ -1,0 +1,20 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/windmill/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:windmill a :Effect; rdfs:label "windmill"; :publishAttr :strength;
+     :setting eff:set2936667, eff:set3378982, eff:set4819213, eff:set4892699, eff:set5123194, eff:set5650691, eff:set7420540 .
+eff:set2936667 :device dev:q2; :deviceAttr :rx; :value 5.13e-01 .
+eff:set3378982 :device dev:q2; :deviceAttr :zoom; :value 4.96e-01 .
+eff:set4819213 :device dev:q2; :deviceAttr :quantumGoboChoice; :value :windmill .
+eff:set4892699 :device dev:q2; :deviceAttr :focus; :value 4.96e-01 .
+eff:set5123194 :device dev:q2; :deviceAttr :goboSpeed; :value 9.6e-02 .
+eff:set5650691 :device dev:q2; :deviceAttr :ry; :value 3.5e-01 .
+eff:set7420540 :device dev:q2; :deviceAttr :color; :scaledValue "#ffffff" .
