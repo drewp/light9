@@ -11,6 +11,7 @@
     <link rel="Stylesheet" type="text/css" href="/style.css"/>
     <style>
         #cmd-go { min-width: 5em; }
+        .song-name { padding-left: 0.4em; }
     </style>
   </head>
   <body>
@@ -19,17 +20,17 @@
 
     <div class="dimStalled">
       <table>
-        <tr><td colspan="3">Song: <span id="currentSong"/></td></tr>
+        <tr><td colspan="3"><strong>Song:</strong> <span id="currentSong"/></td></tr>
         <tr>
-          <td>Time: <span id="currentTime"/></td>
-          <td>Left: <span id="leftTime"/></td>
-          <td>Until autostop: <span id="leftAutoStopTime"/></td>
+          <td><strong>Time:</strong> <span id="currentTime"/></td>
+          <td><strong>Left:</strong> <span id="leftTime"/></td>
+          <td><strong>Until autostop:</strong> <span id="leftAutoStopTime"/></td>
         </tr>
         <tr>
 
           <td colspan="3">
-            Update freq: requested <span id="updateReq"/>, actual <span id="updateActual"/>
-            States: <span id="states"/>
+            <strong>Update freq:</strong> requested <span id="updateReq"/>, actual <span id="updateActual"/>
+            <strong>States:</strong> <span id="states"/>
           </td>
           
         </tr>
@@ -40,18 +41,19 @@
       </div>
     </div>
     <div class="commands">
-      <button id="cmd-stop" class="playMode">Stop<div class="key">s</div></button>
-      <button id="cmd-play" class="playMode">Play <div class="key">p</div></button>
-      <button id="cmd-intro">Skip intro <div class="key">i</div></button>
-      <button id="cmd-post">Skip to Post <div class="key">t</div></button>
-      <button id="cmd-go">Go  <div class="key">g</div><div id="next"></div></button>
+      <button id="cmd-stop" class="playMode"><strong>Stop</strong><div class="key">s</div></button>
+      <button id="cmd-play" class="playMode"><strong>Play</strong> <div class="key">p</div></button>
+      <button id="cmd-intro"><strong>Skip intro</strong> <div class="key">i</div></button>
+      <button id="cmd-post"><strong>Skip to Post</strong> <div class="key">t</div></button>
+      <button id="cmd-go"><strong>Go</strong> <div class="key">g</div><div id="next"></div></button>
 
-      <button id="cmd-out0">Output 0</button>
-      <button id="cmd-out1">Output 1</button>
+      <!--
+      <button id="cmd-out0"><strong>Output 0</strong></button>
+      <button id="cmd-out1"><strong>Output 1</strong></button>
+      -->
     </div>
     
     <p>Running on <span id="nav"/></p>
-    todo: display next action
     <p><a href="">reload</a></p>
 
 <script type="text/javascript">
@@ -114,7 +116,7 @@ $(function () {
             // link is just for dragging, not clicking
             var link = $("<a>");
             link.append($("<span>").addClass("num").text(song.label.slice(0,2)));
-            link.append($("<span>").text(song.label.slice(2)));
+            link.append($("<span>").addClass("song-name").text(song.label.slice(2).trim()));
             link.attr("href", song.uri);
             link.click(function () { button.click(); return false; }); 
             button.append(link);
