@@ -11,18 +11,18 @@
 
 effect:floordots a :Effect; rdfs:label "floordots"; :publishAttr :strength;
      :setting eff:set102225, eff:set2206570, eff:set2667445, eff:set2711622, eff:set3194982, eff:set3297533, eff:set3840733, eff:set5139322, eff:set638498, eff:set6504290, eff:set7631269, eff:set8144495, eff:set8172692, eff:set8845077, eff:set8993438 .
-eff:set102225 :device dev:q3; :deviceAttr :color; :scaledValue "#a58c66" .
+eff:set102225 :device dev:q3; :deviceAttr :color; :scaledValue "#a58a7a" .
 eff:set2206570 :device dev:q2; :deviceAttr :rx; :value 5.03e-01 .
-eff:set2667445 :device dev:q2; :deviceAttr :color; :scaledValue "#dadad9" .
+eff:set2667445 :device dev:q2; :deviceAttr :color; :scaledValue "#dadada" .
 eff:set2711622 :device dev:q2; :deviceAttr :focus; :value 5.31e-01 .
-eff:set3194982 :device dev:q3; :deviceAttr :zoom; :value 8.59e-01 .
-eff:set3297533 :device dev:q1; :deviceAttr :rx; :value 2.56e-01 .
+eff:set3194982 :device dev:q3; :deviceAttr :zoom; :value 1e+00 .
+eff:set3297533 :device dev:q1; :deviceAttr :rx; :value 2.09e-01 .
 eff:set3840733 :device dev:q3; :deviceAttr :rx; :value 7.5e-01 .
-eff:set5139322 :device dev:q1; :deviceAttr :ry; :value 4.43e-01 .
-eff:set638498 :device dev:q2; :deviceAttr :ry; :value 2.8e-02 .
-eff:set6504290 :device dev:q1; :deviceAttr :focus; :value 5.65e-01 .
-eff:set7631269 :device dev:q3; :deviceAttr :ry; :value 4.56e-01 .
-eff:set8144495 :device dev:q1; :deviceAttr :color; :scaledValue "#b78c67" .
+eff:set5139322 :device dev:q1; :deviceAttr :ry; :value 5.63e-01 .
+eff:set638498 :device dev:q2; :deviceAttr :ry; :value 2.92e-01 .
+eff:set6504290 :device dev:q1; :deviceAttr :focus; :value 5.49e-01 .
+eff:set7631269 :device dev:q3; :deviceAttr :ry; :value 5.53e-01 .
+eff:set8144495 :device dev:q1; :deviceAttr :color; :scaledValue "#b7a695" .
 eff:set8172692 :device dev:q3; :deviceAttr :focus; :value 5.07e-01 .
-eff:set8845077 :device dev:q2; :deviceAttr :zoom; :value 6.35e-01 .
-eff:set8993438 :device dev:q1; :deviceAttr :zoom; :value 8.95e-01 .
+eff:set8845077 :device dev:q2; :deviceAttr :zoom; :value 8.97e-01 .
+eff:set8993438 :device dev:q1; :deviceAttr :zoom; :value 1e+00 .
