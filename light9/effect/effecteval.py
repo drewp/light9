@@ -220,8 +220,8 @@ def effect_qsweepusa(effectSettings, strength, songTime, noteTime):
 
     colmap = {
         1: '#ff0000',
-        2: '#888888',
-        3: '#5050ff',
+        2: '#998888',
+        3: '#0050ff',
     }
     
     for n in range(1, 3+1):

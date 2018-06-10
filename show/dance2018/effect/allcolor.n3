@@ -46,7 +46,7 @@ eff:set7657931 :device dev:q1; :deviceAttr :ry; :value 0.475 .
 eff:set7737934 :device dev:aura5; :deviceAttr :ry; :value 2.775e-01 .
 eff:set8029779 :device dev:aura1; :deviceAttr :zoom; :value 5.32e-01 .
 eff:set8668794 :device dev:aura3; :deviceAttr :rx; :value 5.45e-01 .
-eff:set8900244 :device dev:q2; :deviceAttr :ry; :value 0.482 .
+eff:set8900244 :device dev:q2; :deviceAttr :ry; :value 3.4e-01 .
 eff:set9010219 :device dev:q2; :deviceAttr :rx; :value 0.513 .
 eff:set913807 :device dev:q1; :deviceAttr :rx; :value 0.248 .
 eff:set91410 :device dev:q3; :deviceAttr :rx; :value 0.738 .

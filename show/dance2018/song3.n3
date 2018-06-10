@@ -8,7 +8,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song3 :note song:n0, song:n1, song:n11, song:n12, song:n13, song:n14, song:n15, song:n16, song:n17, song:n18, song:n2, song:n3, song:n4 .
+show:song3 :note song:n0, song:n1, song:n11, song:n12, song:n13, song:n14, song:n15, song:n16, song:n17, song:n18, song:n2, song:n24, song:n25, song:n26, song:n27, song:n3, song:n30, song:n31, song:n32, song:n33, song:n34, song:n36, song:n37, song:n39, song:n4, song:n40, song:n43, song:n44, song:n45, song:n46, song:n47, song:n48, song:n49, song:n50, song:n51, song:n52, song:n53, song:n54, song:n55, song:n56, song:n57, song:n58, song:n59 .
 
 song:n10 a :Note; :curve song:n10c1; :effectClass effect:cyc; :originTime 1.065834e+02 .
 
@@ -22,6 +22,19 @@ song:n22 a :Note; :curve song:n22c1; :effectClass effect:cyc; :originTime 1.1111
 
 song:n23 a :Note; :curve song:n23c0; :effectClass effect:lightning;
      :originTime 1.10787e+02 .
+
+song:n28 a :Note; :curve song:n28c1; :effectClass effect:cyc; :originTime 1.472301e+02 .
+
+song:n29 a :Note; :curve song:n29c1; :effectClass effect:cyc; :originTime 1.485893e+02 .
+
+song:n35 a :Note; :curve song:n35c1; :effectClass effect:discostars;
+     :originTime 1.658726e+02 .
+
+song:n38 a :Note; :curve song:n38c1; :effectClass effect:cyc; :originTime 1.543788e+02 .
+
+song:n41 a :Note; :curve song:n41c0; :effectClass effect:hexfill; :originTime 1.68287e+02 .
+
+song:n42 a :Note; :curve song:n42c1; :effectClass effect:cyc; :originTime 1.479848e+02 .
 
 song:n5 a :Note; :curve song:n5c1; :effectClass effect:cyc; :originTime 9.596203e+01 .
 
@@ -157,6 +170,58 @@ song:n23c0p1 :time 1.0011e+01; :value 1e+00 .
 song:n23c0p2 :time 2.0022e+01; :value 1e+00 .
 song:n23c0p3 :time 3.0033e+01; :value 0e+00 .
 
+song:n24 a :Note; :curve song:n24c1; :effectClass effect:hexfill; :originTime 1.129216e+02;
+     :setting song:n24set0 .
+
+song:n24c1 a :Curve; :attr :strength; :point song:n24c1p1, song:n24c1p2, song:n24c1p3, song:n24c1p4 .
+song:n24c1p1 :time -2.21e-01; :value 0e+00 .
+song:n24c1p2 :time -1.94e-01; :value 1e+00 .
+song:n24c1p3 :time 1.904e+00; :value 1e+00 .
+song:n24c1p4 :time 1.948e+00; :value 0e+00 .
+song:n24set0 :effectAttr :colorScale; :value "#ff2200" .
+
+song:n25 a :Note; :curve song:n25c1; :effectClass effect:hexfill; :originTime 1.150054e+02;
+     :setting song:n25set0 .
+
+song:n25c1 a :Curve; :attr :strength; :point song:n25c1p1, song:n25c1p2, song:n25c1p3, song:n25c1p4 .
+song:n25c1p1 :time -1.93e-01; :value 0e+00 .
+song:n25c1p2 :time -1.58e-01; :value 1e+00 .
+song:n25c1p3 :time 2.1e+00; :value 1e+00 .
+song:n25c1p4 :time 2.108e+00; :value 0e+00 .
+song:n25set0 :effectAttr :colorScale; :value "#1100ff" .
+
+song:n26 a :Note; :curve song:n26c1; :effectClass effect:hexfill; :originTime 1.172511e+02;
+     :setting song:n26set0 .
+
+song:n26c1 a :Curve; :attr :strength; :point song:n26c1p1, song:n26c1p2, song:n26c1p3, song:n26c1p4 .
+song:n26c1p1 :time -1.36e-01; :value 0e+00 .
+song:n26c1p2 :time -1.14e-01; :value 1e+00 .
+song:n26c1p3 :time 1.957e+00; :value 1e+00 .
+song:n26c1p4 :time 1.977e+00; :value 0e+00 .
+song:n26set0 :effectAttr :colorScale; :value "#e100ff" .
+
+song:n27 a :Note; :curve song:n27c1; :effectClass effect:hexfill; :originTime 1.194673e+02;
+     :setting song:n27set0 .
+
+song:n27c1 a :Curve; :attr :strength; :point song:n27c1p1, song:n27c1p2, song:n27c1p3, song:n27c1p4 .
+song:n27c1p1 :time -2.83e-01; :value 0e+00 .
+song:n27c1p2 :time -2.45e-01; :value 1e+00 .
+song:n27c1p3 :time 5.43e-01; :value 1e+00 .
+song:n27c1p4 :time 5.57e-01; :value 0e+00 .
+song:n27set0 :effectAttr :colorScale; :value "#59ff00" .
+
+song:n28c1 a :Curve; :attr :strength; :point song:n28c1p1, song:n28c1p2, song:n28c1p3, song:n28c1p4 .
+song:n28c1p1 :time -1e-01; :value 0e+00 .
+song:n28c1p2 :time 0e+00; :value 1e+00 .
+song:n28c1p3 :time 8.1e-02; :value 1e+00 .
+song:n28c1p4 :time 5.81e-01; :value 0e+00 .
+
+song:n29c1 a :Curve; :attr :strength; :point song:n29c1p1, song:n29c1p2, song:n29c1p3, song:n29c1p4 .
+song:n29c1p1 :time -1e-01; :value 0e+00 .
+song:n29c1p2 :time 0e+00; :value 1e+00 .
+song:n29c1p3 :time 4.36e-01; :value 1e+00 .
+song:n29c1p4 :time 9.36e-01; :value 0e+00 .
+
 song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
 song:n2c0p0 :time -3.3643e+01; :value 0e+00 .
 song:n2c0p1 :time -3.2045e+01; :value 1e+00 .
@@ -165,6 +230,82 @@ song:n2c0p3 :time 3.9697e+01; :value 0e+00 .
 
 song:n3 a :Note; :curve song:n3c0; :effectClass effect:warm; :originTime 1.63175e+02;
      :setting song:n3set0 .
+
+song:n30 a :Note; :curve song:n30c1; :effectClass effect:cyc; :originTime 1.498229e+02 .
+
+song:n30c1 a :Curve; :attr :strength; :point song:n30c1p1, song:n30c1p2, song:n30c1p3, song:n30c1p4 .
+song:n30c1p1 :time -2.06e-01; :value 0e+00 .
+song:n30c1p2 :time -1.34e-01; :value 1e+00 .
+song:n30c1p3 :time 3.62e-01; :value 1e+00 .
+song:n30c1p4 :time 3.97e-01; :value 0e+00 .
+
+song:n31 a :Note; :curve song:n31c1; :effectClass effect:hexfill; :originTime 1.519825e+02 .
+
+song:n31c1 a :Curve; :attr :strength; :point song:n31c1p1, song:n31c1p2, song:n31c1p3, song:n31c1p4 .
+song:n31c1p1 :time -1e-01; :value 0e+00 .
+song:n31c1p2 :time 0e+00; :value 1e+00 .
+song:n31c1p3 :time 4.27e-01; :value 1e+00 .
+song:n31c1p4 :time 4.72e-01; :value 0e+00 .
+
+song:n32 a :Note; :curve song:n32c1; :effectClass effect:hexfill; :originTime 1.588114e+02 .
+
+song:n32c1 a :Curve; :attr :strength; :point song:n32c1p1, song:n32c1p2, song:n32c1p3, song:n32c1p4 .
+song:n32c1p1 :time -1.92e-01; :value 0e+00 .
+song:n32c1p2 :time -1.76e-01; :value 1e+00 .
+song:n32c1p3 :time 3.08e-01; :value 1e+00 .
+song:n32c1p4 :time 3.22e-01; :value 0e+00 .
+
+song:n33 a :Note; :curve song:n33c1; :effectClass effect:cyc; :originTime 1.610592e+02 .
+
+song:n33c1 a :Curve; :attr :strength; :point song:n33c1p1, song:n33c1p2, song:n33c1p3, song:n33c1p4 .
+song:n33c1p1 :time -3.15e-01; :value 0e+00 .
+song:n33c1p2 :time -2.94e-01; :value 1e+00 .
+song:n33c1p3 :time 2.79e-01; :value 1e+00 .
+song:n33c1p4 :time 2.86e-01; :value 0e+00 .
+
+song:n34 a :Note; :curve song:n34c1; :effectClass effect:hexfill; :originTime 1.63213e+02 .
+
+song:n34c1 a :Curve; :attr :strength; :point song:n34c1p1, song:n34c1p2, song:n34c1p3, song:n34c1p4 .
+song:n34c1p1 :time -1.2e-02; :value 0e+00 .
+song:n34c1p2 :time 0e+00; :value 1e+00 .
+song:n34c1p3 :time 3.96e-01; :value 1e+00 .
+song:n34c1p4 :time 4e-01; :value 0e+00 .
+
+song:n35c1 a :Curve; :attr :strength; :point song:n35c1p1, song:n35c1p2 .
+song:n35c1p1 :time -1e-01; :value 0e+00 .
+song:n35c1p2 :time 0e+00; :value 1e+00 .
+
+song:n36 a :Note; :curve song:n36c1; :effectClass effect:hexfill; :originTime 1.678581e+02 .
+
+song:n36c1 a :Curve; :attr :strength; :point song:n36c1p1, song:n36c1p2, song:n36c1p3, song:n36c1p4 .
+song:n36c1p1 :time -2.76e-01; :value 0e+00 .
+song:n36c1p2 :time -2.58e-01; :value 1e+00 .
+song:n36c1p3 :time 2.6e-01; :value 1e+00 .
+song:n36c1p4 :time 2.87e-01; :value 0e+00 .
+
+song:n37 a :Note; :curve song:n37c1; :effectClass effect:cyc; :originTime 1.699635e+02 .
+
+song:n37c1 a :Curve; :attr :strength; :point song:n37c1p1, song:n37c1p2, song:n37c1p3, song:n37c1p4 .
+song:n37c1p1 :time -3.5e-01; :value 0e+00 .
+song:n37c1p2 :time -3.09e-01; :value 1e+00 .
+song:n37c1p3 :time 3.48e-01; :value 1e+00 .
+song:n37c1p4 :time 3.76e-01; :value 0e+00 .
+
+song:n38c1 a :Curve; :attr :strength; :point song:n38c1p1, song:n38c1p2, song:n38c1p3, song:n38c1p4 .
+song:n38c1p1 :time -1e-01; :value 0e+00 .
+song:n38c1p2 :time 0e+00; :value 1e+00 .
+song:n38c1p3 :time 1.608e+00; :value 1e+00 .
+song:n38c1p4 :time 2.108e+00; :value 0e+00 .
+
+song:n39 a :Note; :curve song:n39c1; :effectClass effect:cyc; :originTime 1.39786e+02;
+     :setting song:n39set0 .
+
+song:n39c1 a :Curve; :attr :strength; :point song:n39c1p1, song:n39c1p2, song:n39c1p3, song:n39c1p4 .
+song:n39c1p1 :time 1.6413e+01; :value 0e+00 .
+song:n39c1p2 :time 1.6488e+01; :value 1e+00 .
+song:n39c1p3 :time 1.6963e+01; :value 1e+00 .
+song:n39c1p4 :time 1.7055e+01; :value 0e+00 .
+song:n39set0 :effectAttr :colorScale; :value "#88ffa6" .
 
 song:n3c0 a :Curve; :attr :strength; :point song:n3c0p0, song:n3c0p1, song:n3c0p2, song:n3c0p3 .
 song:n3c0p0 :time 7.876e+00; :value 0e+00 .
@@ -176,12 +317,186 @@ song:n3set0 :effectAttr :colorScale; :value "#301e19" .
 song:n4 a :Note; :curve song:n4c0; :effectClass effect:warm; :originTime 6.684e+01;
      :setting song:n4set0 .
 
+song:n40 a :Note; :curve song:n40c1; :effectClass effect:cyc; :originTime 1.655233e+02 .
+
+song:n40c1 a :Curve; :attr :strength; :point song:n40c1p1, song:n40c1p2, song:n40c1p3, song:n40c1p4 .
+song:n40c1p1 :time -3.19e-01; :value 0e+00 .
+song:n40c1p2 :time -2.19e-01; :value 1e+00 .
+song:n40c1p3 :time 3.5e-01; :value 1e+00 .
+song:n40c1p4 :time 4.45e-01; :value 0e+00 .
+
+song:n41c0 a :Curve; :attr :strength; :point song:n41c0p0, song:n41c0p1, song:n41c0p2, song:n41c0p3 .
+song:n41c0p0 :time 0e+00; :value 0e+00 .
+song:n41c0p1 :time 6.54e-01; :value 1e+00 .
+song:n41c0p2 :time 1.307e+00; :value 1e+00 .
+song:n41c0p3 :time 1.961e+00; :value 0e+00 .
+
+song:n42c1 a :Curve; :attr :strength; :point song:n42c1p1, song:n42c1p2, song:n42c1p3, song:n42c1p4 .
+song:n42c1p1 :time -2e+00; :value 0e+00 .
+song:n42c1p2 :time 0e+00; :value 1e+00 .
+song:n42c1p3 :time 2e+01; :value 1e+00 .
+song:n42c1p4 :time 2.2e+01; :value 0e+00 .
+
+song:n43 a :Note; :curve song:n43c1; :effectClass effect:hexfill; :originTime 1.475778e+02 .
+
+song:n43c1 a :Curve; :attr :strength; :point song:n43c1p1, song:n43c1p2, song:n43c1p3, song:n43c1p4 .
+song:n43c1p1 :time -1e-01; :value 0e+00 .
+song:n43c1p2 :time 0e+00; :value 1e+00 .
+song:n43c1p3 :time 4.51e-01; :value 1e+00 .
+song:n43c1p4 :time 4.83e-01; :value 0e+00 .
+
+song:n44 a :Note; :curve song:n44c1; :effectClass effect:qfilltighter;
+     :originTime 2.002797e+02; :setting song:n44set0 .
+
+song:n44c1 a :Curve; :attr :strength; :point song:n44c1p1, song:n44c1p2, song:n44c1p3, song:n44c1p4 .
+song:n44c1p1 :time -2.94e-01; :value 0e+00 .
+song:n44c1p2 :time -2.78e-01; :value 1e+00 .
+song:n44c1p3 :time 6.2e-02; :value 1e+00 .
+song:n44c1p4 :time 6.6e-02; :value 0e+00 .
+song:n44set0 :effectAttr :colorScale; :value "#ff7f7b" .
+
+song:n45 a :Note; :curve song:n45c1; :effectClass effect:alldown; :originTime 2.001417e+02;
+     :setting song:n45set0 .
+
+song:n45c1 a :Curve; :attr :strength; :point song:n45c1p1, song:n45c1p2, song:n45c1p3, song:n45c1p4 .
+song:n45c1p1 :time -1.49e-01; :value 0e+00 .
+song:n45c1p2 :time -1.42e-01; :value 1e+00 .
+song:n45c1p3 :time 1.85e-01; :value 1e+00 .
+song:n45c1p4 :time 2.01e-01; :value 0e+00 .
+song:n45set0 :effectAttr :colorScale; :value "#ffad99" .
+
+song:n46 a :Note; :curve song:n46c1; :effectClass effect:lightning;
+     :originTime 2.149174e+02 .
+
+song:n46c1 a :Curve; :attr :strength; :point song:n46c1p1, song:n46c1p2, song:n46c1p3, song:n46c1p4 .
+song:n46c1p1 :time -1e-01; :value 0e+00 .
+song:n46c1p2 :time 0e+00; :value 1e+00 .
+song:n46c1p3 :time 4.39e-01; :value 1e+00 .
+song:n46c1p4 :time 9.39e-01; :value 0e+00 .
+
+song:n47 a :Note; :curve song:n47c1; :effectClass effect:lightning;
+     :originTime 2.170092e+02 .
+
+song:n47c1 a :Curve; :attr :strength; :point song:n47c1p1, song:n47c1p2, song:n47c1p3, song:n47c1p4 .
+song:n47c1p1 :time -1e-01; :value 0e+00 .
+song:n47c1p2 :time 0e+00; :value 1e+00 .
+song:n47c1p3 :time 5.28e-01; :value 1e+00 .
+song:n47c1p4 :time 1.028e+00; :value 0e+00 .
+
+song:n48 a :Note; :curve song:n48c1; :effectClass effect:lightning;
+     :originTime 2.192076e+02 .
+
+song:n48c1 a :Curve; :attr :strength; :point song:n48c1p1, song:n48c1p2, song:n48c1p3, song:n48c1p4 .
+song:n48c1p1 :time -1e-01; :value 0e+00 .
+song:n48c1p2 :time 0e+00; :value 1e+00 .
+song:n48c1p3 :time 5.47e-01; :value 1e+00 .
+song:n48c1p4 :time 1.047e+00; :value 0e+00 .
+
+song:n49 a :Note; :curve song:n49c1; :effectClass effect:lightning;
+     :originTime 2.214586e+02 .
+
+song:n49c1 a :Curve; :attr :strength; :point song:n49c1p1, song:n49c1p2, song:n49c1p3, song:n49c1p4 .
+song:n49c1p1 :time -1e-01; :value 0e+00 .
+song:n49c1p2 :time 0e+00; :value 1e+00 .
+song:n49c1p3 :time 5.72e-01; :value 1e+00 .
+song:n49c1p4 :time 1.072e+00; :value 0e+00 .
+
 song:n4c0 a :Curve; :attr :strength; :point song:n4c0p0, song:n4c0p1, song:n4c0p2, song:n4c0p3 .
 song:n4c0p0 :time -1.1594e+01; :value 0e+00 .
 song:n4c0p1 :time -1.0959e+01; :value 1e+00 .
 song:n4c0p2 :time 1.07395e+02; :value 1e+00 .
 song:n4c0p3 :time 1.09434e+02; :value 0e+00 .
 song:n4set0 :effectAttr :colorScale; :value "#a3a3a3" .
+
+song:n50 a :Note; :curve song:n50c1; :effectClass effect:lightning;
+     :originTime 2.23702e+02 .
+
+song:n50c1 a :Curve; :attr :strength; :point song:n50c1p1, song:n50c1p2, song:n50c1p3, song:n50c1p4 .
+song:n50c1p1 :time -1e-01; :value 0e+00 .
+song:n50c1p2 :time 0e+00; :value 1e+00 .
+song:n50c1p3 :time 5.1e-01; :value 1e+00 .
+song:n50c1p4 :time 1.01e+00; :value 0e+00 .
+
+song:n51 a :Note; :curve song:n51c1; :effectClass effect:lightning;
+     :originTime 2.260083e+02 .
+
+song:n51c1 a :Curve; :attr :strength; :point song:n51c1p1, song:n51c1p2, song:n51c1p3, song:n51c1p4 .
+song:n51c1p1 :time -1e-01; :value 0e+00 .
+song:n51c1p2 :time 0e+00; :value 1e+00 .
+song:n51c1p3 :time 5.85e-01; :value 1e+00 .
+song:n51c1p4 :time 1.085e+00; :value 0e+00 .
+
+song:n52 a :Note; :curve song:n52c1; :effectClass effect:lightning;
+     :originTime 2.285031e+02 .
+
+song:n52c1 a :Curve; :attr :strength; :point song:n52c1p1, song:n52c1p2, song:n52c1p3, song:n52c1p4 .
+song:n52c1p1 :time -1e-01; :value 0e+00 .
+song:n52c1p2 :time 0e+00; :value 1e+00 .
+song:n52c1p3 :time 2.35e-01; :value 1e+00 .
+song:n52c1p4 :time 7.35e-01; :value 0e+00 .
+
+song:n53 a :Note; :curve song:n53c1; :effectClass effect:lightning;
+     :originTime 2.305059e+02 .
+
+song:n53c1 a :Curve; :attr :strength; :point song:n53c1p1, song:n53c1p2, song:n53c1p3, song:n53c1p4 .
+song:n53c1p1 :time -1e-01; :value 0e+00 .
+song:n53c1p2 :time 0e+00; :value 1e+00 .
+song:n53c1p3 :time 5.8e-01; :value 1e+00 .
+song:n53c1p4 :time 1.08e+00; :value 0e+00 .
+
+song:n54 a :Note; :curve song:n54c1; :effectClass effect:lightning;
+     :originTime 2.327244e+02 .
+
+song:n54c1 a :Curve; :attr :strength; :point song:n54c1p1, song:n54c1p2, song:n54c1p3, song:n54c1p4 .
+song:n54c1p1 :time -1e-01; :value 0e+00 .
+song:n54c1p2 :time 0e+00; :value 1e+00 .
+song:n54c1p3 :time 7.85e-01; :value 1e+00 .
+song:n54c1p4 :time 1.285e+00; :value 0e+00 .
+
+song:n55 a :Note; :curve song:n55c1; :effectClass effect:lightning;
+     :originTime 2.349384e+02 .
+
+song:n55c1 a :Curve; :attr :strength; :point song:n55c1p1, song:n55c1p2, song:n55c1p3, song:n55c1p4 .
+song:n55c1p1 :time -1e-01; :value 0e+00 .
+song:n55c1p2 :time 0e+00; :value 1e+00 .
+song:n55c1p3 :time 6.09e-01; :value 1e+00 .
+song:n55c1p4 :time 1.109e+00; :value 0e+00 .
+
+song:n56 a :Note; :curve song:n56c1; :effectClass effect:lightning;
+     :originTime 2.371456e+02 .
+
+song:n56c1 a :Curve; :attr :strength; :point song:n56c1p1, song:n56c1p2, song:n56c1p3, song:n56c1p4 .
+song:n56c1p1 :time -1e-01; :value 0e+00 .
+song:n56c1p2 :time 0e+00; :value 1e+00 .
+song:n56c1p3 :time 5.55e-01; :value 1e+00 .
+song:n56c1p4 :time 1.055e+00; :value 0e+00 .
+
+song:n57 a :Note; :curve song:n57c1; :effectClass effect:lightning;
+     :originTime 2.393561e+02 .
+
+song:n57c1 a :Curve; :attr :strength; :point song:n57c1p1, song:n57c1p2, song:n57c1p3, song:n57c1p4 .
+song:n57c1p1 :time -1e-01; :value 0e+00 .
+song:n57c1p2 :time 0e+00; :value 1e+00 .
+song:n57c1p3 :time 6.09e-01; :value 1e+00 .
+song:n57c1p4 :time 1.109e+00; :value 0e+00 .
+
+song:n58 a :Note; :curve song:n58c1; :effectClass effect:lightning;
+     :originTime 2.416473e+02 .
+
+song:n58c1 a :Curve; :attr :strength; :point song:n58c1p1, song:n58c1p2, song:n58c1p3, song:n58c1p4 .
+song:n58c1p1 :time -1e-01; :value 0e+00 .
+song:n58c1p2 :time 0e+00; :value 1e+00 .
+song:n58c1p3 :time 5.89e-01; :value 1e+00 .
+song:n58c1p4 :time 1.089e+00; :value 0e+00 .
+
+song:n59 a :Note; :curve song:n59c1; :effectClass effect:lightning;
+     :originTime 2.438756e+02 .
+
+song:n59c1 a :Curve; :attr :strength; :point song:n59c1p1, song:n59c1p2, song:n59c1p3, song:n59c1p4 .
+song:n59c1p1 :time -1e-01; :value 0e+00 .
+song:n59c1p2 :time 0e+00; :value 1e+00 .
+song:n59c1p3 :time 2.45e-01; :value 1e+00 .
+song:n59c1p4 :time 7.45e-01; :value 0e+00 .
 
 song:n5c1 a :Curve; :attr :strength; :point song:n5c1p1, song:n5c1p2, song:n5c1p3, song:n5c1p4 .
 song:n5c1p1 :time -1e-01; :value 0e+00 .

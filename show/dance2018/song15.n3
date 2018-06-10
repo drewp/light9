@@ -27,7 +27,7 @@ show:song15 :note <http://light9.bigasterisk.com/show/dance2018/song15/n0>, <htt
      :value 0e+00 .
 
 <http://light9.bigasterisk.com/show/dance2018/song15/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song15/n1c0>;
-     :effectClass effect:aurasuperwide; :originTime 1.46381e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song15/n1set0> .
+     :effectClass effect:aurawide; :originTime 1.46381e+02; :setting <http://light9.bigasterisk.com/show/dance2018/song15/n1set0> .
 
 <http://light9.bigasterisk.com/show/dance2018/song15/n1c0> a :Curve;
      :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p0>, <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p1>, <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p2>, <http://light9.bigasterisk.com/show/dance2018/song15/n1c0p3> .

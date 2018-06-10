@@ -18,8 +18,7 @@ song:n0c0p1 :time -3.3462e+01; :value 1e+00 .
 song:n0c0p2 :time 1.80525e+02; :value 1e+00 .
 song:n0c0p3 :time 1.83606e+02; :value 0e+00 .
 
-song:n1 a :Note; :curve song:n1c1; :effectClass effect:song04fill;
-     :originTime 1.530205e+02 .
+song:n1 a :Note; :curve song:n1c1; :effectClass effect:song04b; :originTime 1.530205e+02 .
 
 song:n1c1 a :Curve; :attr :strength; :point song:n1c1p1, song:n1c1p2, song:n1c1p3, song:n1c1p4 .
 song:n1c1p1 :time -1.48638e+02; :value 0e+00 .
