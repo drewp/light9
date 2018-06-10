@@ -23,6 +23,6 @@ song:n1 a :Note; :curve song:n1c1; :effectClass effect:song04fill;
 
 song:n1c1 a :Curve; :attr :strength; :point song:n1c1p1, song:n1c1p2, song:n1c1p3, song:n1c1p4 .
 song:n1c1p1 :time -1.50154e+02; :value 0e+00 .
-song:n1c1p2 :time -1.48154e+02; :value 1e+00 .
+song:n1c1p2 :time -1.46773e+02; :value 1e+00 .
 song:n1c1p3 :time 6.9357e+01; :value 1e+00 .
 song:n1c1p4 :time 7.2406e+01; :value 0e+00 .
