@@ -39,6 +39,14 @@ class timeResource(PrettyErrorHandler,cyclone.web.RequestHandler):
         player = self.settings.app.player
         graph = self.settings.app.graph
         self.set_header("Content-Type", "application/json")
+
+        if player.isAutostopped():
+            nextAction = 'finish'
+        elif player.isPlaying():
+            nextAction = 'disabled'
+        else:
+            nextAction = 'play'
+
         self.write(json.dumps({
             "song" : playerSongUri(graph, player),
             "started" : player.playStartTime,
@@ -46,6 +54,7 @@ class timeResource(PrettyErrorHandler,cyclone.web.RequestHandler):
             "playing" : player.isPlaying(),
             "t" : player.currentTime(),
             "state" : player.states(),
+            "next" : nextAction,
             }))
 
     def post(self):
@@ -109,7 +118,9 @@ class goButton(PrettyErrorHandler, cyclone.web.RequestHandler):
         """
         graph, player = self.settings.app.graph, self.settings.app.player
 
-        if player.isPlaying():
+        if player.isAutostopped():
+            player.resume()
+        elif player.isPlaying():
             pass
         else:
             player.resume()

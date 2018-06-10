@@ -9,6 +9,9 @@
     <script type="text/javascript" src="/lib/jquery-ui/jquery-ui.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="/lib/jquery-ui/themes/smoothness/jquery-ui.min.css"/>
     <link rel="Stylesheet" type="text/css" href="/style.css"/>
+    <style>
+        #cmd-go { min-width: 5em; }
+    </style>
   </head>
   <body>
     <h1>ascoltami on ${host}</h1>
@@ -41,7 +44,7 @@
       <button id="cmd-play" class="playMode">Play <div class="key">p</div></button>
       <button id="cmd-intro">Skip intro <div class="key">i</div></button>
       <button id="cmd-post">Skip to Post <div class="key">t</div></button>
-      <button id="cmd-go">Go  <div class="key">space</div></button>
+      <button id="cmd-go">Go  <div class="key">g</div><div id="next"></div></button>
 
       <button id="cmd-out0">Output 0</button>
       <button id="cmd-out1">Output 1</button>
@@ -90,6 +93,7 @@ $(function () {
 		$(data.playing ? "#cmd-play" : "#cmd-stop").addClass("active");
 		lastPlaying = data.playing;
 	    }
+            $("#next").text(data.next);
 	    doneCallback();
 	});
     }
@@ -134,7 +138,10 @@ $(function () {
 	if (ev.which == 105) { $("#cmd-intro").click(); return false; }
 	if (ev.which == 116) { $("#cmd-post").click(); return false; }
 
-	if (ev.which == 32) { $("#cmd-go").click(); return false; }
+	if (ev.key == 'g') {
+            $("#cmd-go").click();
+            return false;
+        }
 	return true;
     });
 

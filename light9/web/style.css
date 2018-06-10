@@ -40,13 +40,19 @@ input[type=text] {
 }
 .songs button {
     display: inline-block;
-    width: 200px;
+    width: 15em;
     height: 50px;
     text-align: left;
     background: black;
     color: white;
     margin: 2px;
-    font-size: 115%;
+    font-size: 130% !important;    
+    font-weight: bold;
+    text-shadow: -1px -1px 0 #000,
+                 1px -1px 0 #000,
+                 -1px 1px 0 #000,
+                 1px 1px 0 #000;
+    white-space: nowrap;
 }
 button a {
     color: white;
@@ -62,13 +68,13 @@ button a {
     padding: 20px
 }
 .commands button.active {
-    background: #1C4054;
+    background: #a90707;
 }
 .key {
     color: #888;
 }
 .currentSong button {
-    background: #55A5C9;
+    background: #a90707;
 }
 .timeRow {
     margin: 14px;
@@ -80,7 +86,13 @@ button a {
     font-size: 27px;
     color: rgb(233, 122, 122);
     display: inline-block;
-    padding: 10px
+    padding: 10px;
+    font-size: 200% !important;    
+    font-weight: bold;
+    text-shadow: -1px -1px 0 #000,
+                 1px -1px 0 #000,
+                 -1px 1px 0 #000,
+                 1px 1px 0 #000;
 }
 
 .dropTarget {
@@ -122,7 +134,7 @@ button a {
 /* ascoltami mini mode */
 @media (max-height: 600px) {
     .songs {
-        -webkit-column-width: 9em;
+        -webkit-column-width: 12em;
     }
     .songs button {
         font-size: initial;
