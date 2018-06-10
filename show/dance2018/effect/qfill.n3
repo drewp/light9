@@ -18,7 +18,7 @@ effect:qfill_set12 :device dev:q1; :deviceAttr :focus; :value 0.971 .
 effect:qfill_set13 :device dev:q2; :deviceAttr :focus; :value 0.971 .
 effect:qfill_set15 :device dev:q3; :deviceAttr :focus; :value 1e+00 .
 effect:qfill_set2 :device dev:q2; :deviceAttr :rx; :value 0.513 .
-effect:qfill_set3 :device dev:q2; :deviceAttr :ry; :value 0.482 .
+effect:qfill_set3 :device dev:q2; :deviceAttr :ry; :value 3.22e-01 .
 effect:qfill_set4 :device dev:q2; :deviceAttr :zoom; :value 0.405 .
 effect:qfill_set5 :device dev:q3; :deviceAttr :rx; :value 7.1e-01 .
 effect:qfill_set6 :device dev:q3; :deviceAttr :ry; :value 3.37e-01 .

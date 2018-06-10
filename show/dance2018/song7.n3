@@ -8,7 +8,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song7 :note song:n2, song:n3, song:n4, song:n5, song:n6 .
+show:song7 :note song:n2, song:n3, song:n4, song:n5, song:n6, song:n8, song:n9 .
 
 song:n0 a :Note; :curve song:n0c0; :effectClass effect:effect0; :originTime 3.0927e+01 .
 
@@ -79,3 +79,21 @@ song:n7c0p0 :time 0e+00; :value 0e+00 .
 song:n7c0p1 :time 7.946e+00; :value 1e+00 .
 song:n7c0p2 :time 1.5891e+01; :value 1e+00 .
 song:n7c0p3 :time 2.3837e+01; :value 0e+00 .
+
+song:n8 a :Note; :curve song:n8c0; :effectClass effect:qpan; :originTime 3.07319e+02 .
+
+song:n8c0 a :Curve; :attr :strength; :point song:n8c0p0, song:n8c0p1, song:n8c0p2, song:n8c0p3 .
+song:n8c0p0 :time -6.93e-01; :value 0e+00 .
+song:n8c0p1 :time -4.23e-01; :value 1e+00 .
+song:n8c0p2 :time 3.406e+00; :value 1e+00 .
+song:n8c0p3 :time 4.348e+00; :value 0e+00 .
+
+song:n9 a :Note; :curve song:n9c0; :effectClass effect:qpan; :originTime 3.05774e+02;
+     :setting song:n9set0 .
+
+song:n9c0 a :Curve; :attr :strength; :point song:n9c0p0, song:n9c0p1, song:n9c0p2, song:n9c0p3 .
+song:n9c0p0 :time -9.04e-01; :value 0e+00 .
+song:n9c0p1 :time -8.38e-01; :value 1e+00 .
+song:n9c0p2 :time -7.25e-01; :value 1e+00 .
+song:n9c0p3 :time -5.88e-01; :value 0e+00 .
+song:n9set0 :effectAttr :colorScale; :value "#000000" .

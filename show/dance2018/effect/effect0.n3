@@ -8,5 +8,11 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect0 a :Effect; rdfs:label "effect0"; :publishAttr :strength .
+effect:effect0 a :Effect; rdfs:label "effect0"; :publishAttr :strength;
+     :setting effect:effect0_set0, effect:effect0_set1, effect:effect0_set13, effect:effect0_set16, effect:effect0_set8 .
 effect:effect0_set19 :value 4.65e-01 .
+effect:effect0_set0 :device dev:q2; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:effect0_set1 :device dev:q2; :deviceAttr :focus; :value 5.89e-01 .
+effect:effect0_set13 :device dev:q2; :deviceAttr :ry; :value 3.83e-01 .
+effect:effect0_set16 :device dev:q2; :deviceAttr :zoom; :value 7.14e-01 .
+effect:effect0_set8 :device dev:q2; :deviceAttr :rx; :value 4.29e-01 .

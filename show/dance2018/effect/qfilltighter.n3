@@ -12,7 +12,7 @@ effect:qfilltighter a :Effect; rdfs:label "qfilltighter"; :publishAttr :strength
      :setting effect:qfilltighter_set0, effect:qfilltighter_set1, effect:qfilltighter_set10, effect:qfilltighter_set11, effect:qfilltighter_set2, effect:qfilltighter_set3, effect:qfilltighter_set4, effect:qfilltighter_set5, effect:qfilltighter_set6, effect:qfilltighter_set7, effect:qfilltighter_set8, effect:qfilltighter_set9 .
 effect:qfilltighter_set0 :device dev:q1; :deviceAttr :color; :scaledValue "#ffffff" .
 effect:qfilltighter_set1 :device dev:q1; :deviceAttr :zoom; :value 0.478 .
-effect:qfilltighter_set10 :device dev:q2; :deviceAttr :ry; :value 3.72e-01 .
+effect:qfilltighter_set10 :device dev:q2; :deviceAttr :ry; :value 2.75e-01 .
 effect:qfilltighter_set11 :device dev:q2; :deviceAttr :zoom; :value 0.331 .
 effect:qfilltighter_set2 :device dev:q1; :deviceAttr :rx; :value 0.314 .
 effect:qfilltighter_set3 :device dev:q1; :deviceAttr :ry; :value 4.25e-01 .
