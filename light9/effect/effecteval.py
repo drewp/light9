@@ -339,7 +339,7 @@ def effect_lightning(effectSettings, strength, songTime, noteTime):
             L9['device/backlight4'], L9['device/backlight5'],
             L9['device/down2'], L9['device/down3'],
             L9['device/down4'], L9['device/hexLow3'],
-            L9['device/hexLow5'], L9['device/lip1 5'],
+            L9['device/hexLow5'],
             L9['device/postL1'], L9['device/postR1']]
     out = {}
     col = rgb_to_hex([int(255 * strength)] * 3)
