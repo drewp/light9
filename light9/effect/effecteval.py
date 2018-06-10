@@ -31,7 +31,9 @@ def lerp(a, b, t):
     return a + (b - a) * t
 def noise(t):
     return pnoise1(t % 1000.0, 2)
-
+def clamp(lo, hi, x):
+    return max(lo, min(hi, x))
+    
 class EffectEval(object):
     """
     runs one effect's code to turn effect attr settings into output
@@ -126,6 +128,19 @@ def effect_auraSparkles(effectSettings, strength, songTime, noteTime):
         (dev, L9['ry']): lerp(.46, .52, (n-1)/4) + .4 * math.cos(ang+n),
             })
     return out
+
+def effect_qpan(effectSettings, strength, songTime, noteTime):
+    dev = L9['device/q2']
+    dur = 4
+    col = scale(scale('#ffffff', strength),
+                effectSettings.get(L9['colorScale']) or '#ffffff')
+    return {
+        (dev, L9['color']): col,
+        (dev, L9['focus']): 0.589,
+        (dev, L9['rx']): lerp(0.778, 0.291, clamp(0, 1, noteTime / dur)),
+        (dev, L9['ry']): 0.383,
+        (dev, L9['zoom']): 0.714,
+    }
 
 def effect_pulseRainbow(effectSettings, strength, songTime, noteTime):
     out = {}
