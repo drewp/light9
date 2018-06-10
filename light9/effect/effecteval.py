@@ -282,6 +282,23 @@ def effect_chase2(effectSettings, strength, songTime, noteTime):
             })
     return out
     
+def effect_whirlscolor(effectSettings, strength, songTime, noteTime):
+    out = {}
+
+    col = effectSettings.get(L9['colorScale'], '#ffffff')
+    col = scale(col, effectSettings.get(L9['strength'], 1))
+    
+    for n in (1, 3):
+        dev = L9['device/q%s' % n]
+        scl = strength
+        col = literalColorHsv(((songTime / 5) + (n / 5)) % 1, 1, scl)
+        out.update({
+            (dev, L9['color']): col,
+            })
+
+    return out
+
+
 def effect_orangeSearch(effectSettings, strength, songTime, noteTime):
     dev = L9['device/auraStage']
     return {(dev, L9['color']): '#a885ff',
