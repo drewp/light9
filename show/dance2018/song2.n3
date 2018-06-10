@@ -13,8 +13,8 @@ show:song2 :note song:n0, song:n1 .
 song:n0 a :Note; :curve song:n0c0; :effectClass effect:combine1; :originTime 4.5036e+01 .
 
 song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
-song:n0c0p0 :time -4.1624e+01; :value 0e+00 .
-song:n0c0p1 :time -3.9059e+01; :value 1e+00 .
+song:n0c0p0 :time -4.1079e+01; :value 0e+00 .
+song:n0c0p1 :time -3.551e+01; :value 1e+00 .
 song:n0c0p2 :time 1.1822e+02; :value 1e+00 .
 song:n0c0p3 :time 1.2064e+02; :value 0e+00 .
 

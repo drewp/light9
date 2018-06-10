@@ -14,11 +14,11 @@ effect:qcenter a :Effect; rdfs:label "qcenter"; :publishAttr :strength;
 effect:qcenter_set0 :device dev:q2; :deviceAttr :color; :scaledValue "#ffffff" .
 effect:qcenter_set1 :device dev:q2; :deviceAttr :zoom; :value 5.08e-01 .
 effect:qcenter_set11 :device dev:q1; :deviceAttr :rx; :value 3.93e-01 .
-effect:qcenter_set12 :device dev:q3; :deviceAttr :rx; :value 5.91e-01 .
+effect:qcenter_set12 :device dev:q3; :deviceAttr :rx; :value 6.32e-01 .
 effect:qcenter_set14 :device dev:q1; :deviceAttr :focus; :value 3.95e-01 .
 effect:qcenter_set15 :device dev:q1; :deviceAttr :ry; :value 4.97e-01 .
-effect:qcenter_set16 :device dev:q3; :deviceAttr :ry; :value 3.69e-01 .
-effect:qcenter_set17 :device dev:q2; :deviceAttr :ry; :value 4.69e-01 .
+effect:qcenter_set16 :device dev:q3; :deviceAttr :ry; :value 4.47e-01 .
+effect:qcenter_set17 :device dev:q2; :deviceAttr :ry; :value 4.44e-01 .
 effect:qcenter_set18 :device dev:q2; :deviceAttr :rx; :value 5.2e-01 .
 effect:qcenter_set2 :device dev:q3; :deviceAttr :color; :scaledValue "#adadad" .
 effect:qcenter_set3 :device dev:q1; :deviceAttr :color; :scaledValue "#919191" .
