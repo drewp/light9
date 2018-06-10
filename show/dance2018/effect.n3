@@ -26,6 +26,8 @@ effect:qsweep a :Effect; :publishAttr :strength ; :group "anim".
 effect:qsweepusa a :Effect; :publishAttr :strength ; :group "anim".
 effect:chase1 a :Effect; :publishAttr :strength ; :group "anim".
 effect:chase2 a :Effect; :publishAttr :strength ; :group "anim".
+effect:whirlscolor a :Effect; :publishAttr :strength ; :group "anim".
+effect:qpan a :Effect; :publishAttr :strength ; :group "anim".
 
 effect:lightning a :Effect; :publishAttr :strength ; :group "main"; :order 7.
 
