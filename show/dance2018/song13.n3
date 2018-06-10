@@ -4,37 +4,42 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix song: <http://light9.bigasterisk.com/show/dance2018/song13/> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song13 :note <http://light9.bigasterisk.com/show/dance2018/song13/n0>, <http://light9.bigasterisk.com/show/dance2018/song13/n1> .
+show:song13 :note song:n0, song:n1, song:n3 .
 
-<http://light9.bigasterisk.com/show/dance2018/song13/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song13/n0c0>;
-     :effectClass effect:allcolor; :originTime 4.8705e+01; :setting <http://light9.bigasterisk.com/show/dance2018/song13/n0set0> .
+song:n2 a :Note; :curve song:n2c1; :effectClass effect:allcolor; :originTime 1.076326e+02 .
 
-<http://light9.bigasterisk.com/show/dance2018/song13/n0c0> a :Curve;
-     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song13/n0c0p0>, <http://light9.bigasterisk.com/show/dance2018/song13/n0c0p1>, <http://light9.bigasterisk.com/show/dance2018/song13/n0c0p2>, <http://light9.bigasterisk.com/show/dance2018/song13/n0c0p3> .
-<http://light9.bigasterisk.com/show/dance2018/song13/n0c0p0> :time -4.505e+01;
-     :value 0e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n0c0p1> :time -4.0084e+01;
-     :value 1e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n0c0p2> :time 1.87675e+02;
-     :value 1e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n0c0p3> :time 1.89256e+02;
-     :value 0e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n0set0> :effectAttr :colorScale;
-     :value "#ffb19f" .
+song:n0 a :Note; :curve song:n0c0; :effectClass effect:allcolor; :originTime 4.8705e+01;
+     :setting song:n0set0 .
 
-<http://light9.bigasterisk.com/show/dance2018/song13/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2018/song13/n1c0>;
-     :effectClass effect:bow; :originTime 2.29877e+02 .
+song:n0c0 a :Curve; :attr :strength; :point song:n0c0p0, song:n0c0p1, song:n0c0p2, song:n0c0p3 .
+song:n0c0p0 :time -4.505e+01; :value 0e+00 .
+song:n0c0p1 :time -4.0084e+01; :value 1e+00 .
+song:n0c0p2 :time 1.83778e+02; :value 1e+00 .
+song:n0c0p3 :time 1.85359e+02; :value 0e+00 .
+song:n0set0 :effectAttr :colorScale; :value "#ffb19f" .
 
-<http://light9.bigasterisk.com/show/dance2018/song13/n1c0> a :Curve;
-     :attr :strength; :point <http://light9.bigasterisk.com/show/dance2018/song13/n1c0p0>, <http://light9.bigasterisk.com/show/dance2018/song13/n1c0p1>, <http://light9.bigasterisk.com/show/dance2018/song13/n1c0p2>, <http://light9.bigasterisk.com/show/dance2018/song13/n1c0p3> .
-<http://light9.bigasterisk.com/show/dance2018/song13/n1c0p0> :time -1.426e+00;
-     :value 0e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n1c0p1> :time 7.94e-01;
-     :value 1e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n1c0p2> :time 6.484e+00;
-     :value 1e+00 .
-<http://light9.bigasterisk.com/show/dance2018/song13/n1c0p3> :time 7.963e+00;
-     :value 0e+00 .
+song:n1 a :Note; :curve song:n1c0; :effectClass effect:bow; :originTime 2.29877e+02 .
+
+song:n1c0 a :Curve; :attr :strength; :point song:n1c0p0, song:n1c0p1, song:n1c0p2, song:n1c0p3 .
+song:n1c0p0 :time -1.426e+00; :value 0e+00 .
+song:n1c0p1 :time 7.94e-01; :value 1e+00 .
+song:n1c0p2 :time 6.484e+00; :value 1e+00 .
+song:n1c0p3 :time 7.963e+00; :value 0e+00 .
+
+song:n2c1 a :Curve; :attr :strength; :point song:n2c1p1, song:n2c1p2, song:n2c1p3, song:n2c1p4 .
+song:n2c1p1 :time -2e+00; :value 0e+00 .
+song:n2c1p2 :time 0e+00; :value 1e+00 .
+song:n2c1p3 :time 2e+01; :value 1e+00 .
+song:n2c1p4 :time 2.2e+01; :value 0e+00 .
+
+song:n3 a :Note; :curve song:n3c1; :effectClass effect:allcolor; :originTime 1.076326e+02 .
+
+song:n3c1 a :Curve; :attr :strength; :point song:n3c1p1, song:n3c1p2, song:n3c1p3, song:n3c1p4 .
+song:n3c1p1 :time -4.639e+00; :value 0e+00 .
+song:n3c1p2 :time -9.01e-01; :value 1e+00 .
+song:n3c1p3 :time 1.28899e+02; :value 1e+00 .
+song:n3c1p4 :time 1.30899e+02; :value 0e+00 .
