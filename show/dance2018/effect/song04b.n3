@@ -1,0 +1,58 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song04b/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song04b a :Effect; rdfs:label "song04b"; :publishAttr :strength;
+     :setting eff:set1634587, eff:set2536113, eff:set2685327, eff:set2860082, eff:set2941100, eff:set3108608, eff:set3356419, eff:set3492229, eff:set3754324, eff:set4071630, eff:set4135127, eff:set4183060, eff:set4256720, eff:set4775969, eff:set5068549, eff:set516204, eff:set5174877, eff:set5629954, eff:set6239247, eff:set6440067, eff:set6552611, eff:set6578376, eff:set6679814, eff:set6812179, eff:set6815740, eff:set6833530, eff:set6898825, eff:set7005056, eff:set7322423, eff:set7373611, eff:set7385703, eff:set7657931, eff:set7690732, eff:set7737934, eff:set8029779, eff:set8668794, eff:set8718277, eff:set877216, eff:set9010219, eff:set913807, eff:set91410, eff:set9276854, eff:set9282917, eff:set931044, eff:set9803546 .
+eff:set1634587 :device dev:aura4; :deviceAttr :color; :scaledValue "#38314c" .
+eff:set2536113 :device dev:down2; :deviceAttr :color; :scaledValue "#d4bb9a" .
+eff:set2685327 :device dev:backlight3; :deviceAttr :color; :scaledValue "#373028" .
+eff:set2860082 :device dev:q1; :deviceAttr :zoom; :value 0.319 .
+eff:set2941100 :device dev:cycL; :deviceAttr :brightness; :scaledValue 1.23e-01 .
+eff:set3108608 :device dev:aura2; :deviceAttr :color; :scaledValue "#41394c" .
+eff:set3356419 :device dev:aura2; :deviceAttr :zoom; :value 5.205e-01 .
+eff:set3492229 :device dev:cycR; :deviceAttr :brightness; :scaledValue 1.23e-01 .
+eff:set3754324 :device dev:upCenter; :deviceAttr :uv; :scaledValue 1.998e-01 .
+eff:set4071630 :device dev:q2; :deviceAttr :zoom; :value 0.405 .
+eff:set4135127 :device dev:aura3; :deviceAttr :ry; :value 1.75e-01 .
+eff:set4183060 :device dev:aura3; :deviceAttr :color; :scaledValue "#4c2d1a" .
+eff:set4256720 :device dev:backlight1; :deviceAttr :color; :scaledValue "#282828" .
+eff:set4775969 :device dev:aura2; :deviceAttr :ry; :value 3.105e-01 .
+eff:set5068549 :device dev:aura3; :deviceAttr :zoom; :value 5.435e-01 .
+eff:set516204 :device dev:aura4; :deviceAttr :zoom; :value 5.35e-01 .
+eff:set5174877 :device dev:q3; :deviceAttr :color; :scaledValue "#48312a" .
+eff:set5629954 :device dev:q2; :deviceAttr :focus; :value 0.971 .
+eff:set6239247 :device dev:backlight4; :deviceAttr :color; :scaledValue "#373028" .
+eff:set6440067 :device dev:q2; :deviceAttr :color; :scaledValue "#48312a" .
+eff:set6552611 :device dev:down4; :deviceAttr :color; :scaledValue "#d4bb9a" .
+eff:set6578376 :device dev:aura1; :deviceAttr :rx; :value 2.695e-01 .
+eff:set6679814 :device dev:q1; :deviceAttr :color; :scaledValue "#48312a" .
+eff:set6812179 :device dev:aura4; :deviceAttr :rx; :value 6.66e-01 .
+eff:set6815740 :device dev:q2; :deviceAttr :ry; :value 3.4e-01 .
+eff:set6833530 :device dev:aura1; :deviceAttr :ry; :value 2.935e-01 .
+eff:set6898825 :device dev:aura5; :deviceAttr :rx; :value 7.145e-01 .
+eff:set7005056 :device dev:aura4; :deviceAttr :ry; :value 2.78e-01 .
+eff:set7322423 :device dev:q3; :deviceAttr :zoom; :value 0.395 .
+eff:set7373611 :device dev:q3; :deviceAttr :ry; :value 4.19e-01 .
+eff:set7385703 :device dev:aura2; :deviceAttr :rx; :value 4.545e-01 .
+eff:set7657931 :device dev:q1; :deviceAttr :ry; :value 0.475 .
+eff:set7690732 :device dev:upCenter; :deviceAttr :color; :scaledValue "#4c4c4c" .
+eff:set7737934 :device dev:aura5; :deviceAttr :ry; :value 2.775e-01 .
+eff:set8029779 :device dev:aura1; :deviceAttr :zoom; :value 5.32e-01 .
+eff:set8668794 :device dev:aura3; :deviceAttr :rx; :value 5.45e-01 .
+eff:set8718277 :device dev:down3; :deviceAttr :color; :scaledValue "#d4bb9a" .
+eff:set877216 :device dev:aura1; :deviceAttr :color; :scaledValue "#4c2e1f" .
+eff:set9010219 :device dev:q2; :deviceAttr :rx; :value 0.513 .
+eff:set913807 :device dev:q1; :deviceAttr :rx; :value 0.248 .
+eff:set91410 :device dev:q3; :deviceAttr :rx; :value 0.738 .
+eff:set9276854 :device dev:backlight2; :deviceAttr :color; :scaledValue "#373028" .
+eff:set9282917 :device dev:backlight5; :deviceAttr :color; :scaledValue "#262626" .
+eff:set931044 :device dev:aura5; :deviceAttr :color; :scaledValue "#4c2e1d" .
+eff:set9803546 :device dev:aura5; :deviceAttr :zoom; :value 5.51e-01 .

@@ -1,0 +1,33 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/aurawide/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2018/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:aurawide a :Effect; rdfs:label "aurawide"; :publishAttr :strength;
+     :setting eff:set1221215, eff:set1336182, eff:set1767835, eff:set3880400, eff:set4491079, eff:set524414, eff:set6274829, eff:set6468348, eff:set7201437, eff:set7368166, eff:set7587193, eff:set7609684, eff:set7684257, eff:set8169620, eff:set8173712, eff:set8201166, eff:set8398391, eff:set8632732, eff:set9725281, eff:set9949789 .
+eff:set1221215 :device dev:aura3; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set1336182 :device dev:aura4; :deviceAttr :zoom; :value 0.419 .
+eff:set1767835 :device dev:aura1; :deviceAttr :rx; :value 5.11e-01 .
+eff:set3880400 :device dev:aura4; :deviceAttr :rx; :value 0.659 .
+eff:set4491079 :device dev:aura5; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set524414 :device dev:aura4; :deviceAttr :ry; :value 0.086 .
+eff:set6274829 :device dev:aura5; :deviceAttr :ry; :value 0.082 .
+eff:set6468348 :device dev:aura1; :deviceAttr :ry; :value 0.175 .
+eff:set7201437 :device dev:aura4; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set7368166 :device dev:aura2; :deviceAttr :ry; :value 0.173 .
+eff:set7587193 :device dev:aura1; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set7609684 :device dev:aura3; :deviceAttr :ry; :value 0.077 .
+eff:set7684257 :device dev:aura3; :deviceAttr :rx; :value 0.557 .
+eff:set8169620 :device dev:aura1; :deviceAttr :zoom; :value 0.435 .
+eff:set8173712 :device dev:aura2; :deviceAttr :zoom; :value 0.425 .
+eff:set8201166 :device dev:aura2; :deviceAttr :rx; :value 0.368 .
+eff:set8398391 :device dev:aura3; :deviceAttr :zoom; :value 0.435 .
+eff:set8632732 :device dev:aura5; :deviceAttr :rx; :value 3.7e-01 .
+eff:set9725281 :device dev:aura2; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set9949789 :device dev:aura5; :deviceAttr :zoom; :value 0.417 .

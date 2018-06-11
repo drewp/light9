@@ -38,6 +38,7 @@ effect:houseside :group "main"; :order 4 .
 effect:cyc :group "main"; :order 3 .
 effect:qwidecenter :group "main"; rdfs:label "qwidecenter [18]"; :order 5 .
 effect:curtain2  :group "main"; :order 2 .
+effect:bow :group "main"; :order 8 .
 
 effect:centerSpot a :Effect; rdfs:label "center spot";
      :group "main"; :order 1; :publishAttr :strength;
