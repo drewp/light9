@@ -233,7 +233,7 @@ song:n28c0 a :Curve; :attr :strength; :point song:n28c0p0, song:n28c0p1, song:n2
 song:n28c0p0 :time 3.6088e+01; :value 0e+00 .
 song:n28c0p1 :time 4.035e+01; :value 1e+00 .
 song:n28c0p2 :time 1.44477e+02; :value 1e+00 .
-song:n28c0p3 :time 1.46422e+02; :value 0e+00 .
+song:n28c0p3 :time 1.47868e+02; :value 0e+00 .
 song:n28set0 :effectAttr :colorScale; :value "#ff4a18" .
 
 song:n29c0 a :Curve; :attr :strength; :point song:n29c0p0, song:n29c0p1, song:n29c0p2, song:n29c0p3 .
