@@ -56,6 +56,9 @@ mypy-collector:
 mypy-paint:
 	env/bin/mypy --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep light9/paint/*.py
 
+reformat:
+	env/bin/yapf --verbose --parallel --in-place --style google light9/**/*.py `file --no-pad  bin/* | grep 'Python script' | perl -lpe 's/:.*//'`
+
 ### show ###
 
 darcs_show_checkpoint:

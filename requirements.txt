@@ -28,6 +28,7 @@ txzmq==0.8.0
 typing==3.6.1
 watchdog==0.8.3
 webcolors==1.7
+yapf==0.27.0
 
 git+http://github.com/drewp/scales.git@448d59fb491b7631877528e7695a93553bfaaa93#egg=scales
 git+http://github.com/11craft/louie.git@f18bb71010c114eca9c6b88c96453340e3b39454#egg=louie
