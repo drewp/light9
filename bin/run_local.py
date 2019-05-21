@@ -4,30 +4,37 @@
 
 import sys, os, socket
 
+
 def fixSysPath():
-    root = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]), '..')) + '/'
+    root = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]),
+                                        '..')) + '/'
 
     # this is site-packages/zope.interface-4.5.0-py2.7-nspkg.pth,
     # slightly edited.
     import types
-    has_mfs = sys.version_info > (3, 5);
+    has_mfs = sys.version_info > (3, 5)
     p = root + 'env/local/lib/python2.7/site-packages/zope'
-    importlib = has_mfs and __import__('importlib.util');
-    has_mfs and __import__('importlib.machinery');
+    importlib = has_mfs and __import__('importlib.util')
+    has_mfs and __import__('importlib.machinery')
     m = has_mfs and sys.modules.setdefault(
-        'zope', importlib.util.module_from_spec(
-            importlib.machinery.PathFinder.find_spec(
-                'zope', [os.path.dirname(p)])));
-    m = m or sys.modules.setdefault('zope', types.ModuleType('zope'));
-    mp = (m or []) and m.__dict__.setdefault('__path__',[]);
+        'zope',
+        importlib.util.module_from_spec(
+            importlib.machinery.PathFinder.find_spec('zope',
+                                                     [os.path.dirname(p)])))
+    m = m or sys.modules.setdefault('zope', types.ModuleType('zope'))
+    mp = (m or []) and m.__dict__.setdefault('__path__', [])
     (p not in mp) and mp.append(p)
-    
+
     p = root + 'env/local/lib/python2.7/site-packages/greplin'
-    importlib = has_mfs and __import__('importlib.util');
-    has_mfs and __import__('importlib.machinery');
-    m = has_mfs and sys.modules.setdefault('greplin', importlib.util.module_from_spec(importlib.machinery.PathFinder.find_spec('greplin', [os.path.dirname(p)])));
-    m = m or sys.modules.setdefault('greplin', types.ModuleType('greplin'));
-    mp = (m or []) and m.__dict__.setdefault('__path__',[]);
+    importlib = has_mfs and __import__('importlib.util')
+    has_mfs and __import__('importlib.machinery')
+    m = has_mfs and sys.modules.setdefault(
+        'greplin',
+        importlib.util.module_from_spec(
+            importlib.machinery.PathFinder.find_spec('greplin',
+                                                     [os.path.dirname(p)])))
+    m = m or sys.modules.setdefault('greplin', types.ModuleType('greplin'))
+    mp = (m or []) and m.__dict__.setdefault('__path__', [])
     (p not in mp) and mp.append(p)
 
     sys.path = [
@@ -46,6 +53,7 @@ def fixSysPath():
         root + 'env/lib/python2.7/site-packages/gtk-2.0',
     ]
 
+
 fixSysPath()
 
 from twisted.python.failure import Failure
@@ -55,12 +63,14 @@ try:
 except ImportError:
     pass
 else:
+
     def rce(self, exc, val, tb):
         sys.stderr.write("Exception in Tkinter callback\n")
         if True:
             sys.excepthook(exc, val, tb)
         else:
             Failure(val, exc, tb).printDetailedTraceback()
+
     Tkinter.Tk.report_callback_exception = rce
 
 import coloredlogs, logging, time
@@ -71,16 +81,19 @@ except ImportError:
     pass
 
 progName = sys.argv[0].split('/')[-1]
-log = logging.getLogger() # this has to get the root logger
-log.name = progName # but we can rename it for clarity
+log = logging.getLogger()  # this has to get the root logger
+log.name = progName  # but we can rename it for clarity
+
 
 class FractionTimeFilter(logging.Filter):
+
     def filter(self, record):
         record.fractionTime = (
             time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(record.created)) +
             ("%.3f" % (record.created % 1)).lstrip('0'))
         # Don't filter the record.
         return 1
+
 
 coloredlogs.install(
     level='DEBUG',
@@ -90,10 +103,13 @@ logging.getLogger().handlers[0].addFilter(FractionTimeFilter())
 
 def setTerminalTitle(s):
     if os.environ.get('TERM', '') in ['xterm', 'rxvt', 'rxvt-unicode-256color']:
-        print "\033]0;%s\007" % s # not escaped/protected correctly
+        print "\033]0;%s\007" % s  # not escaped/protected correctly
+
 
 if 'listsongs' not in sys.argv[0] and 'homepageConfig' not in sys.argv[0]:
-    setTerminalTitle('[%s] %s' % (socket.gethostname(), ' '.join(sys.argv).replace('bin/', '')))
+    setTerminalTitle(
+        '[%s] %s' %
+        (socket.gethostname(), ' '.join(sys.argv).replace('bin/', '')))
 
 # see http://www.youtube.com/watch?v=3cIOT9kM--g for commands that make
 # profiles and set background images

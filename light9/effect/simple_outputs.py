@@ -3,15 +3,17 @@ import traceback
 from light9.namespaces import L9, RDF
 from light9.effect.scale import scale
 
+
 class SimpleOutputs(object):
+
     def __init__(self, graph):
         self.graph = graph
-        
+
         # effect : [(dev, attr, value, isScaled)]
         self.effectOutputs = {}
 
         self.graph.addHandler(self.updateEffectsFromGraph)
-        
+
     def updateEffectsFromGraph(self):
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
             settings = []
@@ -37,7 +39,6 @@ class SimpleOutputs(object):
             if settings:
                 self.effectOutputs[effect] = settings
             # also have to read eff :effectAttr [ :tint x; :tintStrength y ]
-        
 
     def values(self, effect, strength, colorScale):
         out = {}
@@ -48,4 +49,3 @@ class SimpleOutputs(object):
                 value = scale(value, colorScale)
             out[(dev, devAttr)] = value
         return out
-        

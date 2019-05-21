@@ -17,6 +17,7 @@ if not webServer:
     raise ValueError('no %r :webServer' % netHome)
 print "listen %s;" % splitport(urlparse(webServer).netloc)[1]
 
+
 def location(path, server):
     print """
     location /%(path)s/ {
@@ -32,6 +33,7 @@ def location(path, server):
       rewrite /[^/]+/(.*) /$1 break;
     }""" % vars()
 
+
 for role, server in sorted(graph.predicate_objects(netHome)):
     if not server.startswith('http') or role == L9['webServer']:
         continue
@@ -41,11 +43,11 @@ for role, server in sorted(graph.predicate_objects(netHome)):
     server = server.rstrip('/')
     location(path, server)
 
-
-
 showPath = showconfig.showUri().split('/', 3)[-1]
 print """
     location /%(path)s {
       root %(root)s;
-    }""" % {'path': showPath,
-            'root': showconfig.root()[:-len(showPath)]}
+    }""" % {
+    'path': showPath,
+    'root': showconfig.root()[:-len(showPath)]
+}

@@ -19,7 +19,8 @@ class ChauvetColorStrip(Device):
      device attrs:
        color
     """
-        
+
+
 class Mini15(Device):
     """
     plan:
@@ -31,13 +32,17 @@ class Mini15(Device):
         goboShake
         imageAim (configured with a file of calibration data)
     """
+
+
 def clamp255(x):
     return min(255, max(0, x))
-    
+
+
 def _8bit(f):
     if not isinstance(f, (int, float)):
         raise TypeError(repr(f))
     return clamp255(int(f * 255))
+
 
 def resolve(deviceType, deviceAttr, values):
     """
@@ -66,6 +71,7 @@ def resolve(deviceType, deviceAttr, values):
         return Literal(sum(floatVals) / len(floatVals))
     return max(values)
 
+
 def toOutputAttrs(deviceType, deviceAttrSettings):
     """
     Given device attr settings like {L9['color']: Literal('#ff0000')},
@@ -74,6 +80,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
 
     :outputAttrRange happens before we get here.
     """
+
     def floatAttr(attr, default=0):
         out = deviceAttrSettings.get(attr)
         if out is None:
@@ -86,12 +93,10 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         return r, g, b
 
     def cmyAttr(attr):
-        rgb = sRGBColor.new_from_rgb_hex(deviceAttrSettings.get(attr, '#000000'))
+        rgb = sRGBColor.new_from_rgb_hex(deviceAttrSettings.get(
+            attr, '#000000'))
         out = colormath.color_conversions.convert_color(rgb, CMYColor)
-        return (
-            _8bit(out.cmy_c),
-            _8bit(out.cmy_m),
-            _8bit(out.cmy_y))
+        return (_8bit(out.cmy_c), _8bit(out.cmy_m), _8bit(out.cmy_y))
 
     def fine16Attr(attr, scale=1.0):
         x = floatAttr(attr) * scale
@@ -106,20 +111,15 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         if deviceAttrSettings.get(attr) == L9['g2']:
             return 10
         return 0
-        
+
     if deviceType == L9['ChauvetColorStrip']:
         r, g, b = rgbAttr(L9['color'])
-        return {
-            L9['mode']: 215,
-            L9['red']: r,
-            L9['green']: g,
-            L9['blue']: b
-            }
+        return {L9['mode']: 215, L9['red']: r, L9['green']: g, L9['blue']: b}
     elif deviceType == L9['SimpleDimmer']:
         return {L9['level']: _8bit(floatAttr(L9['brightness']))}
     elif deviceType == L9['Mini15']:
         out = {
-            L9['rotationSpeed']: 0, # seems to have no effect
+            L9['rotationSpeed']: 0,  # seems to have no effect
             L9['dimmer']: 255,
             L9['colorChange']: 0,
             L9['colorSpeed']: 0,
@@ -131,17 +131,18 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['mini15Gobo1']: 10,
             L9['mini15Gobo2']: 20,
             L9['mini15Gobo3']: 30,
-            }[deviceAttrSettings.get(L9['mini15GoboChoice'], L9['open'])]
-        
+        }[deviceAttrSettings.get(L9['mini15GoboChoice'], L9['open'])]
+
         out[L9['red']], out[L9['green']], out[L9['blue']] = rgbAttr(L9['color'])
-        out[L9['xRotation']], out[L9['xFine']] = fine16Attr(L9['rx'], 1/540)
-        out[L9['yRotation']], out[L9['yFine']] = fine16Attr(L9['ry'], 1/240)
+        out[L9['xRotation']], out[L9['xFine']] = fine16Attr(L9['rx'], 1 / 540)
+        out[L9['yRotation']], out[L9['yFine']] = fine16Attr(L9['ry'], 1 / 240)
         # didn't find docs on this, but from tests it looks like 64 fine steps takes you to the next coarse step
 
         return out
     elif deviceType == L9['ChauvetHex12']:
         out = {}
-        out[L9['red']], out[L9['green']], out[L9['blue']] = r, g, b = rgbAttr(L9['color'])
+        out[L9['red']], out[L9['green']], out[L9['blue']] = r, g, b = rgbAttr(
+            L9['color'])
         out[L9['amber']] = 0
         out[L9['white']] = min(r, g, b)
         out[L9['uv']] = _8bit(floatAttr(L9['uv']))
@@ -153,7 +154,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         out[L9['fixed255']] = 255
         for num in range(7):
             out[L9['fixed128_%s' % num]] = 128
-        return out        
+        return out
     elif deviceType == L9['MacAura']:
         out = {
             L9['shutter']: 22,
@@ -184,21 +185,23 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
         out = {
             L9['dimmerFadeLo']: 0,
             L9['fixtureControl']: 0,
-            L9['fx1Select']:  0,
-            L9['fx1Adjust']:  0,
-            L9['fx2Select']:  0,
-            L9['fx2Adjust']:  0,
-            L9['fxSync']:  0,            
-            }
+            L9['fx1Select']: 0,
+            L9['fx1Adjust']: 0,
+            L9['fx2Select']: 0,
+            L9['fx2Adjust']: 0,
+            L9['fxSync']: 0,
+        }
 
         # note these values are set to 'fade', so they update slowly. Haven't found where to turn that off.
-        out[L9['cyan']], out[L9['magenta']], out[L9['yellow']] = cmyAttr(L9['color'])
-        
+        out[L9['cyan']], out[L9['magenta']], out[L9['yellow']] = cmyAttr(
+            L9['color'])
+
         out[L9['focusHi']], out[L9['focusLo']] = fine16Attr(L9['focus'])
         out[L9['panHi']], out[L9['panLo']] = fine16Attr(L9['rx'])
         out[L9['tiltHi']], out[L9['tiltLo']] = fine16Attr(L9['ry'])
         out[L9['zoomHi']], out[L9['zoomLo']] = fine16Attr(L9['zoom'])
-        out[L9['dimmerFadeHi']] = 0 if deviceAttrSettings.get(L9['color'], '#000000') == '#000000' else 255
+        out[L9['dimmerFadeHi']] = 0 if deviceAttrSettings.get(
+            L9['color'], '#000000') == '#000000' else 255
 
         out[L9['goboChoice']] = {
             L9['open']: 0,
@@ -208,7 +211,7 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             L9['brush']: 51,
             L9['whirlpool']: 56,
             L9['stars']: 61,
-            }[deviceAttrSettings.get(L9['quantumGoboChoice'], L9['open'])]
+        }[deviceAttrSettings.get(L9['quantumGoboChoice'], L9['open'])]
 
         # my goboSpeed deviceAttr goes 0=stopped to 1=fastest (using one direction only)
         x = .5 + .5 * floatAttr(L9['goboSpeed'])
@@ -220,13 +223,13 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
             out[L9['shutter']] = 30
         else:
             out[L9['shutter']] = 50 + int(150 * (strobe - .1) / .9)
-        
-        out.update( {
+
+        out.update({
             L9['colorWheel']: 0,
             L9['goboStaticRotate']: 0,
             L9['prismRotation']: _8bit(floatAttr(L9['prism'])),
-            L9['iris']: _8bit(floatAttr(L9['iris']) * (200/255)),
-            })
+            L9['iris']: _8bit(floatAttr(L9['iris']) * (200 / 255)),
+        })
         return out
     else:
         raise NotImplementedError('device %r' % deviceType)

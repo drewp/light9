@@ -3,6 +3,7 @@ import gi
 from gi.repository import Gtk
 from gi.repository import Pango
 
+
 def togglePyConsole(self, item, user_ns):
     """
     toggles a toplevel window with an ipython console inside.
@@ -26,11 +27,12 @@ def togglePyConsole(self, item, user_ns):
             self.pythonWindow.show_all()
             self.pythonWindow.set_size_request(750, 550)
             self.pythonWindow.set_resizable(True)
+
             def onDestroy(*args):
                 item.set_active(False)
                 del self.pythonWindow
+
             self.pythonWindow.connect("destroy", onDestroy)
     else:
         if hasattr(self, 'pythonWindow'):
             self.pythonWindow.destroy()
-

@@ -21,26 +21,33 @@ from light9.namespaces import L9
 from lightsim.openglsim import Surface
 
 log = logging.getLogger()
-logging.basicConfig(format="%(asctime)s %(levelname)-5s %(name)s %(filename)s:%(lineno)d: %(message)s")
+logging.basicConfig(
+    format=
+    "%(asctime)s %(levelname)-5s %(name)s %(filename)s:%(lineno)d: %(message)s")
 log.setLevel(logging.DEBUG)
+
 
 def filenamesForChan(graph, chan):
     for lyr in graph.objects(chan, L9['previewLayer']):
         for imgPath in graph.objects(lyr, L9['path']):
             yield imgPath
 
+
 _lastLevels = None
+
+
 def poll(graph, serv, pollFreq, oglSurface):
     pollFreq.update()
     dispatcher.send("status", key="pollFreq", value=str(pollFreq))
     d = serv.callRemote("currentlevels", dmxclient._id)
+
     def received(dmxLevels):
         global _lastLevels
         if dmxLevels == _lastLevels:
             return
         _lastLevels = dmxLevels
 
-        level = {} # filename : level
+        level = {}  # filename : level
         for i, lev in enumerate(dmxLevels):
             if lev == 0:
                 continue
@@ -54,18 +61,21 @@ def poll(graph, serv, pollFreq, oglSurface):
                 level[str(imgPath)] = lev
 
         oglSurface.newLevels(levels=level)
+
     d.addCallback(received)
     return d
 
+
 class StatusKeys(QWidget):
     """listens for dispatcher signal 'status' and displays the key/value args"""
+
     def __init__(self, parent):
         QWidget.__init__(self)
         self.layout = QVBoxLayout()
         self.setLayout(self.layout)
-        self.row = {} # key name : (Frame, value Label)
+        self.row = {}  # key name : (Frame, value Label)
         dispatcher.connect(self.status, "status")
-        
+
     def status(self, key, value):
         if key not in self.row:
             row = QWidget()
@@ -81,7 +91,9 @@ class StatusKeys(QWidget):
             lab = self.row[key]
             lab.setText(value)
 
+
 class Window(QMainWindow):
+
     def __init__(self, filenames):
         QMainWindow.__init__(self, None)
         self.setWindowTitle(dmxclient._id)
@@ -90,13 +102,14 @@ class Window(QMainWindow):
         self.setCentralWidget(w)
         mainLayout = QVBoxLayout()
         w.setLayout(mainLayout)
-        
-        self.glWidget = Surface(self, filenames, imgRescaleTo=128*2)
+
+        self.glWidget = Surface(self, filenames, imgRescaleTo=128 * 2)
 
         mainLayout.addWidget(self.glWidget)
 
         status = StatusKeys(mainLayout)
-        mainLayout.addWidget(status)      
+        mainLayout.addWidget(status)
+
 
 def requiredImages(graph):
     """filenames that we'll need to show, based on a config structure
@@ -109,6 +122,7 @@ def requiredImages(graph):
         for p in graph.objects(lyr, L9['path']):
             filenames.append(str(p))
     return filenames
+
 
 if __name__ == '__main__':
     app = reactor.qApp
@@ -123,4 +137,3 @@ if __name__ == '__main__':
     LoopingCall(poll, graph, serv, pollFreq, window.glWidget).start(.05)
 
     reactor.run()
-

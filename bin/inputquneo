@@ -14,18 +14,20 @@ from rdfdb.syncedgraph import SyncedGraph
 from light9 import networking
 
 import sys
-sys.path.append('/usr/lib/python2.7/dist-packages') # For pygame
+sys.path.append('/usr/lib/python2.7/dist-packages')  # For pygame
 import pygame.midi
 
 curves = {
     23: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-2'),
     24: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-3'),
     25: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-4'),
-    6:URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-5'),
+    6: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-5'),
     18: URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-6'),
 }
 
+
 class WatchMidi(object):
+
     def __init__(self, graph):
         self.graph = graph
         pygame.midi.init()
@@ -36,7 +38,7 @@ class WatchMidi(object):
 
         self.noteIsOn = {}
 
-        self.effectMap = {} # note: effect class uri
+        self.effectMap = {}  # note: effect class uri
         self.graph.addHandler(self.setupNotes)
 
     def setupNotes(self):
@@ -45,14 +47,15 @@ class WatchMidi(object):
             if qn:
                 self.effectMap[int(qn)] = e
         log.info("setup with %s effects", len(self.effectMap))
-        
+
     def findQuneo(self):
         for dev in range(pygame.midi.get_count()):
-            interf, name, isInput, isOutput, opened = pygame.midi.get_device_info(dev)
+            interf, name, isInput, isOutput, opened = pygame.midi.get_device_info(
+                dev)
             if 'QUNEO' in name and isInput:
                 return dev
         raise ValueError("didn't find quneo input device")
-        
+
     def step(self):
         if not self.inp.poll():
             return
@@ -62,7 +65,6 @@ class WatchMidi(object):
             if status in [NOTEON, NOTEOFF]:
                 print status, d1, d2
 
-
             if status == NOTEON:
                 if not self.noteIsOn.get(d1):
                     self.noteIsOn[d1] = True
@@ -71,7 +73,10 @@ class WatchMidi(object):
                         cyclone.httpclient.fetch(
                             url=networking.effectEval.path('songEffects'),
                             method='POST',
-                            headers={'Content-Type': ['application/x-www-form-urlencoded']},
+                            headers={
+                                'Content-Type':
+                                ['application/x-www-form-urlencoded']
+                            },
                             postdata=urllib.urlencode([('drop', e)]),
                         )
                     except KeyError:
@@ -80,10 +85,9 @@ class WatchMidi(object):
             if status == NOTEOFF:
                 self.noteIsOn[d1] = False
 
-
             if 0:
                 # curve editing mode, not done yet
-                for group in [(23,24,25), (6, 18)]:
+                for group in [(23, 24, 25), (6, 18)]:
                     if d1 in group:
                         if not self.noteIsOn.get(group):
                             print "start zero"
@@ -91,18 +95,20 @@ class WatchMidi(object):
                             for d in group:
                                 sendLiveInputPoint(curves[d], 0)
                             self.noteIsOn[group] = True
-                        else: # miss first update
+                        else:  # miss first update
                             sendLiveInputPoint(curves[d1], d2 / 127)
 
-                    if status == 128: #noteoff
+                    if status == 128:  #noteoff
                         for d in group:
                             sendLiveInputPoint(curves[d], 0)
                         self.noteIsOn[group] = False
+
 
 def main():
     log.setLevel(logging.DEBUG)
     graph = SyncedGraph(networking.rdfdb.url, "inputQuneo")
     wm = WatchMidi(graph)
     reactor.run()
+
 
 main()

@@ -11,21 +11,24 @@ from light9.namespaces import L9
 log = logging.getLogger()
 
 registered = []
+
+
 def register(f):
     registered.append(f)
     return f
 
+
 @register
 class Strip(object):
     """list of r,g,b tuples for sending to an LED strip"""
-    which = 'L' # LR means both. W is the wide one
+    which = 'L'  # LR means both. W is the wide one
     pixels = []
 
     def __repr__(self):
         return '<Strip which=%r px0=%r>' % (self.which, self.pixels[0])
-    
+
     @classmethod
-    def solid(cls, which='L', color=(1,1,1), hsv=None):
+    def solid(cls, which='L', color=(1, 1, 1), hsv=None):
         """hsv overrides color"""
         if hsv is not None:
             color = colorsys.hsv_to_rgb(hsv[0] % 1.0, hsv[1], hsv[2])
@@ -37,24 +40,34 @@ class Strip(object):
     def __mul__(self, f):
         if not isinstance(f, (int, float)):
             raise TypeError
-            
+
         s = Strip()
         s.which = self.which
-        s.pixels = [(r*f, g*f, b*f) for r,g,b in self.pixels]
+        s.pixels = [(r * f, g * f, b * f) for r, g, b in self.pixels]
         return s
 
     __rmul__ = __mul__
 
+
 @register
 class Blacklight(float):
     """a level for the blacklight PWM output"""
+
     def __mul__(self, f):
         return Blacklight(float(self) * f)
+
     __rmul__ = __mul__
-    
+
+
 @register
-def chase(t, ontime=0.5, offset=0.2, onval=1.0, 
-          offval=0.0, names=None, combiner=max, random=False):
+def chase(t,
+          ontime=0.5,
+          offset=0.2,
+          onval=1.0,
+          offval=0.0,
+          names=None,
+          combiner=max,
+          random=False):
     """names is list of URIs. returns a submaster that chases through
     the inputs"""
     if random:
@@ -69,24 +82,27 @@ def chase(t, ontime=0.5, offset=0.2, onval=1.0,
             dmx = Patch.dmx_from_uri(uri)
         except KeyError:
             log.info(("chase includes %r, which doesn't resolve to a dmx chan" %
-                   uri))
+                      uri))
             continue
         lev[dmx] = value
 
-    return Submaster.Submaster(name="chase" ,levels=lev)
+    return Submaster.Submaster(name="chase", levels=lev)
+
 
 @register
 def hsv(h, s, v, light='all', centerScale=.5):
-    r,g,b = colorsys.hsv_to_rgb(h % 1.0, s, v)
+    r, g, b = colorsys.hsv_to_rgb(h % 1.0, s, v)
     lev = {}
     if light in ['left', 'all']:
-        lev[73], lev[74], lev[75] = r,g,b
+        lev[73], lev[74], lev[75] = r, g, b
     if light in ['right', 'all']:
-        lev[80], lev[81], lev[82] = r,g,b
+        lev[80], lev[81], lev[82] = r, g, b
     if light in ['center', 'all']:
-        lev[88], lev[89], lev[90] = r*centerScale,g*centerScale,b*centerScale
+        lev[88], lev[89], lev[
+            90] = r * centerScale, g * centerScale, b * centerScale
     return Submaster.Submaster(name='hsv', levels=lev)
-    
+
+
 @register
 def stack(t, names=None, fade=0):
     """names is list of URIs. returns a submaster that stacks the the inputs
@@ -102,19 +118,22 @@ def stack(t, names=None, fade=0):
             try:
                 dmx = Patch.dmx_from_uri(uri)
             except KeyError:
-                log.info(("stack includes %r, which doesn't resolve to a dmx chan"%
-                       uri))
+                log.info(
+                    ("stack includes %r, which doesn't resolve to a dmx chan" %
+                     uri))
                 continue
             lev[dmx] = 1
         else:
             break
-    
+
     return Submaster.Submaster(name="stack", levels=lev)
+
 
 @register
 def smoove(x):
-    return -2 * (x ** 3) + 3 * (x ** 2)
-    
+    return -2 * (x**3) + 3 * (x**2)
+
+
 def configExprGlobals():
     graph = showconfig.getGraph()
     ret = {}
@@ -130,8 +149,10 @@ def configExprGlobals():
 
     ret['nsin'] = lambda x: (math.sin(x * (2 * math.pi)) + 1) / 2
     ret['ncos'] = lambda x: (math.cos(x * (2 * math.pi)) + 1) / 2
+
     def nsquare(t, on=.5):
         return (t % 1.0) < on
+
     ret['nsquare'] = nsquare
 
     _smooth_random_items = [random_mod.random() for x in range(100)]
@@ -156,7 +177,4 @@ def configExprGlobals():
     ret['noise2'] = smooth_random2
     ret['notch2'] = notch_random2
 
-
-
-    
     return ret

@@ -8,8 +8,8 @@ import cyclone.web, cyclone.websocket, cyclone.httpclient
 import sys, optparse, logging, subprocess, json, itertools
 from rdflib import URIRef, Literal
 
-sys.path.append('/usr/lib/pymodules/python2.7/') # for numpy, on rpi
-sys.path.append('/usr/lib/python2.7/dist-packages') # For numpy
+sys.path.append('/usr/lib/pymodules/python2.7/')  # for numpy, on rpi
+sys.path.append('/usr/lib/python2.7/dist-packages')  # For numpy
 from light9 import networking, showconfig
 from light9.effecteval.effect import EffectNode
 from light9.effect.edit import getMusicStatus, songNotePatch
@@ -22,19 +22,24 @@ from greplin import scales
 
 from lib.cycloneerr import PrettyErrorHandler
 
+
 class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
-        self.set_header('Content-Type', 'text/html')        
+        self.set_header('Content-Type', 'text/html')
         self.write(open("light9/effecteval/effect.html").read())
+
     def delete(self):
         graph = self.settings.graph
         uri = URIRef(self.get_argument('uri'))
         with graph.currentState(tripleFilter=(None, L9['effect'], uri)) as g:
             song = ctx = list(g.subjects(L9['effect'], uri))[0]
-        self.settings.graph.patch(Patch(delQuads=[
-            (song, L9['effect'], uri, ctx),
+        self.settings.graph.patch(
+            Patch(delQuads=[
+                (song, L9['effect'], uri, ctx),
             ]))
-        
+
+
 @inlineCallbacks
 def currentSong():
     s = (yield getMusicStatus())['song']
@@ -42,13 +47,17 @@ def currentSong():
         raise ValueError("no current song")
     returnValue(URIRef(s))
 
+
 class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def wideOpenCors(self):
         self.set_header('Access-Control-Allow-Origin', '*')
-        self.set_header('Access-Control-Allow-Methods', 'GET, PUT, POST, DELETE, OPTIONS')
+        self.set_header('Access-Control-Allow-Methods',
+                        'GET, PUT, POST, DELETE, OPTIONS')
         self.set_header('Access-Control-Max-Age', '1000')
-        self.set_header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With')
-    
+        self.set_header('Access-Control-Allow-Headers',
+                        'Content-Type, Authorization, X-Requested-With')
+
     def options(self):
         self.wideOpenCors()
         self.write('')
@@ -60,27 +69,34 @@ class SongEffects(PrettyErrorHandler, cyclone.web.RequestHandler):
 
         try:
             song = URIRef(self.get_argument('uri'))
-        except Exception: # which?
+        except Exception:  # which?
             song = yield currentSong()
 
         event = self.get_argument('event', default='default')
-        
+
         note = self.get_argument('note', default=None)
         if note is not None:
             note = URIRef(note)
 
         log.info("adding to %s", song)
-        note, p = yield songNotePatch(self.settings.graph, dropped, song, event, ctx=song, note=note)
-        
+        note, p = yield songNotePatch(self.settings.graph,
+                                      dropped,
+                                      song,
+                                      event,
+                                      ctx=song,
+                                      note=note)
+
         self.settings.graph.patch(p)
         self.settings.graph.suggestPrefixes(song, {'song': URIRef(song + '/')})
         self.write(json.dumps({'note': note}))
-        
+
+
 class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
+
     def connectionMade(self, *args, **kwargs):
         self.graph = self.settings.graph
         self.graph.addHandler(self.updateClient)
-        
+
     def updateClient(self):
         # todo: abort if client is gone
         playlist = self.graph.value(showconfig.showUri(), L9['playList'])
@@ -88,14 +104,18 @@ class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
         out = []
         for s in songs:
             out.append({'uri': s, 'label': self.graph.label(s)})
-            out[-1]['effects'] = [{'uri': uri, 'label': self.graph.label(uri)} for uri in sorted(self.graph.objects(s, L9['effect']))]
+            out[-1]['effects'] = [{
+                'uri': uri,
+                'label': self.graph.label(uri)
+            } for uri in sorted(self.graph.objects(s, L9['effect']))]
         self.sendMessage({'songs': out})
-        
-        
+
+
 class EffectUpdates(cyclone.websocket.WebSocketHandler):
     """
     stays alive for the life of the effect page
     """
+
     def connectionMade(self, *args, **kwargs):
         log.info("websocket opened")
         self.uri = URIRef(self.get_argument('uri'))
@@ -113,7 +133,7 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
         en = EffectNode(self.graph, self.uri)
         codeLines = [c.code for c in en.codes]
         self.sendMessage({'codeLines': codeLines})
-        
+
     def connectionLost(self, reason):
         log.info("websocket closed")
 
@@ -121,12 +141,12 @@ class EffectUpdates(cyclone.websocket.WebSocketHandler):
         log.info("got message %s" % message)
         # write a patch back to the graph
 
+
 def replaceObjects(graph, c, s, p, newObjs):
-    patch = graph.getObjectPatch(
-        context=c,
-        subject=s,
-        predicate=p,
-        newObject=newObjs[0])
+    patch = graph.getObjectPatch(context=c,
+                                 subject=s,
+                                 predicate=p,
+                                 newObject=newObjs[0])
 
     moreAdds = []
     for line in newObjs[1:]:
@@ -135,8 +155,9 @@ def replaceObjects(graph, c, s, p, newObjs):
                       addQuads=patch.addQuads + moreAdds)
     graph.patch(fullPatch)
 
-        
+
 class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def put(self):
         effect = URIRef(self.get_argument('uri'))
         codeLines = []
@@ -150,16 +171,18 @@ class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
         if not codeLines:
             log.info("no codelines received on PUT /code")
             return
-        with self.settings.graph.currentState(
-                tripleFilter=(None, L9['effect'], effect)) as g:
+        with self.settings.graph.currentState(tripleFilter=(None, L9['effect'],
+                                                            effect)) as g:
             song = g.subjects(L9['effect'], effect).next()
-            
+
         replaceObjects(self.settings.graph, song, effect, L9['code'], codeLines)
-            
+
         # right here we could tell if the code has a python error and return it
         self.send_error(202)
-        
+
+
 class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     @inlineCallbacks
     def get(self):
         # return dmx list for that effect
@@ -176,6 +199,7 @@ class EffectEval(PrettyErrorHandler, cyclone.web.RequestHandler):
 # Completely not sure where the effect background loop should
 # go. Another process could own it, and get this request repeatedly:
 class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
         song = URIRef(self.get_argument('song'))
         effects = effectsForSong(self.settings.graph, song)
@@ -183,34 +207,44 @@ class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
         self.write(maxDict(effectDmxDict(e) for e in effects))
         # return dmx dict for all effects in the song, already combined
 
+
 class App(object):
+
     def __init__(self, show, outputWhere):
         self.show = show
         self.outputWhere = outputWhere
         self.graph = SyncedGraph(networking.rdfdb.url, "effectEval")
-        self.graph.initiallySynced.addCallback(self.launch).addErrback(log.error)
+        self.graph.initiallySynced.addCallback(self.launch).addErrback(
+            log.error)
 
-        self.stats = scales.collection('/',
-                                       scales.PmfStat('sendLevels'),
-                                       scales.PmfStat('getMusic'),
-                                       scales.PmfStat('evals'),
-                                       scales.PmfStat('sendOutput'),
-                                       scales.IntStat('errors'),
-                                       )
+        self.stats = scales.collection(
+            '/',
+            scales.PmfStat('sendLevels'),
+            scales.PmfStat('getMusic'),
+            scales.PmfStat('evals'),
+            scales.PmfStat('sendOutput'),
+            scales.IntStat('errors'),
+        )
 
     def launch(self, *args):
         log.info('launch')
         if self.outputWhere:
             self.loop = makeEffectLoop(self.graph, self.stats, self.outputWhere)
             self.loop.startLoop()
-        
+
         SFH = cyclone.web.StaticFileHandler
         self.cycloneApp = cyclone.web.Application(handlers=[
-            (r'/()', SFH,
-             {'path': 'light9/effecteval', 'default_filename': 'index.html'}),
+            (r'/()', SFH, {
+                'path': 'light9/effecteval',
+                'default_filename': 'index.html'
+            }),
             (r'/effect', EffectEdit),
-            (r'/effect\.js', StaticCoffee, {'src': 'light9/effecteval/effect.coffee'}),
-            (r'/(effect-components\.html)', SFH, {'path': 'light9/effecteval'}),
+            (r'/effect\.js', StaticCoffee, {
+                'src': 'light9/effecteval/effect.coffee'
+            }),
+            (r'/(effect-components\.html)', SFH, {
+                'path': 'light9/effecteval'
+            }),
             (r'/effectUpdates', EffectUpdates),
             (r'/code', Code),
             (r'/songEffectsUpdates', SongEffectsUpdates),
@@ -224,25 +258,33 @@ class App(object):
                                                   stats=self.stats)
         reactor.listenTCP(networking.effectEval.port, self.cycloneApp)
         log.info("listening on %s" % networking.effectEval.port)
-        
+
+
 class StaticCoffee(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def initialize(self, src):
         super(StaticCoffee, self).initialize()
         self.src = src
+
     def get(self):
         self.set_header('Content-Type', 'application/javascript')
-        self.write(subprocess.check_output([
-            '/usr/bin/coffee', '--compile', '--print', self.src]))
+        self.write(
+            subprocess.check_output(
+                ['/usr/bin/coffee', '--compile', '--print', self.src]))
 
-        
+
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option('--show',
+    parser.add_option(
+        '--show',
         help='show URI, like http://light9.bigasterisk.com/show/dance2008',
-                      default=showconfig.showUri())
-    parser.add_option("-v", "--verbose", action="store_true",
+        default=showconfig.showUri())
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
                       help="logging.DEBUG")
-    parser.add_option("--twistedlog", action="store_true",
+    parser.add_option("--twistedlog",
+                      action="store_true",
                       help="twisted logging")
     parser.add_option("--output", metavar="WHERE", help="dmx or leds")
     (options, args) = parser.parse_args()
@@ -250,7 +292,7 @@ if __name__ == "__main__":
 
     if not options.show:
         raise ValueError("missing --show http://...")
-            
+
     app = App(URIRef(options.show), options.output)
     if options.twistedlog:
         from twisted.python import log as twlog

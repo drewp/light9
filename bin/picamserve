@@ -1,7 +1,8 @@
 #!env_pi/bin/python
 from __future__ import division
 from run_local import log
-import sys;sys.path.append('/usr/lib/python2.7/dist-packages/')
+import sys
+sys.path.append('/usr/lib/python2.7/dist-packages/')
 import io, logging, traceback, time
 import cyclone.web
 from twisted.internet import reactor, threads
@@ -12,15 +13,23 @@ try:
     import picamera
     cameraCls = picamera.PiCamera
 except ImportError:
+
     class cameraCls(object):
-        def __enter__(self): return self
-        def __exit__(self, *a): pass
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *a):
+            pass
+
         def capture(self, out, *a, **kw):
             out.write(open('yuv.demo').read())
+
         def capture_continuous(self, *a, **kw):
             for i in range(1000):
                 time.sleep(1)
                 yield str(i)
+
 
 def setCameraParams(c, arg):
     res = int(arg('res', 480))
@@ -33,14 +42,15 @@ def setCameraParams(c, arg):
     c.exposure_mode = arg('exposure_mode', 'fixedfps')
     c.awb_mode = arg('awb_mode', 'off')
     c.brightness = int(arg('brightness', 50))
-    c.exposure_compensation= int(arg('exposure_compensation', 0))
+    c.exposure_compensation = int(arg('exposure_compensation', 0))
     c.awb_gains = (float(arg('redgain', 1)), float(arg('bluegain', 1)))
     c.ISO = int(arg('iso', 250))
     c.rotation = int(arg('rotation', '0'))
 
+
 def setupCrop(c, arg):
-    c.crop = (float(arg('x', 0)), float(arg('y', 0)),
-              float(arg('w', 1)), float(arg('h', 1)))
+    c.crop = (float(arg('x', 0)), float(arg('y', 0)), float(arg('w', 1)),
+              float(arg('h', 1)))
     rw = rh = int(arg('resize', 100))
     # width 1920, showing w=.3 of image, resize=100 -> scale is 100/.3*1920
     # scl is [ output px / camera px ]
@@ -53,7 +63,8 @@ def setupCrop(c, arg):
         # height is the constraint
         rw = int(scl2 * c.crop[2] * c.resolution[0])
     return rw, rh
-    
+
+
 @prof.logTime
 def getFrame(c, arg):
     setCameraParams(c, arg)
@@ -61,8 +72,10 @@ def getFrame(c, arg):
     out = io.BytesIO('w')
     prof.logTime(c.capture)(out, 'jpeg', use_video_port=True, resize=resize)
     return out.getvalue()
-    
+
+
 class Pic(cyclone.web.RequestHandler):
+
     def get(self):
         try:
             self.set_header('Content-Type', 'image/jpeg')
@@ -70,20 +83,24 @@ class Pic(cyclone.web.RequestHandler):
         except Exception:
             traceback.print_exc()
 
+
 def captureContinuousAsync(c, resize, onFrame):
     """
     Calls c.capture_continuous is called in another thread. onFrame is
     called in this reactor thread with each (frameTime, frame)
     result. Runs until onFrame raises StopIteration.
     """
+
     def runner(c, resize):
         stream = io.BytesIO()
         t = time.time()
-        for nextFrame in c.capture_continuous(stream, 'jpeg', use_video_port=True,
+        for nextFrame in c.capture_continuous(stream,
+                                              'jpeg',
+                                              use_video_port=True,
                                               resize=resize):
             t2 = time.time()
             log.debug(" - framecap got %s bytes in %.1f ms",
-                     len(stream.getvalue()), 1000 * (t2 - t))
+                      len(stream.getvalue()), 1000 * (t2 - t))
             try:
                 # This is slow, like 13ms. Hopefully
                 # capture_continuous is working on gathering the next
@@ -91,8 +108,8 @@ def captureContinuousAsync(c, resize, onFrame):
                 # Instead, we could be stashing frames onto a queue or
                 # something that the main thread can pull when
                 # possible (and toss if it gets behind).
-                threads.blockingCallFromThread(reactor,
-                                               onFrame, t, stream.getvalue())
+                threads.blockingCallFromThread(reactor, onFrame, t,
+                                               stream.getvalue())
             except StopIteration:
                 break
             t3 = time.time()
@@ -100,30 +117,35 @@ def captureContinuousAsync(c, resize, onFrame):
             stream.truncate()
             stream.seek(0)
             t = time.time()
+
     return threads.deferToThread(runner, c, resize)
 
+
 class FpsReport(object):
+
     def __init__(self):
         self.frameTimes = []
         self.lastFpsLog = 0
-        
+
     def frame(self):
         now = time.time()
-        
+
         self.frameTimes.append(now)
-        
+
         if len(self.frameTimes) > 15:
             del self.frameTimes[:5]
-            
+
         if now > self.lastFpsLog + 2 and len(self.frameTimes) > 5:
-            deltas = [(b - a) for a, b in zip(self.frameTimes[:-1],
-                                              self.frameTimes[1:])]
+            deltas = [(b - a)
+                      for a, b in zip(self.frameTimes[:-1], self.frameTimes[1:])
+                     ]
             avg = sum(deltas) / len(deltas)
             log.info("fps: %.1f", 1 / avg)
             self.lastFpsLog = now
-        
-    
+
+
 class Pics(cyclone.web.RequestHandler):
+
     @inlineCallbacks
     def get(self):
         try:
@@ -131,21 +153,22 @@ class Pics(cyclone.web.RequestHandler):
             c = self.settings.camera
             setCameraParams(c, self.get_argument)
             resize = setupCrop(c, self.get_argument)
-                          
+
             self.running = True
             log.info("connection open from %s", self.request.remote_ip)
             fpsReport = FpsReport()
-            
+
             def onFrame(frameTime, frame):
                 if not self.running:
                     raise StopIteration
-                    
+
                 now = time.time()
                 self.write("%s %s\n" % (len(frame), frameTime))
                 self.write(frame)
                 self.flush()
 
                 fpsReport.frame()
+
             # another camera request coming in at the same time breaks
             # the server. it would be nice if this request could
             # let-go-and-reopen when it knows about another request
@@ -153,21 +176,30 @@ class Pics(cyclone.web.RequestHandler):
             yield captureContinuousAsync(c, resize, onFrame)
         except Exception:
             traceback.print_exc()
-            
+
     def on_connection_close(self, *a, **kw):
         log.info("connection closed")
         self.running = False
-            
+
+
 log.setLevel(logging.INFO)
 
 with cameraCls() as camera:
     port = 8208
-    reactor.listenTCP(port, cyclone.web.Application(handlers=[
-        (r'/pic', Pic),
-        (r'/pics', Pics),
-        (r'/static/(.*)', cyclone.web.StaticFileHandler, {'path': 'light9/web/'}),
-        (r'/(|gui.js)', cyclone.web.StaticFileHandler, {'path': 'light9/vidref/',
-                                                 'default_filename': 'index.html'}),
-        ], debug=True, camera=camera))
+    reactor.listenTCP(
+        port,
+        cyclone.web.Application(handlers=[
+            (r'/pic', Pic),
+            (r'/pics', Pics),
+            (r'/static/(.*)', cyclone.web.StaticFileHandler, {
+                'path': 'light9/web/'
+            }),
+            (r'/(|gui.js)', cyclone.web.StaticFileHandler, {
+                'path': 'light9/vidref/',
+                'default_filename': 'index.html'
+            }),
+        ],
+                                debug=True,
+                                camera=camera))
     log.info("serving on %s" % port)
     reactor.run()

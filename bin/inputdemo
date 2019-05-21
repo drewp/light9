@@ -1,6 +1,6 @@
 #!bin/python
 import sys
-sys.path.append('/usr/lib/python2.7/dist-packages') # For gtk
+sys.path.append('/usr/lib/python2.7/dist-packages')  # For gtk
 from twisted.internet import gtk3reactor
 gtk3reactor.install()
 from twisted.internet import reactor
@@ -14,12 +14,13 @@ from rdfdb.syncedgraph import SyncedGraph
 import cyclone.httpclient
 from light9.curvecalc.client import sendLiveInputPoint
 
+
 class App(object):
+
     def __init__(self):
         parser = optparse.OptionParser()
         parser.set_usage("%prog [opts] [curve uri]")
-        parser.add_option("--debug", action="store_true",
-                          help="log at DEBUG")
+        parser.add_option("--debug", action="store_true", help="log at DEBUG")
         clientsession.add_option(parser)
         opts, args = parser.parse_args()
 
@@ -30,16 +31,20 @@ class App(object):
 
         self.graph.initiallySynced.addCallback(lambda _: self.launch())
 
-        self.curve = args[0] if args else URIRef('http://light9.bigasterisk.com/show/dance2014/song1/curve/c-1401259747.675542')
+        self.curve = args[0] if args else URIRef(
+            'http://light9.bigasterisk.com/show/dance2014/song1/curve/c-1401259747.675542'
+        )
         print "sending points on curve %s" % self.curve
-        
+
         reactor.run()
 
     def launch(self):
         win = Gtk.Window()
 
         slider = Gtk.Scale.new_with_range(orientation=Gtk.Orientation.VERTICAL,
-                                          min=0, max=1, step=.001)
+                                          min=0,
+                                          max=1,
+                                          step=.001)
         slider.props.inverted = True
         slider.connect('value-changed', self.onChanged)
 
@@ -52,8 +57,10 @@ class App(object):
     def onChanged(self, scale):
         t1 = time.time()
         d = sendLiveInputPoint(self.curve, scale.get_value())
+
         @d.addCallback
         def done(result):
             print "posted in %.1f ms" % (1000 * (time.time() - t1))
+
 
 App()

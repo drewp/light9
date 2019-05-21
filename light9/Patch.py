@@ -8,11 +8,13 @@ def resolve_name(channelname):
     "Ensure that we're talking about the primary name of the light."
     return get_channel_name(get_dmx_channel(channelname))
 
+
 def get_all_channels():
     """returns primary names for all channels (sorted)"""
     prinames = reverse_patch.values()[:]
     prinames.sort()
     return prinames
+
 
 def get_dmx_channel(name):
     if str(name) in patch:
@@ -24,6 +26,7 @@ def get_dmx_channel(name):
     except ValueError:
         raise ValueError("Invalid channel name: %r" % name)
 
+
 def get_channel_name(dmxnum):
     """if you pass a name, it will get normalized"""
     try:
@@ -31,11 +34,14 @@ def get_channel_name(dmxnum):
     except KeyError:
         return str(dmxnum)
 
+
 def get_channel_uri(name):
     return uri_map[name]
 
+
 def dmx_from_uri(uri):
     return uri_patch[uri]
+
 
 def reload_data():
     global patch, reverse_patch, uri_map, uri_patch
@@ -67,6 +73,6 @@ def reload_data():
                     else:
                         reverse_patch[name] = norm_name
 
+
 # importing patch will load initial data
 reload_data()
-

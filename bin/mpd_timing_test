@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """
 records times coming out of ascoltami
 
@@ -17,5 +16,5 @@ import xmlrpclib, time
 s = xmlrpclib.ServerProxy("http://localhost:8040")
 start = time.time()
 while 1:
-    print time.time()-start,s.gettime()
+    print time.time() - start, s.gettime()
     time.sleep(.01)

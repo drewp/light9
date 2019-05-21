@@ -5,16 +5,19 @@ from light9.namespaces import L9, RDF
 from light9.curvecalc.curve import CurveResource
 from light9 import prof
 from light9 import Submaster
-from light9 import Effects # gets reload() later
+from light9 import Effects  # gets reload() later
 log = logging.getLogger('effect')
 
 # consider http://waxeye.org/ for a parser that can be used in py and js
 
+
 class CouldNotConvert(TypeError):
     pass
 
+
 class CodeLine(object):
     """code string is immutable"""
+
     def __init__(self, graph, code):
         self.graph, self.code = graph, code
 
@@ -36,21 +39,23 @@ class CodeLine(object):
         resources = {}
 
         def alreadyInFunc(prefix, s, i):
-            return i >= len(prefix) and s[i-len(prefix):i] == prefix
+            return i >= len(prefix) and s[i - len(prefix):i] == prefix
 
         def repl(m):
             v = '_res%s' % self.uriCounter
             self.uriCounter += 1
             r = resources[v] = URIRef(m.group(1))
             for uriTypeMatches, wrapFuncName, addlArgs in [
-                    (self._uriIsCurve(r), 'curve', ', t'),
+                (self._uriIsCurve(r), 'curve', ', t'),
                     # I'm pretty sure this shouldn't be auto-applied: it's reasonable to refer to a sub and not want its current value
                     #(self._uriIsSub(r), 'currentSubLevel', ''),
             ]:
                 if uriTypeMatches:
-                    if not alreadyInFunc(wrapFuncName + '(', m.string, m.start()):
+                    if not alreadyInFunc(wrapFuncName + '(', m.string,
+                                         m.start()):
                         return '%s(%s%s)' % (wrapFuncName, v, addlArgs)
             return v
+
         outExpr = re.sub(r'<(http\S*?)>', repl, expr)
         return lname, expr, outExpr, resources
 
@@ -60,14 +65,14 @@ class CodeLine(object):
         tokens = set(re.findall(r'\b([a-zA-Z_]\w*)\b', withoutUris))
         tokens.discard('None')
         return tokens
-        
+
     def _uriIsCurve(self, uri):
         # this result could vary with graph changes (rare)
         return self.graph.contains((uri, RDF.type, L9['Curve']))
 
     def _uriIsSub(self, uri):
         return self.graph.contains((uri, RDF.type, L9['Submaster']))
-        
+
     @prof.logTime
     def _resourcesAsPython(self, resources):
         """
@@ -77,7 +82,7 @@ class CodeLine(object):
         out = {}
         subs = prof.logTime(Submaster.get_global_submasters)(self.graph)
         for localVar, uri in resources.items():
-            
+
             for rdfClass in self.graph.objects(uri, RDF.type):
                 if rdfClass == L9['Curve']:
                     cr = CurveResource(self.graph, uri)
@@ -95,8 +100,10 @@ class CodeLine(object):
                 out[localVar] = CouldNotConvert(uri)
 
         return out
-        
+
+
 class EffectNode(object):
+
     def __init__(self, graph, uri):
         self.graph, self.uri = graph, uri
         # this is not expiring at the right time, when an effect goes away
@@ -127,7 +134,9 @@ class EffectNode(object):
             inNames = c.possibleVars.intersection(codeFromOutput.keys())
             inNames.discard(outName)
             deps[outName] = inNames
-        self.codes = [codeFromOutput[n] for n in toposort.toposort_flatten(deps)]
+        self.codes = [
+            codeFromOutput[n] for n in toposort.toposort_flatten(deps)
+        ]
 
     def _currentSubSettingValues(self, sub):
         """what KC subSettings are setting levels right now?"""
@@ -149,25 +158,26 @@ class EffectNode(object):
             raise TypeError("got %r" % uri)
 
         foundLevels = list(self._currentSubSettingValues(uri))
-        
+
         if not foundLevels:
             return 0
-        
+
         return max(foundLevels)
-        
+
     def eval(self, songTime):
         ns = {'t': songTime}
         ns.update(self.otherFuncs)
 
-        ns.update(dict(
-            curve=lambda c, t: c.eval(t),
-            currentSubLevel=self.currentSubLevel,
+        ns.update(
+            dict(
+                curve=lambda c, t: c.eval(t),
+                currentSubLevel=self.currentSubLevel,
             ))
 
         # I think this is slowing effecteval. Could we cache results
         # that we know haven't changed, like if a curve returns 0
         # again, we can skip an eval() call on the line that uses it
-        
+
         for c in self.codes:
             codeNs = ns.copy()
             codeNs.update(c.pyResources)
@@ -180,4 +190,3 @@ class EffectNode(object):
         if 'out' not in ns:
             log.error("ran code for %s, didn't make an 'out' value", self.uri)
         return ns['out']
-

@@ -17,31 +17,38 @@ from lib.cycloneerr import PrettyErrorHandler
 from light9.namespaces import RDF, L9, DEV
 
 
-
-
 class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def post(self):
         painting = json.loads(self.request.body)
         with self.settings.stats.solve.time():
             img = self.settings.solver.draw(painting)
-            sample, sampleDist = self.settings.solver.bestMatch(img, device=DEV['aura2'])
+            sample, sampleDist = self.settings.solver.bestMatch(
+                img, device=DEV['aura2'])
             with self.settings.graph.currentState() as g:
                 bestPath = g.value(sample, L9['imagePath']).replace(L9[''], '')
             #out = solver.solve(painting)
             #layers = solver.simulationLayers(out)
-            
-        self.write(json.dumps({
-            'bestMatch': {'uri': sample, 'path': bestPath, 'dist': sampleDist},
-        #    'layers': layers,
-        #    'out': out,
-        }))
+
+        self.write(
+            json.dumps({
+                'bestMatch': {
+                    'uri': sample,
+                    'path': bestPath,
+                    'dist': sampleDist
+                },
+                #    'layers': layers,
+                #    'out': out,
+            }))
 
     def reloadSolver(self):
         reload(light9.paint.solve)
         self.settings.solver = light9.paint.solve.Solver(self.settings.graph)
         self.settings.solver.loadSamples()
 
+
 class BestMatches(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def post(self):
         body = json.loads(self.request.body)
         painting = body['painting']
@@ -49,35 +56,40 @@ class BestMatches(PrettyErrorHandler, cyclone.web.RequestHandler):
         with self.settings.stats.solve.time():
             img = self.settings.solver.draw(painting)
             outSettings = self.settings.solver.bestMatches(img, devs)
-            self.write(json.dumps({
-                'settings': outSettings.asList()
-                }))
-        
+            self.write(json.dumps({'settings': outSettings.asList()}))
+
+
 class App(object):
+
     def __init__(self, show, session):
         self.show = show
         self.session = session
 
         self.graph = SyncedGraph(networking.rdfdb.url, "paintServer")
-        self.graph.initiallySynced.addCallback(self.launch).addErrback(log.error)
-        
-        self.stats = scales.collection('/', scales.PmfStat('solve'),
-                                       )
-       
+        self.graph.initiallySynced.addCallback(self.launch).addErrback(
+            log.error)
+
+        self.stats = scales.collection(
+            '/',
+            scales.PmfStat('solve'),
+        )
+
     def launch(self, *args):
 
-        self.solver = light9.paint.solve.Solver(self.graph, sessions=[
-            L9['show/dance2017/capture/aura1/cap1876596'],
-            L9['show/dance2017/capture/aura2/cap1876792'],
-            L9['show/dance2017/capture/aura3/cap1877057'],
-            L9['show/dance2017/capture/aura4/cap1877241'],
-            L9['show/dance2017/capture/aura5/cap1877406'],
-            L9['show/dance2017/capture/q1/cap1874255'],
-            L9['show/dance2017/capture/q2/cap1873665'],
-            L9['show/dance2017/capture/q3/cap1876223'],
-        ])
+        self.solver = light9.paint.solve.Solver(
+            self.graph,
+            sessions=[
+                L9['show/dance2017/capture/aura1/cap1876596'],
+                L9['show/dance2017/capture/aura2/cap1876792'],
+                L9['show/dance2017/capture/aura3/cap1877057'],
+                L9['show/dance2017/capture/aura4/cap1877241'],
+                L9['show/dance2017/capture/aura5/cap1877406'],
+                L9['show/dance2017/capture/q1/cap1874255'],
+                L9['show/dance2017/capture/q2/cap1873665'],
+                L9['show/dance2017/capture/q3/cap1876223'],
+            ])
         self.solver.loadSamples()
-        
+
         self.cycloneApp = cyclone.web.Application(handlers=[
             (r'/stats', StatsForCyclone),
             (r'/solve', Solve),
@@ -93,12 +105,16 @@ class App(object):
 
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option('--show',
+    parser.add_option(
+        '--show',
         help='show URI, like http://light9.bigasterisk.com/show/dance2008',
-                      default=showconfig.showUri())
-    parser.add_option("-v", "--verbose", action="store_true",
+        default=showconfig.showUri())
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
                       help="logging.DEBUG")
-    parser.add_option("--twistedlog", action="store_true",
+    parser.add_option("--twistedlog",
+                      action="store_true",
                       help="twisted logging")
     clientsession.add_option(parser)
     (options, args) = parser.parse_args()
@@ -106,7 +122,7 @@ if __name__ == "__main__":
 
     if not options.show:
         raise ValueError("missing --show http://...")
-        
+
     session = clientsession.getUri('paint', options)
 
     app = App(URIRef(options.show), session)

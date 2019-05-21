@@ -21,14 +21,14 @@ from light9 import showconfig, networking
 from light9.namespaces import L9
 from urllib import urlencode
 
+
 # move to web lib
 def post(url, **args):
-    return getPage(url,
-                   method='POST',
-                   postdata=urlencode(args))
+    return getPage(url, method='POST', postdata=urlencode(args))
 
 
 class Commands(object):
+
     @staticmethod
     def playSong(graph, songUri):
         s = xmlrpclib.ServerProxy(networking.musicPlayer.url)
@@ -45,16 +45,21 @@ class Commands(object):
     @staticmethod
     def worklightsOn(graph):
         return post(networking.keyboardComposer.path('fadesub'),
-                    subname='scoop', level=.5, secs=.5)
+                    subname='scoop',
+                    level=.5,
+                    secs=.5)
 
     @staticmethod
     def worklightsOff(graph):
         return post(networking.keyboardComposer.path('fadesub'),
-                    subname='scoop', level=0, secs=.5)
+                    subname='scoop',
+                    level=0,
+                    secs=.5)
 
     @staticmethod
     def dimmerSet(graph, dimmer, value):
         raise NotImplementedError("subcomposer doesnt have an http port yet")
+
 
 class Main(rend.Page):
     docFactory = loaders.xmlfile(sibpath(__file__, "../light9/webcontrol.html"))
@@ -75,9 +80,9 @@ class Main(rend.Page):
         out = []
         for song in songs:
             out.append(
-                T.form(method="post", action="playSong")[
-                    T.input(type='hidden', name='songUri', value=song),
-                    T.button(type='submit')[graph.label(song)]])
+                T.form(method="post", action="playSong")
+                [T.input(type='hidden', name='songUri', value=song),
+                 T.button(type='submit')[graph.label(song)]])
         return out
 
     @inlineCallbacks
@@ -85,18 +90,19 @@ class Main(rend.Page):
         try:
             func = getattr(Commands, segments[0])
             req = inevow.IRequest(ctx)
-            simpleArgDict = dict((k, v[0]) for k,v in req.args.items())
+            simpleArgDict = dict((k, v[0]) for k, v in req.args.items())
             try:
                 ret = yield robust_apply(func, func, self.graph,
                                          **simpleArgDict)
-            except KeyboardInterrupt: raise
+            except KeyboardInterrupt:
+                raise
             except Exception, e:
                 print "Error on command %s" % segments[0]
                 traceback.print_exc()
-                returnValue((url.here.up().
-                             add('status', str(e)).
-                             add('error', 1), segments[1:]))
-                
+                returnValue((url.here.up().add('status',
+                                               str(e)).add('error',
+                                                           1), segments[1:]))
+
             returnValue((url.here.up().add('status', ret), segments[1:]))
             #actually return the orig page, with a status message from the func
         except AttributeError:
@@ -105,7 +111,8 @@ class Main(rend.Page):
 
     def child_icon(self, ctx):
         return static.File("/usr/share/pyshared/elisa/plugins/poblesec/tango")
-            
+
+
 graph = showconfig.getGraph()
 show = showconfig.showUri()
 

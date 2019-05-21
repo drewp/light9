@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """send KeyboardComposer a fade request, for use from the shell"""
 
 import sys
@@ -10,10 +9,8 @@ from light9 import networking
 subname = sys.argv[1]
 level = sys.argv[2]
 fadesecs = '0'
-if len(sys.argv)>3:
+if len(sys.argv) > 3:
     fadesecs = sys.argv[3]
 
 levelServer = Resource(networking.keyboardComposer.url)
 levelServer.post('fadesub', subname=subname, level=level, secs=fadesecs)
-
-

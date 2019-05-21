@@ -6,12 +6,17 @@ from restkit.errors import ResourceNotFound
 import http_parser.http
 log = logging.getLogger()
 
+
 class MusicTime(object):
     """
     fetch times from ascoltami in a background thread; return times
     upon request, adjusted to be more precise with the system clock
     """
-    def __init__(self, period=.2, onChange=lambda position: None, pollCurvecalc=True):
+
+    def __init__(self,
+                 period=.2,
+                 onChange=lambda position: None,
+                 pollCurvecalc=True):
         """period is the seconds between http time requests.
 
         We call onChange with the time in seconds and the total time
@@ -28,7 +33,7 @@ class MusicTime(object):
 
         self.position = {}
         # driven by our pollCurvecalcTime and also by Gui.incomingTime
-        self.lastHoverTime = None # None means "no recent value"
+        self.lastHoverTime = None  # None means "no recent value"
         self.pollMusicTime()
         if pollCurvecalc:
             self.pollCurvecalcTime()
@@ -43,7 +48,7 @@ class MusicTime(object):
         Note that this may be called in a gst camera capture thread. Very often.
         """
         if not hasattr(self, 'position'):
-            return {'t' : 0, 'song' : None}
+            return {'t': 0, 'song': None}
         pos = self.position.copy()
         now = frameTime or time.time()
         if pos.get('playing'):
@@ -54,6 +59,7 @@ class MusicTime(object):
         return pos
 
     def pollMusicTime(self):
+
         def cb(response):
 
             if response.code != 200:
@@ -71,14 +77,14 @@ class MusicTime(object):
             self.onChange(position)
 
             reactor.callLater(self.period, self.pollMusicTime)
-            
+
         def eb(err):
             log.warn("talking to ascoltami: %s", err.getErrorMessage())
             reactor.callLater(2, self.pollMusicTime)
-            
+
         d = fetch(networking.musicPlayer.path("time"))
         d.addCallback(cb)
-        d.addErrback(eb) # note this includes errors in cb()
+        d.addErrback(eb)  # note this includes errors in cb()
 
     def pollCurvecalcTime(self):
         """
@@ -94,7 +100,7 @@ class MusicTime(object):
             self.lastHoverTime = None
             reactor.callLater(.2, self.pollCurvecalcTime)
             return
-            
+
         def cb(response):
             if response.code == 404:
                 # not hovering
@@ -115,9 +121,10 @@ class MusicTime(object):
 
         d = fetch(networking.curveCalc.path("hoverTime"))
         d.addCallback(cb)
-        d.addErrback(eb) # note this includes errors in cb()
-        
+        d.addErrback(eb)  # note this includes errors in cb()
+
     def sendTime(self, t):
         """request that the player go to this time"""
-        self.musicResource.post("time", payload=json.dumps({"t" : t}),
-                                headers={"content-type" : "application/json"})
+        self.musicResource.post("time",
+                                payload=json.dumps({"t": t}),
+                                headers={"content-type": "application/json"})

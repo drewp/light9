@@ -1,6 +1,7 @@
 import sys, traceback, time, logging
 log = logging.getLogger()
 
+
 def run(main, profile=None):
     if not profile:
         main()
@@ -20,7 +21,8 @@ def run(main, profile=None):
         finally:
             statprof.stop()
             statprof.display()
-    
+
+
 def watchPoint(filename, lineno, event="call"):
     """whenever we hit this line, print a stack trace. event='call'
     for lines that are function definitions, like what a profiler
@@ -28,7 +30,8 @@ def watchPoint(filename, lineno, event="call"):
 
     Switch to 'line' to match lines inside functions. Execution speed
     will be much slower."""
-    seenTraces = {} # trace contents : count
+    seenTraces = {}  # trace contents : count
+
     def trace(frame, ev, arg):
         if ev == event:
             if (frame.f_code.co_filename, frame.f_lineno) == (filename, lineno):
@@ -41,17 +44,21 @@ def watchPoint(filename, lineno, event="call"):
                     seenTraces[stack] += 1
 
         return trace
+
     sys.settrace(trace)
 
     # atexit, print the frequencies?
 
+
 def logTime(func):
+
     def inner(*args, **kw):
         t1 = time.time()
         try:
             ret = func(*args, **kw)
         finally:
-            log.info("Call to %s took %.1f ms" % (
-                func.__name__, 1000 * (time.time() - t1)))
+            log.info("Call to %s took %.1f ms" % (func.__name__, 1000 *
+                                                  (time.time() - t1)))
         return ret
+
     return inner

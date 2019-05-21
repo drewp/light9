@@ -16,12 +16,13 @@ if __name__ == "__main__":
     g = SyncedGraph(networking.rdfdb.url, "clientdemo")
 
     from light9.Submaster import PersistentSubmaster
-    sub = PersistentSubmaster(graph=g, uri=URIRef("http://light9.bigasterisk.com/sub/bcools"))
+    sub = PersistentSubmaster(
+        graph=g, uri=URIRef("http://light9.bigasterisk.com/sub/bcools"))
 
     #get sub to show its updating name, then push that all the way into KC gui so we can see just names refresh in there
 
-
     L9 = Namespace("http://light9.bigasterisk.com/")
+
     def updateDemoValue():
         v = list(g.objects(L9['demo'], L9['is']))
         print "demo value is %r" % v
@@ -29,8 +30,10 @@ if __name__ == "__main__":
     g.addHandler(updateDemoValue)
 
     def adj():
-        g.patch(Patch(addQuads=[(L9['demo'], L9['is'], Literal(os.getpid()),
-                                 L9['clientdemo'])],
-                      delQuads=[]))
+        g.patch(
+            Patch(addQuads=[(L9['demo'], L9['is'], Literal(os.getpid()),
+                             L9['clientdemo'])],
+                  delQuads=[]))
+
     reactor.callLater(2, adj)
     reactor.run()

@@ -1,14 +1,16 @@
-
 import logging
 log = logging.getLogger("cursors")
 
 # accept ascii images, read file images, add hotspots, read xbm as
 # cursor with @filename form
 
-_pushed = {} # widget : [old, .., newest]
-def push(widget,new_cursor):
+_pushed = {}  # widget : [old, .., newest]
+
+
+def push(widget, new_cursor):
     global _pushed
-    _pushed.setdefault(widget,[]).append(widget.cget("cursor"))
+    _pushed.setdefault(widget, []).append(widget.cget("cursor"))
+
 
 def pop(widget):
     global _pushed
@@ -18,5 +20,3 @@ def pop(widget):
         log.debug("cursor pop from empty stack")
         return
     widget.config(cursor=c)
-    
-    

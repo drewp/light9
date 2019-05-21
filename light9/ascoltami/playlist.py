@@ -1,15 +1,18 @@
 from light9.showconfig import songOnDisk
 from light9.namespaces import L9
 
+
 class NoSuchSong(ValueError):
     """Raised when a song is requested that doesn't exist (e.g. one
     after the last song in the playlist)."""
 
+
 class Playlist(object):
+
     def __init__(self, graph, playlistUri):
         self.graph = graph
         self.songs = list(graph.items(playlistUri))
-        
+
     def nextSong(self, currentSong):
         """Returns the next song in the playlist or raises NoSuchSong if 
         we are at the end of the playlist."""
@@ -30,14 +33,14 @@ class Playlist(object):
     def allSongs(self):
         """Returns a list of all song URIs in order."""
         return self.songs
-    
+
     def allSongPaths(self):
         """Returns a list of the filesystem paths to all songs in order."""
         paths = []
         for song in self.songs:
             paths.append(songOnDisk(song))
         return paths
-    
+
     def songPath(self, uri):
         """filesystem path to a song"""
         raise NotImplementedError("see showconfig.songOnDisk")

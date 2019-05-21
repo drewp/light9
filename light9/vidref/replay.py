@@ -6,9 +6,11 @@ log = logging.getLogger()
 
 framerate = 15
 
+
 def songDir(song):
-    safeUri = song.split('://')[-1].replace('/','_')
+    safeUri = song.split('://')[-1].replace('/', '_')
     return os.path.expanduser("~/light9-vidref/play-%s" % safeUri)
+
 
 def takeDir(songDir, startTime):
     """
@@ -16,21 +18,24 @@ def takeDir(songDir, startTime):
     """
     return os.path.join(songDir, str(int(startTime)))
 
+
 def snapshotDir():
     return os.path.expanduser("~/light9-vidref/snapshot")
-    
+
+
 class ReplayViews(object):
     """
     the whole list of replay windows. parent is the scrolling area for
     these windows to be added
     """
+
     def __init__(self, parent):
         # today, parent is the vbox the replay windows should appear in
         self.parent = parent
         self.lastStart = None
 
         self.views = []
-     
+
     def update(self, position):
         """
         freshen all replay windows. We get called this about every
@@ -46,8 +51,8 @@ class ReplayViews(object):
             self.lastStart = position['started']
         for v in self.views:
             v.updatePic(position)
-        log.debug("update %s views in %.2fms",
-                  len(self.views), (time.time() - t1) * 1000)
+        log.debug("update %s views in %.2fms", len(self.views),
+                  (time.time() - t1) * 1000)
 
     def loadViewsForSong(self, song):
         """
@@ -62,7 +67,7 @@ class ReplayViews(object):
             takes = sorted(t for t in os.listdir(d) if t.isdigit())
         except OSError:
             return
-        
+
         for take in takes:
             td = takeDir(songDir(song), take)
             r = Replay(td)
@@ -76,10 +81,12 @@ class ReplayViews(object):
             rv = ReplayView(self.parent, r)
             self.views.append(rv)
 
+
 class ReplayView(object):
     """
     one of the replay widgets
     """
+
     def __init__(self, parent, replay):
         self.replay = replay
         self.enabled = True
@@ -134,16 +141,20 @@ class ReplayView(object):
             if True:
                 en = withLabel(gtk.ToggleButton, "Enabled")
                 en.set_active(True)
+
                 def tog(w):
                     self.enabled = w.get_active()
+
                 en.connect("toggled", tog)
                 rows.append(en)
             if True:
                 d = withLabel(gtk.Button, "Delete")
                 d.props.image = delImage
+
                 def onClicked(w):
                     self.replay.deleteDir()
                     self.destroy()
+
                 d.connect("clicked", onClicked)
                 rows.append(d)
             if True:
@@ -156,7 +167,7 @@ class ReplayView(object):
             for r in rows:
                 stack.add(r)
                 stack.set_child_packing(r, False, False, 0, gtk.PACK_START)
-            
+
             replayPanel.pack_start(stack, False, False, 0)
 
         parent.pack_start(replayPanel, False, False)
@@ -166,7 +177,7 @@ class ReplayView(object):
     def destroy(self):
         self.replayPanel.destroy()
         self.enabled = False
-        
+
     def updatePic(self, position, lag=.2):
 
         # this should skip updating off-screen widgets! maybe that is
@@ -185,26 +196,30 @@ class ReplayView(object):
             self.picWidget.set_from_file(inPic)
             if 0:
                 # force redraw of that widget
-                self.picWidget.queue_draw_area(0,0,320,240)
+                self.picWidget.queue_draw_area(0, 0, 320, 240)
                 self.picWidget.get_window().process_updates(True)
         self.showingPic = inPic
 
+
 _existingFrames = {}  # takeDir : frames
-    
+
+
 class Replay(object):
     """
     model for one of the replay widgets
     """
+
     def __init__(self, takeDir):
         self.takeDir = takeDir
         try:
             self.existingFrames = _existingFrames[self.takeDir]
         except KeyError:
             log.info("scanning %s", self.takeDir)
-            self.existingFrames = sorted([Decimal(f.split('.jpg')[0])
-                                          for f in os.listdir(self.takeDir)])
+            self.existingFrames = sorted(
+                [Decimal(f.split('.jpg')[0]) for f in os.listdir(self.takeDir)])
             if not self.existingFrames:
-                raise NotImplementedError("suspiciously found no frames in dir %s" % self.takeDir)
+                raise NotImplementedError(
+                    "suspiciously found no frames in dir %s" % self.takeDir)
             _existingFrames[self.takeDir] = self.existingFrames
 
     def tooShort(self, minSeconds=5):
@@ -238,5 +253,5 @@ class Replay(object):
         i = bisect_left(self.existingFrames, Decimal(str(t)))
         if i >= len(self.existingFrames):
             i = len(self.existingFrames) - 1
-        return os.path.join(self.takeDir, "%08.03f.jpg" %
-                            self.existingFrames[i])
+        return os.path.join(self.takeDir,
+                            "%08.03f.jpg" % self.existingFrames[i])

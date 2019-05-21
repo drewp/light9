@@ -3,7 +3,9 @@ from urllib import splitport
 from showconfig import getGraph, showUri
 from namespaces import L9
 
+
 class ServiceAddress(object):
+
     def __init__(self, service):
         self.service = service
 
@@ -12,8 +14,8 @@ class ServiceAddress(object):
         net = graph.value(showUri(), L9['networking'])
         ret = graph.value(net, self.service)
         if ret is None:
-            raise ValueError("no url for %s -> %s -> %s" % (showUri(), L9['networking'],
-                                                            self.service))
+            raise ValueError("no url for %s -> %s -> %s" %
+                             (showUri(), L9['networking'], self.service))
         return str(ret)
 
     @property
@@ -31,10 +33,12 @@ class ServiceAddress(object):
     @property
     def url(self):
         return self._url()
+
     value = url
-    
+
     def path(self, more):
         return self.url + str(more)
+
 
 captureDevice = ServiceAddress(L9['captureDevice'])
 curveCalc = ServiceAddress(L9['curveCalc'])

@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 log = logging.getLogger()
 
 introPad = 4
-postPad = 9 # 5 + autostop + 4
+postPad = 9  # 5 + autostop + 4
 
 playlist = Playlist.fromShow(showconfig.getGraph(), showconfig.showUri())
 for p in playlist.allSongPaths():
@@ -22,18 +22,16 @@ for p in playlist.allSongPaths():
     try:
         os.makedirs(outputDir)
     except OSError:
-        pass # exists
+        pass  # exists
     outputPath = os.path.join(outputDir, os.path.basename(p))
     outputWave = wave.open(outputPath, 'w')
     outputWave.setparams(inputWave.getparams())
 
     bytesPerSecond = (inputWave.getnchannels() * inputWave.getsampwidth() *
                       inputWave.getframerate())
-    
+
     outputWave.writeframesraw("\x00" * (bytesPerSecond * introPad))
     outputWave.writeframesraw(inputWave.readframes(inputWave.getnframes()))
     outputWave.writeframesraw("\x00" * (bytesPerSecond * postPad))
     outputWave.close()
     log.info("wrote %s", outputPath)
-
-    

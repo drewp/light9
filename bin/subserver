@@ -16,17 +16,19 @@ from light9.namespaces import L9, DCTERMS
 from light9 import networking, showconfig
 
 from lib.cycloneerr import PrettyErrorHandler
-        
+
+
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
+
     def get(self, path, *args, **kw):
         if path in ['', 'effects']:
             return self.respondStaticJade("light9/subserver/%s.jade" %
                                           (path or 'index'))
-            
+
         if path.endswith(".js"):
             return self.responseStaticCoffee(
                 'light9/subserver/%s' %
-                path.replace(".js", ".coffee")) # potential security hole
+                path.replace(".js", ".coffee"))  # potential security hole
 
         cyclone.web.StaticFileHandler.get(self, path, *args, **kw)
 
@@ -35,14 +37,18 @@ class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):
         self.write(html)
 
     def responseStaticCoffee(self, src):
-        self.write(subprocess.check_output([
-            '/usr/bin/coffee', '--compile', '--print', src]))
+        self.write(
+            subprocess.check_output(
+                ['/usr/bin/coffee', '--compile', '--print', src]))
+
 
 class Snapshot(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     @defer.inlineCallbacks
     def post(self):
         about = URIRef(self.get_argument("about"))
-        response = yield cyclone.httpclient.fetch(networking.vidref.path("snapshot"), method="POST", timeout=1)
+        response = yield cyclone.httpclient.fetch(
+            networking.vidref.path("snapshot"), method="POST", timeout=1)
 
         snapUri = URIRef(json.loads(response.body)['snapshot'])
         # vidref could write about when it was taken, etc. would it be
@@ -50,14 +56,16 @@ class Snapshot(PrettyErrorHandler, cyclone.web.RequestHandler):
         # the graph, and then it doesn't even have to return anything?
 
         ctx = showconfig.showUri() + "/snapshots"
-        
-        self.settings.graph.patch(Patch(addQuads=[
-            (about, L9['image'], snapUri, ctx),
-            (snapUri, DCTERMS['created'],
-             Literal(datetime.datetime.now(tzlocal())), ctx),
+
+        self.settings.graph.patch(
+            Patch(addQuads=[
+                (about, L9['image'], snapUri, ctx),
+                (snapUri, DCTERMS['created'],
+                 Literal(datetime.datetime.now(tzlocal())), ctx),
             ]))
-        
+
         self.write(json.dumps({'snapshot': snapUri}))
+
 
 def newestImage(subject):
     newest = (None, None)
@@ -66,10 +74,13 @@ def newestImage(subject):
         if created > newest[0]:
             newest = (created, img)
     return newest[1]
-        
+
+
 if __name__ == "__main__":
     parser = optparse.OptionParser()
-    parser.add_option("-v", "--verbose", action="store_true",
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
                       help="logging.DEBUG")
     (options, args) = parser.parse_args()
 
@@ -77,13 +88,17 @@ if __name__ == "__main__":
 
     graph = SyncedGraph(networking.rdfdb.url, "subServer")
 
-    
     port = networking.subServer.port
-    reactor.listenTCP(port, cyclone.web.Application(handlers=[
-        (r'/snapshot', Snapshot),
-        (r'/(.*)', Static,
-         {"path" : "light9/subserver",
-          "default_filename" : "index.jade"}),
-        ], debug=True, graph=graph))
+    reactor.listenTCP(
+        port,
+        cyclone.web.Application(handlers=[
+            (r'/snapshot', Snapshot),
+            (r'/(.*)', Static, {
+                "path": "light9/subserver",
+                "default_filename": "index.jade"
+            }),
+        ],
+                                debug=True,
+                                graph=graph))
     log.info("serving on %s" % port)
     reactor.run()

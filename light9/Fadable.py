@@ -2,6 +2,7 @@
 from Tix import *
 import time
 
+
 class Fadable:
     """Fading mixin: must mix in with a Tk widget (or something that has
     'after' at least) This is currently used by VolumeBox and MixerTk.
@@ -21,24 +22,28 @@ class Fadable:
     raise or lower the volume.  Shift-mouse wheeling will cause a more
     precise volume adjustment.  Control-mouse wheeling will cause a
     longer fade."""
-    def __init__(self, var, wheel_step=5, use_fades=1, key_bindings=1,
+
+    def __init__(self,
+                 var,
+                 wheel_step=5,
+                 use_fades=1,
+                 key_bindings=1,
                  mouse_bindings=1):
-        self.use_fades = use_fades # whether increase and decrease should fade
-        self.wheel_step = wheel_step # amount that increase and descrease should
-                                     # change volume (by default)
-        
+        self.use_fades = use_fades  # whether increase and decrease should fade
+        self.wheel_step = wheel_step  # amount that increase and descrease should
+        # change volume (by default)
+
         self.fade_start_level = 0
         self.fade_end_level = 0
         self.fade_start_time = 0
         self.fade_length = 1
         self.fade_step_time = 10
         self.fade_var = var
-        self.fading = 0 # whether a fade is in progress
+        self.fading = 0  # whether a fade is in progress
 
         if key_bindings:
             for k in range(1, 10):
-                self.bind("<Key-%d>" % k,
-                    lambda evt, k=k: self.fade(k / 10.0))
+                self.bind("<Key-%d>" % k, lambda evt, k=k: self.fade(k / 10.0))
             self.bind("<Key-0>", lambda evt: self.fade(1.0))
             self.bind("<grave>", lambda evt: self.fade(0))
 
@@ -61,7 +66,7 @@ class Fadable:
             self.bind('<Control-4>', lambda evt: self.increase(length=1))
             self.bind('<Control-5>', lambda evt: self.decrease(length=1))
 
-        self.last_level = None # used for muting
+        self.last_level = None  # used for muting
 
     def set_var_rounded(self, value):
         """use this instead of just self.fade_var.set(value) so we can
@@ -72,26 +77,27 @@ class Fadable:
         # variable's display instead of using Label(textvariable=var)
         # and format it there.
         self.fade_var.set(round(value, 7))
-        
+
     def fade(self, value, length=0.5, step_time=10):
         """Fade to value in length seconds with steps every step_time
         milliseconds"""
-        if length == 0: # 0 seconds fades happen right away and prevents
-                        # and prevents us from entering the fade loop,
-                        # which would cause a divide by zero
+        if length == 0:  # 0 seconds fades happen right away and prevents
+            # and prevents us from entering the fade loop,
+            # which would cause a divide by zero
             self.set_var_rounded(value)
-            self.fading = 0 # we stop all fades
-        else: # the general case
+            self.fading = 0  # we stop all fades
+        else:  # the general case
             self.fade_start_time = time.time()
             self.fade_length = length
 
             self.fade_start_level = self.fade_var.get()
             self.fade_end_level = value
-            
+
             self.fade_step_time = step_time
             if not self.fading:
                 self.fading = 1
                 self.do_fade()
+
     def do_fade(self):
         """Actually performs the fade for Fadable.fade.  Shouldn't be called
         directly."""
@@ -106,6 +112,7 @@ class Fadable:
             self.after(self.fade_step_time, self.do_fade)
         else:
             self.fading = 0
+
     def increase(self, multiplier=1, length=0.3):
         """Increases the volume by multiplier * wheel_step.  If use_fades is
         true, it do this as a fade over length time."""
@@ -116,6 +123,7 @@ class Fadable:
             newlevel = self.fade_var.get() + amount
         newlevel = min(100, newlevel)
         self.set_volume(newlevel, length)
+
     def decrease(self, multiplier=1, length=0.3):
         """Descreases the volume by multiplier * wheel_step.  If use_fades
         is true, it do this as a fade over length time."""
@@ -126,6 +134,7 @@ class Fadable:
             newlevel = self.fade_var.get() - amount
         newlevel = max(0, newlevel)
         self.set_volume(newlevel, length)
+
     def set_volume(self, newlevel, length=0.3):
         """Sets the volume to newlevel, performing a fade of length if
         use_fades is true."""
@@ -133,13 +142,14 @@ class Fadable:
             self.fade(newlevel, length=length)
         else:
             self.set_var_rounded(newlevel)
+
     def toggle_mute(self):
         """Toggles whether the volume is being muted."""
         if self.last_level is None:
             self.last_level = self.fade_var.get()
-            if self.last_level == 0: # we don't want last_level to be zero,
-                                     # since it will make us toggle between 0
-                                     # and 0
+            if self.last_level == 0:  # we don't want last_level to be zero,
+                # since it will make us toggle between 0
+                # and 0
                 newlevel = 1
             else:
                 newlevel = 0
@@ -148,4 +158,3 @@ class Fadable:
             self.last_level = None
 
         self.set_var_rounded(newlevel)
-

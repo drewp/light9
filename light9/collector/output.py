@@ -8,6 +8,7 @@ from twisted.internet import task, threads, reactor
 from greplin import scales
 log = logging.getLogger('output')
 
+
 # eliminate this: lists are always padded now
 def setListElem(outList, index, value, fill=0, combine=lambda old, new: new):
     if len(outList) < index:
@@ -17,6 +18,7 @@ def setListElem(outList, index, value, fill=0, combine=lambda old, new: new):
     else:
         outList[index] = combine(outList[index], value)
 
+
 class Output(object):
     """
     send an array of values to some output device. Call update as
@@ -25,9 +27,10 @@ class Output(object):
     """
     uri = None  # type: URIRef
     numChannels = None  # type: int
+
     def __init__(self):
         raise NotImplementedError
-        
+
     def allConnections(self):
         """
         sequence of (index, uri) for the uris we can output, and which
@@ -35,7 +38,6 @@ class Output(object):
         """
         raise NotImplementedError
 
-    
     def update(self, values):
         """
         output takes a flattened list of values, maybe dmx channels, or
@@ -53,11 +55,13 @@ class Output(object):
         """short string to distinguish outputs"""
         raise NotImplementedError
 
+
 class DummyOutput(Output):
+
     def __init__(self, uri, numChannels=1, **kw):
         self.uri = uri
         self.numChannels = numChannels
-    
+
     def update(self, values):
         pass
 
@@ -67,8 +71,9 @@ class DummyOutput(Output):
     def shortId(self):
         return 'null'
 
-        
+
 class DmxOutput(Output):
+
     def __init__(self, uri, numChannels):
         self.uri = uri
         self.numChannels = numChannels
@@ -85,16 +90,14 @@ class DmxOutput(Output):
                 self.countError()
             else:
                 self.lastSentBuffer = sendingBuffer
-            reactor.callLater(max(0, start + 1/20 - time.time()),
-                              self._loop)
+            reactor.callLater(max(0, start + 1 / 20 - time.time()), self._loop)
 
         d = threads.deferToThread(self.sendDmx, sendingBuffer)
         d.addCallback(done)
-        
+
 
 class EnttecDmx(DmxOutput):
-    stats = scales.collection('/output/enttecDmx',
-                              scales.PmfStat('write'),
+    stats = scales.collection('/output/enttecDmx', scales.PmfStat('write'),
                               scales.PmfStat('update'))
 
     def __init__(self, uri, devicePath='/dev/dmx0', numChannels=80):
@@ -128,16 +131,16 @@ class EnttecDmx(DmxOutput):
     def shortId(self):
         return 'enttec'
 
-                                  
+
 class Udmx(DmxOutput):
-    stats = scales.collection('/output/udmx',
-                              scales.PmfStat('update'),
+    stats = scales.collection('/output/udmx', scales.PmfStat('update'),
                               scales.PmfStat('write'),
                               scales.IntStat('usbErrors'))
+
     def __init__(self, uri, bus, numChannels):
         DmxOutput.__init__(self, uri, numChannels)
         self._shortId = self.uri.rstrip('/')[-1]
-        
+
         from light9.io.udmx import Udmx
         self.dev = Udmx(bus)
         self.currentBuffer = ''
@@ -173,14 +176,14 @@ class Udmx(DmxOutput):
             except usb.core.USBError as e:
                 # not in main thread
                 if e.errno != 75:
-                  msg = 'usb: sending %s bytes to %r; error %r' % (len(buf), self.uri, e)
-                  print msg
+                    msg = 'usb: sending %s bytes to %r; error %r' % (
+                        len(buf), self.uri, e)
+                    print msg
                 return False
 
     def countError(self):
         # in main thread
         Udmx.stats.usbErrors += 1
-        
+
     def shortId(self):
         return self._shortId
-

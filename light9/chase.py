@@ -1,7 +1,13 @@
 from __future__ import division
 
-def chase(t, ontime=0.5, offset=0.2, onval=1.0, 
-          offval=0.0, names=None, combiner=max):
+
+def chase(t,
+          ontime=0.5,
+          offset=0.2,
+          onval=1.0,
+          offval=0.0,
+          names=None,
+          combiner=max):
     names = names or []
     # maybe this is better:
     # period = ontime + ((offset + ontime) * (len(names) - 1))
@@ -26,11 +32,16 @@ def chase(t, ontime=0.5, offset=0.2, onval=1.0,
             outputs[name] = value
     return outputs
 
+
 if __name__ == "__main__":
     # a little testing
     for x in range(80):
         x /= 20.0
-        output = chase(x, onval='x', offval=' ', ontime=0.1, offset=0.2,
+        output = chase(x,
+                       onval='x',
+                       offval=' ',
+                       ontime=0.1,
+                       offset=0.2,
                        names=('a', 'b', 'c', 'd'))
         output = output.items()
         output.sort()

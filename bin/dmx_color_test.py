@@ -7,6 +7,7 @@ from twisted.internet import reactor, task
 log.setLevel(logging.INFO)
 firstDmxChannel = 10
 
+
 def step():
     hue = (time.time() * .2) % 1.0
     r, g, b = colorsys.hsv_to_rgb(hue, 1, 1)

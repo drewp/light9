@@ -13,13 +13,15 @@ from PIL import Image
 from StringIO import StringIO
 log = logging.getLogger('remotepi')
 
+
 class Pipeline(object):
+
     def __init__(self, liveVideo, musicTime, recordingTo, graph):
         self.musicTime = musicTime
         self.recordingTo = recordingTo
 
         self.liveVideo = self._replaceLiveVideoWidget(liveVideo)
-        
+
         self._snapshotRequests = []
         self.graph = graph
         self.graph.addHandler(self.updateCamUrl)
@@ -30,10 +32,10 @@ class Pipeline(object):
         log.info("picsUrl now %r", self.picsUrl)
         if not self.picsUrl:
             return
-        
+
         # this cannot yet survive being called a second time
         self._startRequest(str(self.picsUrl))
-        
+
     def _replaceLiveVideoWidget(self, liveVideo):
         aspectFrame = liveVideo.get_parent()
         liveVideo.destroy()
@@ -42,7 +44,7 @@ class Pipeline(object):
         #img.set_size_request(320, 240)
         aspectFrame.add(img)
         return img
-        
+
     def _startRequest(self, url):
         self._buffer = ''
         log.info('start request to %r', url)
@@ -60,10 +62,10 @@ class Pipeline(object):
         size = int(size)
         if len(self._buffer) - i - 1 < size:
             return
-        jpg = self._buffer[i+1:i+1+size]
+        jpg = self._buffer[i + 1:i + 1 + size]
         self.onFrame(jpg, float(frameTime))
-        self._buffer = self._buffer[i+1+size:]
-        
+        self._buffer = self._buffer[i + 1 + size:]
+
     def snapshot(self):
         """
         returns deferred to the path (which is under snapshotDir()) where
@@ -93,14 +95,13 @@ class Pipeline(object):
                 out.write(jpg)
             d.callback(filename)
         self._snapshotRequests[:] = []
-            
-        
+
         if not position['song']:
             self.updateLiveFromTemp(jpg)
-            return 
+            return
         outDir = takeDir(songDir(position['song']), position['started'])
         outFilename = "%s/%08.03f.jpg" % (outDir, position['t'])
-        if os.path.exists(outFilename): # we're paused on one time
+        if os.path.exists(outFilename):  # we're paused on one time
             self.updateLiveFromTemp(jpg)
             return
         try:
@@ -111,14 +112,14 @@ class Pipeline(object):
             out.write(jpg)
 
         self.updateLiveFromFile(outFilename)
-            
+
         # if you're selecting the text while gtk is updating it,
         # you can get a crash in xcb_io
         if getattr(self, '_lastRecText', None) != outDir:
             with gtk.gdk.lock:
                 self.recordingTo.set_text(outDir)
             self._lastRecText = outDir
-            
+
     def updateLiveFromFile(self, outFilename):
         self.liveVideo.set_from_file(outFilename)
 
@@ -127,17 +128,14 @@ class Pipeline(object):
             img = Image.open(StringIO(jpg))
             if not hasattr(self, 'livePixBuf'):
                 self.livePixBuf = gtk.gdk.pixbuf_new_from_data(
-                    img.tobytes(),
-                    gtk.gdk.COLORSPACE_RGB,
-                    False, 8,
-                    img.size[0], img.size[1],
-                    img.size[0]*3)
+                    img.tobytes(), gtk.gdk.COLORSPACE_RGB, False, 8,
+                    img.size[0], img.size[1], img.size[0] * 3)
                 log.info("live images are %r", img.size)
             else:
                 # don't leak pixbufs; update the one we have
                 a = self.livePixBuf.pixel_array
                 newImg = numpy.fromstring(img.tobytes(), dtype=numpy.uint8)
-                a[:,:,:] = newImg.reshape(a.shape)
+                a[:, :, :] = newImg.reshape(a.shape)
             self.liveVideo.set_from_pixbuf(self.livePixBuf)
 
         except Exception:

@@ -5,8 +5,9 @@ from light9 import networking, showconfig
 import rdfdb.service
 
 rdfdb.service.main(
-    dirUriMap={os.environ['LIGHT9_SHOW'].rstrip('/') + '/':
-               showconfig.showUri() + '/'},
+    dirUriMap={
+        os.environ['LIGHT9_SHOW'].rstrip('/') + '/': showconfig.showUri() + '/'
+    },
     prefixes={
         'show': showconfig.showUri() + '/',
         '': 'http://light9.bigasterisk.com/',
@@ -17,5 +18,4 @@ rdfdb.service.main(
         'dev': 'http://light9.bigasterisk.com/device/',
     },
     port=networking.rdfdb.port,
-    )
-
+)

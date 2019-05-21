@@ -16,6 +16,7 @@ ClientSessionType = TypeVar('ClientSessionType')
 
 log = logging.getLogger('collector')
 
+
 def outputMap(graph, outputs):
     # type: (Graph, List[Output]) -> Dict[Tuple[URIRef, URIRef], Tuple[Output, int]]
     """From rdf config graph, compute a map of
@@ -46,8 +47,10 @@ def outputMap(graph, outputs):
                 ret[(dev, outputAttr)] = (output, index)
                 log.debug('    map %s to %s,%s', outputAttr, output, index)
     return ret
-        
+
+
 class Collector(Generic[ClientType, ClientSessionType]):
+
     def __init__(self, graph, outputs, listeners=None, clientTimeoutSec=10):
         # type: (Graph, List[Output], List[Listener], float) -> None
         self.graph = graph
@@ -60,15 +63,17 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.graph.addHandler(self.rebuildOutputMap)
 
         # client : (session, time, {(dev,devattr): latestValue})
-        self.lastRequest = {} # type: Dict[Tuple[ClientType, ClientSessionType], Tuple[float, Dict[Tuple[URIRef, URIRef], float]]]
+        self.lastRequest = {
+        }  # type: Dict[Tuple[ClientType, ClientSessionType], Tuple[float, Dict[Tuple[URIRef, URIRef], float]]]
 
         # (dev, devAttr): value to use instead of 0
-        self.stickyAttrs = {} # type: Dict[Tuple[URIRef, URIRef], float] 
+        self.stickyAttrs = {}  # type: Dict[Tuple[URIRef, URIRef], float]
 
     def rebuildOutputMap(self):
-        self.outputMap = outputMap(self.graph, self.outputs) # (device, outputattr) : (output, index)
-        self.deviceType = {} # uri: type that's a subclass of Device
-        self.remapOut = {} # (device, deviceAttr) : (start, end)
+        self.outputMap = outputMap(
+            self.graph, self.outputs)  # (device, outputattr) : (output, index)
+        self.deviceType = {}  # uri: type that's a subclass of Device
+        self.remapOut = {}  # (device, deviceAttr) : (start, end)
         for dc in self.graph.subjects(RDF.type, L9['DeviceClass']):
             for dev in self.graph.subjects(RDF.type, dc):
                 self.allDevices.add(dev)
@@ -93,7 +98,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
     # todo: move to settings.py
     def resolvedSettingsDict(self, settingsList):
         # type: (List[Tuple[URIRef, URIRef, float]]) -> Dict[Tuple[URIRef, URIRef], float]
-        out = {} # type: Dict[Tuple[URIRef, URIRef], float]
+        out = {}  # type: Dict[Tuple[URIRef, URIRef], float]
         for d, da, v in settingsList:
             if (d, da) in out:
                 out[(d, da)] = resolve(d, da, [out[(d, da)], v])
@@ -103,13 +108,15 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
     def _warnOnLateRequests(self, client, now, sendTime):
         requestLag = now - sendTime
-        if requestLag > .1 and now > self.initTime + 10 and getattr(self, '_lastWarnTime', 0) < now - 3:
+        if requestLag > .1 and now > self.initTime + 10 and getattr(
+                self, '_lastWarnTime', 0) < now - 3:
             self._lastWarnTime = now
-            log.warn('collector.setAttrs from %s is running %.1fms after the request was made',
-                     client, requestLag * 1000)
+            log.warn(
+                'collector.setAttrs from %s is running %.1fms after the request was made',
+                client, requestLag * 1000)
 
     def _merge(self, lastRequests):
-        deviceAttrs = {} # device: {deviceAttr: value}       
+        deviceAttrs = {}  # device: {deviceAttr: value}
         for _, lastSettings in lastRequests:
             for (device, deviceAttr), value in lastSettings.iteritems():
                 if (device, deviceAttr) in self.remapOut:
@@ -118,7 +125,8 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
                 attrs = deviceAttrs.setdefault(device, {})
                 if deviceAttr in attrs:
-                    value = resolve(device, deviceAttr, [attrs[deviceAttr], value])
+                    value = resolve(device, deviceAttr,
+                                    [attrs[deviceAttr], value])
                 attrs[deviceAttr] = value
                 # list should come from the graph. these are attrs
                 # that should default to holding the last position,
@@ -131,7 +139,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
             daDict = deviceAttrs.setdefault(d, {})
             if da not in daDict:
                 daDict[da] = v
-                    
+
         return deviceAttrs
 
     def setAttrs(self, client, clientSession, settings, sendTime):
@@ -156,8 +164,8 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.lastRequest[(client, clientSession)] = (now, uniqueSettings)
 
         deviceAttrs = self._merge(self.lastRequest.itervalues())
-        
-        outputAttrs = {} # device: {outputAttr: value}
+
+        outputAttrs = {}  # device: {outputAttr: value}
         for d in self.allDevices:
             try:
                 devType = self.deviceType[d]
@@ -167,11 +175,12 @@ class Collector(Generic[ClientType, ClientSessionType]):
             try:
                 outputAttrs[d] = toOutputAttrs(devType, deviceAttrs.get(d, {}))
                 if self.listeners:
-                    self.listeners.outputAttrsSet(d, outputAttrs[d], self.outputMap)
+                    self.listeners.outputAttrsSet(d, outputAttrs[d],
+                                                  self.outputMap)
             except Exception as e:
                 log.error('failing toOutputAttrs on %s: %r', d, e)
-        
-        pendingOut = {} # output : values
+
+        pendingOut = {}  # output : values
         for out in self.outputs:
             pendingOut[out] = [0] * out.numChannels
 
@@ -183,9 +192,10 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.flush(pendingOut)
         dt2 = 1000 * (time.time() - now)
         if dt1 > 30:
-            log.warn("slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" % (
-                dt1, dt2, len(self.lastRequest), len(deviceAttrs), len(outputAttrs)
-            ))
+            log.warn(
+                "slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" %
+                (dt1, dt2, len(
+                    self.lastRequest), len(deviceAttrs), len(outputAttrs)))
 
     def setAttr(self, device, outputAttr, value, pendingOut):
         output, index = self.outputMap[(device, outputAttr)]

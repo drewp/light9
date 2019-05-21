@@ -1,5 +1,4 @@
 #!bin/python
-
 """for completion, print the available song uris on stdout
 
 in .zshrc:
@@ -17,11 +16,13 @@ from rdfdb.syncedgraph import SyncedGraph
 
 graph = SyncedGraph(networking.rdfdb.url, "listsongs")
 
+
 @graph.initiallySynced.addCallback
 def printSongs(result):
     with graph.currentState() as current:
         for song in current.subjects(RDF.type, L9['Song']):
             print song
     reactor.stop()
+
 
 reactor.run()

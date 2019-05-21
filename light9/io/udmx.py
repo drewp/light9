@@ -4,7 +4,6 @@ import usb.core
 from usb.util import CTRL_TYPE_VENDOR, CTRL_RECIPIENT_DEVICE, CTRL_OUT
 
 log = logging.getLogger('udmx')
-
 """
 Send dmx to one of these:
 http://www.amazon.com/Interface-Adapter-Controller-Lighting-Freestyler/dp/B00W52VIOS
@@ -23,24 +22,29 @@ or https://github.com/markusb/uDMX-linux/blob/master/uDMX.c
 
 cmd_SetChannelRange = 0x0002
 
+
 class Udmx(object):
+
     def __init__(self, bus):
         self.dev = None
-        for dev in usb.core.find(idVendor=0x16c0, idProduct=0x05dc, find_all=True):
+        for dev in usb.core.find(idVendor=0x16c0,
+                                 idProduct=0x05dc,
+                                 find_all=True):
             print "udmx device at %r" % dev.bus
             if bus is None or bus == dev.bus:
                 self.dev = dev
         if not self.dev:
-            raise IOError('no matching udmx device found for requested bus %r' % bus)
+            raise IOError('no matching udmx device found for requested bus %r' %
+                          bus)
         log.info('found udmx at %r', self.dev)
-        
+
     def SendDMX(self, buf):
-        ret = self.dev.ctrl_transfer(
-           bmRequestType=CTRL_TYPE_VENDOR | CTRL_RECIPIENT_DEVICE | CTRL_OUT,
-           bRequest=cmd_SetChannelRange,
-           wValue=len(buf),
-           wIndex=0,
-           data_or_wLength=buf)
+        ret = self.dev.ctrl_transfer(bmRequestType=CTRL_TYPE_VENDOR |
+                                     CTRL_RECIPIENT_DEVICE | CTRL_OUT,
+                                     bRequest=cmd_SetChannelRange,
+                                     wValue=len(buf),
+                                     wIndex=0,
+                                     data_or_wLength=buf)
         if ret < 0:
             raise ValueError("ctrl_transfer returned %r" % ret)
 
@@ -52,9 +56,8 @@ def demo(chan, fps=44):
         nsin = math.sin(time.time() * 6.28) / 2.0 + 0.5
         nsin8 = int(255 * nsin)
         try:
-            u.SendDMX('\x00' * (chan - 1) +
-                      chr(210) +
-                      chr(nsin8) + chr(nsin8) + chr(nsin8))
+            u.SendDMX('\x00' * (chan - 1) + chr(210) + chr(nsin8) + chr(nsin8) +
+                      chr(nsin8))
         except usb.core.USBError as e:
             print "err", time.time(), repr(e)
         time.sleep(1 / fps)

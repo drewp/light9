@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """
 alternate to the mpd music player, for ascoltami
 """
@@ -8,10 +7,11 @@ import time, logging, traceback
 from gi.repository import GObject, Gst
 from twisted.internet import reactor, task
 
-
 log = logging.getLogger()
 
+
 class Player(object):
+
     def __init__(self, autoStopOffset=4, onEOS=None):
         """autoStopOffset is the number of seconds before the end of
         song before automatically stopping (which is really pausing).
@@ -20,27 +20,27 @@ class Player(object):
         It is called with one argument which is the URI of the song that
         just finished."""
         self.autoStopOffset = autoStopOffset
-        self.playbin = self.pipeline = Gst.ElementFactory.make('playbin',None)
+        self.playbin = self.pipeline = Gst.ElementFactory.make('playbin', None)
 
         self.playStartTime = 0
         self.lastWatchTime = 0
         self.autoStopTime = 0
         self.lastSetSongUri = None
         self.onEOS = onEOS
-        
+
         task.LoopingCall(self.watchTime).start(.050)
 
         bus = self.pipeline.get_bus()
         # not working- see notes in pollForMessages
         #self.watchForMessages(bus)
-      
+
     def watchTime(self):
         try:
             self.pollForMessages()
-            
+
             t = self.currentTime()
-            log.debug("watch %s < %s < %s",
-                      self.lastWatchTime, self.autoStopTime, t)
+            log.debug("watch %s < %s < %s", self.lastWatchTime,
+                      self.autoStopTime, t)
             if self.lastWatchTime < self.autoStopTime < t:
                 log.info("autostop")
                 self.pause()
@@ -58,6 +58,7 @@ class Player(object):
             print "onEos", args
             if self.onEOS is not None:
                 self.onEOS(self.getSong())
+
         bus.connect('message::eos', onEos)
 
         def onStreamStatus(bus, message):
@@ -65,14 +66,16 @@ class Player(object):
             (statusType, _elem) = message.parse_stream_status()
             if statusType == Gst.StreamStatusType.ENTER:
                 self.setupAutostop()
+
         bus.connect('message::stream-status', onStreamStatus)
-            
+
     def pollForMessages(self):
         """bus.add_signal_watch seems to be having no effect, but this works"""
         bus = self.pipeline.get_bus()
         mt = Gst.MessageType
-        msg = bus.poll(mt.EOS | mt.STREAM_STATUS | mt.ERROR,# | mt.ANY,
-                       0)
+        msg = bus.poll(
+            mt.EOS | mt.STREAM_STATUS | mt.ERROR,  # | mt.ANY,
+            0)
         if msg is not None:
             log.debug("bus message: %r %r", msg.src, msg.type)
             # i'm trying to catch here a case where the pulseaudio
@@ -88,7 +91,7 @@ class Player(object):
                 (statusType, _elem) = msg.parse_stream_status()
                 if statusType == Gst.StreamStatusType.ENTER:
                     self.setupAutostop()
-            
+
     def seek(self, t):
         isSeekable = self.playbin.seek_simple(
             Gst.Format.TIME,
@@ -149,9 +152,15 @@ class Player(object):
         """json-friendly object describing the interesting states of
         the player nodes"""
         success, state, pending = self.playbin.get_state(timeout=0)
-        return {"current": {"name":state.value_nick},
-                "pending": {"name":state.value_nick}}
-        
+        return {
+            "current": {
+                "name": state.value_nick
+            },
+            "pending": {
+                "name": state.value_nick
+            }
+        }
+
     def pause(self):
         self.pipeline.set_state(Gst.State.PAUSED)
 
@@ -161,7 +170,8 @@ class Player(object):
         """
         pos = self.currentTime()
         autoStop = self.duration() - self.autoStopOffset
-        return not self.isPlaying() and abs(pos - autoStop) < 1 # i've seen .4 difference here
+        return not self.isPlaying() and abs(
+            pos - autoStop) < 1  # i've seen .4 difference here
 
     def resume(self):
         self.pipeline.set_state(Gst.State.PLAYING)

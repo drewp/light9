@@ -6,9 +6,12 @@ import Tkinter as tk
 import time
 import restkit, jsonlib
 
+
 class MusicTime:
+
     def __init__(self, url):
         self.player = restkit.Resource(url)
+
     def get_music_time(self):
         playtime = None
         while not playtime:
@@ -20,31 +23,43 @@ class MusicTime:
                 time.sleep(2)
         return playtime
 
+
 class MusicTimeTk(tk.Frame, MusicTime):
+
     def __init__(self, master, url):
         tk.Frame.__init__(self)
         MusicTime.__init__(self, url)
         self.timevar = tk.DoubleVar()
-        self.timelabel = tk.Label(self, textvariable=self.timevar, bd=2,
-            relief='raised', width=10, padx=2, pady=2, anchor='w')
+        self.timelabel = tk.Label(self,
+                                  textvariable=self.timevar,
+                                  bd=2,
+                                  relief='raised',
+                                  width=10,
+                                  padx=2,
+                                  pady=2,
+                                  anchor='w')
         self.timelabel.pack(expand=1, fill='both')
+
         def print_time(evt, *args):
             self.timevar.set(self.get_music_time())
             print self.timevar.get(), evt.keysym
+
         self.timelabel.bind('<KeyPress>', print_time)
         self.timelabel.bind('<1>', print_time)
         self.timelabel.focus()
         self.update_time()
+
     def update_time(self):
         self.timevar.set(self.get_music_time())
         self.after(100, self.update_time)
+
 
 if __name__ == "__main__":
     from optparse import OptionParser
     parser = OptionParser()
     parser.add_option("-u", "--url", default=light9.networking.musicPlayer.url)
     options, args = parser.parse_args()
-    
+
     root = tk.Tk()
     root.title("Time")
     MusicTimeTk(root, options.url).pack(expand=1, fill='both')

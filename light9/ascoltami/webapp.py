@@ -9,32 +9,40 @@ render = render_genshi([sibpath(__file__, ".")], auto_reload=True)
 
 from lib.cycloneerr import PrettyErrorHandler
 
-_songUris = {} # locationUri : song
+_songUris = {}  # locationUri : song
+
+
 def songLocation(graph, songUri):
     loc = URIRef("file://%s" % songOnDisk(songUri))
     _songUris[loc] = songUri
     return loc
-    
+
+
 def songUri(graph, locationUri):
     return _songUris[locationUri]
 
+
 class root(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
         self.set_header("Content-Type", "application/xhtml+xml")
         # todo: use a template; embed the show name and the intro/post
         # times into the page
         self.write(render.index(host=socket.gethostname()))
 
+
 def playerSongUri(graph, player):
     """or None"""
-    
+
     playingLocation = player.getSong()
     if playingLocation:
         return songUri(graph, URIRef(playingLocation))
     else:
         return None
 
-class timeResource(PrettyErrorHandler,cyclone.web.RequestHandler):
+
+class timeResource(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
         player = self.settings.app.player
         graph = self.settings.app.graph
@@ -47,14 +55,15 @@ class timeResource(PrettyErrorHandler,cyclone.web.RequestHandler):
         else:
             nextAction = 'play'
 
-        self.write(json.dumps({
-            "song" : playerSongUri(graph, player),
-            "started" : player.playStartTime,
-            "duration" : player.duration(),
-            "playing" : player.isPlaying(),
-            "t" : player.currentTime(),
-            "state" : player.states(),
-            "next" : nextAction,
+        self.write(
+            json.dumps({
+                "song": playerSongUri(graph, player),
+                "started": player.playStartTime,
+                "duration": player.duration(),
+                "playing": player.isPlaying(),
+                "t": player.currentTime(),
+                "state": player.states(),
+                "next": nextAction,
             }))
 
     def post(self):
@@ -74,28 +83,39 @@ class timeResource(PrettyErrorHandler,cyclone.web.RequestHandler):
         self.set_header("Content-Type", "text/plain")
         self.write("ok")
 
+
 class songs(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
         graph = self.settings.app.graph
 
         songs = getSongsFromShow(graph, self.settings.app.show)
 
         self.set_header("Content-Type", "application/json")
-        self.write(json.dumps({"songs" : [
-            {"uri" : s,
-             "path" : graph.value(s, L9['showPath']),
-             "label" : graph.label(s)} for s in songs]}))
+        self.write(
+            json.dumps({
+                "songs": [{
+                    "uri": s,
+                    "path": graph.value(s, L9['showPath']),
+                    "label": graph.label(s)
+                } for s in songs]
+            }))
+
 
 class songResource(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def post(self):
         """post a uri of song to switch to (and start playing)"""
         graph = self.settings.app.graph
 
-        self.settings.app.player.setSong(songLocation(graph, URIRef(self.request.body)))
+        self.settings.app.player.setSong(
+            songLocation(graph, URIRef(self.request.body)))
         self.set_header("Content-Type", "text/plain")
         self.write("ok")
-    
+
+
 class seekPlayOrPause(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def post(self):
         player = self.settings.app.player
 
@@ -106,12 +126,16 @@ class seekPlayOrPause(PrettyErrorHandler, cyclone.web.RequestHandler):
             player.seek(data['t'])
             player.resume()
 
+
 class output(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def post(self):
         d = json.loads(self.request.body)
         subprocess.check_call(["bin/movesinks", str(d['sink'])])
 
+
 class goButton(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def post(self):
         """
         if music is playing, this silently does nothing.
@@ -124,9 +148,10 @@ class goButton(PrettyErrorHandler, cyclone.web.RequestHandler):
             pass
         else:
             player.resume()
-            
+
         self.set_header("Content-Type", "text/plain")
         self.write("ok")
+
 
 def makeWebApp(app):
     return cyclone.web.Application(handlers=[
@@ -137,5 +162,5 @@ def makeWebApp(app):
         (r"/seekPlayOrPause", seekPlayOrPause),
         (r"/output", output),
         (r"/go", goButton),
-        ], app=app)
-
+    ],
+                                   app=app)

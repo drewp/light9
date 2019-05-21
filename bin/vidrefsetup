@@ -16,17 +16,23 @@ from light9 import networking, showconfig
 
 from lib.cycloneerr import PrettyErrorHandler
 
+
 class RedirToCamera(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
-        return self.redirect(networking.picamserve.path(
-            'pic?' + self.request.query))
-        
+        return self.redirect(
+            networking.picamserve.path('pic?' + self.request.query))
+
+
 class UrlToCamera(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
         self.set_header('Content-Type', 'text/plain')
         self.write(networking.picamserve.path('pic'))
-                   
+
+
 class VidrefCamRequest(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def get(self):
         graph = self.settings.graph
         show = showconfig.showUri()
@@ -35,7 +41,7 @@ class VidrefCamRequest(PrettyErrorHandler, cyclone.web.RequestHandler):
             if ret is None:
                 self.send_error(404)
             self.redirect(ret)
-            
+
     def put(self):
         graph = self.settings.graph
         show = showconfig.showUri()
@@ -45,9 +51,12 @@ class VidrefCamRequest(PrettyErrorHandler, cyclone.web.RequestHandler):
                           newObject=URIRef(self.get_argument('uri')))
         self.send_error(202)
 
+
 def main():
     parser = optparse.OptionParser()
-    parser.add_option("-v", "--verbose", action="store_true",
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
                       help="logging.DEBUG")
     (options, args) = parser.parse_args()
 
@@ -55,15 +64,23 @@ def main():
     graph = SyncedGraph(networking.rdfdb.url, "vidrefsetup")
 
     # deliberately conflict with vidref since they can't talk at once to cam
-    port = networking.vidref.port 
+    port = networking.vidref.port
 
-    reactor.listenTCP(port, cyclone.web.Application(handlers=[
-        (r'/pic', RedirToCamera),
-        (r'/picUrl', UrlToCamera),
-        (r'/vidrefCamRequest', VidrefCamRequest),
-        (r'/()', cyclone.web.StaticFileHandler, {'path': 'light9/vidref/', 'default_filename': 'vidref.html'}),
-        ], debug=True, graph=graph))
+    reactor.listenTCP(
+        port,
+        cyclone.web.Application(handlers=[
+            (r'/pic', RedirToCamera),
+            (r'/picUrl', UrlToCamera),
+            (r'/vidrefCamRequest', VidrefCamRequest),
+            (r'/()', cyclone.web.StaticFileHandler, {
+                'path': 'light9/vidref/',
+                'default_filename': 'vidref.html'
+            }),
+        ],
+                                debug=True,
+                                graph=graph))
     log.info("serving on %s" % port)
     reactor.run()
+
 
 main()

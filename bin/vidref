@@ -1,7 +1,7 @@
 #!bin/python
 from run_local import log
 import sys
-sys.path.append('/usr/lib/python2.7/dist-packages') # For gtk
+sys.path.append('/usr/lib/python2.7/dist-packages')  # For gtk
 from twisted.internet import gtk2reactor
 gtk2reactor.install()
 from twisted.internet import reactor, defer
@@ -15,19 +15,19 @@ from light9.vidref.main import Gui
 from light9.vidref.replay import snapshotDir
 from rdfdb.syncedgraph import SyncedGraph
 
- # find replay dirs correctly. show multiple
- # replays. trash. reorder/pin. dump takes that are too short; they're
- # just from seeking
+# find replay dirs correctly. show multiple
+# replays. trash. reorder/pin. dump takes that are too short; they're
+# just from seeking
 
 parser = optparse.OptionParser()
-parser.add_option("-v", "--verbose", action="store_true",
-                  help="logging.DEBUG")
+parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
 (options, args) = parser.parse_args()
-
 
 log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
+
 class Snapshot(cyclone.web.RequestHandler):
+
     @defer.inlineCallbacks
     def post(self):
         # save next pic
@@ -38,7 +38,7 @@ class Snapshot(cyclone.web.RequestHandler):
             assert outputFilename.startswith(snapshotDir())
             out = networking.vidref.path(
                 "snapshot/%s" % outputFilename[len(snapshotDir()):].lstrip('/'))
-            
+
             self.write(json.dumps({'snapshot': out}))
             self.set_header("Location", out)
             self.set_status(303)
@@ -47,11 +47,13 @@ class Snapshot(cyclone.web.RequestHandler):
             traceback.print_exc()
             raise
 
+
 class SnapshotPic(cyclone.web.StaticFileHandler):
     pass
 
 
 class Time(cyclone.web.RequestHandler):
+
     def put(self):
         body = json.loads(self.request.body)
         t = body['t']
@@ -65,14 +67,21 @@ graph = SyncedGraph(networking.rdfdb.url, "vidref")
 gui = Gui(graph)
 
 port = networking.vidref.port
-reactor.listenTCP(port, cyclone.web.Application(handlers=[
-    (r'/()', cyclone.web.StaticFileHandler,
-     {'path': 'light9/vidref', 'default_filename': 'vidref.html'}),
-    (r'/snapshot', Snapshot),
-    (r'/snapshot/(.*)', SnapshotPic, {"path": snapshotDir()}),
-    (r'/time', Time),
-    ], debug=True, gui=gui))
+reactor.listenTCP(
+    port,
+    cyclone.web.Application(handlers=[
+        (r'/()', cyclone.web.StaticFileHandler, {
+            'path': 'light9/vidref',
+            'default_filename': 'vidref.html'
+        }),
+        (r'/snapshot', Snapshot),
+        (r'/snapshot/(.*)', SnapshotPic, {
+            "path": snapshotDir()
+        }),
+        (r'/time', Time),
+    ],
+                            debug=True,
+                            gui=gui))
 log.info("serving on %s" % port)
 
 reactor.run()
-

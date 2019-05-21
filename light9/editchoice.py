@@ -2,10 +2,12 @@ import Tkinter as tk
 from rdflib import URIRef
 from light9.tkdnd import dragSourceRegister, dropTargetRegister
 
+
 class Local(object):
     """placeholder for the local uri that EditChoice does not
     manage. Set resourceObservable to Local to indicate that you're
     unlinked"""
+
 
 class EditChoice(object):
     """
@@ -52,6 +54,7 @@ class EditChoice(object):
 
     - list of recent resources that this choice was set to
     """
+
     def __init__(self, parent, graph, resourceObservable, label="Editing:"):
         """
         getResource is called to get the URI of the currently
@@ -63,9 +66,12 @@ class EditChoice(object):
         self.currentLinkFrame = tk.Frame(self.frame)
         self.currentLinkFrame.pack(side='left')
 
-        self.subIcon = tk.Label(self.currentLinkFrame, text="...",
-                                borderwidth=2, relief='raised',
-                                padx=10, pady=10)
+        self.subIcon = tk.Label(self.currentLinkFrame,
+                                text="...",
+                                borderwidth=2,
+                                relief='raised',
+                                padx=10,
+                                pady=10)
         self.subIcon.pack()
 
         self.resourceObservable = resourceObservable
@@ -74,12 +80,14 @@ class EditChoice(object):
         # when the value is local, this should stop being a drag source
         dragSourceRegister(self.subIcon, 'copy', 'text/uri-list',
                            self.resourceObservable)
+
         def onEv(ev):
             self.resourceObservable(URIRef(ev.data))
             return "link"
+
         self.onEv = onEv
 
-        b=tk.Button(self.frame, text="Unlink", command=self.switchToLocalSub)
+        b = tk.Button(self.frame, text="Unlink", command=self.switchToLocalSub)
         b.pack(side='left')
 
         # it would be nice if I didn't receive my own drags here, and
@@ -87,7 +95,9 @@ class EditChoice(object):
         for target in ([self.frame, self.currentLinkFrame] +
                        self.frame.winfo_children() +
                        self.currentLinkFrame.winfo_children()):
-            dropTargetRegister(target, typeList=["*"], onDrop=onEv,
+            dropTargetRegister(target,
+                               typeList=["*"],
+                               onDrop=onEv,
                                hoverStyle=dict(background="#555500"))
 
     def uriChanged(self, newUri):
@@ -106,4 +116,3 @@ class EditChoice(object):
 
     def switchToLocalSub(self):
         self.resourceObservable(Local)
-

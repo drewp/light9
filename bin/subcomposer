@@ -69,6 +69,7 @@ class Subcomposer(tk.Frame):
       Submaster.editLevel -> graph (handled in Submaster)
 
     """
+
     def __init__(self, master, graph, session):
         tk.Frame.__init__(self, master, bg='black')
         self.graph = graph
@@ -83,11 +84,12 @@ class Subcomposer(tk.Frame):
         self._currentChoice = Observable(Local)
 
         # this is a PersistentSubmaster (even for local)
-        self.currentSub = Observable(Submaster.PersistentSubmaster(
-                    graph, self.switchToLocal()))
+        self.currentSub = Observable(
+            Submaster.PersistentSubmaster(graph, self.switchToLocal()))
 
         def pc(val):
             log.info("change viewed sub to %s", val)
+
         self._currentChoice.subscribe(pc)
 
         ec = self.editChoice = EditChoice(self, self.graph, self._currentChoice)
@@ -105,39 +107,41 @@ class Subcomposer(tk.Frame):
         e.pack()
         b = tk.Button(box, text="Make global")
         b.pack()
+
         def clicked(*args):
             self.makeGlobal(newName=e.get())
             box.destroy()
-            
+
         b.bind("<Button-1>", clicked)
         e.focus()
-        
+
     def makeGlobal(self, newName):
         """promote our local submaster into a non-local, named one"""
         uri = self.currentSub().uri
         newUri = showconfig.showUri() + ("/sub/%s" %
                                          urllib.quote(newName, safe=''))
-        with self.graph.currentState(
-                tripleFilter=(uri, None, None)) as current:
+        with self.graph.currentState(tripleFilter=(uri, None, None)) as current:
             if (uri, RDF.type, L9['LocalSubmaster']) not in current:
                 raise ValueError("%s is not a local submaster" % uri)
             if (newUri, None, None) in current:
                 raise ValueError("new uri %s is in use" % newUri)
-                
+
         # the local submaster was storing in ctx=self.session, but now
         # we want it to be in ctx=uri
 
         self.relocateSub(newUri, newName)
 
         # these are in separate patches for clarity as i'm debugging this
-        self.graph.patch(Patch(addQuads=[
-            (newUri, RDFS.label, Literal(newName), newUri),
-        ], delQuads=[
-            (newUri, RDF.type, L9['LocalSubmaster'], newUri),
-                           ]))
-        self.graph.patchObject(self.session,
-                               self.session, L9['currentSub'], newUri)
-        
+        self.graph.patch(
+            Patch(addQuads=[
+                (newUri, RDFS.label, Literal(newName), newUri),
+            ],
+                  delQuads=[
+                      (newUri, RDF.type, L9['LocalSubmaster'], newUri),
+                  ]))
+        self.graph.patchObject(self.session, self.session, L9['currentSub'],
+                               newUri)
+
     def relocateSub(self, newUri, newName):
         # maybe this goes in Submaster
         uri = self.currentSub().uri
@@ -146,15 +150,16 @@ class Subcomposer(tk.Frame):
             if u == uri:
                 return newUri
             return u
+
         delQuads = self.currentSub().allQuads()
-        addQuads = [(repl(s), p, repl(o), newUri) for s,p,o,c in delQuads]
+        addQuads = [(repl(s), p, repl(o), newUri) for s, p, o, c in delQuads]
         # patch can't span contexts yet
         self.graph.patch(Patch(addQuads=addQuads, delQuads=[]))
         self.graph.patch(Patch(addQuads=[], delQuads=delQuads))
-        
-        
+
     def setupSubChoiceLinks(self):
         graph = self.graph
+
         def ann():
             print "currently: session=%s currentSub=%r _currentChoice=%r" % (
                 self.session, self.currentSub(), self._currentChoice())
@@ -165,7 +170,7 @@ class Subcomposer(tk.Frame):
             # are failing. this calms things down.
             log.warn('skip graphChanged')
             return
-        
+
             s = graph.value(self.session, L9['currentSub'])
             log.debug('HANDLER getting session currentSub from graph: %s', s)
             if s is None:
@@ -176,12 +181,12 @@ class Subcomposer(tk.Frame):
         def subChanged(newSub):
             log.debug('HANDLER currentSub changed to %s', newSub)
             if newSub is None:
-                graph.patchObject(self.session,
-                                  self.session, L9['currentSub'], None)
+                graph.patchObject(self.session, self.session, L9['currentSub'],
+                                  None)
                 return
             self.sendupdate()
-            graph.patchObject(self.session,
-                              self.session, L9['currentSub'], newSub.uri)
+            graph.patchObject(self.session, self.session, L9['currentSub'],
+                              newSub.uri)
 
             localStmt = (newSub.uri, RDF.type, L9['LocalSubmaster'])
             with graph.currentState(tripleFilter=localStmt) as current:
@@ -195,7 +200,7 @@ class Subcomposer(tk.Frame):
                     self._currentChoice(newSub.uri)
 
         dispatcher.connect(self.levelsChanged, "sub levels changed")
-            
+
         @self._currentChoice.subscribe
         def choiceChanged(newChoice):
             log.debug('HANDLER choiceChanged to %s', newChoice)
@@ -203,13 +208,14 @@ class Subcomposer(tk.Frame):
                 newChoice = self.switchToLocal()
             if newChoice is not None:
                 newSub = Submaster.PersistentSubmaster(graph, newChoice)
-                log.debug('write new choice to currentSub, from %r to %r', self.currentSub(), newSub)
+                log.debug('write new choice to currentSub, from %r to %r',
+                          self.currentSub(), newSub)
                 self.currentSub(newSub)
 
     def levelsChanged(self, sub):
         if sub == self.currentSub():
             self.sendupdate()
-        
+
     def switchToLocal(self):
         """
         change our display to a local submaster
@@ -220,27 +226,30 @@ class Subcomposer(tk.Frame):
         self.localSerial += 1
         new = URIRef("http://light9.bigasterisk.com/sub/local/%s" % localId)
         log.debug('making up a local sub %s', new)
-        self.graph.patch(Patch(addQuads=[
-            (new, RDF.type, L9['Submaster'], self.session),
-            (new, RDF.type, L9['LocalSubmaster'], self.session),
-        ]))
-        
+        self.graph.patch(
+            Patch(addQuads=[
+                (new, RDF.type, L9['Submaster'], self.session),
+                (new, RDF.type, L9['LocalSubmaster'], self.session),
+            ]))
+
         return new
-        
+
     def setupLevelboxUi(self):
         self.levelbox = Levelbox(self, self.graph, self.currentSub)
         self.levelbox.pack(side='top')
 
-        tk.Button(self, text="All to zero",
-             command=lambda *args: self.currentSub().clear()).pack(side='top')
+        tk.Button(
+            self,
+            text="All to zero",
+            command=lambda *args: self.currentSub().clear()).pack(side='top')
 
     def savenewsub(self, subname):
-        leveldict={}
-        for i,lev in zip(range(len(self.levels)),self.levels):
-            if lev!=0:
-                leveldict[get_channel_name(i+1)]=lev
+        leveldict = {}
+        for i, lev in zip(range(len(self.levels)), self.levels):
+            if lev != 0:
+                leveldict[get_channel_name(i + 1)] = lev
 
-        s=Submaster.Submaster(subname, levels=leveldict)
+        s = Submaster.Submaster(subname, levels=leveldict)
         s.save()
 
     def sendupdate(self):
@@ -252,14 +261,15 @@ def launch(opts, args, root, graph, session):
     if not opts.no_geometry:
         toplevelat("subcomposer - %s" % opts.session, root, graph, session)
 
-        
     sc = Subcomposer(root, graph, session)
     sc.pack()
-    
+
     subcomposerweb.init(graph, session, sc.currentSub)
 
-    tk.Label(root,text="Bindings: B1 adjust level; B2 set full; B3 instant bump",
-             font="Helvetica -12 italic",anchor='w').pack(side='top',fill='x')
+    tk.Label(root,
+             text="Bindings: B1 adjust level; B2 set full; B3 instant bump",
+             font="Helvetica -12 italic",
+             anchor='w').pack(side='top', fill='x')
 
     if len(args) == 1:
         # it might be a little too weird that cmdline arg to this
@@ -269,8 +279,7 @@ def launch(opts, args, root, graph, session):
         # same window pos), so maybe it doesn't matter. But still,
         # this tool should probably default to making new sessions
         # usually instead of loading the same one
-        graph.patchObject(session,
-                          session, L9['currentSub'], URIRef(args[0]))
+        graph.patchObject(session, session, L9['currentSub'], URIRef(args[0]))
 
     task.LoopingCall(sc.sendupdate).start(10)
 
@@ -279,7 +288,8 @@ def launch(opts, args, root, graph, session):
 
 if __name__ == "__main__":
     parser = OptionParser(usage="%prog [suburi]")
-    parser.add_option('--no-geometry', action='store_true',
+    parser.add_option('--no-geometry',
+                      action='store_true',
                       help="don't save/restore window geometry")
     parser.add_option('-v', action='store_true', help="log debug level")
 
@@ -287,8 +297,8 @@ if __name__ == "__main__":
     opts, args = parser.parse_args()
 
     log.setLevel(logging.DEBUG if opts.v else logging.INFO)
-    
-    root=tk.Tk()
+
+    root = tk.Tk()
     root.config(bg='black')
     root.tk_setPalette("#004633")
 
@@ -297,8 +307,9 @@ if __name__ == "__main__":
     graph = SyncedGraph(networking.rdfdb.url, "subcomposer")
     session = clientsession.getUri('subcomposer', opts)
 
-    graph.initiallySynced.addCallback(lambda _: launch(opts, args, root, graph, session))
+    graph.initiallySynced.addCallback(lambda _: launch(opts, args, root, graph,
+                                                       session))
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
-    tksupport.install(root,ms=10)
+    tksupport.install(root, ms=10)
     prof.run(reactor.run, profile=False)

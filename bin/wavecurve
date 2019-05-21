@@ -3,24 +3,30 @@ import optparse
 import run_local
 from light9.wavepoints import simp
 
+
 def createCurve(inpath, outpath, t):
     print "reading %s, writing %s" % (inpath, outpath)
     points = simp(inpath.replace('.ogg', '.wav'), seconds_per_average=t)
 
     f = file(outpath, 'w')
     for time_val in points:
-        print >>f, "%s %s" % time_val
+        print >> f, "%s %s" % time_val
+
 
 parser = optparse.OptionParser(usage="""%prog inputSong.wav outputCurve
 
 You probably just want -a
 
 """)
-parser.add_option("-t", type="float", default=.01,
+parser.add_option("-t",
+                  type="float",
+                  default=.01,
                   help="seconds per sample (default .01, .07 is smooth)")
-parser.add_option("-a", "--all", action="store_true",
+parser.add_option("-a",
+                  "--all",
+                  action="store_true",
                   help="make standard curves for all songs")
-options,args = parser.parse_args()
+options, args = parser.parse_args()
 
 if options.all:
     from light9 import showconfig
@@ -32,8 +38,7 @@ if options.all:
     playlist = Playlist.fromShow(showconfig.getGraph(), showconfig.showUri())
     for song in playlist.allSongs():
         inpath = showconfig.songOnDisk(song)
-        for curveName, t in [('music', .01),
-                             ('smooth_music', .07)]:
+        for curveName, t in [('music', .01), ('smooth_music', .07)]:
             outpath = showconfig.curvesDir() + "/%s-%s" % (
                 showconfig.songFilenameFromURI(song), curveName)
             createCurve(inpath, outpath, t)

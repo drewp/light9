@@ -1,8 +1,10 @@
 import logging
 log = logging.getLogger('observable')
 
+
 class _NoNewVal(object):
     pass
+
 
 class Observable(object):
     """
@@ -13,6 +15,7 @@ class Observable(object):
     http://knockoutjs.com/documentation/observables.html
     https://github.com/drpancake/python-observable/blob/master/observable/observable.py
     """
+
     def __init__(self, val):
         self.val = val
         self.subscribers = set()

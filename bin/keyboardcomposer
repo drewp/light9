@@ -27,43 +27,58 @@ from light9.effect.simple_outputs import SimpleOutputs
 
 from bcf2000 import BCF2000
 
-nudge_keys = {
-    'up'   : list('qwertyui'),
-    'down' : list('asdfghjk')
-}
+nudge_keys = {'up': list('qwertyui'), 'down': list('asdfghjk')}
+
 
 class DummySliders:
+
     def valueOut(self, name, value):
         pass
+
     def close(self):
         pass
+
     def reopen(self):
         pass
 
+
 class SubScale(tk.Scale, Fadable):
+
     def __init__(self, master, *args, **kw):
         self.scale_var = kw.get('variable') or tk.DoubleVar()
-        kw.update({'variable' : self.scale_var,
-                   'from' : 1, 'to' : 0, 'showvalue' : 0,
-                   'sliderlength' : 15, 'res' : 0.01,
-                   'width' : 40, 'troughcolor' : 'black', 'bg' : 'grey40',
-                   'highlightthickness' : 1, 'bd' : 1,
-                   'highlightcolor' : 'red', 'highlightbackground' : 'black',
-                   'activebackground' : 'red'})
+        kw.update({
+            'variable': self.scale_var,
+            'from': 1,
+            'to': 0,
+            'showvalue': 0,
+            'sliderlength': 15,
+            'res': 0.01,
+            'width': 40,
+            'troughcolor': 'black',
+            'bg': 'grey40',
+            'highlightthickness': 1,
+            'bd': 1,
+            'highlightcolor': 'red',
+            'highlightbackground': 'black',
+            'activebackground': 'red'
+        })
         tk.Scale.__init__(self, master, *args, **kw)
         Fadable.__init__(self, var=self.scale_var, wheel_step=0.05)
         self.draw_indicator_colors()
+
     def draw_indicator_colors(self):
         if self.scale_var.get() == 0:
             self['troughcolor'] = 'black'
         else:
             self['troughcolor'] = 'blue'
 
+
 class SubmasterBox(tk.Frame):
     """
     this object owns the level of the submaster (the rdf graph is the
     real authority)
     """
+
     def __init__(self, master, graph, sub, session, col, row):
         self.graph = graph
         self.sub = sub
@@ -71,22 +86,31 @@ class SubmasterBox(tk.Frame):
         self.col, self.row = col, row
         bg = self.graph.value(sub, L9.color, default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
-        hsv = colorsys.rgb_to_hsv(*[x/255 for x in rgb])
-        darkBg = webcolors.rgb_to_hex(tuple([int(x * 255) for x in colorsys.hsv_to_rgb(
-            hsv[0], hsv[1], .2)]))
+        hsv = colorsys.rgb_to_hsv(*[x / 255 for x in rgb])
+        darkBg = webcolors.rgb_to_hex(
+            tuple([
+                int(x * 255) for x in colorsys.hsv_to_rgb(hsv[0], hsv[1], .2)
+            ]))
         tk.Frame.__init__(self, master, bd=1, relief='raised', bg=bg)
         self.name = self.graph.label(sub)
         self.slider_var = tk.DoubleVar()
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
 
-        self.namelabel = tk.Label(self, font="Arial 9", bg=darkBg,
-            fg='white', pady=0)
+        self.namelabel = tk.Label(self,
+                                  font="Arial 9",
+                                  bg=darkBg,
+                                  fg='white',
+                                  pady=0)
         self.graph.addHandler(self.updateName)
 
         self.namelabel.pack(side=tk.TOP)
-        levellabel = tk.Label(self, textvariable=self.slider_var, font="Arial 6",
-            bg='black', fg='white', pady=0)
+        levellabel = tk.Label(self,
+                              textvariable=self.slider_var,
+                              font="Arial 6",
+                              bg='black',
+                              fg='white',
+                              pady=0)
         levellabel.pack(side=tk.TOP)
         self.scale.pack(side=tk.BOTTOM, expand=1, fill=tk.BOTH)
 
@@ -111,7 +135,9 @@ class SubmasterBox(tk.Frame):
         self.updateGraphWithLevel(self.sub, self.slider_var.get())
 
         # needs fixing: plan is to use dispatcher or a method call to tell a hardware-mapping object who changed, and then it can make io if that's a current hw slider
-        dispatcher.send("send_to_hw", sub=self.sub, hwCol=self.col + 1,
+        dispatcher.send("send_to_hw",
+                        sub=self.sub,
+                        hwCol=self.col + 1,
                         boxRow=self.row)
 
     def updateGraphWithLevel(self, uri, level):
@@ -125,8 +151,10 @@ class SubmasterBox(tk.Frame):
                                 subject=self.session,
                                 predicate=L9['subSetting'],
                                 nodeClass=L9['SubSetting'],
-                                keyPred=L9['sub'], newKey=uri,
-                                valuePred=L9['level'], newValue=Literal(level))
+                                keyPred=L9['sub'],
+                                newKey=uri,
+                                valuePred=L9['level'],
+                                newValue=Literal(level))
 
     def updateLevelFromGraph(self):
         """read rdf level, write it to subbox.slider_var"""
@@ -135,30 +163,34 @@ class SubmasterBox(tk.Frame):
 
         for setting in graph.objects(self.session, L9['subSetting']):
             if graph.value(setting, L9['sub']) == self.sub:
-                self.pauseTrace = True # don't bounce this update back to server
+                self.pauseTrace = True  # don't bounce this update back to server
                 try:
                     self.slider_var.set(graph.value(setting, L9['level']))
                 finally:
                     self.pauseTrace = False
 
     def updateName(self):
+
         def shortUri(u):
             return '.../' + u.split('/')[-1]
-        self.namelabel.config(text=self.graph.label(self.sub) or shortUri(self.sub))
+
+        self.namelabel.config(
+            text=self.graph.label(self.sub) or shortUri(self.sub))
+
 
 class KeyboardComposer(tk.Frame, SubClient):
-    def __init__(self, root, graph, session,
-                 hw_sliders=True):
+
+    def __init__(self, root, graph, session, hw_sliders=True):
         tk.Frame.__init__(self, root, bg='black')
         SubClient.__init__(self)
         self.graph = graph
         self.session = session
 
-        self.subbox = {} # sub uri : SubmasterBox
-        self.slider_table = {} # coords : SubmasterBox
-        self.rows = [] # this holds Tk Frames for each row
+        self.subbox = {}  # sub uri : SubmasterBox
+        self.slider_table = {}  # coords : SubmasterBox
+        self.rows = []  # this holds Tk Frames for each row
 
-        self.current_row = 0 # should come from session graph
+        self.current_row = 0  # should come from session graph
 
         self.use_hw_sliders = hw_sliders
         self.connect_to_hw(hw_sliders)
@@ -170,7 +202,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         self.codeWatcher = CodeWatcher(
             onChange=lambda: self.graph.addHandler(self.redraw_sliders))
-        
+
         self.send_levels_loop(delay=.05)
         self.graph.addHandler(self.rowFromGraph)
 
@@ -180,19 +212,28 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         self.sliders_status_var = tk.IntVar()
         self.sliders_status_var.set(self.use_hw_sliders)
-        self.sliders_checkbutton = tk.Checkbutton(self.buttonframe,
-            text="Sliders", variable=self.sliders_status_var,
+        self.sliders_checkbutton = tk.Checkbutton(
+            self.buttonframe,
+            text="Sliders",
+            variable=self.sliders_status_var,
             command=lambda: self.toggle_slider_connectedness(),
-            bg='black', fg='white')
+            bg='black',
+            fg='white')
         self.sliders_checkbutton.pack(side=tk.LEFT)
 
-        self.alltozerobutton = tk.Button(self.buttonframe, text="All to Zero",
-            command=self.alltozero, bg='black', fg='white')
+        self.alltozerobutton = tk.Button(self.buttonframe,
+                                         text="All to Zero",
+                                         command=self.alltozero,
+                                         bg='black',
+                                         fg='white')
         self.alltozerobutton.pack(side='left')
 
-        self.save_stage_button = tk.Button(self.buttonframe, text="Save",
+        self.save_stage_button = tk.Button(
+            self.buttonframe,
+            text="Save",
             command=lambda: self.save_current_stage(self.sub_name.get()),
-            bg='black', fg='white')
+            bg='black',
+            fg='white')
         self.save_stage_button.pack(side=tk.LEFT)
         self.sub_name = tk.Entry(self.buttonframe, bg='black', fg='white')
         self.sub_name.pack(side=tk.LEFT)
@@ -222,11 +263,9 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         withgroups = []
         for effect in self.graph.subjects(RDF.type, L9['Effect']):
-            withgroups.append((
-                self.graph.value(effect, L9['group']),
-                self.graph.value(effect, L9['order']),
-                self.graph.label(effect),
-                effect))
+            withgroups.append((self.graph.value(effect, L9['group']),
+                               self.graph.value(effect, L9['order']),
+                               self.graph.label(effect), effect))
         withgroups.sort()
 
         log.info("withgroups %s", withgroups)
@@ -240,13 +279,15 @@ class KeyboardComposer(tk.Frame, SubClient):
                 rowcount += 1
                 col = 0
 
-            subbox = SubmasterBox(row, self.graph, effect, self.session, col, rowcount)
+            subbox = SubmasterBox(row, self.graph, effect, self.session, col,
+                                  rowcount)
             subbox.place(relx=col / 8, rely=0, relwidth=1 / 8, relheight=1)
             self.subbox[effect] = self.slider_table[(rowcount, col)] = subbox
 
             self.setup_key_nudgers(subbox.scale)
 
-            self.effectEval[effect] = light9.effect.effecteval.EffectEval(self.graph, effect, simpleOutputs)
+            self.effectEval[effect] = light9.effect.effecteval.EffectEval(
+                self.graph, effect, simpleOutputs)
 
             col = (col + 1) % 8
             last_group = group
@@ -277,15 +318,19 @@ class KeyboardComposer(tk.Frame, SubClient):
         keyhintrow = tk.Frame(self)
 
         col = 0
-        for upkey, downkey in zip(nudge_keys['up'],
-                                  nudge_keys['down']):
+        for upkey, downkey in zip(nudge_keys['up'], nudge_keys['down']):
             # what a hack!
             downkey = downkey.replace('semicolon', ';')
             upkey, downkey = (upkey.upper(), downkey.upper())
 
             # another what a hack!
-            keylabel = tk.Label(keyhintrow, text='%s\n%s' % (upkey, downkey),
-                width=1, font=('Arial', 10), bg='red', fg='white', anchor='c')
+            keylabel = tk.Label(keyhintrow,
+                                text='%s\n%s' % (upkey, downkey),
+                                width=1,
+                                font=('Arial', 10),
+                                bg='red',
+                                fg='white',
+                                anchor='c')
             keylabel.pack(side=tk.LEFT, expand=1, fill=tk.X)
             col += 1
 
@@ -322,7 +367,9 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.change_row(self.current_row + diff)
 
     def rowFromGraph(self):
-        self.change_row(int(self.graph.value(self.session, L9['currentRow'], default=0)), fromGraph=True)
+        self.change_row(int(
+            self.graph.value(self.session, L9['currentRow'], default=0)),
+                        fromGraph=True)
 
     def change_row(self, row, fromGraph=False):
         old_row = self.current_row
@@ -357,8 +404,7 @@ class KeyboardComposer(tk.Frame, SubClient):
                 self.sliders.valueOut("button-upper%d" % col, False)
                 self.sliders.valueOut("slider%d" % col, 0)
                 continue
-            self.send_to_hw(sub=subbox.sub, hwCol=col,
-                            boxRow=self.current_row)
+            self.send_to_hw(sub=subbox.sub, hwCol=col, boxRow=self.current_row)
 
     def got_nudger(self, number, direction, full=0):
         try:
@@ -382,7 +428,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         try:
             subbox = self.slider_table[(self.current_row, col)]
         except KeyError:
-            return # no slider assigned at that column
+            return  # no slider assigned at that column
 
         if hasattr(self, 'pendingHwSet'):
             import twisted.internet.error
@@ -400,7 +446,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         if boxRow != self.current_row:
             return
-        
+
         try:
             level = self.get_levels()[sub]
         except KeyError:
@@ -421,13 +467,16 @@ class KeyboardComposer(tk.Frame, SubClient):
         """group is a URI or None"""
         row = tk.Frame(self, bd=2, bg='black')
         row.subGroup = group
+
         def onDrop(ev):
             self.change_group(sub=URIRef(ev.data), row=row)
             return "link"
-        
-        dropTargetRegister(row, onDrop=onDrop, typeList=['*'],
+
+        dropTargetRegister(row,
+                           onDrop=onDrop,
+                           typeList=['*'],
                            hoverStyle=dict(background="#555500"))
-        
+
         row.pack(expand=1, fill=tk.BOTH)
         self.setup_key_nudgers(row)
         self.rows.append(row)
@@ -437,9 +486,10 @@ class KeyboardComposer(tk.Frame, SubClient):
         """update this sub's group, and maybe other sub groups as needed, so
         this sub displays in this row"""
         group = row.subGroup
-        self.graph.patchObject(
-            context=self.session,
-            subject=sub, predicate=L9['group'], newObject=group)
+        self.graph.patchObject(context=self.session,
+                               subject=sub,
+                               predicate=L9['group'],
+                               newObject=group)
 
     def highlight_row(self, row):
         row = self.rows[row]
@@ -450,8 +500,9 @@ class KeyboardComposer(tk.Frame, SubClient):
         row['bg'] = 'black'
 
     def get_levels(self):
-        return dict([(uri, box.slider_var.get())
-            for uri, box in self.subbox.items()])
+        return dict([
+            (uri, box.slider_var.get()) for uri, box in self.subbox.items()
+        ])
 
     def get_output_settings(self, _graph=None):
         _graph = _graph or self.graph
@@ -481,17 +532,18 @@ class KeyboardComposer(tk.Frame, SubClient):
             (effect, RDF.type, L9['Effect'], ctx),
             (effect, RDFS.label, Literal(subname), ctx),
             (effect, L9['publishAttr'], L9['strength'], ctx),
-            ])
+        ])
 
         self.graph.suggestPrefixes(ctx, {'eff': effect + '/'})
         self.graph.patch(Patch(addQuads=stmts, delQuads=[]))
-              
+
         self.sub_name.delete(0, tk.END)
 
     def alltozero(self):
         for uri, subbox in self.subbox.items():
             if subbox.scale.scale_var.get() != 0:
                 subbox.scale.fade(value=0.0, length=0)
+
 
 # move to web lib
 def postArgGetter(request):
@@ -500,19 +552,23 @@ def postArgGetter(request):
     support for repeated args."""
     # this is something nevow normally does for me
     request.content.seek(0)
-    fields = cgi.FieldStorage(request.content, request.received_headers,
+    fields = cgi.FieldStorage(request.content,
+                              request.received_headers,
                               environ={'REQUEST_METHOD': 'POST'})
+
     def getArg(n):
         try:
             return request.args[n][0]
         except KeyError:
             return fields[n].value
+
     return getArg
 
 
 class LevelServerHttp(resource.Resource):
     isLeaf = True
-    def __init__(self,name_to_subbox):
+
+    def __init__(self, name_to_subbox):
         self.name_to_subbox = name_to_subbox
 
     def render_POST(self, request):
@@ -521,15 +577,18 @@ class LevelServerHttp(resource.Resource):
         if request.path == '/fadesub':
             # fadesub?subname=scoop&level=0&secs=.2
             self.name_to_subbox[arg('subname')].scale.fade(
-                float(arg('level')),
-                float(arg('secs')))
+                float(arg('level')), float(arg('secs')))
             return "set %s to %s" % (arg('subname'), arg('level'))
         else:
             raise NotImplementedError(repr(request))
 
+
 class Sliders(BCF2000):
+
     def __init__(self, kc):
-        devices = ['/dev/snd/midiC3D0', '/dev/snd/midiC2D0', '/dev/snd/midiC1D0']
+        devices = [
+            '/dev/snd/midiC3D0', '/dev/snd/midiC2D0', '/dev/snd/midiC1D0'
+        ]
         for dev in devices:
             try:
                 BCF2000.__init__(self, dev=dev)
@@ -541,6 +600,7 @@ class Sliders(BCF2000):
 
         self.kc = kc
         log.info('found sliders on %s', dev)
+
     def valueIn(self, name, value):
         kc = self.kc
         if name.startswith("slider"):
@@ -572,21 +632,25 @@ class Sliders(BCF2000):
             kc.change_row(kc.current_row + diff)
             self.valueOut(name, 0)
 
+
 def launch(opts, root, graph, session):
     tl = toplevelat("Keyboard Composer - %s" % opts.session,
-                    existingtoplevel=root, graph=graph, session=session)
+                    existingtoplevel=root,
+                    graph=graph,
+                    session=session)
 
-    kc = KeyboardComposer(tl, graph, session,
-                          hw_sliders=not opts.no_sliders)
+    kc = KeyboardComposer(tl, graph, session, hw_sliders=not opts.no_sliders)
     kc.pack(fill=tk.BOTH, expand=1)
 
     for helpline in ["Bindings: B3 mute"]:
-        tk.Label(root,text=helpline, font="Helvetica -12 italic",
-                 anchor='w').pack(side='top',fill='x')
-            
+        tk.Label(root, text=helpline, font="Helvetica -12 italic",
+                 anchor='w').pack(side='top', fill='x')
+
+
 if __name__ == "__main__":
     parser = OptionParser()
-    parser.add_option('--no-sliders', action='store_true',
+    parser.add_option('--no-sliders',
+                      action='store_true',
                       help="don't attach to hardware sliders")
     clientsession.add_option(parser)
     parser.add_option('-v', action='store_true', help="log info level")
@@ -598,16 +662,16 @@ if __name__ == "__main__":
 
     # i think this also needs delayed start (like subcomposer has), to have a valid graph
     # before setting any stuff from the ui
-    
+
     root = tk.Tk()
     initTkdnd(root.tk, 'tkdnd/trunk/')
 
     session = clientsession.getUri('keyboardcomposer', opts)
 
-    graph.initiallySynced.addCallback(
-        lambda _: launch(opts, root, graph, session))
+    graph.initiallySynced.addCallback(lambda _: launch(opts, root, graph,
+                                                       session))
 
     root.protocol('WM_DELETE_WINDOW', reactor.stop)
 
-    tksupport.install(root,ms=20)
+    tksupport.install(root, ms=20)
     prof.run(reactor.run, profile=None)

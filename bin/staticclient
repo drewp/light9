@@ -16,7 +16,8 @@ from light9 import dmxclient, showconfig, networking
 
 if __name__ == "__main__":
     parser = OptionParser(usage="%prog")
-    parser.add_option('--chan', help='channel number, starts at 1', type=int) #todo: or name or uri
+    parser.add_option('--chan', help='channel number, starts at 1',
+                      type=int)  #todo: or name or uri
     parser.add_option('--level', help='0..1', type=float)
     parser.add_option('-v', action='store_true', help="log debug level")
 
@@ -26,9 +27,11 @@ if __name__ == "__main__":
 
     levels = [0] * (opts.chan - 1) + [opts.level]
     log.info('staticclient will write this forever: %r', levels)
+
     def write():
         log.debug('writing %r', levels)
         dmxclient.outputlevels(levels, twisted=1)
+
     log.info('looping...')
     task.LoopingCall(write).start(1)
     reactor.run()

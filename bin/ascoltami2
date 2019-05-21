@@ -4,7 +4,7 @@ from twisted.internet import reactor
 import web, thread, sys, optparse, logging
 from rdflib import URIRef
 sys.path.append(".")
-sys.path.append('/usr/lib/python2.7/dist-packages') # For gi
+sys.path.append('/usr/lib/python2.7/dist-packages')  # For gi
 
 import gi
 gi.require_version('Gst', '1.0')
@@ -17,7 +17,9 @@ from light9 import networking, showconfig
 
 from gi.repository import GObject, Gst, Gtk
 
+
 class App(object):
+
     def __init__(self, graph, show):
         self.graph = graph
         self.player = Player(onEOS=self.onEOS)
@@ -32,21 +34,27 @@ class App(object):
 
         try:
             nextSong = self.playlist.nextSong(thisSongUri)
-        except NoSuchSong: # we're at the end of the playlist
+        except NoSuchSong:  # we're at the end of the playlist
             return
 
         self.player.setSong(songLocation(graph, nextSong), play=False)
+
 
 if __name__ == "__main__":
     GObject.threads_init()
     Gst.init(None)
 
     parser = optparse.OptionParser()
-    parser.add_option('--show',
-        help='show URI, like http://light9.bigasterisk.com/show/dance2008', default=showconfig.showUri())
-    parser.add_option("-v", "--verbose", action="store_true",
+    parser.add_option(
+        '--show',
+        help='show URI, like http://light9.bigasterisk.com/show/dance2008',
+        default=showconfig.showUri())
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
                       help="logging.DEBUG")
-    parser.add_option("--twistedlog", action="store_true",
+    parser.add_option("--twistedlog",
+                      action="store_true",
                       help="twisted logging")
     (options, args) = parser.parse_args()
 
@@ -54,7 +62,7 @@ if __name__ == "__main__":
 
     if not options.show:
         raise ValueError("missing --show http://...")
-            
+
     graph = showconfig.getGraph()
     app = App(graph, URIRef(options.show))
     if options.twistedlog:

@@ -1,5 +1,4 @@
 #!/usr/bin/python
-
 """
 
 dvcam test
@@ -15,7 +14,9 @@ from light9.vidref.videorecorder import Pipeline
 from light9.vidref import remotepivideo
 log = logging.getLogger()
 
+
 class Gui(object):
+
     def __init__(self, graph):
         wtree = gtk.Builder()
         wtree.add_from_file(sibpath(__file__, "vidref.glade"))
@@ -28,7 +29,8 @@ class Gui(object):
         self.musicScale = wtree.get_object("musicScale")
         self.musicScale.connect("value-changed", self.onMusicScaleValue)
         # tiny race here if onMusicScaleValue tries to use musicTime right away
-        self.musicTime = MusicTime(onChange=self.onMusicTimeChange, pollCurvecalc=False)
+        self.musicTime = MusicTime(onChange=self.onMusicTimeChange,
+                                   pollCurvecalc=False)
         self.ignoreScaleChanges = False
         # self.attachLog(wtree.get_object("lastLog")) # disabled due to crashing
 
@@ -40,33 +42,31 @@ class Gui(object):
         vid3 = wtree.get_object("vid3")
 
         if 0:
-            self.pipeline = Pipeline(
-                liveVideoXid=vid3.window.xid,
-                musicTime=self.musicTime,
-                recordingTo=self.recordingTo)
+            self.pipeline = Pipeline(liveVideoXid=vid3.window.xid,
+                                     musicTime=self.musicTime,
+                                     recordingTo=self.recordingTo)
         else:
-            self.pipeline = remotepivideo.Pipeline(
-                liveVideo=vid3,
-                musicTime=self.musicTime,
-                recordingTo=self.recordingTo,
-                graph=graph)
+            self.pipeline = remotepivideo.Pipeline(liveVideo=vid3,
+                                                   musicTime=self.musicTime,
+                                                   recordingTo=self.recordingTo,
+                                                   graph=graph)
 
         vid3.props.width_request = 360
         vid3.props.height_request = 220
         wtree.get_object("frame1").props.height_request = 220
-        
 
-        self.pipeline.setInput('v4l') # auto seems to not search for dv
+        self.pipeline.setInput('v4l')  # auto seems to not search for dv
 
         gobject.timeout_add(1000 // framerate, self.updateLoop)
 
-
     def snapshot(self):
         return self.pipeline.snapshot()
-        
+
     def attachLog(self, textBuffer):
         """write log lines to this gtk buffer"""
+
         class ToBuffer(logging.Handler):
+
             def emit(self, record):
                 textBuffer.set_text(record.getMessage())
 
@@ -86,10 +86,9 @@ class Gui(object):
     def getInputs(self):
         return ['auto', 'dv', 'video0']
 
-
     def on_liveVideoEnabled_toggled(self, widget):
         self.pipeline.setLiveVideo(widget.get_active())
-                                                   
+
     def on_liveFrameRate_value_changed(self, widget):
         print widget.get_value()
 

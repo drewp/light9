@@ -26,15 +26,18 @@ from rdfdb.patch import Patch
 
 stats = scales.collection('/webServer', scales.PmfStat('setAttr'))
 
+
 class Camera(object):
+
     def __init__(self, imageUrl):
         self.imageUrl = imageUrl
-    
+
     def takePic(self, uri, writePath):
         log.info('takePic %s', uri)
-        return treq.get(self.imageUrl).addCallbacks(
-            lambda r: self._done(writePath, r), log.error)
-        
+        return treq.get(
+            self.imageUrl).addCallbacks(lambda r: self._done(writePath, r),
+                                        log.error)
+
     @inlineCallbacks
     def _done(self, writePath, response):
         jpg = yield response.content()
@@ -46,18 +49,21 @@ class Camera(object):
             out.write(jpg)
         log.info('wrote %s', writePath)
 
+
 def deferSleep(sec):
     d = Deferred()
     reactor.callLater(sec, d.callback, None)
     return d
-    
+
+
 class Capture(object):
     firstMoveTime = 3
     settleTime = .5
+
     def __init__(self, graph, dev):
         self.graph = graph
         self.dev = dev
-        
+
         def steps(a, b, n):
             return [round(a + (b - a) * i / n, 5) for i in range(n)]
 
@@ -72,8 +78,8 @@ class Capture(object):
         # aura
         rxSteps = steps(0.15, .95, 10)
         rySteps = steps(0, .9, 5)
-        zoomSteps = steps(.6, .9, 3)       
-        
+        zoomSteps = steps(.6, .9, 3)
+
         row = 0
         for ry in rySteps:
             xSteps = rxSteps[:]
@@ -82,31 +88,36 @@ class Capture(object):
             row += 1
             for rx in xSteps:
                 for zoom in zoomSteps:
-                    self.toGather.append(DeviceSettings(graph, [
-                        (dev, L9['rx'], rx),
-                        (dev, L9['ry'], ry),
-                        (dev, L9['color'], '#ffffff'),
-                        (dev, L9['zoom'], zoom),
-                        #(dev, L9['focus'], 0.13),
-                    ]))
+                    self.toGather.append(
+                        DeviceSettings(
+                            graph,
+                            [
+                                (dev, L9['rx'], rx),
+                                (dev, L9['ry'], ry),
+                                (dev, L9['color'], '#ffffff'),
+                                (dev, L9['zoom'], zoom),
+                                #(dev, L9['focus'], 0.13),
+                            ]))
 
         self.devTail = dev.rsplit('/')[-1]
-        self.session = URIRef('/'.join([showconfig.showUri(),
-                                   'capture', self.devTail, self.captureId]))
+        self.session = URIRef('/'.join(
+            [showconfig.showUri(), 'capture', self.devTail, self.captureId]))
         self.ctx = URIRef(self.session + '/index')
-                
-        self.graph.patch(Patch(addQuads=[
-            (self.session, RDF.type, L9['CaptureSession'], self.ctx),
-        ]))
-                
+
+        self.graph.patch(
+            Patch(addQuads=[
+                (self.session, RDF.type, L9['CaptureSession'], self.ctx),
+            ]))
+
         self.numPics = 0
         self.settingsCache = set()
         self.step().addErrback(log.error)
 
     def off(self):
-        return sendToCollector(client='captureDevice', session='main',
+        return sendToCollector(client='captureDevice',
+                               session='main',
                                settings=DeviceSettings(self.graph, []))
-        
+
     @inlineCallbacks
     def step(self):
         if not self.toGather:
@@ -115,61 +126,73 @@ class Capture(object):
             reactor.stop()
             return
         settings = self.toGather.pop()
-        
+
         log.info('[%s left] move to %r', len(self.toGather), settings)
-        yield sendToCollector(client='captureDevice', session='main',
+        yield sendToCollector(client='captureDevice',
+                              session='main',
                               settings=settings)
-        
-        yield deferSleep(self.firstMoveTime if self.numPics == 0 else
-                         self.settleTime)
-        
+
+        yield deferSleep(self.firstMoveTime if self.numPics ==
+                         0 else self.settleTime)
+
         picId = 'pic%s' % self.numPics
-        path = '/'.join([
-            'capture', self.devTail, self.captureId, picId]) + '.jpg'
+        path = '/'.join(['capture', self.devTail, self.captureId, picId
+                        ]) + '.jpg'
         uri = URIRef(self.session + '/' + picId)
-        
+
         yield camera.takePic(uri, os.path.join(showconfig.root(), path))
         self.numPics += 1
 
         writeCaptureDescription(self.graph, self.ctx, self.session, uri,
-                                self.dev,
-                                path, self.settingsCache, settings)
-        
+                                self.dev, path, self.settingsCache, settings)
+
         reactor.callLater(0, self.step)
 
-        
 
-camera = Camera('http://plus:8200/picamserve/pic?res=1080&resize=800&iso=800&redgain=1.6&bluegain=1.6&shutter=60000&x=0&w=1&y=0&h=.952')
+camera = Camera(
+    'http://plus:8200/picamserve/pic?res=1080&resize=800&iso=800&redgain=1.6&bluegain=1.6&shutter=60000&x=0&w=1&y=0&h=.952'
+)
+
 
 class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
+
     def put(self):
         with stats.setAttr.time():
-            client, clientSession, settings, sendTime = parseJsonMessage(self.request.body)
+            client, clientSession, settings, sendTime = parseJsonMessage(
+                self.request.body)
             self.set_status(202)
+
 
 def launch(graph):
 
     cap = Capture(graph, dev=L9['device/aura5'])
     reactor.listenTCP(networking.captureDevice.port,
                       cyclone.web.Application(handlers=[
-                          (r'/()', cyclone.web.StaticFileHandler,
-                           {"path" : "light9/web", "default_filename" : "captureDevice.html"}),
+                          (r'/()', cyclone.web.StaticFileHandler, {
+                              "path": "light9/web",
+                              "default_filename": "captureDevice.html"
+                          }),
                           (r'/stats', StatsForCyclone),
                       ]),
                       interface='::')
     log.info('serving http on %s', networking.captureDevice.port)
-    
+
+
 def main():
     parser = optparse.OptionParser()
-    parser.add_option("-v", "--verbose", action="store_true",
+    parser.add_option("-v",
+                      "--verbose",
+                      action="store_true",
                       help="logging.DEBUG")
     (options, args) = parser.parse_args()
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
     graph = SyncedGraph(networking.rdfdb.url, "captureDevice")
 
-    graph.initiallySynced.addCallback(lambda _: launch(graph)).addErrback(log.error)
+    graph.initiallySynced.addCallback(lambda _: launch(graph)).addErrback(
+        log.error)
     reactor.run()
+
 
 if __name__ == '__main__':
     main()

@@ -9,7 +9,9 @@ from Queue import Queue, Empty
 from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
 log = logging.getLogger()
 
+
 class Pipeline(object):
+
     def __init__(self, liveVideoXid, musicTime, recordingTo):
         self.musicTime = musicTime
         self.liveVideoXid = liveVideoXid
@@ -28,28 +30,31 @@ class Pipeline(object):
         but I haven't noticed that being a problem yet.
         """
         d = defer.Deferred()
+
         def req(frame):
             filename = "%s/%s.jpg" % (snapshotDir(), time.time())
             log.debug("received snapshot; saving in %s", filename)
             frame.save(filename)
             d.callback(filename)
+
         log.debug("requesting snapshot")
         self.snapshotRequests.put(req)
         return d
-        
+
     def setInput(self, name):
         sourcePipe = {
             "auto": "autovideosrc name=src1",
-            "testpattern" : "videotestsrc name=src1",
+            "testpattern": "videotestsrc name=src1",
             "dv": "dv1394src name=src1 ! dvdemux ! dvdec",
-            "v4l": "v4l2src device=/dev/video0 name=src1" ,
-            }[name]
+            "v4l": "v4l2src device=/dev/video0 name=src1",
+        }[name]
 
-        cam = (sourcePipe + " ! "
-              "videorate ! video/x-raw-yuv,framerate=%s/1 ! "
-              "videoscale ! video/x-raw-yuv,width=640,height=480;video/x-raw-rgb,width=320,height=240 ! "
-              "videocrop left=160 top=180 right=120 bottom=80 ! "
-              "queue name=vid" % framerate)
+        cam = (
+            sourcePipe + " ! "
+            "videorate ! video/x-raw-yuv,framerate=%s/1 ! "
+            "videoscale ! video/x-raw-yuv,width=640,height=480;video/x-raw-rgb,width=320,height=240 ! "
+            "videocrop left=160 top=180 right=120 bottom=80 ! "
+            "queue name=vid" % framerate)
 
         print cam
         self.pipeline = gst.parse_launch(cam)
@@ -58,8 +63,9 @@ class Pipeline(object):
             e = gst.element_factory_make(t, n)
             self.pipeline.add(e)
             return e
-        
+
         sink = makeElem("xvimagesink")
+
         def setRec(t):
             # if you're selecting the text while gtk is updating it,
             # you can get a crash in xcb_io
@@ -68,21 +74,22 @@ class Pipeline(object):
             with gtk.gdk.lock:
                 self.recordingTo.set_text(t)
             self._lastRecText = t
+
         recSink = VideoRecordSink(self.musicTime, setRec, self.snapshotRequests)
         self.pipeline.add(recSink)
 
         tee = makeElem("tee")
-        
+
         caps = makeElem("capsfilter")
         caps.set_property('caps', gst.caps_from_string('video/x-raw-rgb'))
 
         gst.element_link_many(self.pipeline.get_by_name("vid"), tee, sink)
         gst.element_link_many(tee, makeElem("ffmpegcolorspace"), caps, recSink)
         sink.set_xwindow_id(self.liveVideoXid)
-        self.pipeline.set_state(gst.STATE_PLAYING)        
+        self.pipeline.set_state(gst.STATE_PLAYING)
 
     def setLiveVideo(self, on):
-        
+
         if on:
             self.pipeline.set_state(gst.STATE_PLAYING)
             # this is an attempt to bring the dv1394 source back, but
@@ -91,13 +98,11 @@ class Pipeline(object):
                 gst.FORMAT_TIME, gst.SEEK_FLAG_FLUSH, 0 * gst.SECOND)
         else:
             self.pipeline.set_state(gst.STATE_READY)
-                                                   
+
 
 class VideoRecordSink(gst.Element):
-    _sinkpadtemplate = gst.PadTemplate ("sinkpadtemplate",
-                                        gst.PAD_SINK,
-                                        gst.PAD_ALWAYS,
-                                        gst.caps_new_any())
+    _sinkpadtemplate = gst.PadTemplate("sinkpadtemplate", gst.PAD_SINK,
+                                       gst.PAD_ALWAYS, gst.caps_new_any())
 
     def __init__(self, musicTime, updateRecordingTo, snapshotRequests):
         gst.Element.__init__(self)
@@ -107,14 +112,15 @@ class VideoRecordSink(gst.Element):
         self.add_pad(self.sinkpad)
         self.sinkpad.set_chain_function(self.chainfunc)
         self.lastTime = 0
-        
+
         self.musicTime = musicTime
 
         self.imagesToSave = Queue()
         self.startBackgroundImageSaver(self.imagesToSave)
-        
+
     def startBackgroundImageSaver(self, imagesToSave):
         """do image saves in another thread to not block gst"""
+
         def imageSaver():
             while True:
                 args = imagesToSave.get()
@@ -135,7 +141,7 @@ class VideoRecordSink(gst.Element):
                 else:
                     req(args[1])
                     self.snapshotRequests.task_done()
-        
+
         t = Thread(target=imageSaver)
         t.setDaemon(True)
         t.start()
@@ -159,14 +165,14 @@ class VideoRecordSink(gst.Element):
 
     def saveImg(self, position, img, bufferTimestamp):
         if not position['song']:
-            return 
-        
+            return
+
         t1 = time.time()
         outDir = takeDir(songDir(position['song']), position['started'])
         outFilename = "%s/%08.03f.jpg" % (outDir, position['t'])
-        if os.path.exists(outFilename): # we're paused on one time
+        if os.path.exists(outFilename):  # we're paused on one time
             return
-        
+
         try:
             os.makedirs(outDir)
         except OSError:
@@ -175,11 +181,10 @@ class VideoRecordSink(gst.Element):
         img.save(outFilename)
 
         now = time.time()
-        log.info("wrote %s delay of %.2fms, took %.2fms",
-                  outFilename,
-                  (now - self.lastTime) * 1000,
-                  (now - t1) * 1000)
+        log.info("wrote %s delay of %.2fms, took %.2fms", outFilename,
+                 (now - self.lastTime) * 1000, (now - t1) * 1000)
         self.updateRecordingTo(outDir)
         self.lastTime = now
+
 
 gobject.type_register(VideoRecordSink)
