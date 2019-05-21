@@ -1,13 +1,12 @@
 ### setup ###
 
 packages:
-	sudo aptitude install coffeescript normalize-audio audacity python-pygame libffi-dev tix libzmq3-dev python-dev libssl-dev python-opencv python-cairo npm git python-virtualenv nginx-full python-tk
+	sudo aptitude install coffeescript normalize-audio audacity python3-pygame libffi-dev tix libzmq3-dev python3-dev libssl-dev python3-opencv python3-cairo npm git python3-virtualenv nginx-full python3-tk
 
 gst_packages:
-	sudo aptitude install python-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio python-gst-1.0 python-pygoocanvas gir1.2-goocanvas-2.0
+	sudo aptitude install python3-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio python3-gst-1.0 gir1.2-goocanvas-2.0
 
-PYTHON=/usr/bin/pypy
-PYTHON=/usr/bin/python
+PYTHON=/usr/bin/python3
 
 create_virtualenv:
 	mkdir -p env
@@ -15,29 +14,8 @@ create_virtualenv:
 	env/bin/pip install -U pip
 	ln -sf ../env/bin/python bin/python
 
-
-install_python_deps: link_to_sys_packages
-	env/bin/pip install twisted
-	env/bin/pip install -U -r requirements.txt
-
-DP=/usr/lib/python2.7/dist-packages
-SP=env/lib/python2.7/site-packages
-
-link_to_sys_packages:
-	# http://stackoverflow.com/questions/249283/virtualenv-on-ubuntu-with-no-site-packages
-	ln -sf $(DP)/glib $(SP)/
-	ln -sf $(DP)/gi $(SP)/
-	ln -sf $(DP)/gobject $(SP)/
-	ln -sf $(DP)/cairo $(SP)/
-	ln -sf $(DP)/gtk-2.0 $(SP)/
-	ln -sf $(DP)/pygtk.py $(SP)/
-	ln -sf $(DP)/pygtk.pth $(SP)/
-	ln -sf $(DP)/pygst.pth $(SP)/
-	ln -sf $(DP)/pygst.py $(SP)/
-	ln -sf $(DP)/gst-0.10 $(SP)/
-	ln -sf $(DP)/goocanvasmodule.so $(SP)/
-	ln -sf $(DP)/cv2.x86_64-linux-gnu.so $(SP)/
-	ln -sf $(DP)/cv.py $(SP)/
+install_python_deps:
+	env/bin/pip install --index-url https://projects.bigasterisk.com/ --extra-index-url https://pypi.org/simple -U -r requirements.txt
 
 binexec:
 	chmod a+x bin/*
@@ -67,21 +45,16 @@ tkdnd_build:
 	./configure
 	make
 
-env-mypy/bin/mypy:
-	mkdir -p env-mypy
-	virtualenv -p /usr/bin/python3  env-mypy/
-	env-mypy/bin/pip install mypy==0.590 lxml==4.2.1
-
 ### build ###
 
 coffee:
 	zsh -c 'cd light9/web; ../../node_modules/coffeescript/bin/coffee --map -cw {.,live,timeline,paint,effects}/*.coffee'
 
-mypy-collector: env-mypy/bin/mypy
-	env-mypy/bin/mypy --py2 --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep bin/collector light9/collector/*.py
+mypy-collector:
+	env/bin/mypy --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep bin/collector light9/collector/*.py
 
-mypy-paint: env-mypy/bin/mypy
-	env-mypy/bin/mypy --py2 --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep light9/paint/*.py
+mypy-paint:
+	env/bin/mypy --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep light9/paint/*.py
 
 ### show ###
 
@@ -92,11 +65,11 @@ darcs_show_checkpoint:
 ### pi setup ###
 
 raspberry_pi_packages:
-	sudo apt-get install python-picamera python-dev python-twisted python-virtualenv
+	sudo apt-get install python3-picamera python3-dev python3-twisted python3-virtualenv
 
 raspberry_pi_virtualenv:
 	mkdir -p env_pi
-	virtualenv --system-site-packages env_pi
+	virtualenv -p /usr/bin/python3 --system-site-packages env_pi
 	env_pi/bin/pip install cyclone 'coloredlogs==6.0'
 
 ### arduino build ###
