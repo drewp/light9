@@ -1,4 +1,3 @@
-
 from rdflib import Literal
 from decimal import Decimal
 from webcolors import rgb_to_hex, hex_to_rgb

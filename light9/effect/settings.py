@@ -1,4 +1,3 @@
-
 """
 Data structure and convertors for a table of (device,attr,value)
 rows. These might be effect attrs ('strength'), device attrs ('rx'),

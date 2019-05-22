@@ -1,4 +1,3 @@
-
 import logging
 import usb.core
 from usb.util import CTRL_TYPE_VENDOR, CTRL_RECIPIENT_DEVICE, CTRL_OUT

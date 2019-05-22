@@ -1,4 +1,3 @@
-
 from light9 import networking
 from light9.effect.settings import DeviceSettings
 from twisted.internet import defer

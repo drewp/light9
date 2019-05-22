@@ -1,4 +1,3 @@
-
 import math, logging, traceback
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -555,8 +554,8 @@ class Curveview(object):
 
     def print_state(self, msg=""):
         if 0:
-            print("%s: dragging_dots=%s selecting=%s" % (
-                msg, self.dragging_dots, self.selecting))
+            print("%s: dragging_dots=%s selecting=%s" %
+                  (msg, self.dragging_dots, self.selecting))
 
     def select_points(self, pts):
         """set selection to the given point values (tuples, not indices)"""

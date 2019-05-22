@@ -1,6 +1,5 @@
 #!bin/python
 
-
 from run_local import log
 import json
 from twisted.internet import reactor

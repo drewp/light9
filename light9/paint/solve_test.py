@@ -69,7 +69,7 @@ class TestSimulationLayers(unittest.TestCase):
             settings=DeviceSettings(self.graph, [(
                 DEV['aura1'], L9['color'],
                 "#ffffff"), (DEV['aura1'], L9['rx'],
-                              0.5), (DEV['aura1'], L9['ry'], 0.573)]))
+                             0.5), (DEV['aura1'], L9['ry'], 0.573)]))
         self.assertEqual([{
             'path': CAM_TEST['bg2-d.jpg'],
             'color': (1., 1., 1.)
@@ -80,7 +80,7 @@ class TestSimulationLayers(unittest.TestCase):
             settings=DeviceSettings(self.graph, [(
                 DEV['aura1'], L9['color'],
                 "#304050"), (DEV['aura1'], L9['rx'],
-                              0.5), (DEV['aura1'], L9['ry'], 0.573)]))
+                             0.5), (DEV['aura1'], L9['ry'], 0.573)]))
         self.assertEqual([{
             'path': CAM_TEST['bg2-d.jpg'],
             'color': (.188, .251, .314)

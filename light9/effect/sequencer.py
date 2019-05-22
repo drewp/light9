@@ -2,7 +2,6 @@
 copies from effectloop.py, which this should replace
 '''
 
-
 from louie import dispatcher
 from rdflib import URIRef
 from twisted.internet import reactor

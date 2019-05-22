@@ -1,4 +1,3 @@
-
 from rdflib import URIRef, Literal
 from light9.namespaces import L9, RDF, DEV
 from webcolors import rgb_to_hex, hex_to_rgb

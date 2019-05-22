@@ -1,6 +1,5 @@
 #!bin/python
 
-
 import run_local
 import sys, logging
 

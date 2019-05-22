@@ -16,7 +16,6 @@ subcomposer
 
 """
 
-
 from run_local import log
 import time, logging
 
@@ -161,8 +160,8 @@ class Subcomposer(tk.Frame):
         graph = self.graph
 
         def ann():
-            print("currently: session=%s currentSub=%r _currentChoice=%r" % (
-                self.session, self.currentSub(), self._currentChoice()))
+            print("currently: session=%s currentSub=%r _currentChoice=%r" %
+                  (self.session, self.currentSub(), self._currentChoice()))
 
         @graph.addHandler
         def graphChanged():

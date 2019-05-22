@@ -1,4 +1,3 @@
-
 import traceback
 from light9.namespaces import L9, RDF
 from light9.effect.scale import scale

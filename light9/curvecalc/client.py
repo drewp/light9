@@ -12,8 +12,10 @@ def sendLiveInputPoint(curve, value):
                                  method='POST',
                                  timeout=1,
                                  postdata=urllib.parse.urlencode({
-                                     'curve': curve,
-                                     'value': str(value),
+                                     'curve':
+                                     curve,
+                                     'value':
+                                     str(value),
                                  }))
 
     @f.addCallback

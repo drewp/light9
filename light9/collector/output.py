@@ -1,4 +1,3 @@
-
 from rdflib import URIRef
 import sys
 import time

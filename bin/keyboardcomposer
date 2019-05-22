@@ -1,6 +1,5 @@
 #!bin/python
 
-
 from run_local import log
 import cgi, time, logging
 from optparse import OptionParser
@@ -501,9 +500,8 @@ class KeyboardComposer(tk.Frame, SubClient):
         row['bg'] = 'black'
 
     def get_levels(self):
-        return dict([
-            (uri, box.slider_var.get()) for uri, box in list(self.subbox.items())
-        ])
+        return dict([(uri, box.slider_var.get())
+                     for uri, box in list(self.subbox.items())])
 
     def get_output_settings(self, _graph=None):
         _graph = _graph or self.graph

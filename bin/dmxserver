@@ -24,7 +24,6 @@ todo:
   if parport fails, run in dummy mode (and make an option for that too)
 """
 
-
 from twisted.internet import reactor
 from twisted.web import xmlrpc, server
 import sys, time, os
@@ -127,7 +126,7 @@ class XMLRPCServe(xmlrpc.XMLRPC):
             lastseen = self.lastseen[cid]
             if lastseen < now - purge_age:
                 print(("forgetting client %s (no activity for %s sec)" %
-                      (cid, purge_age)))
+                       (cid, purge_age)))
                 try:
                     del self.clientlevels[cid]
                 except KeyError:
@@ -184,8 +183,8 @@ class XMLRPCServe(xmlrpc.XMLRPC):
 
     def printlevels(self):
         """write all the levels to stdout"""
-        print("Levels:", "".join(
-            ["% 2d " % (x * 100) for x in self.combinedlevels]))
+        print("Levels:",
+              "".join(["% 2d " % (x * 100) for x in self.combinedlevels]))
 
     def printstats(self):
         """print the clock, freq, etc, with a \r at the end"""

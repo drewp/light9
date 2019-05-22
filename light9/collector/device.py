@@ -1,4 +1,3 @@
-
 import logging
 import math
 from light9.namespaces import L9, RDF, DEV

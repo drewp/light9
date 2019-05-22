@@ -1,4 +1,3 @@
-
 from light9.namespaces import RDF, L9, DEV
 from PIL import Image
 import numpy

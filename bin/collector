@@ -7,7 +7,6 @@ custom code for some attributes.
 Input can be over http or zmq.
 """
 
-
 from run_local import log
 
 from rdflib import URIRef, Literal

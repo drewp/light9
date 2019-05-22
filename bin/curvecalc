@@ -9,7 +9,6 @@ todo: curveview should preserve more objects, for speed maybe
 
 """
 
-
 import sys
 import imp
 sys.path.append('/usr/lib/python2.7/dist-packages')  # For gtk
@@ -413,7 +412,8 @@ class Main(object):
             ('input time', lambda t: "%.2fs" % t),
             ('output levels', lambda levels: textwrap.fill(
                 "; ".join([
-                    "%s:%.2f" % (n, v) for n, v in list(levels.items())[:2] if v > 0
+                    "%s:%.2f" % (n, v) for n, v in list(levels.items())[:2] if v
+                    > 0
                 ]), 70)),
             ('update period', lambda t: "%.1fms" % (t * 1000)),
             ('update status', lambda x: str(x)),

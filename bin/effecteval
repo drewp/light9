@@ -1,6 +1,5 @@
 #!bin/python
 
-
 from run_local import log
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue

@@ -55,7 +55,8 @@ class pad(tk.Frame):
         self.master.after_idle(self.output)
 
     def output(self):
-        dmx = sub_maxes(*[s * l for s, l in list(self.levs.items())]).get_dmx_list()
+        dmx = sub_maxes(*[s * l
+                          for s, l in list(self.levs.items())]).get_dmx_list()
         dmxclient.outputlevels(dmx, clientid="bumppad")
 
 

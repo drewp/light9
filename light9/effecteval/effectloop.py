@@ -1,4 +1,3 @@
-
 import time, json, logging, traceback
 import numpy
 import serial
@@ -182,8 +181,9 @@ class EffectLoop(object):
                 self.lastLogTime = now
 
     def logMessage(self, out):
-        return ("send dmx: {%s}" % ", ".join(
-            "%r: %.3g" % (str(k), v) for k, v in list(out.get_levels().items())))
+        return ("send dmx: {%s}" %
+                ", ".join("%r: %.3g" % (str(k), v)
+                          for k, v in list(out.get_levels().items())))
 
 
 Z = numpy.zeros((50, 3), dtype=numpy.float16)
