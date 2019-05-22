@@ -45,7 +45,7 @@ class Hover(object):
         self.oldStyle = {}
 
     def set(self, ev):
-        for k, v in self.style.items():
+        for k, v in list(self.style.items()):
             self.oldStyle[k] = self.widget.cget(k)
         self.widget.configure(**self.style)
         return ev.action

@@ -1,4 +1,4 @@
-import Tkinter as tk
+import tkinter as tk
 from rdflib import URIRef
 from light9.tkdnd import dragSourceRegister, dropTargetRegister
 
@@ -110,7 +110,7 @@ class EditChoice(object):
 
     def updateLabel(self):
         uri = self.resourceObservable()
-        print "get label", repr(uri)
+        print("get label", repr(uri))
         label = self.graph.label(uri)
         self.subIcon.config(text=label or uri)
 

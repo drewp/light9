@@ -1,4 +1,4 @@
-from __future__ import division
+
 import os, logging, time
 from rdflib import Graph, RDF
 from rdflib import RDFS, Literal, BNode
@@ -7,7 +7,7 @@ from light9.TLUtility import dict_scale, dict_max
 from light9 import showconfig
 from light9.Patch import resolve_name, get_dmx_channel, get_channel_uri, reload_data
 from louie import dispatcher
-from rdfdb.patch import Patch
+from .rdfdb.patch import Patch
 log = logging.getLogger('submaster')
 
 class Submaster(object):
@@ -38,7 +38,7 @@ class Submaster(object):
 
     def set_all_levels(self, leveldict):
         self.levels.clear()
-        for k, v in leveldict.items():
+        for k, v in list(leveldict.items()):
             # this may call _editedLevels too many times
             self.set_level(k, v, save=0)
 
@@ -46,7 +46,7 @@ class Submaster(object):
         return self.levels
 
     def no_nonzero(self):
-        return all(v == 0 for v in self.levels.itervalues())
+        return all(v == 0 for v in self.levels.values())
 
     def __mul__(self, scalar):
         return Submaster("%s*%s" % (self.name, scalar),
@@ -62,8 +62,7 @@ class Submaster(object):
         return (self.name, tuple(sorted(self.levels.items())))
 
     def __repr__(self):
-        items = getattr(self, 'levels', {}).items()
-        items.sort()
+        items = sorted(list(getattr(self, 'levels', {}).items()))
         levels = ' '.join(["%s:%.2f" % item for item in items])
         return "<'%s': [%s]>" % (getattr(self, 'name', 'no name yet'), levels)
 
@@ -80,7 +79,7 @@ class Submaster(object):
         leveldict = self.get_levels() # gets levels of sub contents
 
         levels = []
-        for k, v in leveldict.items():
+        for k, v in list(leveldict.items()):
             if v == 0:
                 continue
             try:
@@ -114,9 +113,9 @@ class Submaster(object):
         NOTE: You should only crossfade between normalized submasters."""
         otherlevels = othersub.get_levels()
         keys_set = {}
-        for k in self.levels.keys() + otherlevels.keys():
+        for k in list(self.levels.keys()) + list(otherlevels.keys()):
             keys_set[k] = 1
-        all_keys = keys_set.keys()
+        all_keys = list(keys_set.keys())
 
         xfaded_sub = Submaster("xfade", {})
         for k in all_keys:
@@ -241,7 +240,7 @@ class PersistentSubmaster(Submaster):
         graph = Graph()
         subUri = L9['sub/%s' % self.name]
         graph.add((subUri, RDFS.label, Literal(self.name)))
-        for chan in self.levels.keys():
+        for chan in list(self.levels.keys()):
             try:
                 chanUri = get_channel_uri(chan)
             except KeyError:
@@ -279,7 +278,7 @@ def combine_subdict(subdict, name=None, permanent=False):
     object.  You can give it a better name than the computed one that it
     will get or make it permanent if you'd like it to be saved to disk.
     Serves 8."""
-    scaledsubs = [sub * level for sub, level in subdict.items()]
+    scaledsubs = [sub * level for sub, level in list(subdict.items())]
     maxes = sub_maxes(*scaledsubs)
     if name:
         maxes.name = name
@@ -314,8 +313,7 @@ class Submasters(object):
 
     def get_all_subs(self):
         "All Submaster objects"
-        l = self.submasters.items()
-        l.sort()
+        l = sorted(list(self.submasters.items()))
         l = [x[1] for x in l]
         songs = []
         notsongs = []

@@ -11,10 +11,10 @@ for example:
 
 """
 
-import xmlrpclib, time
+import xmlrpc.client, time
 
-s = xmlrpclib.ServerProxy("http://localhost:8040")
+s = xmlrpc.client.ServerProxy("http://localhost:8040")
 start = time.time()
-while 1:
-    print time.time() - start, s.gettime()
+while True:
+    print(time.time() - start, s.gettime())
     time.sleep(.01)

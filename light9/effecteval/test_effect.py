@@ -3,7 +3,7 @@ import mock
 import sys
 sys.path.insert(0, 'bin')  # for run_local
 
-from effect import CodeLine
+from .effect import CodeLine
 from rdflib import URIRef
 
 
@@ -76,8 +76,8 @@ class TestPossibleVars(unittest.TestCase):
         self.assertEqual(set([]), CodeLine(None, 'a1 = 1').possibleVars)
 
     def test2(self):
-        self.assertEqual(set(['a2']), CodeLine(None, 'a1 = a2').possibleVars)
+        self.assertEqual({'a2'}, CodeLine(None, 'a1 = a2').possibleVars)
 
     def test3(self):
-        self.assertEqual(set(['a2', 'a3']),
+        self.assertEqual({'a2', 'a3'},
                          CodeLine(None, 'a1 = a2 + a3').possibleVars)

@@ -1,7 +1,7 @@
-from urlparse import urlparse
-from urllib import splitport
-from showconfig import getGraph, showUri
-from namespaces import L9
+from urllib.parse import urlparse
+from urllib.parse import splitport
+from .showconfig import getGraph, showUri
+from .namespaces import L9
 
 
 class ServiceAddress(object):

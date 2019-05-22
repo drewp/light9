@@ -10,7 +10,7 @@ from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
 from light9 import prof, showconfig
 from light9.namespaces import L9
 from PIL import Image
-from StringIO import StringIO
+from io import StringIO
 log = logging.getLogger('remotepi')
 
 
@@ -80,7 +80,7 @@ class Pipeline(object):
         pass
 
     def setLiveVideo(self, on):
-        print "setLiveVideo", on
+        print("setLiveVideo", on)
 
     def onFrame(self, jpg, frameTime):
         # We could pass frameTime here to try to compensate for lag,

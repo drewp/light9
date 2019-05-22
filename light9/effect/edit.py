@@ -65,9 +65,9 @@ def songEffectPatch(graph, dropped, song, event, ctx):
 
         _maybeAddMusicLine(quads, effect, song, ctx)
 
-    print "adding"
+    print("adding")
     for qq in quads:
-        print qq
+        print(qq)
     returnValue(Patch(addQuads=quads))
 
 
@@ -163,7 +163,7 @@ def _newEffect(graph, song, ctx):
         (song, L9['effect'], effect, ctx),
         (effect, RDF.type, L9['Effect'], ctx),
     ]
-    print "_newEffect", effect, quads
+    print("_newEffect", effect, quads)
     return effect, quads
 
 

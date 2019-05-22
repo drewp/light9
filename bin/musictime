@@ -2,7 +2,7 @@
 import run_local
 import light9.networking
 
-import Tkinter as tk
+import tkinter as tk
 import time
 import restkit, jsonlib
 
@@ -18,8 +18,8 @@ class MusicTime:
             try:
                 playtime = jsonlib.read(self.player.get("time").body_string(),
                                         use_float=True)['t']
-            except restkit.RequestError, e:
-                print "Server error %s, waiting" % e
+            except restkit.RequestError as e:
+                print("Server error %s, waiting" % e)
                 time.sleep(2)
         return playtime
 
@@ -42,7 +42,7 @@ class MusicTimeTk(tk.Frame, MusicTime):
 
         def print_time(evt, *args):
             self.timevar.set(self.get_music_time())
-            print self.timevar.get(), evt.keysym
+            print(self.timevar.get(), evt.keysym)
 
         self.timelabel.bind('<KeyPress>', print_time)
         self.timelabel.bind('<1>', print_time)

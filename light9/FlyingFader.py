@@ -1,6 +1,6 @@
-from Tix import *
+from tkinter.tix import *
 from time import time, sleep
-from __future__ import division
+
 
 
 class Mass:

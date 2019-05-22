@@ -7,7 +7,7 @@ custom code for some attributes.
 Input can be over http or zmq.
 """
 
-from __future__ import division
+
 from run_local import log
 
 from rdflib import URIRef, Literal
@@ -34,7 +34,7 @@ def parseJsonMessage(msg):
     body = json.loads(msg)
     settings = []
     for device, attr, value in body['settings']:
-        if isinstance(value, basestring) and value.startswith('http'):
+        if isinstance(value, str) and value.startswith('http'):
             value = URIRef(value)
         else:
             value = Literal(value)
@@ -114,7 +114,7 @@ class WebListeners(object):
 
     def makeMsg(self, dev, attrs, outputMap):
         attrRows = []
-        for attr, val in attrs.items():
+        for attr, val in list(attrs.items()):
             output, index = outputMap[(dev, attr)]
             attrRows.append({
                 'attr': attr.rsplit('/')[-1],

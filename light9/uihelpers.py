@@ -1,11 +1,11 @@
 """all the tiny tk helper functions"""
 
-from __future__ import nested_scopes
+
 #from Tkinter import Button
 import logging, time
 from rdflib import Literal
-from Tix import Button, Toplevel, Tk, IntVar, Entry, DoubleVar
-import Tkinter
+from tkinter.tix import Button, Toplevel, Tk, IntVar, Entry, DoubleVar
+import tkinter
 from light9.namespaces import L9
 
 log = logging.getLogger("toplevel")
@@ -33,7 +33,7 @@ def toplevel_savegeometry(tl,name):
             f=open(".light9-window-geometry-%s" % name.replace(' ','_'),'w')
             f.write(tl.geometry())
         # else the window never got mapped
-    except Exception, e:
+    except Exception as e:
         # it's ok if there's no saved geometry
         pass
 
@@ -62,7 +62,7 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
 
     def savePos(ev):
         geo = tl.geometry()
-        if not isinstance(ev.widget, (Tk, Tkinter.Tk)):
+        if not isinstance(ev.widget, (Tk, tkinter.Tk)):
             # I think these are due to internal widget size changes,
             # not the toplevel changing
             return
@@ -103,12 +103,12 @@ def toggle_slider(s):
 
 # for lambda callbacks
 def printout(t):
-    print 'printout', t
+    print('printout', t)
 
 def printevent(ev):
     for k in dir(ev):
         if not k.startswith('__'):
-            print 'ev', k, getattr(ev,k)
+            print('ev', k, getattr(ev,k))
 
 def eventtoparent(ev,sequence):
     "passes an event to the parent, screws up TixComboBoxes"
@@ -131,7 +131,7 @@ def colorlabel(label):
     txt=label['text'] or "0"
     lev=float(txt)/100
     low=(80,80,180)
-    high=(255,55,050)
+    high=(255,55,0o50)
     out = [int(l+lev*(h-l)) for h,l in zip(high,low)]
     col="#%02X%02X%02X" % tuple(out)
     label.config(bg=col)
@@ -218,19 +218,19 @@ class FancyDoubleVar(DoubleVar):
         return cbname
     trace=trace_variable
     def disable_traces(self):
-        for cb,mode in self.callbacklist.items():
+        for cb,mode in list(self.callbacklist.items()):
 #            DoubleVar.trace_vdelete(self,v[0],k)
             self._tk.call("trace", "vdelete", self._name, mode,cb)
             # but no master delete!
 
     def recreate_traces(self):
-        for cb,mode in self.callbacklist.items():
+        for cb,mode in list(self.callbacklist.items()):
 #            self.trace_variable(v[0],v[1])
             self._tk.call("trace", "variable", self._name, mode,cb)
 
     def trace_named(self, name, callback):
         if name in self.namedtraces:
-            print "FancyDoubleVar: already had a trace named %s - replacing it" % name
+            print("FancyDoubleVar: already had a trace named %s - replacing it" % name)
             self.delete_named(name)
 
         cbname = self.trace_variable('w',callback) # this will register in self.callbacklist too
@@ -245,9 +245,9 @@ class FancyDoubleVar(DoubleVar):
 
             self.trace_vdelete('w',cbname)
 	    #self._tk.call("trace","vdelete",self._name,'w',cbname)
-            print "FancyDoubleVar: successfully deleted trace named %s" % name
+            print("FancyDoubleVar: successfully deleted trace named %s" % name)
         else:
-            print "FancyDoubleVar: attempted to delete named %s which wasn't set to any function" % name
+            print("FancyDoubleVar: attempted to delete named %s which wasn't set to any function" % name)
 
 def get_selection(listbox):
     'Given a listbox, returns first selection as integer'
@@ -259,7 +259,7 @@ if __name__=='__main__':
     root.tk_focusFollowsMouse()
     iv=IntVar()
     def cb():
-        print "cb!"
+        print("cb!")
     t = Togglebutton(root,text="testbutton",command=cb,variable=iv)
     t.pack()
     Entry(root,textvariable=iv).pack()

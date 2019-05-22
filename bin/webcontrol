@@ -6,7 +6,7 @@ computers and phones
 todo:
 disable buttons that don't make sense
 """
-import sys, xmlrpclib, traceback
+import sys, xmlrpc.client, traceback
 from twisted.internet import reactor
 from twisted.python import log
 from twisted.python.util import sibpath
@@ -19,7 +19,7 @@ from louie.robustapply import robust_apply
 sys.path.append(".")
 from light9 import showconfig, networking
 from light9.namespaces import L9
-from urllib import urlencode
+from urllib.parse import urlencode
 
 
 # move to web lib
@@ -31,7 +31,7 @@ class Commands(object):
 
     @staticmethod
     def playSong(graph, songUri):
-        s = xmlrpclib.ServerProxy(networking.musicPlayer.url)
+        s = xmlrpc.client.ServerProxy(networking.musicPlayer.url)
         songPath = graph.value(URIRef(songUri), L9.showPath)
         if songPath is None:
             raise ValueError("unknown song %s" % songUri)
@@ -39,7 +39,7 @@ class Commands(object):
 
     @staticmethod
     def stopMusic(graph):
-        s = xmlrpclib.ServerProxy(networking.musicPlayer.url)
+        s = xmlrpc.client.ServerProxy(networking.musicPlayer.url)
         return s.stop()
 
     @staticmethod
@@ -90,14 +90,14 @@ class Main(rend.Page):
         try:
             func = getattr(Commands, segments[0])
             req = inevow.IRequest(ctx)
-            simpleArgDict = dict((k, v[0]) for k, v in req.args.items())
+            simpleArgDict = dict((k, v[0]) for k, v in list(req.args.items()))
             try:
                 ret = yield robust_apply(func, func, self.graph,
                                          **simpleArgDict)
             except KeyboardInterrupt:
                 raise
-            except Exception, e:
-                print "Error on command %s" % segments[0]
+            except Exception as e:
+                print("Error on command %s" % segments[0])
                 traceback.print_exc()
                 returnValue((url.here.up().add('status',
                                                str(e)).add('error',

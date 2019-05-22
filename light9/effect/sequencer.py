@@ -2,7 +2,7 @@
 copies from effectloop.py, which this should replace
 '''
 
-from __future__ import division
+
 from louie import dispatcher
 from rdflib import URIRef
 from twisted.internet import reactor
@@ -20,6 +20,7 @@ from light9.effect.settings import DeviceSettings
 from light9.effect.simple_outputs import SimpleOutputs
 
 from greplin import scales
+import imp
 
 log = logging.getLogger('sequencer')
 stats = scales.collection(
@@ -95,7 +96,7 @@ class Note(object):
             (str(k), str(v)) for k, v in sorted(effectSettings.items()))
         report['nonZero'] = effectSettings[L9['strength']] > 0
         out, evalReport = self.effectEval.outputFromEffect(
-            effectSettings.items(),
+            list(effectSettings.items()),
             songTime=t,
             # note: not using origin here since it's going away
             noteTime=t - self.points[0][0])
@@ -118,7 +119,7 @@ class CodeWatcher(object):
 
         def go():
             log.info("reload effecteval")
-            reload(effecteval)
+            imp.reload(effecteval)
             self.onChange()
 
         # in case we got an event at the start of the write

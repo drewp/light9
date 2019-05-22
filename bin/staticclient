@@ -2,10 +2,10 @@
 """
 push a dmx level forever
 """
-from __future__ import division, nested_scopes
+
 import time, logging
 from optparse import OptionParser
-import logging, urllib
+import logging, urllib.request, urllib.parse, urllib.error
 from twisted.internet import reactor, tksupport, task
 from rdflib import URIRef, RDF, RDFS, Literal
 

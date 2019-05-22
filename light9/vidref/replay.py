@@ -1,4 +1,4 @@
-from __future__ import division
+
 import os, gtk, shutil, logging, time
 from bisect import bisect_left
 from decimal import Decimal

@@ -1,5 +1,5 @@
 #!bin/python
-from __future__ import division
+
 from rdflib import URIRef
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, Deferred

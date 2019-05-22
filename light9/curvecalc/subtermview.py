@@ -42,8 +42,7 @@ class Subexprview(object):
         curveNames = self.curveset.curveNamesInOrder()
         currentExpr = self.entryBuffer.get_text()
 
-        usedCurves = [n for n in curveNames if n in currentExpr]
-        usedCurves.sort()
+        usedCurves = sorted([n for n in curveNames if n in currentExpr])
 
         dispatcher.send("set_featured_curves", curveNames=usedCurves)
 
@@ -52,7 +51,7 @@ class Subexprview(object):
 
     def set_expression_from_graph(self):
         e = str(self.graph.value(self.ownerSubterm, L9['expression']))
-        print "from graph, set to %r" % e
+        print("from graph, set to %r" % e)
 
         if e != self.entryBuffer.get_text():
             self.entryBuffer.set_text(e, len(e))

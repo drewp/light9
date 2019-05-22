@@ -3,7 +3,7 @@ some clients will support the concept of a named session that keeps
 multiple instances of that client separate
 """
 from rdflib import URIRef
-from urllib import quote
+from urllib.parse import quote
 from light9 import showconfig
 
 

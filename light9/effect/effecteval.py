@@ -1,4 +1,4 @@
-from __future__ import division
+
 from rdflib import URIRef, Literal
 from light9.namespaces import L9, RDF, DEV
 from webcolors import rgb_to_hex, hex_to_rgb
@@ -13,7 +13,7 @@ from light9.effect.settings import DeviceSettings
 from light9.effect.scale import scale
 import random
 random.seed(0)
-print "reload effecteval"
+print("reload effecteval")
 
 log = logging.getLogger('effecteval')
 
@@ -96,7 +96,7 @@ class EffectEval(object):
             else:
                 out.update(func(effectSettings, strength, songTime, noteTime))
 
-        outList = [(d, a, v) for (d, a), v in out.iteritems()]
+        outList = [(d, a, v) for (d, a), v in out.items()]
         return DeviceSettings(self.graph, outList), report
 
 
@@ -137,7 +137,7 @@ def effect_auraSparkles(effectSettings, strength, songTime, noteTime):
     out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
     tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
-    print effectSettings
+    print(effectSettings)
     tr, tg, tb = hex_to_rgb(tint)
     for n in range(1, 5 + 1):
         scl = strength * ((int(songTime * 10) % n) < 1)
@@ -209,7 +209,7 @@ def effect_aurawash(effectSettings, strength, songTime, noteTime):
     col = literalColorHsv(noise(noisePos), 1, scl)
     col = scale(col, effectSettings.get(L9['colorScale']) or '#ffffff')
 
-    print songTime, quantTime, col
+    print(songTime, quantTime, col)
 
     for n in range(1, 5 + 1):
         dev = L9['device/aura%s' % n]

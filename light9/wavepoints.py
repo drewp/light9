@@ -1,21 +1,21 @@
-from __future__ import division
+
 import wave, audioop
 
 def simp(filename, seconds_per_average=0.001):
     """smaller seconds_per_average means fewer data points"""
     wavefile = wave.open(filename, 'rb')
-    print "# gnuplot data for %s, seconds_per_average=%s" % \
-        (filename, seconds_per_average)
-    print "# %d channels, samplewidth: %d, framerate: %s, frames: %d\n# Compression type: %s (%s)" % wavefile.getparams()
+    print("# gnuplot data for %s, seconds_per_average=%s" % \
+        (filename, seconds_per_average))
+    print("# %d channels, samplewidth: %d, framerate: %s, frames: %d\n# Compression type: %s (%s)" % wavefile.getparams())
 
     framerate = wavefile.getframerate() # frames / second
     frames_to_read = int(framerate * seconds_per_average)
-    print "# frames_to_read=%s" % frames_to_read
+    print("# frames_to_read=%s" % frames_to_read)
 
     time_and_max = []
     values = []
     count = 0
-    while 1:
+    while True:
         fragment = wavefile.readframes(frames_to_read)
         if not fragment:
             break

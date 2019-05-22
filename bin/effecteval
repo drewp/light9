@@ -1,6 +1,6 @@
 #!bin/python
 
-from __future__ import division
+
 from run_local import log
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
@@ -173,7 +173,7 @@ class Code(PrettyErrorHandler, cyclone.web.RequestHandler):
             return
         with self.settings.graph.currentState(tripleFilter=(None, L9['effect'],
                                                             effect)) as g:
-            song = g.subjects(L9['effect'], effect).next()
+            song = next(g.subjects(L9['effect'], effect))
 
         replaceObjects(self.settings.graph, song, effect, L9['code'], codeLines)
 

@@ -59,7 +59,7 @@ fixSysPath()
 from twisted.python.failure import Failure
 
 try:
-    import Tkinter
+    import tkinter
 except ImportError:
     pass
 else:
@@ -71,7 +71,7 @@ else:
         else:
             Failure(val, exc, tb).printDetailedTraceback()
 
-    Tkinter.Tk.report_callback_exception = rce
+    tkinter.Tk.report_callback_exception = rce
 
 import coloredlogs, logging, time
 try:
@@ -103,7 +103,7 @@ logging.getLogger().handlers[0].addFilter(FractionTimeFilter())
 
 def setTerminalTitle(s):
     if os.environ.get('TERM', '') in ['xterm', 'rxvt', 'rxvt-unicode-256color']:
-        print "\033]0;%s\007" % s  # not escaped/protected correctly
+        print("\033]0;%s\007" % s)  # not escaped/protected correctly
 
 
 if 'listsongs' not in sys.argv[0] and 'homepageConfig' not in sys.argv[0]:

@@ -5,12 +5,12 @@ from light9.wavepoints import simp
 
 
 def createCurve(inpath, outpath, t):
-    print "reading %s, writing %s" % (inpath, outpath)
+    print("reading %s, writing %s" % (inpath, outpath))
     points = simp(inpath.replace('.ogg', '.wav'), seconds_per_average=t)
 
     f = file(outpath, 'w')
     for time_val in points:
-        print >> f, "%s %s" % time_val
+        print("%s %s" % time_val, file=f)
 
 
 parser = optparse.OptionParser(usage="""%prog inputSong.wav outputCurve

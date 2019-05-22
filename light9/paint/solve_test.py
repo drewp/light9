@@ -1,6 +1,6 @@
 import unittest
 import numpy.testing
-import solve
+from . import solve
 from rdflib import Namespace
 from light9.namespaces import RDF, L9, DEV
 from rdfdb.localsyncedgraph import LocalSyncedGraph
@@ -33,7 +33,7 @@ class TestSolve(unittest.TestCase):
         })
         self.assertEqual(
             DeviceSettings(self.graph, [
-                (DEV['aura1'], L9['color'], u"#ffffff"),
+                (DEV['aura1'], L9['color'], "#ffffff"),
                 (DEV['aura1'], L9['rx'], 0.5),
                 (DEV['aura1'], L9['ry'], 0.573),
             ]), devAttrs)
@@ -68,7 +68,7 @@ class TestSimulationLayers(unittest.TestCase):
         layers = self.solver.simulationLayers(
             settings=DeviceSettings(self.graph, [(
                 DEV['aura1'], L9['color'],
-                u"#ffffff"), (DEV['aura1'], L9['rx'],
+                "#ffffff"), (DEV['aura1'], L9['rx'],
                               0.5), (DEV['aura1'], L9['ry'], 0.573)]))
         self.assertEqual([{
             'path': CAM_TEST['bg2-d.jpg'],
@@ -79,7 +79,7 @@ class TestSimulationLayers(unittest.TestCase):
         layers = self.solver.simulationLayers(
             settings=DeviceSettings(self.graph, [(
                 DEV['aura1'], L9['color'],
-                u"#304050"), (DEV['aura1'], L9['rx'],
+                "#304050"), (DEV['aura1'], L9['rx'],
                               0.5), (DEV['aura1'], L9['ry'], 0.573)]))
         self.assertEqual([{
             'path': CAM_TEST['bg2-d.jpg'],
@@ -89,10 +89,10 @@ class TestSimulationLayers(unittest.TestCase):
     def testPerfect2Matches(self):
         layers = self.solver.simulationLayers(
             settings=DeviceSettings(self.graph, [
-                (DEV['aura1'], L9['color'], u"#ffffff"),
+                (DEV['aura1'], L9['color'], "#ffffff"),
                 (DEV['aura1'], L9['rx'], 0.5),
                 (DEV['aura1'], L9['ry'], 0.573),
-                (DEV['aura2'], L9['color'], u"#ffffff"),
+                (DEV['aura2'], L9['color'], "#ffffff"),
                 (DEV['aura2'], L9['rx'], 0.7),
                 (DEV['aura2'], L9['ry'], 0.573),
             ]))

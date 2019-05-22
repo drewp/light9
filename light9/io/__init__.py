@@ -1,4 +1,4 @@
-from __future__ import division
+
 import sys
 
 
@@ -11,14 +11,14 @@ class BaseIO(object):
 
     def golive(self):
         """call this if you want to promote the dummy object becomes a live object"""
-        print "IO: %s is going live" % self.__name__
+        print("IO: %s is going live" % self.__name__)
         self.dummy = 0
         # you'd override with additional startup stuff here,
         # perhaps even loading a module and saving it to a class
         # attr so the subclass-specific functions can use it
 
     def godummy(self):
-        print "IO: %s is going dummy" % self.__name__
+        print("IO: %s is going dummy" % self.__name__)
         self.dummy = 1
         # you might override this to close ports, etc
 
@@ -44,7 +44,7 @@ class ParportDMX(BaseIO):
 
     def golive(self):
         BaseIO.golive(self)
-        import parport
+        from . import parport
         self.parport = parport
         self.parport.getparport()
 
@@ -71,7 +71,7 @@ class UsbDMX(BaseIO):
     def _dmx(self):
         if self.out is None:
             if self.port == 'udmx':
-                from udmx import Udmx
+                from .udmx import Udmx
                 self.out = Udmx()
                 self.out.write = self.out.SendDMX
             else:

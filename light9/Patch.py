@@ -11,8 +11,7 @@ def resolve_name(channelname):
 
 def get_all_channels():
     """returns primary names for all channels (sorted)"""
-    prinames = reverse_patch.values()[:]
-    prinames.sort()
+    prinames = sorted(list(reverse_patch.values())[:])
     return prinames
 
 

@@ -1,4 +1,4 @@
-from __future__ import division
+
 import glob, time, logging, ast, os
 from bisect import bisect_left, bisect
 import louie as dispatcher
@@ -55,7 +55,7 @@ class Curve(object):
     def set_from_string(self, pts):
         self.points[:] = []
         vals = pts.split()
-        pairs = zip(vals[0::2], vals[1::2])
+        pairs = list(zip(vals[0::2], vals[1::2]))
         for x, y in pairs:
             self.points.append((float(x), ast.literal_eval(y)))
         self.points.sort()
@@ -64,7 +64,7 @@ class Curve(object):
     def points_as_string(self):
 
         def outVal(x):
-            if isinstance(x, basestring):  # markers
+            if isinstance(x, str):  # markers
                 return x
             return "%.4g" % x
 
@@ -74,7 +74,7 @@ class Curve(object):
     def save(self, filename):
         # this is just around for markers, now
         if filename.endswith('-music') or filename.endswith('_music'):
-            print "not saving music track"
+            print("not saving music track")
             return
         f = file(filename, 'w')
         for p in self.points:
@@ -148,7 +148,7 @@ class Curve(object):
         leftidx = max(0, bisect(self.points, (x1, None)) - beyond)
         rightidx = min(len(self.points),
                        bisect(self.points, (x2, None)) + beyond)
-        return range(leftidx, rightidx)
+        return list(range(leftidx, rightidx))
 
     def points_between(self, x1, x2):
         """returns (x,y) points"""
@@ -329,7 +329,7 @@ class Curveset(object):
         try:
             self.markers.load("%s.markers" % basename)
         except IOError:
-            print "no marker file found"
+            print("no marker file found")
 
     def save(self):
         """writes a file for each curve with a name
@@ -339,7 +339,7 @@ class Curveset(object):
             showconfig.songFilenameFromURI(self.currentSong))
 
         patches = []
-        for cr in self.curveResources.values():
+        for cr in list(self.curveResources.values()):
             patches.extend(cr.getSavePatches())
 
         self.markers.save("%s.markers" % basename)

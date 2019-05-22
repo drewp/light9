@@ -1,7 +1,7 @@
 """Collected utility functions, many are taken from Drew's utils.py in
 Cuisine CVS and Hiss's Utility.py."""
 
-from __future__ import generators
+
 import sys
 
 __author__ = "David McClosky <dmcc@bigasterisk.com>, " + \
@@ -32,7 +32,7 @@ def make_attributes_from_args(*argnames):
         try:
             setattr(callerself,a,callerlocals[a])
         except KeyError:
-            raise KeyError, "Function has no argument '%s'" % a
+            raise KeyError("Function has no argument '%s'" % a)
 
 def enumerate(*collections):
     """Generates an indexed series:  (0,coll[0]), (1,coll[1]) ...
@@ -42,19 +42,19 @@ def enumerate(*collections):
     """
     i = 0
     iters = [iter(collection) for collection in collections]
-    while 1:
-        yield [i,] + [iterator.next() for iterator in iters]
+    while True:
+        yield [i,] + [next(iterator) for iterator in iters]
         i += 1
 
 def dumpobj(o):
     """Prints all the object's non-callable attributes"""
-    print repr(o)
+    print(repr(o))
     for a in [x for x in dir(o) if not callable(getattr(o, x))]:
         try:
-            print "  %20s: %s " % (a, getattr(o, a))
+            print("  %20s: %s " % (a, getattr(o, a)))
         except:
             pass
-    print ""
+    print("")
 
 def dict_filter_update(d, **newitems):
     """Adds a set of new keys and values to dictionary 'd' if the values are
@@ -65,7 +65,7 @@ def dict_filter_update(d, **newitems):
     >>> some_dict
     {'c': 1, 's': 'hello'}
     """
-    for k, v in newitems.items():
+    for k, v in list(newitems.items()):
         if v: d[k] = v
 
 def try_get_logger(channel):
@@ -109,7 +109,7 @@ class DummyClass:
             import warnings
             warnings.warn(msg)
         if self.raise_exceptions:
-            raise AttributeError, msg
+            raise AttributeError(msg)
         return lambda *args, **kw: self.bogus_function()
     def bogus_function(self):
         pass
@@ -144,16 +144,16 @@ def trace(func):
     TODO: print out default keywords (maybe)
           indent for recursive call like the lisp version (possible use of 
               generators?)"""
-    name = func.func_name
+    name = func.__name__
     def tracer(*args, **kw):
         s = '|>> %s called' % name
         if args:
             s += ' args: %r' % list(args)
         if kw:
             s += ' kw: %r' % kw
-        print s
+        print(s)
         ret = func(*args, **kw)
-        print '<<| %s returned %s' % (name, ret)
+        print('<<| %s returned %s' % (name, ret))
         return ret
     return tracer
 
@@ -165,13 +165,13 @@ def dict_max(*dicts):
     """
     newdict = {}
     for d in dicts:
-        for k,v in d.items():
+        for k,v in list(d.items()):
             newdict[k] = max(v, newdict.get(k, 0))
     return newdict
 
 def dict_scale(d,scl):
     """scales all values in dict and returns a new dict"""
-    return dict([(k,v*scl) for k,v in d.items()])
+    return dict([(k,v*scl) for k,v in list(d.items())])
     
 def dict_subset(d, dkeys, default=0):
     """Subset of dictionary d: only the keys in dkeys.  If you plan on omitting

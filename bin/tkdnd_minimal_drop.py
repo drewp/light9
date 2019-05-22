@@ -1,6 +1,6 @@
 #!bin/python
 from run_local import log
-import Tkinter as tk
+import tkinter as tk
 from light9.tkdnd import initTkdnd, dropTargetRegister
 from twisted.internet import reactor, tksupport
 
@@ -20,15 +20,15 @@ tk.Label(frame1, text="not a target").pack(side='left')
 
 
 def onDrop(ev):
-    print "onDrop", ev
+    print("onDrop", ev)
 
 
 def enter(ev):
-    print 'enter', ev
+    print('enter', ev)
 
 
 def leave(ev):
-    print 'leave', ev
+    print('leave', ev)
 
 
 dropTargetRegister(label,
@@ -45,7 +45,7 @@ dropTargetRegister(labelInner,
 
 
 def prn():
-    print "cont", root.winfo_containing(201, 151)
+    print("cont", root.winfo_containing(201, 151))
 
 
 b = tk.Button(root, text="coord", command=prn)

@@ -4,7 +4,7 @@ dmxclient.outputlevels(..)
 
 client id is formed from sys.argv[0] and the PID.  """
 
-import xmlrpclib, os, sys, socket, time, logging
+import xmlrpc.client, os, sys, socket, time, logging
 from twisted.internet import defer
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 import json
@@ -50,17 +50,17 @@ def outputlevels(levellist, twisted=0, clientid=_id):
     if _dmx is None:
         url = networking.dmxServer.url
         if not twisted:
-            _dmx = xmlrpclib.Server(url)
+            _dmx = xmlrpc.client.Server(url)
         else:
             _dmx = TwistedZmqClient(networking.dmxServerZmq)
 
     if not twisted:
         try:
             _dmx.outputlevels(clientid, levellist)
-        except socket.error, e:
+        except socket.error as e:
             log.error("dmx server error %s, waiting" % e)
             time.sleep(1)
-        except xmlrpclib.Fault, e:
+        except xmlrpc.client.Fault as e:
             log.error("outputlevels had xml fault: %s" % e)
             time.sleep(1)
     else:
@@ -70,7 +70,7 @@ def outputlevels(levellist, twisted=0, clientid=_id):
 
 dummy = os.getenv('DMXDUMMY')
 if dummy:
-    print "dmxclient: DMX is in dummy mode."
+    print("dmxclient: DMX is in dummy mode.")
 
     def outputlevels(*args, **kw):
         pass

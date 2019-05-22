@@ -5,7 +5,7 @@ import gtk
 from PIL import Image
 from threading import Thread
 from twisted.internet import defer
-from Queue import Queue, Empty
+from queue import Queue, Empty
 from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
 log = logging.getLogger()
 
@@ -56,7 +56,7 @@ class Pipeline(object):
             "videocrop left=160 top=180 right=120 bottom=80 ! "
             "queue name=vid" % framerate)
 
-        print cam
+        print(cam)
         self.pipeline = gst.parse_launch(cam)
 
         def makeElem(t, n=None):

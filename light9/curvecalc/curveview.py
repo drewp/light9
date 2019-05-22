@@ -1,4 +1,4 @@
-from __future__ import division
+
 import math, logging, traceback
 from gi.repository import Gtk
 from gi.repository import Gdk
@@ -10,9 +10,10 @@ from light9.curvecalc.zoomcontrol import RegionZoom
 from light9.curvecalc import cursors
 from light9.curvecalc.curve import introPad, postPad
 from lib.goocanvas_compat import Points, polyline_new_line
+import imp
 
 log = logging.getLogger()
-print "curveview.py toplevel"
+print("curveview.py toplevel")
 
 
 def vlen(v):
@@ -48,8 +49,7 @@ class Sketch:
         self.curveview.add_point(p)
 
     def release(self, ev):
-        pts = self.pts
-        pts.sort()
+        pts = sorted(self.pts)
         finalPoints = pts[:]
 
         dx = .01
@@ -168,7 +168,7 @@ class SelectManip(object):
 
     def onMotion(self, item, target_item, event, param):
         if hasattr(self, 'dragStartTime'):
-            origPts = zip(self.getSelectedIndices(), self.origPoints)
+            origPts = list(zip(self.getSelectedIndices(), self.origPoints))
             left = origPts[0][1][0]
             right = origPts[-1][1][0]
             width = right - left
@@ -461,7 +461,7 @@ class Curveview(object):
         return canvas
 
     def onAny(self, w, event):
-        print "   %s on %s" % (event, w)
+        print("   %s on %s" % (event, w))
 
     def onFocusIn(self, *args):
         dispatcher.send('curve row focus change')
@@ -555,8 +555,8 @@ class Curveview(object):
 
     def print_state(self, msg=""):
         if 0:
-            print "%s: dragging_dots=%s selecting=%s" % (
-                msg, self.dragging_dots, self.selecting)
+            print("%s: dragging_dots=%s selecting=%s" % (
+                msg, self.dragging_dots, self.selecting))
 
     def select_points(self, pts):
         """set selection to the given point values (tuples, not indices)"""
@@ -749,7 +749,7 @@ class Curveview(object):
         if not self.alive():
             return
         if not self.redrawsEnabled:
-            print "no redrawsEnabled, skipping", self
+            print("no redrawsEnabled, skipping", self)
             return
 
         visible_x = (self.world_from_screen(0, 0)[0],
@@ -993,7 +993,7 @@ class Curveview(object):
         if not self.redrawsEnabled:
             return
 
-        for i, d in self.dots.items():
+        for i, d in list(self.dots.items()):
             if i in self.selected_points:
                 d.set_property('fill_color', 'red')
             else:
@@ -1161,7 +1161,7 @@ class CurveRow(object):
         controls.add(box)
 
         curve_name_label = Gtk.LinkButton()
-        print "need to truncate this name length somehow"
+        print("need to truncate this name length somehow")
 
         def update_label():
             # todo: abort if we don't still exist...
@@ -1237,11 +1237,11 @@ class Curvesetview(object):
         self.watchCurveAreaHeight()
 
     def __del__(self):
-        print "del curvesetview", id(self)
+        print("del curvesetview", id(self))
 
     def initZoomControl(self, zoomControlBox):
         import light9.curvecalc.zoomcontrol
-        reload(light9.curvecalc.zoomcontrol)
+        imp.reload(light9.curvecalc.zoomcontrol)
         zoomControl = light9.curvecalc.zoomcontrol.ZoomControl()
         zoomControlBox.add(zoomControl.widget)
         zoomControl.widget.show_all()

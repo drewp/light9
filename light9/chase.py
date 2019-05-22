@@ -1,4 +1,4 @@
-from __future__ import division
+
 
 
 def chase(t,
@@ -43,6 +43,5 @@ if __name__ == "__main__":
                        ontime=0.1,
                        offset=0.2,
                        names=('a', 'b', 'c', 'd'))
-        output = output.items()
-        output.sort()
-        print "%.2f\t%s" % (x, ' '.join([str(x) for x in output]))
+        output = sorted(list(output.items()))
+        print("%.2f\t%s" % (x, ' '.join([str(x) for x in output])))

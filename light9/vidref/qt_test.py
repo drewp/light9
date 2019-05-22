@@ -37,33 +37,33 @@ class Vid(object):
         bus.connect("sync-message::element", self.on_sync_message)
 
     def on_message(self, bus, message):
-        print "msg", bus, message
+        print("msg", bus, message)
         t = message.type
         if t == gst.MESSAGE_EOS:
             self.player.set_state(gst.STATE_NULL)
         elif t == gst.MESSAGE_ERROR:
             err, debug = message.parse_error()
-            print "Error: %s" % err, debug
+            print("Error: %s" % err, debug)
             self.player.set_state(gst.STATE_NULL)
 
     def on_sync_message(self, bus, message):
-        print "syncmsg", bus, message
+        print("syncmsg", bus, message)
         if message.structure is None:
             return
         message_name = message.structure.get_name()
         if message_name == "prepare-xwindow-id":
-            print "pxi"
+            print("pxi")
             win_id = self.windowId
             assert win_id
             imagesink = message.src
             imagesink.set_property("force-aspect-ratio", True)
-            print "set_xwindow_id"
+            print("set_xwindow_id")
             imagesink.set_xwindow_id(win_id)
-            print "dnoe msg"
+            print("dnoe msg")
 
     def startPrev(self):
         self.player.set_state(gst.STATE_PLAYING)
-        print "should be playing"
+        print("should be playing")
 
 
 class MainWin(QtGui.QMainWindow):
@@ -77,4 +77,4 @@ class MainWin(QtGui.QMainWindow):
 
     @QtCore.pyqtSlot()
     def startLiveView(self):
-        print "slv"
+        print("slv")

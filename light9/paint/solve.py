@@ -1,4 +1,4 @@
-from __future__ import division
+
 from light9.namespaces import RDF, L9, DEV
 from PIL import Image
 import numpy
@@ -152,7 +152,7 @@ class Solver(object):
         results = []
         dist = ImageDist(img)
         if device is None:
-            items = self.samples.items()
+            items = list(self.samples.items())
         else:
             items = self.samplesForDevice[device]
         for uri, img2 in sorted(items):
@@ -162,9 +162,9 @@ class Solver(object):
             results.append((dist.distanceTo(img2), uri, img2))
         results.sort()
         topDist, topUri, topImg = results[0]
-        print 'tops2'
+        print('tops2')
         for row in results[:4]:
-            print '%.5f' % row[0], row[1][-20:], self.sampleSettings[row[1]]
+            print('%.5f' % row[0], row[1][-20:], self.sampleSettings[row[1]])
 
         #saveNumpy('/tmp/best_in.png', img)
         #saveNumpy('/tmp/best_out.png', topImg)
@@ -221,8 +221,7 @@ class Solver(object):
             #saveNumpy('/tmp/sample_%s.png' % sample.split('/')[-1],
             #          f(picSample))
             sampleDist[sample] = dist.distanceTo(picSample)
-        results = [(d, uri) for uri, d in sampleDist.items()]
-        results.sort()
+        results = sorted([(d, uri) for uri, d in list(sampleDist.items())])
 
         sample = results[0][1]
 
@@ -284,7 +283,7 @@ class Solver(object):
 
     def combineImages(self, layers):
         """make a result image from our self.samples images"""
-        out = (self.fromPath.itervalues().next() * 0).astype(numpy.uint16)
+        out = (next(iter(self.fromPath.values())) * 0).astype(numpy.uint16)
         for layer in layers:
             colorScaled = self.fromPath[layer['path']] * layer['color']
             out += colorScaled.astype(numpy.uint16)
@@ -302,7 +301,7 @@ class Solver(object):
         for dev, devSettings in settings.byDevice():
             requestedColor = devSettings.getValue(dev, L9['color'])
             candidatePics = []  # (distance, path, picColor)
-            for sample, s in self.sampleSettings.items():
+            for sample, s in list(self.sampleSettings.items()):
                 path = self.path[sample]
                 otherDevSettings = s.ofDevice(dev)
                 if not otherDevSettings:

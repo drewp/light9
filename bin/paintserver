@@ -1,6 +1,6 @@
 #!bin/python
 
-from __future__ import division
+
 from run_local import log
 import json
 from twisted.internet import reactor
@@ -15,6 +15,7 @@ from light9 import clientsession
 import light9.paint.solve
 from lib.cycloneerr import PrettyErrorHandler
 from light9.namespaces import RDF, L9, DEV
+import imp
 
 
 class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
@@ -42,7 +43,7 @@ class Solve(PrettyErrorHandler, cyclone.web.RequestHandler):
             }))
 
     def reloadSolver(self):
-        reload(light9.paint.solve)
+        imp.reload(light9.paint.solve)
         self.settings.solver = light9.paint.solve.Solver(self.settings.graph)
         self.settings.solver.loadSamples()
 

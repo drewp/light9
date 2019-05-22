@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from __future__ import division, nested_scopes
+
 import sys, wave
 
 def wavelength(filename):
@@ -15,4 +15,4 @@ def wavelength(filename):
 
 if __name__ == "__main__":
     for songfile in sys.argv[1:]:
-        print songfile, wavelength(songfile)
+        print(songfile, wavelength(songfile))

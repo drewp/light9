@@ -3,8 +3,8 @@ from run_local import log
 from rdflib import RDF, URIRef
 from light9 import networking, showconfig
 from light9.namespaces import L9
-from urlparse import urlparse
-from urllib import splitport
+from urllib.parse import urlparse
+from urllib.parse import splitport
 
 from rdfdb.syncedgraph import SyncedGraph
 from twisted.internet import reactor
@@ -15,11 +15,11 @@ netHome = graph.value(showconfig.showUri(), L9['networking'])
 webServer = graph.value(netHome, L9['webServer'])
 if not webServer:
     raise ValueError('no %r :webServer' % netHome)
-print "listen %s;" % splitport(urlparse(webServer).netloc)[1]
+print("listen %s;" % splitport(urlparse(webServer).netloc)[1])
 
 
 def location(path, server):
-    print """
+    print("""
     location /%(path)s/ {
 
       # for websocket
@@ -31,7 +31,7 @@ def location(path, server):
       proxy_pass %(server)s;
       proxy_buffering off;
       rewrite /[^/]+/(.*) /$1 break;
-    }""" % vars()
+    }""" % vars())
 
 
 for role, server in sorted(graph.predicate_objects(netHome)):
@@ -44,10 +44,10 @@ for role, server in sorted(graph.predicate_objects(netHome)):
     location(path, server)
 
 showPath = showconfig.showUri().split('/', 3)[-1]
-print """
+print("""
     location /%(path)s {
       root %(root)s;
     }""" % {
     'path': showPath,
     'root': showconfig.root()[:-len(showPath)]
-}
+})

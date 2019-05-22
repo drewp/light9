@@ -8,9 +8,10 @@ now launches like this:
 todo: curveview should preserve more objects, for speed maybe
 
 """
-from __future__ import division
+
 
 import sys
+import imp
 sys.path.append('/usr/lib/python2.7/dist-packages')  # For gtk
 from twisted.internet import gtk3reactor
 gtk3reactor.install()
@@ -22,7 +23,7 @@ from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import Gdk
 
-from urlparse import parse_qsl
+from urllib.parse import parse_qsl
 import louie as dispatcher
 from rdflib import URIRef, Literal, RDF, RDFS
 import logging
@@ -171,7 +172,7 @@ class Main(object):
 
         def recv(widget, context, x, y, selection, targetType, time):
             subUri = URIRef(selection.data.strip())
-            print "into curves", subUri
+            print("into curves", subUri)
             with self.graph.currentState(tripleFilter=(subUri, RDFS.label,
                                                        None)) as current:
                 subName = current.label(subUri)
@@ -190,7 +191,7 @@ class Main(object):
                     pass
             curveView = self.curvesetView.row(subName).curveView
             t = self.lastSeenInputTime  # curveView.current_time() # new curve hasn't heard the time yet. this has gotten too messy- everyone just needs to be able to reach the time source
-            print "time", t
+            print("time", t)
             curveView.add_points([(t - .5, 0), (t, 1)])
 
         w.connect("drag-data-received", recv)
@@ -412,7 +413,7 @@ class Main(object):
             ('input time', lambda t: "%.2fs" % t),
             ('output levels', lambda levels: textwrap.fill(
                 "; ".join([
-                    "%s:%.2f" % (n, v) for n, v in levels.items()[:2] if v > 0
+                    "%s:%.2f" % (n, v) for n, v in list(levels.items())[:2] if v > 0
                 ]), 70)),
             ('update period', lambda t: "%.1fms" % (t * 1000)),
             ('update status', lambda x: str(x)),
@@ -445,14 +446,14 @@ class Main(object):
 
         if (not hasattr(self, 'curvesetView') or
                 self.curvesetView._mtimes != mtimes):
-            print "reload curveview.py"
+            print("reload curveview.py")
             curvesVBox = wtree.get_object("curves")
             zoomControlBox = wtree.get_object("zoomControlBox")
             [curvesVBox.remove(c) for c in curvesVBox.get_children()]
             [zoomControlBox.remove(c) for c in zoomControlBox.get_children()]
             try:
                 linecache.clearcache()
-                reload(curveview)
+                imp.reload(curveview)
 
                 # old ones are not getting deleted right
                 if hasattr(self, 'curvesetView'):
@@ -469,7 +470,7 @@ class Main(object):
                 # ok. You'll just get some wasted redraws.
                 self.curvesetView.goLive()
             except Exception:
-                print "reload failed:"
+                print("reload failed:")
                 traceback.print_exc()
         if self.opts.reload:
             reactor.callLater(1, self.refreshCurveView)

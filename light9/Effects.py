@@ -1,10 +1,10 @@
-from __future__ import division
+
 import random as random_mod
 import math
 import logging, colorsys
 import light9.Submaster as Submaster
-from chase import chase as chase_logic
-import showconfig
+from .chase import chase as chase_logic
+from . import showconfig
 from rdflib import RDF
 from light9 import Patch
 from light9.namespaces import L9
@@ -77,7 +77,7 @@ def chase(t,
 
     chase_vals = chase_logic(t, ontime, offset, onval, offval, names, combiner)
     lev = {}
-    for uri, value in chase_vals.items():
+    for uri, value in list(chase_vals.items()):
         try:
             dmx = Patch.dmx_from_uri(uri)
         except KeyError:
@@ -142,7 +142,7 @@ def configExprGlobals():
         shortName = chaseUri.rsplit('/')[-1]
         chans = graph.value(chaseUri, L9['channels'])
         ret[shortName] = list(graph.items(chans))
-        print "%r is a chase" % shortName
+        print("%r is a chase" % shortName)
 
     for f in registered:
         ret[f.__name__] = f

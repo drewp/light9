@@ -29,7 +29,7 @@ class Output(object):
 
     def updateerr(self, e):
 
-        print e.getTraceback()
+        print(e.getTraceback())
         dispatcher.send("update status", val=e.getErrorMessage())
         if self.later and not self.later.cancelled and not self.later.called:
             self.later.cancel()

@@ -1,4 +1,4 @@
-from __future__ import division
+
 """
 Data structure and convertors for a table of (device,attr,value)
 rows. These might be effect attrs ('strength'), device attrs ('rx'),
@@ -16,7 +16,7 @@ from light9.collector.device import resolve
 
 def parseHex(h):
     if h[0] != '#': raise ValueError(h)
-    return [int(h[i:i + 2], 16) for i in 1, 3, 5]
+    return [int(h[i:i + 2], 16) for i in (1, 3, 5)]
 
 
 def parseHexNorm(h):
@@ -112,7 +112,7 @@ class _Settings(object):
                     raise TypeError('bad row %r' % (row,))
                 dd = out._compiled.setdefault(row[0], {})
 
-                if isinstance(row[2], basestring):
+                if isinstance(row[2], str):
                     prev = parseHexNorm(dd.get(row[1], '#000000'))
                     newVal = toHex(prev +
                                    weight * numpy.array(parseHexNorm(row[2])))
@@ -128,8 +128,8 @@ class _Settings(object):
         return 0.0
 
     def _delZeros(self):
-        for dev, av in self._compiled.items():
-            for attr, val in av.items():
+        for dev, av in list(self._compiled.items()):
+            for attr, val in list(av.items()):
                 if val == self._zeroForAttr(attr):
                     del av[attr]
             if not av:
@@ -150,15 +150,15 @@ class _Settings(object):
     def __ne__(self, other):
         return not self == other
 
-    def __nonzero__(self):
+    def __bool__(self):
         return bool(self._compiled)
 
     def __repr__(self):
         words = []
 
         def accum():
-            for dev, av in self._compiled.iteritems():
-                for attr, val in sorted(av.iteritems()):
+            for dev, av in self._compiled.items():
+                for attr, val in sorted(av.items()):
                     words.append(
                         '%s.%s=%s' %
                         (dev.rsplit('/')[-1], attr.rsplit('/')[-1], val))
@@ -179,13 +179,13 @@ class _Settings(object):
     def asList(self):
         """old style list of (dev, attr, val) tuples"""
         out = []
-        for dev, av in self._compiled.iteritems():
-            for attr, val in av.iteritems():
+        for dev, av in self._compiled.items():
+            for attr, val in av.items():
                 out.append((dev, attr, val))
         return out
 
     def devices(self):
-        return self._compiled.keys()
+        return list(self._compiled.keys())
 
     def toVector(self, deviceAttrFilter=None):
         out = []
@@ -198,7 +198,7 @@ class _Settings(object):
         return out
 
     def byDevice(self):
-        for dev, av in self._compiled.iteritems():
+        for dev, av in self._compiled.items():
             yield dev, self.__class__._fromCompiled(self.graph, {dev: av})
 
     def ofDevice(self, dev):

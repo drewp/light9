@@ -2,7 +2,7 @@
 """
 alternate to the mpd music player, for ascoltami
 """
-from __future__ import division
+
 import time, logging, traceback
 from gi.repository import GObject, Gst
 from twisted.internet import reactor, task
@@ -55,14 +55,14 @@ class Player(object):
         bus.add_signal_watch()
 
         def onEos(*args):
-            print "onEos", args
+            print("onEos", args)
             if self.onEOS is not None:
                 self.onEOS(self.getSong())
 
         bus.connect('message::eos', onEos)
 
         def onStreamStatus(bus, message):
-            print "streamstatus", bus, message
+            print("streamstatus", bus, message)
             (statusType, _elem) = message.parse_stream_status()
             if statusType == Gst.StreamStatusType.ENTER:
                 self.setupAutostop()

@@ -90,7 +90,7 @@ class Gui(object):
         self.pipeline.setLiveVideo(widget.get_active())
 
     def on_liveFrameRate_value_changed(self, widget):
-        print widget.get_value()
+        print(widget.get_value())
 
     def onMusicTimeChange(self, position):
         self.ignoreScaleChanges = True

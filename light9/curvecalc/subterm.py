@@ -91,7 +91,7 @@ class Subterm(object):
                     subUri = current.value(self.uri, L9['sub'])
                     sub = self.submasters.get_sub_by_uri(subUri)
                     return sub * subexpr_eval
-            except Exception, e:
+            except Exception as e:
                 dispatcher.send("expr_error", sender=self.uri, exc=repr(e))
                 return Submaster.Submaster(name='Error: %s' % str(e), levels={})
 
@@ -133,7 +133,7 @@ class Subterm(object):
 
         try:
             self.lasteval = eval(expr, glo)
-        except Exception, e:
+        except Exception as e:
             dispatcher.send("expr_error", sender=self.uri, exc=e)
             return Submaster.Submaster("zero", {})
         else:

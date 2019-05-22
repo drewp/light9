@@ -21,7 +21,7 @@ graph = SyncedGraph(networking.rdfdb.url, "listsongs")
 def printSongs(result):
     with graph.currentState() as current:
         for song in current.subjects(RDF.type, L9['Song']):
-            print song
+            print(song)
     reactor.stop()
 
 

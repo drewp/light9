@@ -1,6 +1,6 @@
 """calculates your updates-per-second"""
 
-from __future__ import division
+
 import time
 
 class Updatefreq:

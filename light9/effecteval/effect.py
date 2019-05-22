@@ -81,7 +81,7 @@ class CodeLine(object):
         """
         out = {}
         subs = prof.logTime(Submaster.get_global_submasters)(self.graph)
-        for localVar, uri in resources.items():
+        for localVar, uri in list(resources.items()):
 
             for rdfClass in self.graph.objects(uri, RDF.type):
                 if rdfClass == L9['Curve']:
@@ -131,7 +131,7 @@ class EffectNode(object):
         deps = {}
         for c in self.codes:
             outName = c.outName
-            inNames = c.possibleVars.intersection(codeFromOutput.keys())
+            inNames = c.possibleVars.intersection(list(codeFromOutput.keys()))
             inNames.discard(outName)
             deps[outName] = inNames
         self.codes = [

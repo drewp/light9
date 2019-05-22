@@ -1,4 +1,4 @@
-from __future__ import division
+
 from gi.repository import Gtk
 from gi.repository import GObject
 from gi.repository import GooCanvas

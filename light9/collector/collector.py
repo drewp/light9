@@ -1,4 +1,4 @@
-from __future__ import division
+
 import time
 import logging
 from rdflib import Literal
@@ -88,7 +88,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
     def _forgetStaleClients(self, now):
         # type: (float) -> None
         staleClientSessions = []
-        for c, (t, _) in self.lastRequest.iteritems():
+        for c, (t, _) in self.lastRequest.items():
             if t < now - self.clientTimeoutSec:
                 staleClientSessions.append(c)
         for c in staleClientSessions:
@@ -118,7 +118,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
     def _merge(self, lastRequests):
         deviceAttrs = {}  # device: {deviceAttr: value}
         for _, lastSettings in lastRequests:
-            for (device, deviceAttr), value in lastSettings.iteritems():
+            for (device, deviceAttr), value in lastSettings.items():
                 if (device, deviceAttr) in self.remapOut:
                     start, end = self.remapOut[(device, deviceAttr)]
                     value = Literal(start + float(value) * (end - start))
@@ -135,7 +135,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
                     self.stickyAttrs[(device, deviceAttr)] = value
 
         # e.g. don't let an unspecified rotation go to 0
-        for (d, da), v in self.stickyAttrs.iteritems():
+        for (d, da), v in self.stickyAttrs.items():
             daDict = deviceAttrs.setdefault(d, {})
             if da not in daDict:
                 daDict[da] = v
@@ -163,7 +163,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
         uniqueSettings = self.resolvedSettingsDict(settings)
         self.lastRequest[(client, clientSession)] = (now, uniqueSettings)
 
-        deviceAttrs = self._merge(self.lastRequest.itervalues())
+        deviceAttrs = self._merge(iter(self.lastRequest.values()))
 
         outputAttrs = {}  # device: {outputAttr: value}
         for d in self.allDevices:
@@ -184,8 +184,8 @@ class Collector(Generic[ClientType, ClientSessionType]):
         for out in self.outputs:
             pendingOut[out] = [0] * out.numChannels
 
-        for device, attrs in outputAttrs.iteritems():
-            for outputAttr, value in attrs.iteritems():
+        for device, attrs in outputAttrs.items():
+            for outputAttr, value in attrs.items():
                 self.setAttr(device, outputAttr, value, pendingOut)
 
         dt1 = 1000 * (time.time() - now)
@@ -204,6 +204,6 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
     def flush(self, pendingOut):
         """write any changed outputs"""
-        for out, vals in pendingOut.iteritems():
+        for out, vals in pendingOut.items():
             out.update(vals)
             out.flush()

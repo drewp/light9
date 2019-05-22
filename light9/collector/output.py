@@ -1,4 +1,4 @@
-from __future__ import division
+
 from rdflib import URIRef
 import sys
 import time
@@ -169,7 +169,7 @@ class Udmx(DmxOutput):
         with Udmx.stats.write.time():
             try:
                 if not buf:
-                    print "skip empty msg"
+                    print("skip empty msg")
                     return True
                 self.dev.SendDMX(buf)
                 return True
@@ -178,7 +178,7 @@ class Udmx(DmxOutput):
                 if e.errno != 75:
                     msg = 'usb: sending %s bytes to %r; error %r' % (
                         len(buf), self.uri, e)
-                    print msg
+                    print(msg)
                 return False
 
     def countError(self):

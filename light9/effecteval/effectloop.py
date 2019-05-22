@@ -1,4 +1,4 @@
-from __future__ import division
+
 import time, json, logging, traceback
 import numpy
 import serial
@@ -183,7 +183,7 @@ class EffectLoop(object):
 
     def logMessage(self, out):
         return ("send dmx: {%s}" % ", ".join(
-            "%r: %.3g" % (str(k), v) for k, v in out.get_levels().items()))
+            "%r: %.3g" % (str(k), v) for k, v in list(out.get_levels().items())))
 
 
 Z = numpy.zeros((50, 3), dtype=numpy.float16)
@@ -306,7 +306,7 @@ class LedLoop(EffectLoop):
 
     def logMessage(self, out):
         return str([(w, p.tolist() if isinstance(p, numpy.ndarray) else p)
-                    for w, p in out.items()])
+                    for w, p in list(out.items())])
 
 
 def makeEffectLoop(graph, stats, outputWhere):

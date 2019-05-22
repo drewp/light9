@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from __future__ import division, nested_scopes
+
 
 import sys
 sys.path.append("../../editor/pour")
@@ -14,7 +14,7 @@ from dispatch import dispatcher
 
 import dmxclient
 
-import Tkinter as tk
+import tkinter as tk
 
 defaultfont = "arial 8"
 
@@ -80,10 +80,10 @@ class Fieldset(collectiveelement):
             name = f.name()
             intens = f.calc(x, y)
             if intens > 0:
-                print name, intens,
+                print(name, intens, end=' ')
                 active += 1
         if active > 0:
-            print
+            print()
         self.dmxsend(x, y)
 
     def dmxsend(self, x, y):
@@ -135,7 +135,7 @@ class FieldDisplay:
         w2c = self.canvas.world2canvas
 
         # rings
-        for intens, ring in self.rings.items():
+        for intens, ring in list(self.rings.items()):
             rad = f.getdistforintensity(intens)
             p1 = w2c(*(f.center() - Pair(rad, rad)))
             p2 = w2c(*(f.center() + Pair(rad, rad)))
@@ -251,7 +251,7 @@ class Tracker(tk.Frame):
             ev.x, ev.y)))
 
         def save(ev):
-            print "saving"
+            print("saving")
             self.fieldsetfile.save()
 
         master.bind("<Key-s>", save)
@@ -296,7 +296,7 @@ class Tracker(tk.Frame):
                               fill='white',
                               anchor=anc1 + anc2,
                               tags='cornercoords')
-        [d.setcoords() for d in self.displays.values()]
+        [d.setcoords() for d in list(self.displays.values())]
 
 
 ########################################################################

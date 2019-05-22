@@ -2,7 +2,7 @@
 """
 plays back effect notes from the timeline
 """
-from __future__ import division
+
 from run_local import log
 from twisted.internet import reactor
 from light9.greplin_cyclone import StatsForCyclone

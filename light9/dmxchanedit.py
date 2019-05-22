@@ -16,8 +16,8 @@ proposal for new attribute system:
 - we have to stop packing these into the names. Names should be like 'b33' or 'blue3' or just '44'. maybe 'blacklight'.
 
 """
-from __future__ import nested_scopes, division
-import Tkinter as tk
+
+import tkinter as tk
 from rdflib import RDF, Literal
 import math, logging
 from decimal import Decimal
@@ -227,7 +227,7 @@ class Levelbox(tk.Frame):
                 continue
             if isinstance(lev, Decimal):
                 lev = float(lev)
-            assert isinstance(lev, (int, long, float)), repr(lev)
+            assert isinstance(lev, (int, float)), repr(lev)
             try:
                 self.levelFromUri[chan].setTo(lev)
                 remaining.remove(chan)

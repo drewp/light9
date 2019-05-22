@@ -15,7 +15,7 @@ subcomposer
 
 
 """
-from __future__ import division, nested_scopes
+
 
 from run_local import log
 import time, logging
@@ -23,8 +23,8 @@ import time, logging
 log.setLevel(logging.DEBUG)
 
 from optparse import OptionParser
-import logging, urllib
-import Tkinter as tk
+import logging, urllib.request, urllib.parse, urllib.error
+import tkinter as tk
 import louie as dispatcher
 from twisted.internet import reactor, tksupport, task
 from rdflib import URIRef, RDF, RDFS, Literal
@@ -119,7 +119,7 @@ class Subcomposer(tk.Frame):
         """promote our local submaster into a non-local, named one"""
         uri = self.currentSub().uri
         newUri = showconfig.showUri() + ("/sub/%s" %
-                                         urllib.quote(newName, safe=''))
+                                         urllib.parse.quote(newName, safe=''))
         with self.graph.currentState(tripleFilter=(uri, None, None)) as current:
             if (uri, RDF.type, L9['LocalSubmaster']) not in current:
                 raise ValueError("%s is not a local submaster" % uri)
@@ -161,8 +161,8 @@ class Subcomposer(tk.Frame):
         graph = self.graph
 
         def ann():
-            print "currently: session=%s currentSub=%r _currentChoice=%r" % (
-                self.session, self.currentSub(), self._currentChoice())
+            print("currently: session=%s currentSub=%r _currentChoice=%r" % (
+                self.session, self.currentSub(), self._currentChoice()))
 
         @graph.addHandler
         def graphChanged():
@@ -245,7 +245,7 @@ class Subcomposer(tk.Frame):
 
     def savenewsub(self, subname):
         leveldict = {}
-        for i, lev in zip(range(len(self.levels)), self.levels):
+        for i, lev in zip(list(range(len(self.levels))), self.levels):
             if lev != 0:
                 leveldict[get_channel_name(i + 1)] = lev
 

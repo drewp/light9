@@ -1,6 +1,6 @@
 #!bin/python
 
-from __future__ import division, nested_scopes
+
 from run_local import log
 import cgi, time, logging
 from optparse import OptionParser
@@ -9,7 +9,7 @@ from louie import dispatcher
 from twisted.internet import reactor, tksupport
 from twisted.web import resource
 from rdflib import URIRef, Literal
-import Tix as tk
+import tkinter.tix as tk
 
 from light9.Fadable import Fadable
 from light9.subclient import SubClient
@@ -26,6 +26,7 @@ from rdfdb.patch import Patch
 from light9.effect.simple_outputs import SimpleOutputs
 
 from bcf2000 import BCF2000
+import imp
 
 nudge_keys = {'up': list('qwertyui'), 'down': list('asdfghjk')}
 
@@ -250,7 +251,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         for r in self.rows:
             r.destroy()
         self.rows = []
-        for b in self.subbox.values():
+        for b in list(self.subbox.values()):
             b.cleanup()
         self.subbox.clear()
         self.slider_table.clear()
@@ -271,7 +272,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         log.info("withgroups %s", withgroups)
 
         self.effectEval = {}
-        reload(light9.effect.effecteval)
+        imp.reload(light9.effect.effecteval)
         simpleOutputs = SimpleOutputs(self.graph)
         for group, order, sortLabel, effect in withgroups:
             if col == 0 or group != last_group:
@@ -338,7 +339,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.keyhints = keyhintrow
 
     def setup_key_nudgers(self, tkobject):
-        for d, keys in nudge_keys.items():
+        for d, keys in list(nudge_keys.items()):
             for key in keys:
                 # lowercase makes full=0
                 keysym = "<KeyPress-%s>" % key
@@ -501,7 +502,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
     def get_levels(self):
         return dict([
-            (uri, box.slider_var.get()) for uri, box in self.subbox.items()
+            (uri, box.slider_var.get()) for uri, box in list(self.subbox.items())
         ])
 
     def get_output_settings(self, _graph=None):
@@ -540,7 +541,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.sub_name.delete(0, tk.END)
 
     def alltozero(self):
-        for uri, subbox in self.subbox.items():
+        for uri, subbox in list(self.subbox.items()):
             if subbox.scale.scale_var.get() != 0:
                 subbox.scale.fade(value=0.0, length=0)
 

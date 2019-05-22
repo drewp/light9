@@ -1,5 +1,5 @@
 #!env_pi/bin/python
-from __future__ import division
+
 from run_local import log
 import sys
 sys.path.append('/usr/lib/python2.7/dist-packages/')

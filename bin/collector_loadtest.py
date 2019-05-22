@@ -10,7 +10,7 @@ log.setLevel(logging.DEBUG)
 
 
 def loadTest():
-    print "scheduling loadtest"
+    print("scheduling loadtest")
     n = 2500
     times = [None] * n
     session = "loadtest%s" % time.time()
@@ -41,7 +41,7 @@ def loadTest():
         offset += .002
 
     def done():
-        print "loadtest done"
+        print("loadtest done")
         with open('/tmp/times', 'w') as f:
             f.write(''.join('%s\n' % t for t in times))
         reactor.stop()

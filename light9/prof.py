@@ -37,8 +37,8 @@ def watchPoint(filename, lineno, event="call"):
             if (frame.f_code.co_filename, frame.f_lineno) == (filename, lineno):
                 stack = ''.join(traceback.format_stack(frame))
                 if stack not in seenTraces:
-                    print "watchPoint hit"
-                    print stack
+                    print("watchPoint hit")
+                    print(stack)
                     seenTraces[stack] = 1
                 else:
                     seenTraces[stack] += 1

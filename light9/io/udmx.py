@@ -1,4 +1,4 @@
-from __future__ import division
+
 import logging
 import usb.core
 from usb.util import CTRL_TYPE_VENDOR, CTRL_RECIPIENT_DEVICE, CTRL_OUT
@@ -30,7 +30,7 @@ class Udmx(object):
         for dev in usb.core.find(idVendor=0x16c0,
                                  idProduct=0x05dc,
                                  find_all=True):
-            print "udmx device at %r" % dev.bus
+            print("udmx device at %r" % dev.bus)
             if bus is None or bus == dev.bus:
                 self.dev = dev
         if not self.dev:
@@ -59,5 +59,5 @@ def demo(chan, fps=44):
             u.SendDMX('\x00' * (chan - 1) + chr(210) + chr(nsin8) + chr(nsin8) +
                       chr(nsin8))
         except usb.core.USBError as e:
-            print "err", time.time(), repr(e)
+            print("err", time.time(), repr(e))
         time.sleep(1 / fps)
