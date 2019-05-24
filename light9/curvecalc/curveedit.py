@@ -5,7 +5,7 @@ import cgi, time
 from twisted.internet import reactor
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 from rdflib import URIRef
-from lib.cycloneerr import PrettyErrorHandler
+from cycloneerr import PrettyErrorHandler
 from run_local import log
 from louie import dispatcher
 

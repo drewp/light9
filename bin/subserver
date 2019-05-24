@@ -15,7 +15,7 @@ from rdfdb.patch import Patch
 from light9.namespaces import L9, DCTERMS
 from light9 import networking, showconfig
 
-from lib.cycloneerr import PrettyErrorHandler
+from cycloneerr import PrettyErrorHandler
 
 
 class Static(PrettyErrorHandler, cyclone.web.StaticFileHandler):

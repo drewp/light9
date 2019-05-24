@@ -3,9 +3,6 @@ from run_local import log
 from twisted.internet import reactor
 import web, _thread, sys, optparse, logging
 from rdflib import URIRef
-sys.path.append(".")
-sys.path.append('/usr/lib/python2.7/dist-packages')  # For gi
-
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('Gtk', '3.0')

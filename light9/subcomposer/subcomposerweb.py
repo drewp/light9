@@ -1,6 +1,6 @@
 import logging
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-from lib.cycloneerr import PrettyErrorHandler
+from cycloneerr import PrettyErrorHandler
 from light9 import networking
 from rdflib import URIRef, Literal
 from twisted.internet import reactor

@@ -131,7 +131,7 @@ class Player(object):
         log.info("preloading %s", songPath)
         assert songPath.startswith("file://"), songPath
         try:
-            open(songPath[len("file://"):]).read()
+            open(songPath[len("file://"):], 'rb').read()
         except IOError as e:
             log.error("couldn't preload %s, %r", songPath, e)
             raise

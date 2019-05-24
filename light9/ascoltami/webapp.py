@@ -7,7 +7,7 @@ from rdflib import URIRef
 from web.contrib.template import render_genshi
 render = render_genshi([sibpath(__file__, ".")], auto_reload=True)
 
-from lib.cycloneerr import PrettyErrorHandler
+from cycloneerr import PrettyErrorHandler
 
 _songUris = {}  # locationUri : song
 
@@ -109,7 +109,7 @@ class songResource(PrettyErrorHandler, cyclone.web.RequestHandler):
         graph = self.settings.app.graph
 
         self.settings.app.player.setSong(
-            songLocation(graph, URIRef(self.request.body)))
+            songLocation(graph, URIRef(self.request.body.decode('utf8'))))
         self.set_header("Content-Type", "text/plain")
         self.write("ok")
 

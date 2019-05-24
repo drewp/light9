@@ -33,7 +33,7 @@ def showUri():
     """Return the show URI associated with $LIGHT9_SHOW."""
     global _showUri
     if _showUri is None:
-        _showUri = URIRef(file(path.join(root(), 'URI')).read().strip())
+        _showUri = URIRef(open(path.join(root(), 'URI')).read().strip())
     return _showUri
 
 def songOnDisk(song):

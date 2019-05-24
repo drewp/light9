@@ -35,6 +35,7 @@ git+http://github.com/11craft/louie.git@f18bb71010c114eca9c6b88c96453340e3b39454
 git+http://github.com/webpy/webpy@ace0f8954c28311004b33c7a513c6e40a3c02470#egg=web
 https://github.com/drewp/cyclone/archive/python3.zip#egg=cyclone
 
-rdfdb==0.8.0
+cycloneerr==0.3.0
+rdfdb==0.11.0
 
 

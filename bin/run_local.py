@@ -8,49 +8,21 @@ import sys, os, socket
 def fixSysPath():
     root = os.path.abspath(os.path.join(os.path.dirname(sys.argv[0]),
                                         '..')) + '/'
-
-    # this is site-packages/zope.interface-4.5.0-py2.7-nspkg.pth,
-    # slightly edited.
-    import types
-    has_mfs = sys.version_info > (3, 5)
-    p = root + 'env/local/lib/python2.7/site-packages/zope'
-    importlib = has_mfs and __import__('importlib.util')
-    has_mfs and __import__('importlib.machinery')
-    m = has_mfs and sys.modules.setdefault(
-        'zope',
-        importlib.util.module_from_spec(
-            importlib.machinery.PathFinder.find_spec('zope',
-                                                     [os.path.dirname(p)])))
-    m = m or sys.modules.setdefault('zope', types.ModuleType('zope'))
-    mp = (m or []) and m.__dict__.setdefault('__path__', [])
-    (p not in mp) and mp.append(p)
-
-    p = root + 'env/local/lib/python2.7/site-packages/greplin'
-    importlib = has_mfs and __import__('importlib.util')
-    has_mfs and __import__('importlib.machinery')
-    m = has_mfs and sys.modules.setdefault(
-        'greplin',
-        importlib.util.module_from_spec(
-            importlib.machinery.PathFinder.find_spec('greplin',
-                                                     [os.path.dirname(p)])))
-    m = m or sys.modules.setdefault('greplin', types.ModuleType('greplin'))
-    mp = (m or []) and m.__dict__.setdefault('__path__', [])
-    (p not in mp) and mp.append(p)
-
     sys.path = [
         root,
-        root + 'env/lib/python2.7',
-        root + 'env/lib/python2.7/plat-x86_64-linux-gnu',
-        root + 'env/lib/python2.7/lib-tk',
-        root + 'env/lib/python2.7/lib-old',
-        root + 'env/lib/python2.7/lib-dynload',
-        '/usr/lib/python2.7',
-        '/usr/lib/python2.7/plat-x86_64-linux-gnu',
-        '/usr/lib/python2.7/lib-tk',
-        root + 'env/local/lib/python2.7/site-packages',
-        root + 'env/local/lib/python2.7/site-packages/gtk-2.0',
-        root + 'env/lib/python2.7/site-packages',
-        root + 'env/lib/python2.7/site-packages/gtk-2.0',
+        root + 'env/lib/python3.7',
+        root + 'env/lib/python3.7/plat-x86_64-linux-gnu',
+        root + 'env/lib/python3.7/lib-tk',
+        root + 'env/lib/python3.7/lib-old',
+        root + 'env/lib/python3.7/lib-dynload',
+        '/usr/lib/python3/dist-packages/',
+        '/usr/lib/python3.7',
+#        '/usr/lib/python3.7/plat-x86_64-linux-gnu',
+#        '/usr/lib/python3.7/lib-tk',
+#        root + 'env/local/lib/python3.7/site-packages',
+#        root + 'env/local/lib/python3.7/site-packages/gtk-2.0',
+        root + 'env/lib/python3.7/site-packages',
+#        root + 'env/lib/python3.7/site-packages/gtk-2.0',
     ]
 
 

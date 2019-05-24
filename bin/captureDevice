@@ -13,7 +13,7 @@ import cyclone.web, cyclone.websocket, cyclone.httpclient
 from greplin import scales
 
 from run_local import log
-from lib.cycloneerr import PrettyErrorHandler
+from cycloneerr import PrettyErrorHandler
 
 from light9.namespaces import L9, RDF
 from light9 import networking, showconfig

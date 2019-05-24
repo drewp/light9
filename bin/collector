@@ -20,7 +20,7 @@ import traceback
 import cyclone.web, cyclone.websocket
 from greplin import scales
 
-from lib.cycloneerr import PrettyErrorHandler
+from cycloneerr import PrettyErrorHandler
 from light9.collector.output import EnttecDmx, Udmx, DummyOutput
 from light9.collector.collector import Collector
 from light9.namespaces import L9
