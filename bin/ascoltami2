@@ -1,7 +1,7 @@
 #!bin/python
 from run_local import log
 from twisted.internet import reactor
-import web, _thread, sys, optparse, logging
+import sys, optparse, logging
 from rdflib import URIRef
 import gi
 gi.require_version('Gst', '1.0')
@@ -12,7 +12,7 @@ from light9.ascoltami.playlist import Playlist, NoSuchSong
 from light9.ascoltami.webapp import makeWebApp, songUri, songLocation
 from light9 import networking, showconfig
 
-from gi.repository import GObject, Gst, Gtk
+from gi.repository import GObject, Gst
 
 
 class App(object):

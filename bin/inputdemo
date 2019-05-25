@@ -5,13 +5,12 @@ from twisted.internet import gtk3reactor
 gtk3reactor.install()
 from twisted.internet import reactor
 from rdflib import URIRef
-import optparse, logging, urllib.request, urllib.parse, urllib.error, time
+import optparse, logging, time
 from gi.repository import Gtk
 from run_local import log
-from light9 import showconfig, networking
+from light9 import networking
 from light9 import clientsession
 from rdfdb.syncedgraph import SyncedGraph
-import cyclone.httpclient
 from light9.curvecalc.client import sendLiveInputPoint
 
 

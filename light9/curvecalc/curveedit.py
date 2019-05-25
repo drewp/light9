@@ -1,12 +1,11 @@
 """
 this may be split out from curvecalc someday, since it doesn't
 need to be tied to a gui """
-import cgi, time
+import cgi
 from twisted.internet import reactor
 import cyclone.web, cyclone.httpclient, cyclone.websocket
 from rdflib import URIRef
 from cycloneerr import PrettyErrorHandler
-from run_local import log
 from louie import dispatcher
 
 

@@ -1,12 +1,12 @@
-import os, logging, time
+import logging
 from rdflib import Graph, RDF
 from rdflib import RDFS, Literal, BNode
 from light9.namespaces import L9, XSD
 from light9.TLUtility import dict_scale, dict_max
 from light9 import showconfig
-from light9.Patch import resolve_name, get_dmx_channel, get_channel_uri, reload_data
+from light9.Patch import resolve_name, get_dmx_channel, get_channel_uri
 from louie import dispatcher
-from .rdfdb.patch import Patch
+from rdfdb.patch import Patch
 log = logging.getLogger('submaster')
 
 
@@ -73,7 +73,7 @@ class Submaster(object):
         # not sure how useful this is
         if not isinstance(other, Submaster):
             return -1
-        return cmp(self.ident(), other.ident())
+        return cmp(self.ident(), other.ident()) # noqa
 
     def __hash__(self):
         return hash(self.ident())
@@ -189,7 +189,7 @@ class PersistentSubmaster(Submaster):
                 continue
             try:
                 self.levels[name] = float(val)
-            except:
+            except Exception:
                 log.error("name %r val %r" % (name, val))
                 raise
 
@@ -326,11 +326,11 @@ class Submasters(object):
 
     def get_all_subs(self):
         "All Submaster objects"
-        l = sorted(list(self.submasters.items()))
-        l = [x[1] for x in l]
+        v = sorted(list(self.submasters.items()))
+        v = [x[1] for x in v]
         songs = []
         notsongs = []
-        for s in l:
+        for s in v:
             if s.name and s.name.startswith('song'):
                 songs.append(s)
             else:

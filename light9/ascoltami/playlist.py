@@ -19,13 +19,13 @@ class Playlist(object):
         try:
             currentIndex = self.songs.index(currentSong)
         except IndexError:
-            raise ValueError("%r is not in the current playlist (%r)." % \
-                (currentSong, self.playlistUri))
+            raise ValueError("%r is not in the current playlist (%r)." %
+                             (currentSong, self.playlistUri))
 
         try:
             nextSong = self.songs[currentIndex + 1]
         except IndexError:
-            raise NoSuchSong("%r is the last item in the playlist." % \
+            raise NoSuchSong("%r is the last item in the playlist." %
                              currentSong)
 
         return nextSong

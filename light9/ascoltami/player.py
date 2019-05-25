@@ -4,8 +4,8 @@ alternate to the mpd music player, for ascoltami
 """
 
 import time, logging, traceback
-from gi.repository import GObject, Gst
-from twisted.internet import reactor, task
+from gi.repository import Gst
+from twisted.internet import task
 
 log = logging.getLogger()
 
@@ -30,7 +30,7 @@ class Player(object):
 
         task.LoopingCall(self.watchTime).start(.050)
 
-        bus = self.pipeline.get_bus()
+        #bus = self.pipeline.get_bus()
         # not working- see notes in pollForMessages
         #self.watchForMessages(bus)
 
@@ -46,7 +46,7 @@ class Player(object):
                 self.pause()
 
             self.lastWatchTime = t
-        except:
+        except Exception:
             traceback.print_exc()
 
     def watchForMessages(self, bus):

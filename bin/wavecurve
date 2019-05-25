@@ -1,6 +1,6 @@
 #!bin/python
 import optparse
-import run_local
+from run_local import log
 from light9.wavepoints import simp
 
 
@@ -8,9 +8,10 @@ def createCurve(inpath, outpath, t):
     print("reading %s, writing %s" % (inpath, outpath))
     points = simp(inpath.replace('.ogg', '.wav'), seconds_per_average=t)
 
-    f = file(outpath, 'w')
+    f = open(outpath, 'w')
     for time_val in points:
         print("%s %s" % time_val, file=f)
+    log.info(r'Wrote {outpath}')
 
 
 parser = optparse.OptionParser(usage="""%prog inputSong.wav outputCurve
@@ -30,8 +31,6 @@ options, args = parser.parse_args()
 
 if options.all:
     from light9 import showconfig
-    from light9.namespaces import L9
-    from rdflib import RDF
     from light9.ascoltami.playlist import Playlist
     graph = showconfig.getGraph()
 

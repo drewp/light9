@@ -33,7 +33,7 @@ def toplevel_savegeometry(tl, name):
             f = open(".light9-window-geometry-%s" % name.replace(' ', '_'), 'w')
             f.write(tl.geometry())
         # else the window never got mapped
-    except Exception as e:
+    except Exception:
         # it's ok if there's no saved geometry
         pass
 

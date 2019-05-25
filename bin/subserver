@@ -4,11 +4,11 @@ live web display of all existing subs with pictures, mainly for
 dragging them into CC or Timeline
 """
 from run_local import log
-import sys, optparse, logging, json, subprocess, datetime
+import optparse, logging, json, subprocess, datetime
 from dateutil.tz import tzlocal
 from twisted.internet import reactor, defer
 import cyclone.web, cyclone.httpclient, cyclone.websocket
-from rdflib import RDF, URIRef, Literal
+from rdflib import URIRef, Literal
 import pyjade.utils
 from rdfdb.syncedgraph import SyncedGraph
 from rdfdb.patch import Patch

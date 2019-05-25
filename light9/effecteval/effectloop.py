@@ -1,18 +1,17 @@
 import time, json, logging, traceback
 import numpy
 import serial
-from twisted.internet import reactor, threads
+from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
 from twisted.internet.error import TimeoutError
-from rdflib import URIRef, Literal
+from rdflib import URIRef
 import cyclone.httpclient
-from light9.namespaces import L9, RDF, RDFS
+from light9.namespaces import L9, RDF
 from light9.effecteval.effect import EffectNode
 from light9 import Effects
 from light9 import networking
 from light9 import Submaster
 from light9 import dmxclient
-from light9 import prof
 log = logging.getLogger('effectloop')
 
 

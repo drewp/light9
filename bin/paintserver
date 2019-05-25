@@ -13,7 +13,7 @@ from rdflib import URIRef
 from light9 import clientsession
 import light9.paint.solve
 from cycloneerr import PrettyErrorHandler
-from light9.namespaces import RDF, L9, DEV
+from light9.namespaces import L9, DEV
 import imp
 
 

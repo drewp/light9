@@ -18,7 +18,7 @@ proposal for new attribute system:
 """
 
 import tkinter as tk
-from rdflib import RDF, Literal
+from rdflib import RDF
 import math, logging
 from decimal import Decimal
 from light9.namespaces import L9

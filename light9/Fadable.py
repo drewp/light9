@@ -1,5 +1,4 @@
 # taken from SnackMix -- now that's reusable code
-from tkinter.tix import *
 import time
 
 

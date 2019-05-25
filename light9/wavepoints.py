@@ -4,13 +4,14 @@ import wave, audioop
 def simp(filename, seconds_per_average=0.001):
     """smaller seconds_per_average means fewer data points"""
     wavefile = wave.open(filename, 'rb')
-    print("# gnuplot data for %s, seconds_per_average=%s" % \
-        (filename, seconds_per_average))
+    print("# gnuplot data for %s, seconds_per_average=%s" %
+          (filename, seconds_per_average))
     print(
         "# %d channels, samplewidth: %d, framerate: %s, frames: %d\n# Compression type: %s (%s)"
         % wavefile.getparams())
 
     framerate = wavefile.getframerate()  # frames / second
+
     frames_to_read = int(framerate * seconds_per_average)
     print("# frames_to_read=%s" % frames_to_read)
 
@@ -31,7 +32,7 @@ def simp(filename, seconds_per_average=0.001):
         values.append(m)
         count += frames_to_read
         # if count>1000000:
-        # break
+        #     break
 
     # find the min and max
     min_value, max_value = min(values), max(values)

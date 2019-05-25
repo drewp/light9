@@ -342,16 +342,16 @@ class KeyboardComposer(tk.Frame, SubClient):
             for key in keys:
                 # lowercase makes full=0
                 keysym = "<KeyPress-%s>" % key
-                tkobject.bind(keysym, \
-                    lambda evt, num=keys.index(key), d=d: \
-                        self.got_nudger(num, d))
+                tkobject.bind(keysym,
+                              lambda evt, num=keys.index(key), d=d: self.
+                              got_nudger(num, d))
 
                 # uppercase makes full=1
                 keysym = "<KeyPress-%s>" % key.upper()
                 keysym = keysym.replace('SEMICOLON', 'colon')
-                tkobject.bind(keysym, \
-                    lambda evt, num=keys.index(key), d=d: \
-                        self.got_nudger(num, d, full=1))
+                tkobject.bind(keysym,
+                              lambda evt, num=keys.index(key), d=d: self.
+                              got_nudger(num, d, full=1))
 
         # Row changing:
         # Page dn, C-n, and ] do down

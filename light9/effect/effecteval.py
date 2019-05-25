@@ -1,13 +1,10 @@
-from rdflib import URIRef, Literal
-from light9.namespaces import L9, RDF, DEV
+from rdflib import Literal
+from light9.namespaces import L9, DEV
 from webcolors import rgb_to_hex, hex_to_rgb
 from colorsys import hsv_to_rgb
-from decimal import Decimal
 import math
-import traceback
 from noise import pnoise1
 import logging
-import time
 from light9.effect.settings import DeviceSettings
 from light9.effect.scale import scale
 import random
@@ -135,7 +132,6 @@ def effect_animRainbow(effectSettings, strength, songTime, noteTime):
 def effect_auraSparkles(effectSettings, strength, songTime, noteTime):
     out = {}
     tint = effectSettings.get(L9['tint'], '#ffffff')
-    tintStrength = float(effectSettings.get(L9['tintStrength'], 0))
     print(effectSettings)
     tr, tg, tb = hex_to_rgb(tint)
     for n in range(1, 5 + 1):

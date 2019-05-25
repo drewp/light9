@@ -1,6 +1,5 @@
-import json, socket, subprocess, cyclone.web, os
+import json, socket, subprocess, cyclone.web
 from twisted.python.util import sibpath
-from twisted.python.filepath import FilePath
 from light9.namespaces import L9
 from light9.showconfig import getSongsFromShow, songOnDisk
 from rdflib import URIRef
@@ -140,7 +139,7 @@ class goButton(PrettyErrorHandler, cyclone.web.RequestHandler):
         """
         if music is playing, this silently does nothing.
         """
-        graph, player = self.settings.app.graph, self.settings.app.player
+        player = self.settings.app.player
 
         if player.isAutostopped():
             player.resume()

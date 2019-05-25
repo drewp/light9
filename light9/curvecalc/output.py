@@ -1,8 +1,6 @@
 import time, logging
 from twisted.internet import reactor
 from light9 import Submaster, dmxclient
-from light9.namespaces import L9
-from light9.curvecalc.subterm import Subterm
 
 from louie import dispatcher
 log = logging.getLogger("output")

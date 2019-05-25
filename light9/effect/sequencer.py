@@ -44,7 +44,9 @@ class Note(object):
             ea = settingValues[L9['effectAttr']]
             self.baseEffectSettings[ea] = settingValues[L9['value']]
 
-        floatVal = lambda s, p: float(g.value(s, p).toPython())
+        def floatVal(s, p):
+            return float(g.value(s, p).toPython())
+
         originTime = floatVal(uri, L9['originTime'])
         self.points = []
         for curve in g.objects(uri, L9['curve']):

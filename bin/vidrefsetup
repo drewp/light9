@@ -3,15 +3,12 @@
 camera captures with a continuous camera capture yet """
 
 from run_local import log
-import sys, optparse, logging, json, subprocess, datetime
-from dateutil.tz import tzlocal
-from twisted.internet import reactor, defer
+import optparse, logging
+from twisted.internet import reactor
 import cyclone.web, cyclone.httpclient, cyclone.websocket
-from rdflib import RDF, URIRef, Literal
-import pyjade.utils
+from rdflib import URIRef
 from rdfdb.syncedgraph import SyncedGraph
-from rdfdb.patch import Patch
-from light9.namespaces import L9, DCTERMS
+from light9.namespaces import L9
 from light9 import networking, showconfig
 
 from cycloneerr import PrettyErrorHandler

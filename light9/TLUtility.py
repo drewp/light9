@@ -56,7 +56,7 @@ def dumpobj(o):
     for a in [x for x in dir(o) if not callable(getattr(o, x))]:
         try:
             print("  %20s: %s " % (a, getattr(o, a)))
-        except:
+        except Exception:
             pass
     print("")
 
@@ -190,7 +190,7 @@ def dict_max(*dicts):
 
 def dict_scale(d, scl):
     """scales all values in dict and returns a new dict"""
-    return dict([(k, v * scl) for k, v in list(d.items())])
+    return dict([(k, v * scl) for k, v in d.items()])
 
 
 def dict_subset(d, dkeys, default=0):

@@ -7,7 +7,7 @@ function _songs { local expl;  _description files expl 'songs';  compadd "$expl[
 compdef _songs curvecalc
 """
 
-from run_local import log
+from run_local import log  # noqa
 from twisted.internet import reactor
 from rdflib import RDF
 from light9 import networking

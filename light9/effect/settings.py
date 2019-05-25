@@ -6,8 +6,7 @@ or output attrs (dmx channel).
 import decimal
 import numpy
 from rdflib import URIRef, Literal
-from light9.namespaces import RDF, L9, DEV
-from rdfdb.patch import Patch
+from light9.namespaces import RDF, L9
 import logging
 log = logging.getLogger('settings')
 from light9.collector.device import resolve

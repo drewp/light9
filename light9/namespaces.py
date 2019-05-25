@@ -1,4 +1,4 @@
-from rdflib import Namespace, RDF, RDFS
+from rdflib import Namespace, RDF, RDFS  # noqa
 
 
 # Namespace was showing up in profiles

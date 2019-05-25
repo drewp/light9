@@ -1,5 +1,5 @@
 #!bin/python
-import run_local
+import run_local  # noqa
 import os
 from light9 import networking, showconfig
 import rdfdb.service

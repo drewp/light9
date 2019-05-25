@@ -4,7 +4,7 @@ from run_local import log
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue
 import cyclone.web, cyclone.websocket, cyclone.httpclient
-import sys, optparse, logging, subprocess, json, itertools
+import sys, optparse, logging, json, itertools
 from rdflib import URIRef, Literal
 
 sys.path.append('/usr/lib/pymodules/python2.7/')  # for numpy, on rpi
@@ -20,6 +20,7 @@ from rdfdb.syncedgraph import SyncedGraph
 from greplin import scales
 
 from cycloneerr import PrettyErrorHandler
+from light9.coffee import StaticCoffee
 
 
 class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
@@ -201,9 +202,9 @@ class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):
         song = URIRef(self.get_argument('song'))
-        effects = effectsForSong(self.settings.graph, song)
+        effects = effectsForSong(self.settings.graph, song) # noqa
         raise NotImplementedError
-        self.write(maxDict(effectDmxDict(e) for e in effects))
+        self.write(maxDict(effectDmxDict(e) for e in effects)) # noqa
         # return dmx dict for all effects in the song, already combined
 
 
@@ -257,19 +258,6 @@ class App(object):
                                                   stats=self.stats)
         reactor.listenTCP(networking.effectEval.port, self.cycloneApp)
         log.info("listening on %s" % networking.effectEval.port)
-
-
-class StaticCoffee(PrettyErrorHandler, cyclone.web.RequestHandler):
-
-    def initialize(self, src):
-        super(StaticCoffee, self).initialize()
-        self.src = src
-
-    def get(self):
-        self.set_header('Content-Type', 'application/javascript')
-        self.write(
-            subprocess.check_output(
-                ['/usr/bin/coffee', '--compile', '--print', self.src]))
 
 
 if __name__ == "__main__":

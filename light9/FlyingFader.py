@@ -1,6 +1,5 @@
-from tkinter.tix import *
-from time import time, sleep
-
+from tkinter import tix
+from time import time
 
 class Mass:
 
@@ -65,7 +64,7 @@ class Mass:
         return not self._stopped
 
 
-class FlyingFader(Frame):
+class FlyingFader(tix.Frame):
 
     def __init__(self,
                  master,
@@ -75,7 +74,7 @@ class FlyingFader(Frame):
                  font=('Arial', 8),
                  labelwidth=12,
                  **kw):
-        Frame.__init__(self, master)
+        tix.Frame.__init__(self, master)
         self.name = label
         self.variable = variable
 
@@ -94,25 +93,23 @@ class FlyingFader(Frame):
         }
         scaleopts.update(kw)
         if scaleopts['orient'] == 'vert':
-            side1 = TOP
-            side2 = BOTTOM
+            side2 = tix.BOTTOM
         else:
-            side1 = RIGHT
-            side2 = LEFT
+            side2 = tix.LEFT
 
-        self.scale = Scale(self, **scaleopts)
-        self.vlabel = Label(self, text="0.0", width=6, font=font)
-        self.label = Label(self,
-                           text=label,
-                           font=font,
-                           anchor='w',
-                           width=labelwidth)  #wraplength=40, )
+        self.scale = tix.Scale(self, **scaleopts)
+        self.vlabel = tix.Label(self, text="0.0", width=6, font=font)
+        self.label = tix.Label(self,
+                               text=label,
+                               font=font,
+                               anchor='w',
+                               width=labelwidth)  #wraplength=40, )
 
         self.oldtrough = self.scale['troughcolor']
 
-        self.scale.pack(side=side2, expand=1, fill=BOTH, anchor='c')
-        self.vlabel.pack(side=side2, expand=0, fill=X)
-        self.label.pack(side=side2, expand=0, fill=X)
+        self.scale.pack(side=side2, expand=1, fill=tix.BOTH, anchor='c')
+        self.vlabel.pack(side=side2, expand=0, fill=tix.X)
+        self.label.pack(side=side2, expand=0, fill=tix.X)
 
         for k in range(1, 10):
             self.scale.bind(
@@ -150,7 +147,7 @@ class FlyingFader(Frame):
         mult = 1
         if evt.state & 8 and evt.state & 4: mult = 0.25  # both
         elif evt.state & 8: mult = 0.5  # alt
-        elif evt.state & 4: mult = 2  # control
+        elif evt.state & 4: mult = 2  # control # noqa
 
         self.mass.x = self.variable.get()
         self.mass.goto(newlevel)
@@ -204,22 +201,19 @@ def colorfade(scale, lev):
 
 
 if __name__ == '__main__':
-    root = Tk()
+    root = tix.Tk()
     root.tk_focusFollowsMouse()
 
-    FlyingFader(root, variable=DoubleVar(), label="suck").pack(side=LEFT,
-                                                               expand=1,
-                                                               fill=BOTH)
-    FlyingFader(root, variable=DoubleVar(), label="moof").pack(side=LEFT,
-                                                               expand=1,
-                                                               fill=BOTH)
-    FlyingFader(root, variable=DoubleVar(), label="zarf").pack(side=LEFT,
-                                                               expand=1,
-                                                               fill=BOTH)
+    FlyingFader(root, variable=tix.DoubleVar(),
+                label="suck").pack(side=tix.LEFT, expand=1, fill=tix.BOTH)
+    FlyingFader(root, variable=tix.DoubleVar(),
+                label="moof").pack(side=tix.LEFT, expand=1, fill=tix.BOTH)
+    FlyingFader(root, variable=tix.DoubleVar(),
+                label="zarf").pack(side=tix.LEFT, expand=1, fill=tix.BOTH)
     FlyingFader(root,
-                variable=DoubleVar(),
-                label="long name goes here.  got it?").pack(side=LEFT,
+                variable=tix.DoubleVar(),
+                label="long name goes here.  got it?").pack(side=tix.LEFT,
                                                             expand=1,
-                                                            fill=BOTH)
+                                                            fill=tix.BOTH)
 
     root.mainloop()

@@ -72,5 +72,5 @@ dummy = os.getenv('DMXDUMMY')
 if dummy:
     print("dmxclient: DMX is in dummy mode.")
 
-    def outputlevels(*args, **kw):
+    def outputlevels(*args, **kw): # noqa
         pass

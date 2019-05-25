@@ -162,7 +162,6 @@ class Pics(cyclone.web.RequestHandler):
                 if not self.running:
                     raise StopIteration
 
-                now = time.time()
                 self.write("%s %s\n" % (len(frame), frameTime))
                 self.write(frame)
                 self.flush()

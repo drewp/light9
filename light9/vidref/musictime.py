@@ -1,9 +1,7 @@
-import restkit, time, json, logging
+import time, json, logging
 from light9 import networking
 from twisted.internet import reactor
 from cyclone.httpclient import fetch
-from restkit.errors import ResourceNotFound
-import http_parser.http
 log = logging.getLogger()
 
 
@@ -29,7 +27,6 @@ class MusicTime(object):
         self.period = period
         self.hoverPeriod = .05
         self.onChange = onChange
-        self.musicResource = restkit.Resource(networking.musicPlayer.url)
 
         self.position = {}
         # driven by our pollCurvecalcTime and also by Gui.incomingTime
@@ -125,6 +122,9 @@ class MusicTime(object):
 
     def sendTime(self, t):
         """request that the player go to this time"""
-        self.musicResource.post("time",
-                                payload=json.dumps({"t": t}),
-                                headers={"content-type": "application/json"})
+        fetch(
+            method=b'POST',
+            url=networking.musicPlayer.path('time'),
+            body=json.dumps({"t": t}),
+            headers={b"content-type": [b"application/json"]},
+        )

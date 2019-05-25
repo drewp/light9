@@ -1,5 +1,5 @@
 from light9.collector.collector_client import sendToCollector
-from twisted.internet import reactor, task
+from twisted.internet import reactor
 import traceback
 import time
 import logging
@@ -38,7 +38,7 @@ class SubClient:
         try:
             with self.graph.currentState() as g:
                 outputSettings = self.get_output_settings(_graph=g)
-        except:
+        except Exception:
             traceback.print_exc()
             return
         return sendToCollector('subclient', self.session, outputSettings)

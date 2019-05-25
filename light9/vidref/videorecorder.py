@@ -158,7 +158,7 @@ class VideoRecordSink(gst.Element):
             img = Image.fromstring('RGB', (cap['width'], cap['height']),
                                    buffer.data)
             self.imagesToSave.put((position, img, buffer.timestamp))
-        except:
+        except Exception:
             traceback.print_exc()
 
         return gst.FLOW_OK

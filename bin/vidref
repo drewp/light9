@@ -7,10 +7,9 @@ gtk2reactor.install()
 from twisted.internet import reactor, defer
 import gobject
 gobject.threads_init()
-import gtk
 import sys, logging, optparse, json
 import cyclone.web, cyclone.httpclient, cyclone.websocket
-from light9 import networking, showconfig
+from light9 import networking
 from light9.vidref.main import Gui
 from light9.vidref.replay import snapshotDir
 from rdfdb.syncedgraph import SyncedGraph
@@ -42,7 +41,7 @@ class Snapshot(cyclone.web.RequestHandler):
             self.write(json.dumps({'snapshot': out}))
             self.set_header("Location", out)
             self.set_status(303)
-        except Exception as e:
+        except Exception:
             import traceback
             traceback.print_exc()
             raise

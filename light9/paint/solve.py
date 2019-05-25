@@ -1,11 +1,11 @@
-from light9.namespaces import RDF, L9, DEV
+from light9.namespaces import L9, DEV
 from PIL import Image
 import numpy
 import scipy.misc, scipy.ndimage, scipy.optimize
 import cairo
 import logging
 
-from light9.effect.settings import DeviceSettings, parseHex, toHex
+from light9.effect.settings import DeviceSettings, parseHex
 
 log = logging.getLogger('solve')
 
@@ -151,7 +151,7 @@ class Solver(object):
         results = []
         dist = ImageDist(img)
         if device is None:
-            items = list(self.samples.items())
+            items = self.samples.items()
         else:
             items = self.samplesForDevice[device]
         for uri, img2 in sorted(items):
@@ -220,18 +220,18 @@ class Solver(object):
             #saveNumpy('/tmp/sample_%s.png' % sample.split('/')[-1],
             #          f(picSample))
             sampleDist[sample] = dist.distanceTo(picSample)
-        results = sorted([(d, uri) for uri, d in list(sampleDist.items())])
+        results = sorted([(d, uri) for uri, d in sampleDist.items()])
 
         sample = results[0][1]
 
         # this is wrong; some wrong-alignments ought to be dimmer than full
         brightest0 = brightest(pic0)
-        brightestSample = brightest(self.samples[sample])
+        #brightestSample = brightest(self.samples[sample])
 
         if max(brightest0) < 1 / 255:
             return DeviceSettings(self.graph, [])
 
-        scale = brightest0 / brightestSample
+        #scale = brightest0 / brightestSample
 
         s = DeviceSettings.fromResource(self.graph, sample)
         # missing color scale, but it was wrong to operate on all devs at once
@@ -300,7 +300,7 @@ class Solver(object):
         for dev, devSettings in settings.byDevice():
             requestedColor = devSettings.getValue(dev, L9['color'])
             candidatePics = []  # (distance, path, picColor)
-            for sample, s in list(self.sampleSettings.items()):
+            for sample, s in self.sampleSettings.items():
                 path = self.path[sample]
                 otherDevSettings = s.ofDevice(dev)
                 if not otherDevSettings:

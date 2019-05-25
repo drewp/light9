@@ -1,5 +1,3 @@
-from gi.repository import Gtk
-from gi.repository import GObject
 from gi.repository import GooCanvas
 import louie as dispatcher
 from light9.curvecalc import cursors

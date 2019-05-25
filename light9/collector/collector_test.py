@@ -1,7 +1,7 @@
 import unittest
 import datetime, time
 from freezegun import freeze_time
-from rdflib import Namespace, URIRef
+from rdflib import Namespace
 
 from light9.namespaces import L9, DEV
 from light9.collector.collector import Collector, outputMap

@@ -7,8 +7,9 @@ from light9.collector.device import toOutputAttrs, resolve
 
 # types only
 from rdflib import Graph, URIRef
-from typing import List, Dict, Tuple, Any, TypeVar, Generic
+from typing import List, Dict, Tuple, TypeVar, Generic, Optional
 from light9.collector.output import Output
+from light9.collector.weblisteners import WebListeners
 
 ClientType = TypeVar('ClientType')
 ClientSessionType = TypeVar('ClientSessionType')
@@ -24,7 +25,7 @@ def outputMap(graph, outputs):
     """
     ret = {}
 
-    outputByUri = {}  # universeUri : output
+    outputByUri: Dict[URIRef, Output] = {}  # universeUri : output
     for out in outputs:
         outputByUri[out.uri] = out
 
@@ -50,8 +51,11 @@ def outputMap(graph, outputs):
 
 class Collector(Generic[ClientType, ClientSessionType]):
 
-    def __init__(self, graph, outputs, listeners=None, clientTimeoutSec=10):
-        # type: (Graph, List[Output], List[Listener], float) -> None
+    def __init__(self,
+                 graph: Graph,
+                 outputs: List[Output],
+                 listeners: Optional[WebListeners] = None,
+                 clientTimeoutSec: float = 10):
         self.graph = graph
         self.outputs = outputs
         self.listeners = listeners

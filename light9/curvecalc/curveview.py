@@ -1,4 +1,4 @@
-import math, logging, traceback
+import math, logging
 from gi.repository import Gtk
 from gi.repository import Gdk
 from gi.repository import GooCanvas
@@ -6,7 +6,6 @@ import louie as dispatcher
 from rdflib import Literal
 from twisted.internet import reactor
 from light9.curvecalc.zoomcontrol import RegionZoom
-from light9.curvecalc import cursors
 from light9.curvecalc.curve import introPad, postPad
 from lib.goocanvas_compat import Points, polyline_new_line
 import imp
@@ -1276,8 +1275,8 @@ class Curvesetview(object):
         if not self.live:  # workaround for old instances living past reload()
             return
 
-        r = self.row_under_mouse()
-        key = event.string
+        #r = self.row_under_mouse()
+        #key = event.string
         pass  # no handlers right now
 
     def row_under_mouse(self):

@@ -3,7 +3,7 @@ import sys
 import time
 import usb.core
 import logging
-from twisted.internet import task, threads, reactor
+from twisted.internet import threads, reactor
 from greplin import scales
 log = logging.getLogger('output')
 

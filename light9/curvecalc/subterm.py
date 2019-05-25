@@ -1,8 +1,8 @@
-import math, os, random, logging
-from rdflib import Graph, URIRef, RDF, RDFS, Literal
+import logging
+from rdflib import Literal
 from louie import dispatcher
 import light9.Effects
-from light9 import Submaster, showconfig, prof
+from light9 import Submaster
 from light9.Patch import get_dmx_channel
 from rdfdb.patch import Patch
 from light9.namespaces import L9

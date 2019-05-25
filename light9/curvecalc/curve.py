@@ -1,4 +1,4 @@
-import glob, time, logging, ast, os
+import logging, ast, os
 from bisect import bisect_left, bisect
 import louie as dispatcher
 from twisted.internet import reactor
@@ -45,7 +45,7 @@ class Curve(object):
 
     def load(self, filename):
         self.points[:] = []
-        for line in file(filename):
+        for line in open(filename):
             x, y = line.split()
             self.points.append((float(x), ast.literal_eval(y)))
         self.points.sort()
@@ -75,7 +75,7 @@ class Curve(object):
         if filename.endswith('-music') or filename.endswith('_music'):
             print("not saving music track")
             return
-        f = file(filename, 'w')
+        f = open(filename, 'w')
         for p in self.points:
             f.write("%s %r\n" % p)
         f.close()

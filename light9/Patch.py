@@ -1,4 +1,3 @@
-import os
 from rdflib import RDF
 from light9.namespaces import L9
 from light9 import showconfig

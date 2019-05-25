@@ -3,7 +3,7 @@ from twisted.python.filepath import FilePath
 from os import path, getenv
 from rdflib import Graph
 from rdflib import URIRef
-from .namespaces import MUS, L9
+from .namespaces import L9
 log = logging.getLogger('showconfig')
 
 _config = None  # graph

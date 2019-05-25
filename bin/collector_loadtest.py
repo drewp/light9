@@ -1,7 +1,7 @@
 import sys
 sys.path.append('bin')
 from run_local import log
-from light9.collector.collector_client import sendToCollector, sendToCollectorZmq
+from light9.collector.collector_client import sendToCollector
 from light9.namespaces import L9, DEV
 from twisted.internet import reactor
 import time

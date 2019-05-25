@@ -1,14 +1,11 @@
 #!bin/python
 from run_local import log
-from rdflib import RDF, URIRef
-from light9 import networking, showconfig
+from light9 import showconfig
 from light9.namespaces import L9
 from urllib.parse import urlparse
 from urllib.parse import splitport
 
-from rdfdb.syncedgraph import SyncedGraph
-from twisted.internet import reactor
-
+log.info('generating config')
 graph = showconfig.getGraph()
 
 netHome = graph.value(showconfig.showUri(), L9['networking'])

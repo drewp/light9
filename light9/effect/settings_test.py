@@ -2,7 +2,7 @@ import unittest
 from rdflib import Literal
 from rdfdb.patch import Patch
 from rdfdb.localsyncedgraph import LocalSyncedGraph
-from light9.namespaces import RDF, L9, DEV
+from light9.namespaces import L9, DEV
 from light9.effect.settings import DeviceSettings
 
 

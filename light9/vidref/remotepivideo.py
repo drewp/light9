@@ -6,8 +6,8 @@ import gtk
 import numpy
 import treq
 from twisted.internet import defer
-from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
-from light9 import prof, showconfig
+from light9.vidref.replay import songDir, takeDir, snapshotDir
+from light9 import showconfig
 from light9.namespaces import L9
 from PIL import Image
 from io import StringIO

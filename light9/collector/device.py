@@ -1,6 +1,5 @@
 import logging
-import math
-from light9.namespaces import L9, RDF, DEV
+from light9.namespaces import L9
 from rdflib import Literal
 from webcolors import hex_to_rgb, rgb_to_hex
 from colormath.color_objects import sRGBColor, CMYColor

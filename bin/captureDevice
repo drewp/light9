@@ -23,6 +23,7 @@ from light9.greplin_cyclone import StatsForCyclone
 from light9.effect.settings import DeviceSettings
 from light9.collector.collector_client import sendToCollector
 from rdfdb.patch import Patch
+from light9.zmqtransport import parseJsonMessage
 
 stats = scales.collection('/webServer', scales.PmfStat('setAttr'))
 
@@ -174,7 +175,8 @@ def launch(graph):
                           }),
                           (r'/stats', StatsForCyclone),
                       ]),
-                      interface='::')
+                      interface='::',
+                      cap=cap)
     log.info('serving http on %s', networking.captureDevice.port)
 
 

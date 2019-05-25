@@ -21,11 +21,12 @@ import re
 import sys
 import os
 from gi.repository import Pango
-from StringIO import StringIO
+from io import StringIO
+from functools import reduce
  
 try:
-	import IPython
-except Exception,e:
+        import IPython
+except Exception as e:
 	raise "Error importing IPython (%s)" % str(e)
  
 ansi_colors =  {'0;30': 'Black',
@@ -148,11 +149,11 @@ class IterableIPShell:
  
   def shell(self, cmd,verbose=0,debug=0,header=''):
     stat = 0
-    if verbose or debug: print header+cmd
+    if verbose or debug: print(header+cmd)
     # flush stdout so we don't mangle python's buffering
     if not debug:
       input, output = os.popen4(cmd)
-      print output.read()
+      print(output.read())
       output.close()
       input.close()
  

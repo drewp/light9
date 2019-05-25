@@ -79,7 +79,7 @@ class Gui(object):
         try:
             with gtk.gdk.lock:
                 self.replayViews.update(position)
-        except:
+        except Exception:
             traceback.print_exc()
         return True
 

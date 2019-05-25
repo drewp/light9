@@ -4,7 +4,6 @@ client code for talking to curvecalc
 import cyclone.httpclient
 from light9 import networking
 import urllib.request, urllib.parse, urllib.error
-from run_local import log
 
 
 def sendLiveInputPoint(curve, value):
