@@ -1,4 +1,3 @@
-
 import os, logging, time
 from rdflib import Graph, RDF
 from rdflib import RDFS, Literal, BNode
@@ -10,8 +9,10 @@ from louie import dispatcher
 from .rdfdb.patch import Patch
 log = logging.getLogger('submaster')
 
+
 class Submaster(object):
     """mapping of channels to levels"""
+
     def __init__(self, name, levels):
         """this sub has a name just for debugging. It doesn't get persisted.
         See PersistentSubmaster.
@@ -51,7 +52,9 @@ class Submaster(object):
     def __mul__(self, scalar):
         return Submaster("%s*%s" % (self.name, scalar),
                          levels=dict_scale(self.levels, scalar))
+
     __rmul__ = __mul__
+
     def max(self, *othersubs):
         return sub_maxes(self, *othersubs)
 
@@ -76,7 +79,7 @@ class Submaster(object):
         return hash(self.ident())
 
     def get_dmx_list(self):
-        leveldict = self.get_levels() # gets levels of sub contents
+        leveldict = self.get_levels()  # gets levels of sub contents
 
         levels = []
         for k, v in list(leveldict.items()):
@@ -85,8 +88,9 @@ class Submaster(object):
             try:
                 dmxchan = get_dmx_channel(k) - 1
             except ValueError:
-                log.error("error trying to compute dmx levels for submaster %s"
-                          % self.name)
+                log.error(
+                    "error trying to compute dmx levels for submaster %s" %
+                    self.name)
                 raise
             if dmxchan >= len(levels):
                 levels.extend([0] * (dmxchan - len(levels) + 1))
@@ -119,14 +123,16 @@ class Submaster(object):
 
         xfaded_sub = Submaster("xfade", {})
         for k in all_keys:
-            xfaded_sub.set_level(k,
-                                 linear_fade(self.levels.get(k, 0),
-                                             otherlevels.get(k, 0),
-                                             amount))
+            xfaded_sub.set_level(
+                k,
+                linear_fade(self.levels.get(k, 0), otherlevels.get(k, 0),
+                            amount))
 
         return xfaded_sub
 
+
 class PersistentSubmaster(Submaster):
+
     def __init__(self, graph, uri):
         if uri is None:
             raise TypeError("uri must be URIRef")
@@ -144,7 +150,7 @@ class PersistentSubmaster(Submaster):
 
     def changeName(self, newName):
         self.graph.patchObject(self.uri, self.uri, RDFS.label, Literal(newName))
-        
+
     def setName(self):
         log.info("sub update name %s %s", self.uri, self.graph.label(self.uri))
         self.name = self.graph.label(self.uri)
@@ -193,23 +199,27 @@ class PersistentSubmaster(Submaster):
         typeStmt = (self.uri, RDF.type, L9['Submaster'])
         with self.graph.currentState(tripleFilter=typeStmt) as current:
             try:
-                log.debug("submaster's type statement is in %r so we save there" %
-                          list(current.contextsForStatement(typeStmt)))
+                log.debug(
+                    "submaster's type statement is in %r so we save there" %
+                    list(current.contextsForStatement(typeStmt)))
                 ctx = current.contextsForStatement(typeStmt)[0]
             except IndexError:
                 log.info("declaring %s to be a submaster" % self.uri)
                 ctx = self.uri
-                self.graph.patch(Patch(addQuads=[
-                    (self.uri, RDF.type, L9['Submaster'], ctx),
+                self.graph.patch(
+                    Patch(addQuads=[
+                        (self.uri, RDF.type, L9['Submaster'], ctx),
                     ]))
 
         return ctx
 
     def editLevel(self, chan, newLevel):
         self.graph.patchMapping(self._saveContext(),
-                                subject=self.uri, predicate=L9['lightLevel'],
+                                subject=self.uri,
+                                predicate=L9['lightLevel'],
                                 nodeClass=L9['ChannelSetting'],
-                                keyPred=L9['channel'], newKey=chan,
+                                keyPred=L9['channel'],
+                                newKey=chan,
                                 valuePred=L9['level'],
                                 newValue=Literal(newLevel))
 
@@ -225,16 +235,15 @@ class PersistentSubmaster(Submaster):
         quads = []
         with self.graph.currentState() as current:
             quads.extend(current.quads((self.uri, None, None)))
-            for s,p,o,c in quads:
+            for s, p, o, c in quads:
                 if p == L9['lightLevel']:
                     quads.extend(current.quads((o, None, None)))
         return quads
 
-
     def save(self):
         raise NotImplementedError("obsolete?")
         if self.temporary:
-            log.info("not saving temporary sub named %s",self.name)
+            log.info("not saving temporary sub named %s", self.name)
             return
 
         graph = Graph()
@@ -265,11 +274,13 @@ def linear_fade(start, end, amount):
     level = start + (amount * (end - start))
     return level
 
+
 def sub_maxes(*subs):
     nonzero_subs = [s for s in subs if not s.no_nonzero()]
     name = "max(%s)" % ", ".join([repr(s) for s in nonzero_subs])
     return Submaster(name,
                      levels=dict_max(*[sub.levels for sub in nonzero_subs]))
+
 
 def combine_subdict(subdict, name=None, permanent=False):
     """A subdict is { Submaster objects : levels }.  We combine all
@@ -287,10 +298,12 @@ def combine_subdict(subdict, name=None, permanent=False):
 
     return maxes
 
+
 class Submasters(object):
     "Collection o' Submaster objects"
+
     def __init__(self, graph):
-        self.submasters = {} # uri : Submaster
+        self.submasters = {}  # uri : Submaster
         self.graph = graph
 
         graph.addHandler(self.findSubs)
@@ -332,8 +345,10 @@ class Submasters(object):
     def get_sub_by_name(self, name):
         return get_sub_by_name(name, self)
 
+
 # a global instance of Submasters, created on demand
 _submasters = None
+
 
 def get_global_submasters(graph):
     """
@@ -345,6 +360,7 @@ def get_global_submasters(graph):
     if _submasters is None:
         _submasters = Submasters(graph)
     return _submasters
+
 
 def get_sub_by_name(name, submasters=None):
     """name is a channel or sub nama, submasters is a Submasters object.
@@ -359,14 +375,14 @@ def get_sub_by_name(name, submasters=None):
 
     try:
         val = int(name)
-        s = Submaster("#%d" % val, levels={val : 1.0})
+        s = Submaster("#%d" % val, levels={val: 1.0})
         return s
     except ValueError:
         pass
 
     try:
         subnum = get_dmx_channel(name)
-        s = Submaster("'%s'" % name, levels={subnum : 1.0})
+        s = Submaster("'%s'" % name, levels={subnum: 1.0})
         return s
     except ValueError:
         pass

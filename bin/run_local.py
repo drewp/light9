@@ -17,12 +17,12 @@ def fixSysPath():
         root + 'env/lib/python3.7/lib-dynload',
         '/usr/lib/python3/dist-packages/',
         '/usr/lib/python3.7',
-#        '/usr/lib/python3.7/plat-x86_64-linux-gnu',
-#        '/usr/lib/python3.7/lib-tk',
-#        root + 'env/local/lib/python3.7/site-packages',
-#        root + 'env/local/lib/python3.7/site-packages/gtk-2.0',
+        #        '/usr/lib/python3.7/plat-x86_64-linux-gnu',
+        #        '/usr/lib/python3.7/lib-tk',
+        #        root + 'env/local/lib/python3.7/site-packages',
+        #        root + 'env/local/lib/python3.7/site-packages/gtk-2.0',
         root + 'env/lib/python3.7/site-packages',
-#        root + 'env/lib/python3.7/site-packages/gtk-2.0',
+        #        root + 'env/lib/python3.7/site-packages/gtk-2.0',
     ]
 
 

@@ -1,13 +1,13 @@
 """Collected utility functions, many are taken from Drew's utils.py in
 Cuisine CVS and Hiss's Utility.py."""
 
-
 import sys
 
 __author__ = "David McClosky <dmcc@bigasterisk.com>, " + \
              "Drew Perttula <drewp@bigasterisk.com>"
 __cvsid__ = "$Id: TLUtility.py,v 1.1 2003/05/25 08:25:35 dmcc Exp $"
-__version__ = "$Revision: 1.1 $"[11:-2]
+__version__ = "$Revision: 1.1 $" [11:-2]
+
 
 def make_attributes_from_args(*argnames):
     """
@@ -25,14 +25,15 @@ def make_attributes_from_args(*argnames):
             self.baz=baz
             ... 
     """
-    
-    callerlocals=sys._getframe(1).f_locals
-    callerself=callerlocals['self']
+
+    callerlocals = sys._getframe(1).f_locals
+    callerself = callerlocals['self']
     for a in argnames:
         try:
-            setattr(callerself,a,callerlocals[a])
+            setattr(callerself, a, callerlocals[a])
         except KeyError:
             raise KeyError("Function has no argument '%s'" % a)
+
 
 def enumerate(*collections):
     """Generates an indexed series:  (0,coll[0]), (1,coll[1]) ...
@@ -43,8 +44,11 @@ def enumerate(*collections):
     i = 0
     iters = [iter(collection) for collection in collections]
     while True:
-        yield [i,] + [next(iterator) for iterator in iters]
+        yield [
+            i,
+        ] + [next(iterator) for iterator in iters]
         i += 1
+
 
 def dumpobj(o):
     """Prints all the object's non-callable attributes"""
@@ -55,6 +59,7 @@ def dumpobj(o):
         except:
             pass
     print("")
+
 
 def dict_filter_update(d, **newitems):
     """Adds a set of new keys and values to dictionary 'd' if the values are
@@ -68,6 +73,7 @@ def dict_filter_update(d, **newitems):
     for k, v in list(newitems.items()):
         if v: d[k] = v
 
+
 def try_get_logger(channel):
     """Tries to get a logger with the channel 'channel'.  Will return a
     silent DummyClass if logging is not available."""
@@ -77,6 +83,7 @@ def try_get_logger(channel):
     except ImportError:
         log = DummyClass()
     return log
+
 
 class DummyClass:
     """A class that can be instantiated but never used.  It is intended to
@@ -96,9 +103,11 @@ class DummyClass:
       File "Utility.py", line 33, in __getattr__
         raise AttributeError, "Attempted usage of a DummyClass: %s" % key
     AttributeError: Attempted usage of a DummyClass: somefunction"""
+
     def __init__(self, use_warnings=1, raise_exceptions=0, **kw):
         """Constructs a DummyClass"""
         make_attributes_from_args('use_warnings', 'raise_exceptions')
+
     def __getattr__(self, key):
         """Raises an exception to warn the user that a Dummy is not being
         replaced in time."""
@@ -111,20 +120,26 @@ class DummyClass:
         if self.raise_exceptions:
             raise AttributeError(msg)
         return lambda *args, **kw: self.bogus_function()
+
     def bogus_function(self):
         pass
+
 
 class ClassyDict(dict):
     """A dict that accepts attribute-style access as well (for keys
     that are legal names, obviously). I used to call this Struct, but
     chose the more colorful name to avoid confusion with the struct
     module."""
+
     def __getattr__(self, a):
         return self[a]
+
     def __setattr__(self, a, v):
         self[a] = v
+
     def __delattr__(self, a):
         del self[a]
+
 
 def trace(func):
     """Good old fashioned Lisp-style tracing.  Example usage:
@@ -145,6 +160,7 @@ def trace(func):
           indent for recursive call like the lisp version (possible use of 
               generators?)"""
     name = func.__name__
+
     def tracer(*args, **kw):
         s = '|>> %s called' % name
         if args:
@@ -155,7 +171,9 @@ def trace(func):
         ret = func(*args, **kw)
         print('<<| %s returned %s' % (name, ret))
         return ret
+
     return tracer
+
 
 # these functions taken from old light8 code
 def dict_max(*dicts):
@@ -165,21 +183,24 @@ def dict_max(*dicts):
     """
     newdict = {}
     for d in dicts:
-        for k,v in list(d.items()):
+        for k, v in list(d.items()):
             newdict[k] = max(v, newdict.get(k, 0))
     return newdict
 
-def dict_scale(d,scl):
+
+def dict_scale(d, scl):
     """scales all values in dict and returns a new dict"""
-    return dict([(k,v*scl) for k,v in list(d.items())])
-    
+    return dict([(k, v * scl) for k, v in list(d.items())])
+
+
 def dict_subset(d, dkeys, default=0):
     """Subset of dictionary d: only the keys in dkeys.  If you plan on omitting
     keys, make sure you like the default."""
-    newd = {} # dirty variables!
+    newd = {}  # dirty variables!
     for k in dkeys:
         newd[k] = d.get(k, default)
     return newd
+
 
 # functions specific to Timeline
 # TBD
@@ -193,6 +214,7 @@ def last_less_than(array, x):
             return best
     return best
 
+
 # TBD
 def first_greater_than(array, x):
     """array must be sorted"""
@@ -205,5 +227,3 @@ def first_greater_than(array, x):
         elif best is not None:
             return best
     return best
-
-

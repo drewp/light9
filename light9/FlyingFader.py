@@ -2,7 +2,6 @@ from tkinter.tix import *
 from time import time, sleep
 
 
-
 class Mass:
 
     def __init__(self):

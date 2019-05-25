@@ -1,6 +1,3 @@
-
-
-
 def chase(t,
           ontime=0.5,
           offset=0.2,

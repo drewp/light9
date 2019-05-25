@@ -1,6 +1,7 @@
 from glob import glob
 from os.path import join, basename
 
+
 class TkdndEvent(object):
     """
     see http://www.ellogon.org/petasis/tcltk-projects/tkdnd/tkdnd-man-page
@@ -14,15 +15,15 @@ class TkdndEvent(object):
     unnecessarily change their types later.
     """
     substitutions = {
-        "%A" : "action",
-        "%b" : "button",
-        "%D" : "data",
-        "%m" : "modifiers",
-        "%T" : "type",
-        "%W" : "targetWindow",
-        "%X" : "mouseX",
-        "%Y" : "mouseY",
-        }
+        "%A": "action",
+        "%b": "button",
+        "%D": "data",
+        "%m": "modifiers",
+        "%T": "type",
+        "%W": "targetWindow",
+        "%X": "mouseX",
+        "%Y": "mouseY",
+    }
 
     @classmethod
     def makeEvent(cls, *args):
@@ -39,7 +40,9 @@ class TkdndEvent(object):
     def __repr__(self):
         return "<TkdndEvent %r>" % self.__dict__
 
+
 class Hover(object):
+
     def __init__(self, widget, style):
         self.widget, self.style = widget, style
         self.oldStyle = {}
@@ -53,21 +56,22 @@ class Hover(object):
     def restore(self, ev):
         self.widget.configure(**self.oldStyle)
 
+
 def initTkdnd(tk, tkdndBuildDir):
     """
     pass the 'tk' attribute of any Tkinter object, and the top dir of
     your built tkdnd package
     """
     tk.call('source', join(tkdndBuildDir, 'library/tkdnd.tcl'))
-    for dll in glob(join(tkdndBuildDir,
-                         '*tkdnd*' + tk.call('info', 'sharedlibextension'))):
-        tk.call('tkdnd::initialise',
-                join(tkdndBuildDir, 'library'),
-                join('..', basename(dll)),
-                'tkdnd')
+    for dll in glob(
+            join(tkdndBuildDir,
+                 '*tkdnd*' + tk.call('info', 'sharedlibextension'))):
+        tk.call('tkdnd::initialise', join(tkdndBuildDir, 'library'),
+                join('..', basename(dll)), 'tkdnd')
 
-def dragSourceRegister(widget,
-                       action='copy', datatype='text/uri-list', data=''):
+
+def dragSourceRegister(widget, action='copy', datatype='text/uri-list',
+                       data=''):
     """
     if the 'data' param is callable, it will be called every time to
     look up the current data.
@@ -87,19 +91,23 @@ def dragSourceRegister(widget,
             return
         return (action, datatype, dataValue)
 
-    funcId = widget._register(init,
-                              widget._substitute,
-                              1 # needscleanup
-                              )
+    funcId = widget._register(
+        init,
+        widget._substitute,
+        1  # needscleanup
+    )
     widget.bind("<<DragInitCmd>>", funcId)
 
-def dropTargetRegister(widget, typeList=None,
-                       onDropEnter=None,
-                       onDropPosition=None,
-                       onDropLeave=None,
-                       onDrop=None,
-                       hoverStyle=None,
-                       ):
+
+def dropTargetRegister(
+        widget,
+        typeList=None,
+        onDropEnter=None,
+        onDropPosition=None,
+        onDropLeave=None,
+        onDrop=None,
+        hoverStyle=None,
+):
     """
     the optional callbacks will be called with a TkdndEvent
     argument.
@@ -116,11 +124,14 @@ def dropTargetRegister(widget, typeList=None,
 
     if hoverStyle is not None:
         hover = Hover(widget, hoverStyle)
+
         def wrappedDrop(ev):
             hover.restore(ev)
             if onDrop:
                 return onDrop(ev)
-        return dropTargetRegister(widget, typeList=typeList,
+
+        return dropTargetRegister(widget,
+                                  typeList=typeList,
                                   onDropEnter=hover.set,
                                   onDropLeave=hover.restore,
                                   onDropPosition=onDropPosition,
@@ -128,17 +139,17 @@ def dropTargetRegister(widget, typeList=None,
 
     if typeList is None:
         typeList = ['*']
-    widget.tk.call(*(['tkdnd::drop_target', 'register', widget._w]+typeList))
+    widget.tk.call(*(['tkdnd::drop_target', 'register', widget._w] + typeList))
 
     for sequence, handler in [
         ('<<DropEnter>>', onDropEnter),
         ('<<DropPosition>>', onDropPosition),
         ('<<DropLeave>>', onDropLeave),
         ('<<Drop>>', onDrop),
-        ]:
+    ]:
         if not handler:
             continue
-        func = widget._register(handler, subst=TkdndEvent.makeEvent, needcleanup=1)
+        func = widget._register(handler,
+                                subst=TkdndEvent.makeEvent,
+                                needcleanup=1)
         widget.bind(sequence, func + " " + TkdndEvent.tclSubstitutions)
-
-

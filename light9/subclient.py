@@ -5,10 +5,12 @@ import time
 import logging
 log = logging.getLogger()
 
+
 class SubClient:
+
     def __init__(self):
         """assumed that your init saves self.graph"""
-        pass # we may later need init code for network setup
+        pass  # we may later need init code for network setup
 
     def get_levels_as_sub(self):
         """Subclasses must implement this method and return a Submaster
@@ -19,16 +21,18 @@ class SubClient:
 
     def send_levels_loop(self, delay=1000):
         now = time.time()
+
         def done(sec):
-            reactor.callLater(max(0, time.time() - (now + delay)),
+            reactor.callLater(max(0,
+                                  time.time() - (now + delay)),
                               self.send_levels_loop)
+
         def err(e):
             log.warn('subclient loop: %r', e)
             reactor.callLater(2, self.send_levels_loop)
-            
+
         d = self._send_sub()
         d.addCallbacks(done, err)
-
 
     def _send_sub(self):
         try:
