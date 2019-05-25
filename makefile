@@ -50,14 +50,11 @@ tkdnd_build:
 coffee:
 	zsh -c 'cd light9/web; ../../node_modules/coffeescript/bin/coffee --map -cw {.,live,timeline,paint,effects}/*.coffee'
 
-mypy-collector:
-	env/bin/mypy --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep bin/collector light9/collector/*.py
-
-mypy-paint:
-	env/bin/mypy --ignore-missing-imports --strict-optional --custom-typeshed-dir stubs --html-report /tmp/rep light9/paint/*.py
+mypy:
+	inv mypy
 
 reformat:
-	env/bin/yapf --verbose --parallel --in-place --style google light9/**/*.py `file --no-pad  bin/* | grep 'Python script' | perl -lpe 's/:.*//'`
+	inv reformat
 
 ### show ###
 
