@@ -38,4 +38,4 @@ git+http://github.com/webpy/webpy@ace0f8954c28311004b33c7a513c6e40a3c02470#egg=w
 https://github.com/drewp/cyclone/archive/python3.zip#egg=cyclone
 
 cycloneerr==0.3.0
-rdfdb==0.13.0
+rdfdb==0.15.0
