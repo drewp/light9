@@ -126,6 +126,8 @@ class MusicTime(object):
         fetch(
             method=b'POST',
             url=networking.musicPlayer.path('time'),
-            postdata=json.dumps({"t": t}).encode('utf8'),
+            postdata=json.dumps({
+                "t": t
+            }).encode('utf8'),
             headers={b"content-type": [b"application/json"]},
         )

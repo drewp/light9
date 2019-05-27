@@ -29,7 +29,6 @@ from rdfdb.syncedgraph import SyncedGraph
 from light9.collector.output import EnttecDmx, Udmx, DummyOutput  # noqa
 
 
-
 class Updates(cyclone.websocket.WebSocketHandler):
 
     def connectionMade(self, *args, **kwargs):

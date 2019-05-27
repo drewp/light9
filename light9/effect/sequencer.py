@@ -56,7 +56,8 @@ class Note(object):
                 self.getCurvePoints(curve, L9['strength'], originTime))
         self.points.sort()
 
-    def getCurvePoints(self, curve, attr, originTime) -> List[Tuple[float, float]]:
+    def getCurvePoints(self, curve, attr,
+                       originTime) -> List[Tuple[float, float]]:
         points = []
         po = list(self.graph.predicate_objects(curve))
         if dict(po).get(L9['attr'], None) != attr:
@@ -131,7 +132,9 @@ class CodeWatcher(object):
 
 class Sequencer(object):
 
-    def __init__(self, graph: SyncedGraph, sendToCollector: Callable[[DeviceSettings], None],
+    def __init__(self,
+                 graph: SyncedGraph,
+                 sendToCollector: Callable[[DeviceSettings], None],
                  fps=40):
         self.graph = graph
         self.fps = fps

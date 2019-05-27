@@ -181,14 +181,19 @@ class SubmasterBox(tk.Frame):
 
 class KeyboardComposer(tk.Frame, SubClient):
 
-    def __init__(self, root: tk.Tk, graph: SyncedGraph, session: URIRef, hw_sliders=True):
+    def __init__(self,
+                 root: tk.Tk,
+                 graph: SyncedGraph,
+                 session: URIRef,
+                 hw_sliders=True):
         tk.Frame.__init__(self, root, bg='black')
         SubClient.__init__(self)
         self.graph = graph
         self.session = session
 
         self.subbox: Dict[URIRef, SubmasterBox] = {}  # sub uri : SubmasterBox
-        self.slider_table: Dict[Tuple[int, int], SubmasterBox] = {}  # coords : SubmasterBox
+        self.slider_table: Dict[Tuple[int, int], SubmasterBox] = {
+        }  # coords : SubmasterBox
         self.rows: List[tk.Frame] = []  # this holds Tk Frames for each row
 
         self.current_row = 0  # should come from session graph

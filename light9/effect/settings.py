@@ -12,6 +12,7 @@ log = logging.getLogger('settings')
 from light9.collector.device import resolve
 from typing import Sequence, Dict, Union, List
 
+
 def parseHex(h):
     if h[0] != '#': raise ValueError(h)
     return [int(h[i:i + 2], 16) for i in (1, 3, 5)]
@@ -24,7 +25,7 @@ def parseHexNorm(h):
 def toHex(rgbFloat: Sequence[float]) -> str:
     assert len(rgbFloat) == 3
     scaled = (max(0, min(255, int(v * 255))) for v in rgbFloat)
-    return '#%02x%02x%02x' % tuple(scaled) # type: ignore
+    return '#%02x%02x%02x' % tuple(scaled)  # type: ignore
 
 
 def getVal(graph, subj):
@@ -43,7 +44,8 @@ class _Settings(object):
 
     def __init__(self, graph, settingsList):
         self.graph = graph  # for looking up all possible attrs
-        self._compiled: Dict[URIRef, Dict[URIRef, Union[float, str]]] = {}  # dev: { attr: val }; val is number or colorhex
+        self._compiled: Dict[URIRef, Dict[URIRef, Union[float, str]]] = {
+        }  # dev: { attr: val }; val is number or colorhex
         for row in settingsList:
             self._compiled.setdefault(row[0], {})[row[1]] = row[2]
         # self._compiled may not be final yet- see _fromCompiled

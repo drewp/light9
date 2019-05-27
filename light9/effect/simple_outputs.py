@@ -4,13 +4,15 @@ from light9.effect.scale import scale
 from typing import Dict, List, Tuple, Any
 from rdflib import URIRef
 
+
 class SimpleOutputs(object):
 
     def __init__(self, graph):
         self.graph = graph
 
         # effect : [(dev, attr, value, isScaled)]
-        self.effectOutputs: Dict[URIRef, List[Tuple[URIRef, URIRef, Any, bool]]] = {}
+        self.effectOutputs: Dict[URIRef, List[
+            Tuple[URIRef, URIRef, Any, bool]]] = {}
 
         self.graph.addHandler(self.updateEffectsFromGraph)
 

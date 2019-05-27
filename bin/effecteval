@@ -202,9 +202,9 @@ class SongEffectsEval(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):
         song = URIRef(self.get_argument('song'))
-        effects = effectsForSong(self.settings.graph, song) # noqa
+        effects = effectsForSong(self.settings.graph, song)  # noqa
         raise NotImplementedError
-        self.write(maxDict(effectDmxDict(e) for e in effects)) # noqa
+        self.write(maxDict(effectDmxDict(e) for e in effects))  # noqa
         # return dmx dict for all effects in the song, already combined
 
 
