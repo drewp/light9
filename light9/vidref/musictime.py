@@ -1,8 +1,11 @@
 import time, json, logging
-from light9 import networking
-from twisted.internet import reactor
-from cyclone.httpclient import fetch
 from typing import Dict
+
+from twisted.internet import reactor
+import treq
+
+from light9 import networking
+
 log = logging.getLogger()
 
 
@@ -80,7 +83,7 @@ class MusicTime(object):
             log.warn("talking to ascoltami: %s", err.getErrorMessage())
             reactor.callLater(2, self.pollMusicTime)
 
-        d = fetch(networking.musicPlayer.path("time"))
+        d = treq.get(networking.musicPlayer.path("time").toPython())
         d.addCallback(cb)
         d.addErrback(eb)  # note this includes errors in cb()
 
@@ -117,17 +120,16 @@ class MusicTime(object):
             self.lastHoverTime = None
             reactor.callLater(2, self.pollCurvecalcTime)
 
-        d = fetch(networking.curveCalc.path("hoverTime"))
+        d = treq.get(networking.curveCalc.path("hoverTime"))
         d.addCallback(cb)
         d.addErrback(eb)  # note this includes errors in cb()
 
     def sendTime(self, t):
         """request that the player go to this time"""
-        fetch(
-            method=b'POST',
-            url=networking.musicPlayer.path('time'),
-            postdata=json.dumps({
-                "t": t
-            }).encode('utf8'),
-            headers={b"content-type": [b"application/json"]},
+        treq.post(networking.musicPlayer.path('time'),
+                  data=json.dumps({
+                      "t": time
+                  }).encode('utf8'),
+                  headers={b"content-type": [b"application/json"]},
         )
+        

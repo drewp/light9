@@ -1,4 +1,4 @@
-import cyclone.web, cyclone.websocket, cyclone.httpclient
+import cyclone.web
 
 import greplin.scales.twistedweb, greplin.scales.formats
 from greplin import scales

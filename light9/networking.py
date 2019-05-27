@@ -1,5 +1,7 @@
-from rdflib import URIRef
 from urllib.parse import urlparse
+
+from rdflib import URIRef
+
 from .showconfig import getGraph, showUri
 from .namespaces import L9
 
@@ -33,8 +35,8 @@ class ServiceAddress(object):
 
     value = url
 
-    def path(self, more):
-        return self.url + str(more)
+    def path(self, more: str) -> URIRef:
+        return URIRef(self.url + more)
 
 
 captureDevice = ServiceAddress(L9['captureDevice'])

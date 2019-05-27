@@ -1,12 +1,11 @@
-import json
-import cyclone.httpclient
-from twisted.internet.defer import inlineCallbacks, returnValue
 from rdflib import URIRef, Literal
+from twisted.internet.defer import inlineCallbacks, returnValue
+import treq
 
 from light9 import networking
+from light9.curvecalc.curve import CurveResource
 from light9.namespaces import L9, RDF, RDFS
 from rdfdb.patch import Patch
-from light9.curvecalc.curve import CurveResource
 
 
 def clamp(x, lo, hi):
@@ -15,10 +14,9 @@ def clamp(x, lo, hi):
 
 @inlineCallbacks
 def getMusicStatus():
-    returnValue(
-        json.loads(
-            (yield cyclone.httpclient.fetch(networking.musicPlayer.path('time'),
-                                            timeout=.5)).body))
+    resp = yield treq.get(networking.musicPlayer.path('time'), timeout=.5)
+    body = yield resp.json_content()
+    returnValue(body)
 
 
 @inlineCallbacks

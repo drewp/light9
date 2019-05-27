@@ -1,17 +1,20 @@
-import time, json, logging, traceback
-import numpy
-import serial
+import time, logging, traceback
+
+from rdflib import URIRef
 from twisted.internet import reactor
 from twisted.internet.defer import inlineCallbacks, returnValue, succeed
 from twisted.internet.error import TimeoutError
-from rdflib import URIRef
-import cyclone.httpclient
-from light9.namespaces import L9, RDF
-from light9.effecteval.effect import EffectNode
+import numpy
+import serial
+import treq
+
 from light9 import Effects
-from light9 import networking
 from light9 import Submaster
 from light9 import dmxclient
+from light9 import networking
+from light9.effecteval.effect import EffectNode
+from light9.namespaces import L9, RDF
+
 log = logging.getLogger('effectloop')
 
 
@@ -66,8 +69,8 @@ class EffectLoop(object):
         old = now - self.requestTime
         if old > self.coastSecs:
             try:
-                response = json.loads((yield cyclone.httpclient.fetch(
-                    networking.musicPlayer.path('time'), timeout=.5)).body)
+                r = yield treq.get(networking.musicPlayer.path('time'), timeout=.5)
+                response = yield r.json_content()
             except TimeoutError:
                 log.warning("TimeoutError: using stale time from %.1f ago", old)
             else:

@@ -2,11 +2,13 @@
 this may be split out from curvecalc someday, since it doesn't
 need to be tied to a gui """
 import cgi
-from twisted.internet import reactor
-import cyclone.web, cyclone.httpclient, cyclone.websocket
-from rdflib import URIRef
-from cycloneerr import PrettyErrorHandler
+
 from louie import dispatcher
+from rdflib import URIRef
+from twisted.internet import reactor
+import cyclone.web
+
+from cycloneerr import PrettyErrorHandler
 
 
 def serveCurveEdit(port, hoverTimeResponse, curveset):
