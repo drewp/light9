@@ -1,9 +1,10 @@
 #!/usr/bin/python
-from __future__ import division
+
 import math
 import twisted.internet.fdesc
 from twisted.internet import reactor
 from twisted.internet.task import LoopingCall
+from typing import Dict
 
 class BCF2000(object):
 
@@ -35,7 +36,7 @@ class BCF2000(object):
         once as C0D0. It should be autodetected"""
         self.devPath = dev
         self.dev = None
-        self.lastValue = {} # control name : value
+        self.lastValue: Dict[str, int] = {} # control name : value
         self.reopen()
         self.packet = ""
         loop = LoopingCall(self.poll)
@@ -47,7 +48,7 @@ class BCF2000(object):
         except (IOError, AttributeError):
             return
         if len(bytes) == 0:
-            print "midi stall, reopen slider device"
+            print("midi stall, reopen slider device")
             self.reopen()
             return
         self.packet += bytes
@@ -67,7 +68,7 @@ class BCF2000(object):
             self.lastValue[name] = value
             self.valueIn(name, value)
         else:
-            print "unknown control %s to %s" % (which, value)
+            print("unknown control %s to %s" % (which, value))
 
     def reopen(self):
         if self.dev is not None:
@@ -83,7 +84,7 @@ class BCF2000(object):
     def valueIn(self, name, value):
         """override this with your handler for when events come in
         from the hardware"""
-        print "slider %s to %s" % (name, value)
+        print("slider %s to %s" % (name, value))
         if name == 'slider1':
             for x in range(2,8+1):
                 v2 = int(64 + 64 * math.sin(x / 3 + value / 10))
@@ -101,7 +102,7 @@ class BCF2000(object):
         if self.lastValue.get(name) == value:
             return
         self.lastValue[name] = value
-        which = [k for k,v in self.control.items() if v == name]
+        which = [k for k,v in list(self.control.items()) if v == name]
         assert len(which) == 1, "unknown control name %r" % name
         if name.startswith('button-'):
             value = value * 127

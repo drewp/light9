@@ -1,5 +1,6 @@
 /*
-  url is now relative to the window location
+  url is now relative to the window location. Note that nginx may drop
+  the connection after 60sec of inactivity.
 */
 function reconnectingWebSocket(url, onMessage) {
     var pong = 0;

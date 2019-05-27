@@ -1,6 +1,6 @@
 from glob import glob
 from os.path import join, basename
-
+from typing import Dict, Any
 
 class TkdndEvent(object):
     """
@@ -45,7 +45,7 @@ class Hover(object):
 
     def __init__(self, widget, style):
         self.widget, self.style = widget, style
-        self.oldStyle = {}
+        self.oldStyle: Dict[Any, Any] = {}
 
     def set(self, ev):
         for k, v in list(self.style.items()):

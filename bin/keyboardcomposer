@@ -9,6 +9,7 @@ from twisted.internet import reactor, tksupport
 from twisted.web import resource
 from rdflib import URIRef, Literal
 import tkinter.tix as tk
+from typing import Dict, Tuple, List
 
 from light9.Fadable import Fadable
 from light9.subclient import SubClient
@@ -84,7 +85,7 @@ class SubmasterBox(tk.Frame):
         self.sub = sub
         self.session = session
         self.col, self.row = col, row
-        bg = self.graph.value(sub, L9.color, default='#000000')
+        bg = self.graph.value(sub, L9['color'], default='#000000')
         rgb = webcolors.hex_to_rgb(bg)
         hsv = colorsys.rgb_to_hsv(*[x / 255 for x in rgb])
         darkBg = webcolors.rgb_to_hex(
@@ -186,9 +187,9 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.graph = graph
         self.session = session
 
-        self.subbox = {}  # sub uri : SubmasterBox
-        self.slider_table = {}  # coords : SubmasterBox
-        self.rows = []  # this holds Tk Frames for each row
+        self.subbox: Dict[URIRef, SubmasterBox] = {}  # sub uri : SubmasterBox
+        self.slider_table: Dict[Tuple[int, int], SubmasterBox] = {}  # coords : SubmasterBox
+        self.rows: List[tk.Frame] = []  # this holds Tk Frames for each row
 
         self.current_row = 0  # should come from session graph
 
@@ -270,7 +271,7 @@ class KeyboardComposer(tk.Frame, SubClient):
 
         log.info("withgroups %s", withgroups)
 
-        self.effectEval = {}
+        self.effectEval: Dict[URIRef, light9.effect.effecteval.EffectEval] = {}
         imp.reload(light9.effect.effecteval)
         simpleOutputs = SimpleOutputs(self.graph)
         for group, order, sortLabel, effect in withgroups:

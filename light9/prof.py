@@ -1,4 +1,5 @@
 import sys, traceback, time, logging
+from typing import Any, Dict
 log = logging.getLogger()
 
 
@@ -30,7 +31,7 @@ def watchPoint(filename, lineno, event="call"):
 
     Switch to 'line' to match lines inside functions. Execution speed
     will be much slower."""
-    seenTraces = {}  # trace contents : count
+    seenTraces: Dict[Any, int] = {}  # trace contents : count
 
     def trace(frame, ev, arg):
         if ev == event:

@@ -11,12 +11,14 @@ from twisted.python.filepath import FilePath
 import cyclone.sse
 import logging, bisect, time
 import traceback
+from typing import Any, Callable, Dict, List, Tuple
 
 from light9.namespaces import L9, RDF
 from light9.vidref.musictime import MusicTime
 from light9.effect import effecteval
 from light9.effect.settings import DeviceSettings
 from light9.effect.simple_outputs import SimpleOutputs
+from rdfdb.syncedgraph import SyncedGraph
 
 from greplin import scales
 import imp
@@ -38,7 +40,7 @@ class Note(object):
         self.uri = uri
         self.effectEval = effectevalModule.EffectEval(
             graph, g.value(uri, L9['effectClass']), simpleOutputs)
-        self.baseEffectSettings = {}  # {effectAttr: value}
+        self.baseEffectSettings: Dict[URIRef, Any] = {}  # {effectAttr: value}
         for s in g.objects(uri, L9['setting']):
             settingValues = dict(g.predicate_objects(s))
             ea = settingValues[L9['effectAttr']]
@@ -48,13 +50,13 @@ class Note(object):
             return float(g.value(s, p).toPython())
 
         originTime = floatVal(uri, L9['originTime'])
-        self.points = []
+        self.points: List[Tuple[float, float]] = []
         for curve in g.objects(uri, L9['curve']):
             self.points.extend(
                 self.getCurvePoints(curve, L9['strength'], originTime))
         self.points.sort()
 
-    def getCurvePoints(self, curve, attr, originTime):
+    def getCurvePoints(self, curve, attr, originTime) -> List[Tuple[float, float]]:
         points = []
         po = list(self.graph.predicate_objects(curve))
         if dict(po).get(L9['attr'], None) != attr:
@@ -129,16 +131,17 @@ class CodeWatcher(object):
 
 class Sequencer(object):
 
-    def __init__(self, graph, sendToCollector, fps=40):
+    def __init__(self, graph: SyncedGraph, sendToCollector: Callable[[DeviceSettings], None],
+                 fps=40):
         self.graph = graph
         self.fps = fps
         self.sendToCollector = sendToCollector
         self.music = MusicTime(period=.2, pollCurvecalc=False)
 
-        self.recentUpdateTimes = []
-        self.lastStatLog = 0
+        self.recentUpdateTimes: List[float] = []
+        self.lastStatLog = 0.0
         self._compileGraphCall = None
-        self.notes = {}  # song: [notes]
+        self.notes: Dict[URIRef, List[Note]] = {}  # song: [notes]
         self.simpleOutputs = SimpleOutputs(self.graph)
         self.graph.addHandler(self.compileGraph)
         self.updateLoop()
@@ -166,7 +169,7 @@ class Sequencer(object):
                 Note(self.graph, note, effecteval, self.simpleOutputs))
         log.info('  compile %s took %.2f ms', song, 1000 * (time.time() - t1))
 
-    def updateLoop(self):
+    def updateLoop(self) -> None:
         # print "updateLoop"
         now = time.time()
         self.recentUpdateTimes = self.recentUpdateTimes[-40:] + [now]
@@ -232,7 +235,7 @@ class Updates(cyclone.sse.SSEHandler):
 
     def __init__(self, application, request, **kwargs):
         cyclone.sse.SSEHandler.__init__(self, application, request, **kwargs)
-        self.state = {}
+        self.state: Dict = {}
         dispatcher.connect(self.updateState, 'state')
         self.numConnected = 0
 

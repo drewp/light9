@@ -1,4 +1,5 @@
 from rdflib import Namespace, RDF, RDFS  # noqa
+from typing import Dict
 
 
 # Namespace was showing up in profiles
@@ -6,7 +7,7 @@ class FastNs(object):
 
     def __init__(self, base):
         self.ns = Namespace(base)
-        self.cache = {}
+        self.cache: Dict[str, Namespace] = {}
 
     def __getitem__(self, term):
         if term not in self.cache:

@@ -10,7 +10,7 @@ from light9.namespaces import RDF, L9
 import logging
 log = logging.getLogger('settings')
 from light9.collector.device import resolve
-
+from typing import Sequence, Dict, Union, List
 
 def parseHex(h):
     if h[0] != '#': raise ValueError(h)
@@ -21,9 +21,10 @@ def parseHexNorm(h):
     return [x / 255 for x in parseHex(h)]
 
 
-def toHex(rgbFloat):
-    return '#%02x%02x%02x' % tuple(
-        max(0, min(255, int(v * 255))) for v in rgbFloat)
+def toHex(rgbFloat: Sequence[float]) -> str:
+    assert len(rgbFloat) == 3
+    scaled = (max(0, min(255, int(v * 255))) for v in rgbFloat)
+    return '#%02x%02x%02x' % tuple(scaled) # type: ignore
 
 
 def getVal(graph, subj):
@@ -42,7 +43,7 @@ class _Settings(object):
 
     def __init__(self, graph, settingsList):
         self.graph = graph  # for looking up all possible attrs
-        self._compiled = {}  # dev: { attr: val }; val is number or colorhex
+        self._compiled: Dict[URIRef, Dict[URIRef, Union[float, str]]] = {}  # dev: { attr: val }; val is number or colorhex
         for row in settingsList:
             self._compiled.setdefault(row[0], {})[row[1]] = row[2]
         # self._compiled may not be final yet- see _fromCompiled
@@ -68,7 +69,7 @@ class _Settings(object):
 
     @classmethod
     def fromVector(cls, graph, vector, deviceAttrFilter=None):
-        compiled = {}
+        compiled: Dict[URIRef, Dict[URIRef, Union[float, str]]] = {}
         i = 0
         for (d, a) in cls(graph, [])._vectorKeys(deviceAttrFilter):
             if a == L9['color']:
@@ -186,7 +187,7 @@ class _Settings(object):
         return list(self._compiled.keys())
 
     def toVector(self, deviceAttrFilter=None):
-        out = []
+        out: List[float] = []
         for dev, attr in self._vectorKeys(deviceAttrFilter):
             v = self.getValue(dev, attr)
             if attr == L9['color']:

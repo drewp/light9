@@ -2,6 +2,7 @@ import time, json, logging
 from light9 import networking
 from twisted.internet import reactor
 from cyclone.httpclient import fetch
+from typing import Dict
 log = logging.getLogger()
 
 
@@ -28,7 +29,7 @@ class MusicTime(object):
         self.hoverPeriod = .05
         self.onChange = onChange
 
-        self.position = {}
+        self.position: Dict[str, float] = {}
         # driven by our pollCurvecalcTime and also by Gui.incomingTime
         self.lastHoverTime = None  # None means "no recent value"
         self.pollMusicTime()
@@ -125,6 +126,6 @@ class MusicTime(object):
         fetch(
             method=b'POST',
             url=networking.musicPlayer.path('time'),
-            body=json.dumps({"t": t}),
+            postdata=json.dumps({"t": t}).encode('utf8'),
             headers={b"content-type": [b"application/json"]},
         )

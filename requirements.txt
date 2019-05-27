@@ -31,6 +31,7 @@ ipdb==0.10.2
 ipython==5.3.0
 mypy==0.701
 flake8
+typing_extensions
 
 git+http://github.com/drewp/scales.git@448d59fb491b7631877528e7695a93553bfaaa93#egg=scales
 git+http://github.com/11craft/louie.git@f18bb71010c114eca9c6b88c96453340e3b39454#egg=louie

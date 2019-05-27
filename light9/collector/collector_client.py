@@ -11,7 +11,6 @@ _zmqClient = None
 
 
 class TwistedZmqClient(object):
-
     def __init__(self, service):
         zf = ZmqFactory()
         e = ZmqEndpoint('connect', 'tcp://%s:%s' % (service.host, service.port))

@@ -1,21 +1,23 @@
 #!bin/python
 import run_local  # noqa
 import os
+from rdflib import URIRef
 from light9 import networking, showconfig
 import rdfdb.service
 
 rdfdb.service.main(
     dirUriMap={
-        os.environ['LIGHT9_SHOW'].rstrip('/') + '/': showconfig.showUri() + '/'
+        os.environ['LIGHT9_SHOW'].encode('ascii').rstrip(b'/') + b'/':
+        URIRef(showconfig.showUri() + '/')
     },
     prefixes={
-        'show': showconfig.showUri() + '/',
-        '': 'http://light9.bigasterisk.com/',
-        'rdf': 'http://www.w3.org/1999/02/22-rdf-syntax-ns#',
-        'rdfs': 'http://www.w3.org/2000/01/rdf-schema#',
-        'xsd': 'http://www.w3.org/2001/XMLSchema#',
-        'effect': 'http://light9.bigasterisk.com/effect/',
-        'dev': 'http://light9.bigasterisk.com/device/',
+        'show': URIRef(showconfig.showUri() + '/'),
+        '': URIRef('http://light9.bigasterisk.com/'),
+        'rdf': URIRef('http://www.w3.org/1999/02/22-rdf-syntax-ns#'),
+        'rdfs': URIRef('http://www.w3.org/2000/01/rdf-schema#'),
+        'xsd': URIRef('http://www.w3.org/2001/XMLSchema#'),
+        'effect': URIRef('http://light9.bigasterisk.com/effect/'),
+        'dev': URIRef('http://light9.bigasterisk.com/device/'),
     },
     port=networking.rdfdb.port,
 )

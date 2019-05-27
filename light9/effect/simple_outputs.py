@@ -1,7 +1,8 @@
 import traceback
 from light9.namespaces import L9, RDF
 from light9.effect.scale import scale
-
+from typing import Dict, List, Tuple, Any
+from rdflib import URIRef
 
 class SimpleOutputs(object):
 
@@ -9,7 +10,7 @@ class SimpleOutputs(object):
         self.graph = graph
 
         # effect : [(dev, attr, value, isScaled)]
-        self.effectOutputs = {}
+        self.effectOutputs: Dict[URIRef, List[Tuple[URIRef, URIRef, Any, bool]]] = {}
 
         self.graph.addHandler(self.updateEffectsFromGraph)
 

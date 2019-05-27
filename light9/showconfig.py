@@ -2,14 +2,15 @@ import logging, warnings
 from twisted.python.filepath import FilePath
 from os import path, getenv
 from rdflib import Graph
-from rdflib import URIRef
+from rdflib import URIRef, Literal
 from .namespaces import L9
+from typing import List, cast
 log = logging.getLogger('showconfig')
 
 _config = None  # graph
 
 
-def getGraph():
+def getGraph() -> Graph:
     warnings.warn(
         "code that's using showconfig.getGraph should be "
         "converted to use the sync graph",
@@ -27,26 +28,26 @@ def getGraph():
     return _config
 
 
-def root():
+def root() -> bytes:
     r = getenv("LIGHT9_SHOW")
     if r is None:
         raise OSError(
             "LIGHT9_SHOW env variable has not been set to the show root")
-    return r
+    return r.encode('ascii')
 
 
 _showUri = None
 
 
-def showUri():
+def showUri() -> URIRef:
     """Return the show URI associated with $LIGHT9_SHOW."""
     global _showUri
     if _showUri is None:
-        _showUri = URIRef(open(path.join(root(), 'URI')).read().strip())
+        _showUri = URIRef(open(path.join(root(), b'URI')).read().strip())
     return _showUri
 
 
-def songOnDisk(song):
+def songOnDisk(song: URIRef) -> bytes:
     """given a song URI, where's the on-disk file that mpd would read?"""
     graph = getGraph()
     root = graph.value(showUri(), L9['musicRoot'])
@@ -57,20 +58,22 @@ def songOnDisk(song):
     if not name:
         raise ValueError("Song %r has no :songFilename" % song)
 
-    return path.abspath(path.join(root, name))
+    return path.abspath(path.join(
+        cast(Literal, root).toPython(),
+        cast(Literal, name).toPython()))
 
 
-def songFilenameFromURI(uri):
+def songFilenameFromURI(uri: URIRef) -> bytes:
     """
     'http://light9.bigasterisk.com/show/dance2007/song8' -> 'song8'
 
     everything that uses this should be deprecated for real URIs
     everywhere"""
     assert isinstance(uri, URIRef)
-    return uri.split('/')[-1]
+    return str(uri).split('/')[-1].encode('ascii')
 
 
-def getSongsFromShow(graph, show):
+def getSongsFromShow(graph: Graph, show: URIRef) -> List[URIRef]:
     playList = graph.value(show, L9['playList'])
     if not playList:
         raise ValueError("%r has no l9:playList" % show)
@@ -82,12 +85,12 @@ def getSongsFromShow(graph, show):
 
 
 def curvesDir():
-    return path.join(root(), "curves")
+    return path.join(root(), b"curves")
 
 
 def subFile(subname):
-    return path.join(root(), "subs", subname)
+    return path.join(root(), b"subs", subname)
 
 
 def subsDir():
-    return path.join(root(), 'subs')
+    return path.join(root(), b'subs')

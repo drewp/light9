@@ -1,5 +1,4 @@
 from urllib.parse import urlparse
-from urllib.parse import splitport
 from .showconfig import getGraph, showUri
 from .namespaces import L9
 
@@ -20,15 +19,11 @@ class ServiceAddress(object):
 
     @property
     def port(self):
-        _, netloc, _, _, _, _ = urlparse(self._url())
-        host, port = splitport(netloc)
-        return int(port)
+        return urlparse(self._url()).port
 
     @property
     def host(self):
-        _, netloc, _, _, _, _ = urlparse(self._url())
-        host, port = splitport(netloc)
-        return host
+        return urlparse(self._url()).hostname
 
     @property
     def url(self):

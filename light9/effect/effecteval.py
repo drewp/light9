@@ -1,4 +1,4 @@
-from rdflib import Literal
+from rdflib import Literal, URIRef
 from light9.namespaces import L9, DEV
 from webcolors import rgb_to_hex, hex_to_rgb
 from colorsys import hsv_to_rgb
@@ -7,6 +7,7 @@ from noise import pnoise1
 import logging
 from light9.effect.settings import DeviceSettings
 from light9.effect.scale import scale
+from typing import Dict, Tuple, Any
 import random
 random.seed(0)
 print("reload effecteval")
@@ -76,7 +77,7 @@ class EffectEval(object):
             return DeviceSettings(self.graph, []), {'zero': True}
 
         report = {}
-        out = {}  # (dev, attr): value
+        out: Dict[Tuple[URIRef, URIRef], Any] = {}  # (dev, attr): value
 
         out.update(
             self.simpleOutputs.values(

@@ -30,18 +30,21 @@ def pkg_sources():
 
 @task
 def mypy(ctx):
+    print('\n\n')
     def run(sources):
         ss = ' '.join(sources)
-        ctx.run(f'MYPYPATH=stubs env/bin/mypy --check-untyped-defs {ss}',
+        ctx.run(f'MYPYPATH=stubs:/my/proj/rdfdb env/bin/mypy --check-untyped-defs {ss}',
                 pty=True, warn=True)
 
     sources = ' '.join(bin_sources + pkg_sources())
     ctx.run(f'env/bin/flake8 --ignore=E115,E123,E124,E126,E225,E231,E261,E262,E265,E301,E302,E303,E305,E306,E401,E402,E501,E701,E731,W291,W293,W391,W504 {sources}', warn=True)
 
     sources = ' '.join(pkg_sources())
-    for src in bin_sources:
-        print(f"mypy {src}")
-        run([src])# + pkg_sources())
+    run(['bin/rdfdb'])
+    run(['bin/keyboardcomposer'])
+    #for src in bin_sources:
+    #    print(f"mypy {src}")
+    #    run([src])# + pkg_sources())
 @task
 def reformat(ctx):
     ctx.run("env/bin/yapf --verbose --parallel --in-place --style google light9/**/*.py `file --no-pad  bin/* | grep 'Python script' | perl -lpe 's/:.*//'`")

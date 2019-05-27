@@ -6,6 +6,7 @@ from rdflib import Literal
 from tkinter.tix import Button, Toplevel, Tk, IntVar, Entry, DoubleVar
 import tkinter
 from light9.namespaces import L9
+from typing import Dict
 
 log = logging.getLogger("toplevel")
 
@@ -44,7 +45,7 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
 
     lastSaved = [None]
     setOnce = [False]
-    graphSetTime = [0]
+    graphSetTime = [0.0]
 
     def setPosFromGraphOnce():
         """
@@ -53,7 +54,7 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
         """
         if setOnce[0]:
             return
-        geo = graph.value(session, L9.windowGeometry)
+        geo = graph.value(session, L9['windowGeometry'])
         log.debug("setPosFromGraphOnce %s", geo)
 
         setOnce[0] = True
@@ -76,7 +77,7 @@ def toplevelat(name, existingtoplevel=None, graph=None, session=None):
             return
         lastSaved[0] = geo
         log.debug("saving position %s", geo)
-        graph.patchObject(session, session, L9.windowGeometry, Literal(geo))
+        graph.patchObject(session, session, L9['windowGeometry'], Literal(geo))
 
     if graph is not None and session is not None:
         graph.addHandler(setPosFromGraphOnce)
@@ -142,7 +143,7 @@ def colorlabel(label):
     low = (80, 80, 180)
     high = (255, 55, 0o50)
     out = [int(l + lev * (h - l)) for h, l in zip(high, low)]
-    col = "#%02X%02X%02X" % tuple(out)
+    col = "#%02X%02X%02X" % tuple(out) # type: ignore
     label.config(bg=col)
 
 
@@ -150,7 +151,7 @@ def colorlabel(label):
 def colorfade(low, high, percent):
     '''not foolproof.  make sure 0 < percent < 1'''
     out = [int(l + percent * (h - l)) for h, l in zip(high, low)]
-    col = "#%02X%02X%02X" % tuple(out)
+    col = "#%02X%02X%02X" % tuple(out) # type: ignore
     return col
 
 
@@ -216,8 +217,8 @@ class FancyDoubleVar(DoubleVar):
 
     def __init__(self, master=None):
         DoubleVar.__init__(self, master)
-        self.callbacklist = {}  # cbname : mode
-        self.namedtraces = {}  # name : cbname
+        self.callbacklist: Dict[str, str] = {}  # cbname : mode
+        self.namedtraces: Dict[str, str] = {}  # name : cbname
 
     def trace_variable(self, mode, callback):
         """Define a trace callback for the variable.
