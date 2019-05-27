@@ -167,7 +167,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
 
   _onGraph: (graph) ->
     @project = new Project(graph)
-    @show = 'http://light9.bigasterisk.com/show/dance2018'
+    @show = 'http://light9.bigasterisk.com/show/dance2019'
 
   _onSetAdjuster: () ->
     @makeZoomAdjs()
