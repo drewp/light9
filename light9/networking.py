@@ -1,3 +1,4 @@
+from rdflib import URIRef
 from urllib.parse import urlparse
 from .showconfig import getGraph, showUri
 from .namespaces import L9
@@ -8,14 +9,15 @@ class ServiceAddress(object):
     def __init__(self, service):
         self.service = service
 
-    def _url(self):
+    def _url(self) -> URIRef:
         graph = getGraph()
         net = graph.value(showUri(), L9['networking'])
         ret = graph.value(net, self.service)
         if ret is None:
             raise ValueError("no url for %s -> %s -> %s" %
                              (showUri(), L9['networking'], self.service))
-        return str(ret)
+        assert isinstance(ret, URIRef)
+        return ret
 
     @property
     def port(self):
@@ -26,7 +28,7 @@ class ServiceAddress(object):
         return urlparse(self._url()).hostname
 
     @property
-    def url(self):
+    def url(self) -> URIRef:
         return self._url()
 
     value = url

@@ -20,7 +20,7 @@ class TwistedZmqClient(object):
         self.conn.push(msg)
 
 
-def toCollectorJson(client, session, settings):
+def toCollectorJson(client, session, settings) -> str:
     assert isinstance(settings, DeviceSettings)
     return json.dumps({
         'settings': settings.asList(),
@@ -41,7 +41,7 @@ def sendToCollectorZmq(msg):
 def sendToCollector(client, session, settings, useZmq=False):
     """deferred to the time in seconds it took to get a response from collector"""
     sendTime = time.time()
-    msg = toCollectorJson(client, session, settings)
+    msg = toCollectorJson(client, session, settings).encode('utf8')
 
     if useZmq:
         d = sendToCollectorZmq(msg)

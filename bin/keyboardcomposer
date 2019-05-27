@@ -9,7 +9,7 @@ from twisted.internet import reactor, tksupport
 from twisted.web import resource
 from rdflib import URIRef, Literal
 import tkinter.tix as tk
-from typing import Dict, Tuple, List
+from typing import Any, Dict, Tuple, List
 
 from light9.Fadable import Fadable
 from light9.subclient import SubClient
@@ -181,7 +181,7 @@ class SubmasterBox(tk.Frame):
 
 class KeyboardComposer(tk.Frame, SubClient):
 
-    def __init__(self, root, graph, session, hw_sliders=True):
+    def __init__(self, root: tk.Tk, graph: SyncedGraph, session: URIRef, hw_sliders=True):
         tk.Frame.__init__(self, root, bg='black')
         SubClient.__init__(self)
         self.graph = graph
@@ -239,7 +239,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.sub_name = tk.Entry(self.buttonframe, bg='black', fg='white')
         self.sub_name.pack(side=tk.LEFT)
 
-    def redraw_sliders(self):
+    def redraw_sliders(self) -> None:
         self.draw_sliders()
         if len(self.rows):
             self.change_row(self.current_row)
@@ -372,7 +372,7 @@ class KeyboardComposer(tk.Frame, SubClient):
             self.graph.value(self.session, L9['currentRow'], default=0)),
                         fromGraph=True)
 
-    def change_row(self, row, fromGraph=False):
+    def change_row(self, row: int, fromGraph=False) -> None:
         old_row = self.current_row
         self.current_row = row
         self.current_row = max(0, self.current_row)
@@ -633,7 +633,7 @@ class Sliders(BCF2000):
             self.valueOut(name, 0)
 
 
-def launch(opts, root, graph, session):
+def launch(opts: Any, root: tk.Tk, graph: SyncedGraph, session: URIRef):
     tl = toplevelat("Keyboard Composer - %s" % opts.session,
                     existingtoplevel=root,
                     graph=graph,
