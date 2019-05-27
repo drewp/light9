@@ -24,6 +24,7 @@ txzmq==0.8.0
 typing==3.6.1
 watchdog==0.8.3
 webcolors==1.7
+udmx-pyusb==2.0.0
 yapf==0.27.0
 
 coverage==4.3.4

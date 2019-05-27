@@ -130,19 +130,28 @@ class EnttecDmx(DmxOutput):
     def shortId(self):
         return 'enttec'
 
+USE_PYUDMX = True
 
 class Udmx(DmxOutput):
     stats = scales.collection('/output/udmx', scales.PmfStat('update'),
                               scales.PmfStat('write'),
                               scales.IntStat('usbErrors'))
 
-    def __init__(self, uri, bus, numChannels):
+    def __init__(self, uri, bus, address, numChannels):
         DmxOutput.__init__(self, uri, numChannels)
         self._shortId = self.uri.rstrip('/')[-1]
 
-        from light9.io.udmx import Udmx
-        self.dev = Udmx(bus)
-        self.currentBuffer = ''
+        if USE_PYUDMX:
+            from pyudmx import pyudmx
+            self.dev = pyudmx.uDMXDevice()
+            if not self.dev.open(bus=bus, address=address):
+                raise ValueError("dmx open failed")
+        else:
+            from light9.io.udmx import Udmx
+            self.dev = Udmx(bus)
+            self.currentBuffer = ''
+
+        self.currentBuffer = []
         self.lastSentBuffer = None
         self.lastLog = 0
 
@@ -162,7 +171,7 @@ class Udmx(DmxOutput):
             log.debug('%s %s', self.shortId(), ' '.join(map(str, values)))
             self.lastLog = now
 
-        self.currentBuffer = ''.join(map(chr, values))
+        self.currentBuffer = values
 
     def sendDmx(self, buf):
         with Udmx.stats.write.time():
@@ -170,7 +179,13 @@ class Udmx(DmxOutput):
                 if not buf:
                     print("skip empty msg")
                     return True
-                self.dev.SendDMX(buf)
+                if USE_PYUDMX:
+                    sent = self.dev.send_multi_value(1, self.currentBuffer)
+                    if sent != len(self.currentBuffer):
+                        raise ValueError("incomplete send")
+                else:
+                    self.dev.SendDMX(''.join(map(chr, self.currentBuffer)))
+
                 return True
             except usb.core.USBError as e:
                 # not in main thread
