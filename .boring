@@ -151,9 +151,13 @@
 ^tkdnd
 ^node_modules
 
-# temporary!
-rgbled/build-nano328/
+\.js\.map$
+^\.mypy_cache
+^lib/FlameGraph/
+^lib/pyflame/
 ^show/dance..../capture
 ^show/dance2017/networking.n3
-\.js\.map$
+^show/dance2019/model/
 ^timelapse/
+__pycache__
+rgbled/build-nano328/
