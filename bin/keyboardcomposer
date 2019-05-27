@@ -1,32 +1,33 @@
 #!bin/python
 
 from run_local import log
-import cgi, time, logging
+
 from optparse import OptionParser
-import webcolors, colorsys
+from typing import Any, Dict, Tuple, List
+import cgi, time, logging
+import imp
+import tkinter.tix as tk
+
 from louie import dispatcher
+from rdflib import URIRef, Literal
 from twisted.internet import reactor, tksupport
 from twisted.web import resource
-from rdflib import URIRef, Literal
-import tkinter.tix as tk
-from typing import Any, Dict, Tuple, List
-
-from light9.Fadable import Fadable
-from light9.subclient import SubClient
-from light9 import showconfig, networking, prof
-from light9.uihelpers import toplevelat
-from light9.namespaces import L9, RDF, RDFS
-from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
-from light9 import clientsession
-from rdfdb.syncedgraph import SyncedGraph
-from light9.effect.sequencer import CodeWatcher
-import light9.effect.effecteval
-from light9.effect.settings import DeviceSettings
-from rdfdb.patch import Patch
-from light9.effect.simple_outputs import SimpleOutputs
+import webcolors, colorsys
 
 from bcf2000 import BCF2000
-import imp
+from light9 import clientsession
+from light9 import showconfig, networking, prof
+from light9.Fadable import Fadable
+from light9.effect.sequencer import CodeWatcher
+from light9.effect.settings import DeviceSettings
+from light9.effect.simple_outputs import SimpleOutputs
+from light9.namespaces import L9, RDF, RDFS
+from light9.subclient import SubClient
+from light9.tkdnd import initTkdnd, dragSourceRegister, dropTargetRegister
+from light9.uihelpers import toplevelat
+from rdfdb.patch import Patch
+from rdfdb.syncedgraph import SyncedGraph
+import light9.effect.effecteval
 
 nudge_keys = {'up': list('qwertyui'), 'down': list('asdfghjk')}
 
@@ -78,6 +79,10 @@ class SubmasterBox(tk.Frame):
     """
     this object owns the level of the submaster (the rdf graph is the
     real authority)
+
+    This leaks handlers or DoubleVars or something and tries to just
+    skip the obsolete ones. It'll get slower and bigger over
+    time. todo: make aa web version.
     """
 
     def __init__(self, master, graph, sub, session, col, row):
@@ -94,6 +99,7 @@ class SubmasterBox(tk.Frame):
             ]))
         tk.Frame.__init__(self, master, bd=1, relief='raised', bg=bg)
         self.name = self.graph.label(sub)
+        self._val = 0.0
         self.slider_var = tk.DoubleVar()
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
@@ -106,16 +112,16 @@ class SubmasterBox(tk.Frame):
         self.graph.addHandler(self.updateName)
 
         self.namelabel.pack(side=tk.TOP)
-        levellabel = tk.Label(self,
+        self.levellabel = tk.Label(self,
                               textvariable=self.slider_var,
                               font="Arial 6",
                               bg='black',
                               fg='white',
                               pady=0)
-        levellabel.pack(side=tk.TOP)
+        self.levellabel.pack(side=tk.TOP)
         self.scale.pack(side=tk.BOTTOM, expand=1, fill=tk.BOTH)
 
-        for w in [self, self.namelabel, levellabel]:
+        for w in [self, self.namelabel, self.levellabel]:
             dragSourceRegister(w, 'copy', 'text/uri-list', sub)
 
         self._slider_var_trace = self.slider_var.trace('w', self.slider_changed)
@@ -125,15 +131,29 @@ class SubmasterBox(tk.Frame):
         # initial position
         # stil need? dispatcher.send("send_to_hw", sub=sub.uri, hwCol=col + 1)
 
+    def getVal(self) -> float:
+        return self._val
+    
+    def setVal(self, newVal: float) -> None:
+        if self.scale is None:
+            return
+        try:
+            self.scale.set(newVal)
+            self.levellabel.config(text=str(newVal))
+        except Exception:
+            log.warn("disabling handlers on broken subbox")
+            self.scale = None
+        
     def cleanup(self):
         self.slider_var.trace_vdelete('w', self._slider_var_trace)
 
     def slider_changed(self, *args):
+        self._val = self.scale.get()
         self.scale.draw_indicator_colors()
 
         if self.pauseTrace:
             return
-        self.updateGraphWithLevel(self.sub, self.slider_var.get())
+        self.updateGraphWithLevel(self.sub, self.getVal())
 
         # needs fixing: plan is to use dispatcher or a method call to tell a hardware-mapping object who changed, and then it can make io if that's a current hw slider
         dispatcher.send("send_to_hw",
@@ -166,17 +186,23 @@ class SubmasterBox(tk.Frame):
             if graph.value(setting, L9['sub']) == self.sub:
                 self.pauseTrace = True  # don't bounce this update back to server
                 try:
-                    self.slider_var.set(graph.value(setting, L9['level']))
+                    self.setVal(graph.value(setting, L9['level']).toPython())
                 finally:
                     self.pauseTrace = False
-
+                    
     def updateName(self):
-
+        if self.scale is None:
+            return
+        
         def shortUri(u):
             return '.../' + u.split('/')[-1]
 
-        self.namelabel.config(
-            text=self.graph.label(self.sub) or shortUri(self.sub))
+        try:
+            self.namelabel.config(
+                text=self.graph.label(self.sub) or shortUri(self.sub))
+        except Exception:
+            log.warn("disabling handlers on broken subbox")
+            self.scale = None
 
 
 class KeyboardComposer(tk.Frame, SubClient):
@@ -442,7 +468,7 @@ class KeyboardComposer(tk.Frame, SubClient):
                 self.pendingHwSet.cancel()
             except twisted.internet.error.AlreadyCalled:
                 pass
-        self.pendingHwSet = reactor.callLater(.01, subbox.slider_var.set, value)
+        self.pendingHwSet = reactor.callLater(.01, subbox.safeSliderSet, value)
 
     def send_to_hw(self, sub, hwCol, boxRow):
         if isinstance(self.sliders, DummySliders):
@@ -506,7 +532,7 @@ class KeyboardComposer(tk.Frame, SubClient):
         row['bg'] = 'black'
 
     def get_levels(self):
-        return dict([(uri, box.slider_var.get())
+        return dict([(uri, box.getVal())
                      for uri, box in list(self.subbox.items())])
 
     def get_output_settings(self, _graph=None):
@@ -620,11 +646,10 @@ class Sliders(BCF2000):
             except KeyError:
                 return
 
-            slider_var = tkslider.slider_var
-            if slider_var.get() == 1:
-                slider_var.set(0)
+            if tkslider.getVal() == 1.0:
+                tkslider.setVal(0.0)
             else:
-                slider_var.set(1)
+                tkslider.setVal(1.0)
         elif name.startswith("button-corner"):
             button_num = int(name[13:]) - 1
             if button_num == 1:
@@ -662,6 +687,7 @@ if __name__ == "__main__":
     opts, args = parser.parse_args()
 
     log.setLevel(logging.DEBUG if opts.v else logging.WARN)
+    logging.getLogger('colormath').setLevel(logging.INFO)
 
     graph = SyncedGraph(networking.rdfdb.url, "keyboardcomposer")
 
