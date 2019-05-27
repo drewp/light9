@@ -1,0 +1,3 @@
+
+def noise1(x: float, octaves: int=1, persistence: float=0.5, lacunarity: float=2.0, repeat: int=1024, base: float=0.0): ...
+pnoise1 = noise1

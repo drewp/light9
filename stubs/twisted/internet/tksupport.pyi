@@ -1,0 +1,3 @@
+from typing import Any
+
+def install(root: Any, ms: int=20): ...
