@@ -661,7 +661,7 @@ if __name__ == "__main__":
     parser.add_option('-v', action='store_true', help="log info level")
     opts, args = parser.parse_args()
 
-    log.setLevel(logging.INFO if opts.v else logging.WARN)
+    log.setLevel(logging.DEBUG if opts.v else logging.WARN)
 
     graph = SyncedGraph(networking.rdfdb.url, "keyboardcomposer")
 
