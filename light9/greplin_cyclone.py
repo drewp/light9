@@ -1,6 +1,8 @@
+from typing import List
+
 import cyclone.web
 
-import greplin.scales.twistedweb, greplin.scales.formats
+import greplin.scales.twistedweb, greplin.scales.formats, greplin.scales.util
 from greplin import scales
 
 
@@ -9,9 +11,8 @@ from greplin import scales
 class StatsForCyclone(cyclone.web.RequestHandler):
 
     def get(self):
-        parts = []
-        statDict = greplin.scales.twistedweb.util.lookup(
-            scales.getStats(), parts)
+        parts: List[str] = []
+        statDict = greplin.scales.util.lookup(scales.getStats(), parts)
 
         if statDict is None:
             self.set_status(404)
