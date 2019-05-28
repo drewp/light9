@@ -1,203 +1,179 @@
 from rdflib import URIRef
-import sys
 import time
 import usb.core
 import logging
-from twisted.internet import threads, reactor
+from twisted.internet import threads, reactor, task
 from greplin import scales
 log = logging.getLogger('output')
-
-
-# eliminate this: lists are always padded now
-def setListElem(outList, index, value, fill=0, combine=lambda old, new: new):
-    if len(outList) < index:
-        outList.extend([fill] * (index - len(outList)))
-    if len(outList) <= index:
-        outList.append(value)
-    else:
-        outList[index] = combine(outList[index], value)
+logAllDmx = logging.getLogger('output.allDmx')
 
 
 class Output(object):
     """
-    send an array of values to some output device. Call update as
-    often as you want- the result will be sent as soon as possible,
+    send a binary buffer of values to some output device. Call update
+    as often as you want- the result will be sent as soon as possible,
     and with repeats as needed to outlast hardware timeouts.
+
+    This base class doesn't ever call _write. Subclasses below have
+    strategies for that.
     """
-    uri = None  # type: URIRef
-    numChannels = None  # type: int
+    uri: URIRef
 
-    def __init__(self):
-        raise NotImplementedError
+    def __init__(self, uri: URIRef):
+        self.uri = uri
+        scales.init(self, '/output%s' % self.shortId())
+        self._currentBuffer = b''
 
-    def allConnections(self):
-        """
-        sequence of (index, uri) for the uris we can output, and which
-        index in 'values' to use for them
-        """
-        raise NotImplementedError
+        if log.isEnabledFor(logging.DEBUG):
+            self._lastLoggedMsg = ''
+            task.LoopingCall(self._periodicLog).start(1)
 
-    def update(self, values):
-        """
-        output takes a flattened list of values, maybe dmx channels, or
-        pin numbers, etc
-        """
-        raise NotImplementedError
-
-    def flush(self):
-        """
-        send latest data to output
-        """
-        raise NotImplementedError
-
-    def shortId(self):
+    def shortId(self) -> str:
         """short string to distinguish outputs"""
-        raise NotImplementedError
+        return self.uri.rstrip('/').rsplit('/')[-1]
+
+    def update(self, buf: bytes) -> None:
+        """caller asks for the output to be this buffer"""
+        self._currentBuffer = buf
+
+    def _periodicLog(self):
+        msg = '%s: %s' % (self.shortId(), ' '.join(map(str,
+                                                       self._currentBuffer)))
+        if msg != self._lastLoggedMsg:
+            log.debug(msg)
+            self._lastLoggedMsg = msg
+
+    _writeSucceed = scales.IntStat('write/succeed')
+    _writeFail = scales.IntStat('write/fail')
+    _writeCall = scales.PmfStat('write/call')
+
+    def _write(self, buf: bytes) -> None:
+        """
+        write buffer to output hardware (may be throttled if updates are
+        too fast, or repeated if they are too slow)
+        """
+        pass
 
 
 class DummyOutput(Output):
 
-    def __init__(self, uri, numChannels=1, **kw):
-        self.uri = uri
-        self.numChannels = numChannels
-
-    def update(self, values):
-        pass
-
-    def flush(self):
-        pass
-
-    def shortId(self):
-        return 'null'
+    def __init__(self, uri, **kw):
+        super().__init__(uri)
 
 
-class DmxOutput(Output):
+class BackgroundLoopOutput(Output):
+    """Call _write forever at 20hz in background threads"""
 
-    def __init__(self, uri, numChannels):
-        self.uri = uri
-        self.numChannels = numChannels
+    rate = 20  # Hz
 
-    def flush(self):
-        pass
+    def __init__(self, uri):
+        super().__init__(uri)
+        self._currentBuffer = b''
+
+        self._loop()
 
     def _loop(self):
         start = time.time()
-        sendingBuffer = self.currentBuffer
+        sendingBuffer = self._currentBuffer
 
         def done(worked):
-            if not worked:
-                self.countError()
-            else:
-                self.lastSentBuffer = sendingBuffer
-            reactor.callLater(max(0, start + 1 / 20 - time.time()), self._loop)
+            self._writeSucceed += 1
+            reactor.callLater(max(0, start + 1 / self.rate - time.time()),
+                              self._loop)
 
-        d = threads.deferToThread(self.sendDmx, sendingBuffer)
-        d.addCallback(done)
+        def err(e):
+            self._writeFail += 1
+            log.error(e)
+
+        d = threads.deferToThread(self._write, sendingBuffer)
+        d.addCallbacks(done, err)
 
 
-class EnttecDmx(DmxOutput):
+class Udmx(BackgroundLoopOutput):
+
+    def __init__(self, uri, bus, address):
+        from pyudmx import pyudmx
+        self.dev = pyudmx.uDMXDevice()
+        if not self.dev.open(bus=bus, address=address):
+            raise ValueError("dmx open failed")
+
+        super().__init__(uri)
+
+    _writeOverflow = scales.IntStat('write/overflow')
+
+    def _write(self, buf):
+        with self._writeCall.time():
+            try:
+                if not buf:
+                    return
+
+                if logAllDmx.isEnabledFor(logging.DEBUG):
+                    # for testing fps, smooth fades, etc
+                    logAllDmx.debug(
+                        '%s: %s' %
+                        (self.shortId(), ' '.join(map(str, buf[:20]))))
+
+                sent = self.dev.send_multi_value(1, buf)
+                if sent != len(buf):
+                    raise ValueError("incomplete send")
+
+            except usb.core.USBError as e:
+                # not in main thread
+                if e.errno == 75:
+                    self._writeOverflow += 1
+                    return
+
+                msg = 'usb: sending %s bytes to %r; error %r' % (len(buf),
+                                                                 self.uri, e)
+                log.warn(msg)
+                raise
+
+
+'''
+# the code used in 2018 and before
+class UdmxOld(BackgroundLoopOutput):
+    
+    def __init__(self, uri, bus):
+        from light9.io.udmx import Udmx
+        self._dev = Udmx(bus)
+        
+        super().__init__(uri)
+
+    def _write(self, buf: bytes):
+        try:
+            if not buf:
+                return
+            self.dev.SendDMX(buf)
+
+        except usb.core.USBError as e:
+            # not in main thread
+            if e.errno != 75:
+                msg = 'usb: sending %s bytes to %r; error %r' % (
+                    len(buf), self.uri, e)
+                log.warn(msg)
+            raise
+          
+                                
+# out of date
+class EnttecDmx(BackgroundLoopOutput):
     stats = scales.collection('/output/enttecDmx', scales.PmfStat('write'),
                               scales.PmfStat('update'))
 
     def __init__(self, uri, devicePath='/dev/dmx0', numChannels=80):
-        DmxOutput.__init__(self, uri, numChannels)
-
         sys.path.append("dmx_usb_module")
         from dmx import Dmx
         self.dev = Dmx(devicePath)
-        self.currentBuffer = ''
-        self.lastLog = 0
-        self._loop()
+        super().__init__(uri)
+
 
     @stats.update.time()
     def update(self, values):
-        now = time.time()
-        if now > self.lastLog + 1:
-            log.info('enttec %s', ' '.join(map(str, values)))
-            self.lastLog = now
 
         # I was outputting on 76 and it was turning on the light at
         # dmx75. So I added the 0 byte. No notes explaining the footer byte.
         self.currentBuffer = '\x00' + ''.join(map(chr, values)) + "\x00"
 
     @stats.write.time()
-    def sendDmx(self, buf):
-        self.dev.write(self.currentBuffer)
-
-    def countError(self):
-        pass
-
-    def shortId(self):
-        return 'enttec'
-
-USE_PYUDMX = True
-
-class Udmx(DmxOutput):
-    stats = scales.collection('/output/udmx', scales.PmfStat('update'),
-                              scales.PmfStat('write'),
-                              scales.IntStat('usbErrors'))
-
-    def __init__(self, uri, bus, address, numChannels):
-        DmxOutput.__init__(self, uri, numChannels)
-        self._shortId = self.uri.rstrip('/')[-1]
-
-        if USE_PYUDMX:
-            from pyudmx import pyudmx
-            self.dev = pyudmx.uDMXDevice()
-            if not self.dev.open(bus=bus, address=address):
-                raise ValueError("dmx open failed")
-        else:
-            from light9.io.udmx import Udmx
-            self.dev = Udmx(bus)
-            self.currentBuffer = ''
-
-        self.currentBuffer = []
-        self.lastSentBuffer = None
-        self.lastLog = 0
-
-        # Doesn't actually need to get called repeatedly, but we do
-        # need these two things:
-        #   1. A throttle so we don't lag behind sending old updates.
-        #   2. Retries if there are usb errors.
-        # Copying the LoopingCall logic accomplishes those with a
-        # little wasted time if there are no updates.
-        #task.LoopingCall(self._loop).start(0.050)
-        self._loop()
-
-    @stats.update.time()
-    def update(self, values):
-        now = time.time()
-        if now > self.lastLog + 1:
-            log.debug('%s %s', self.shortId(), ' '.join(map(str, values)))
-            self.lastLog = now
-
-        self.currentBuffer = values
-
-    def sendDmx(self, buf):
-        with Udmx.stats.write.time():
-            try:
-                if not buf:
-                    print("skip empty msg")
-                    return True
-                if USE_PYUDMX:
-                    sent = self.dev.send_multi_value(1, self.currentBuffer)
-                    if sent != len(self.currentBuffer):
-                        raise ValueError("incomplete send")
-                else:
-                    self.dev.SendDMX(''.join(map(chr, self.currentBuffer)))
-
-                return True
-            except usb.core.USBError as e:
-                # not in main thread
-                if e.errno != 75:
-                    msg = 'usb: sending %s bytes to %r; error %r' % (
-                        len(buf), self.uri, e)
-                    print(msg)
-                return False
-
-    def countError(self):
-        # in main thread
-        Udmx.stats.usbErrors += 1
-
-    def shortId(self):
-        return self._shortId
+    def _write(self, buf):
+        self.dev.write(buf)
+'''

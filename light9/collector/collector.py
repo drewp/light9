@@ -1,59 +1,60 @@
 import time
 import logging
-from rdflib import Literal
-from light9.namespaces import L9, RDF
-from light9.collector.output import setListElem
+from typing import cast, List, Dict, Tuple, Optional, Set
+
+from rdflib import Graph, Literal
+
 from light9.collector.device import toOutputAttrs, resolve
-
-# types only
-from rdflib import Graph, URIRef
-from typing import List, Dict, Tuple, TypeVar, Generic, Optional
-from light9.collector.output import Output
+from light9.collector.output import Output as OutputInstance
 from light9.collector.weblisteners import WebListeners
-
-ClientType = TypeVar('ClientType')
-ClientSessionType = TypeVar('ClientSessionType')
-
+from light9.namespaces import L9, RDF
+from rdfdb.syncedgraph import SyncedGraph
+from light9.newtypes import ClientType, ClientSessionType, OutputUri, DeviceUri, DeviceClass, DmxIndex, DmxMessageIndex, DeviceAttr, OutputAttr, OutputValue, UnixTime, OutputRange
 log = logging.getLogger('collector')
 
 
-def outputMap(graph, outputs):
-    # type: (Graph, List[Output]) -> Dict[Tuple[URIRef, URIRef], Tuple[Output, int]]
+def outputMap(
+        graph: Graph, outputs: List[OutputInstance]
+) -> Dict[Tuple[DeviceUri, OutputAttr], Tuple[OutputInstance, DmxMessageIndex]]:
     """From rdf config graph, compute a map of
        (device, outputattr) : (output, index)
     that explains which output index to set for any device update.
     """
     ret = {}
 
-    outputByUri: Dict[URIRef, Output] = {}  # universeUri : output
+    outputByUri: Dict[OutputUri, OutputInstance] = {}
     for out in outputs:
-        outputByUri[out.uri] = out
+        outputByUri[OutputUri(out.uri)] = out
 
     for dc in graph.subjects(RDF.type, L9['DeviceClass']):
         log.info('mapping DeviceClass %s', dc)
         for dev in graph.subjects(RDF.type, dc):
+            dev = cast(DeviceUri, dev)
             log.info('  mapping device %s', dev)
-            universe = graph.value(dev, L9['dmxUniverse'])
+            universe = cast(OutputUri, graph.value(dev, L9['dmxUniverse']))
             try:
                 output = outputByUri[universe]
             except Exception:
                 log.warn('dev %r :dmxUniverse %r', dev, universe)
                 raise
-            dmxBase = int(graph.value(dev, L9['dmxBase']).toPython())
+            dmxBase = DmxIndex(
+                cast(Literal, graph.value(dev, L9['dmxBase'])).toPython())
             for row in graph.objects(dc, L9['attr']):
-                outputAttr = graph.value(row, L9['outputAttr'])
-                offset = int(graph.value(row, L9['dmxOffset']).toPython())
-                index = dmxBase + offset - 1
+                outputAttr = cast(OutputAttr,
+                                  graph.value(row, L9['outputAttr']))
+                offset = DmxIndex(
+                    cast(Literal, graph.value(row, L9['dmxOffset'])).toPython())
+                index = DmxMessageIndex(dmxBase + offset - 1)
                 ret[(dev, outputAttr)] = (output, index)
                 log.debug('    map %s to %s,%s', outputAttr, output, index)
     return ret
 
 
-class Collector(Generic[ClientType, ClientSessionType]):
+class Collector:
 
     def __init__(self,
-                 graph: Graph,
-                 outputs: List[Output],
+                 graph: SyncedGraph,
+                 outputs: List[OutputInstance],
                  listeners: Optional[WebListeners] = None,
                  clientTimeoutSec: float = 10):
         self.graph = graph
@@ -61,32 +62,34 @@ class Collector(Generic[ClientType, ClientSessionType]):
         self.listeners = listeners
         self.clientTimeoutSec = clientTimeoutSec
         self.initTime = time.time()
-        self.allDevices = set()
+        self.allDevices: Set[DeviceUri] = set()
 
         self.graph.addHandler(self.rebuildOutputMap)
 
         # client : (session, time, {(dev,devattr): latestValue})
-        self.lastRequest = {
-        }  # type: Dict[Tuple[ClientType, ClientSessionType], Tuple[float, Dict[Tuple[URIRef, URIRef], float]]]
+        self.lastRequest: Dict[Tuple[ClientType, ClientSessionType], Tuple[
+            UnixTime, Dict[Tuple[DeviceUri, DeviceAttr], float]]] = {}
 
         # (dev, devAttr): value to use instead of 0
-        self.stickyAttrs = {}  # type: Dict[Tuple[URIRef, URIRef], float]
+        self.stickyAttrs: Dict[Tuple[DeviceUri, DeviceAttr], float] = {}
 
     def rebuildOutputMap(self):
-        self.outputMap = outputMap(
-            self.graph, self.outputs)  # (device, outputattr) : (output, index)
-        self.deviceType = {}  # uri: type that's a subclass of Device
-        self.remapOut = {}  # (device, deviceAttr) : (start, end)
+        self.outputMap = outputMap(self.graph, self.outputs)
+        self.deviceType: Dict[DeviceUri, DeviceClass] = {}
+        self.remapOut: Dict[Tuple[DeviceUri, DeviceAttr], OutputRange] = {}
         for dc in self.graph.subjects(RDF.type, L9['DeviceClass']):
-            for dev in self.graph.subjects(RDF.type, dc):
+            for dev in map(DeviceUri, self.graph.subjects(RDF.type, dc)):
                 self.allDevices.add(dev)
                 self.deviceType[dev] = dc
 
                 for remap in self.graph.objects(dev, L9['outputAttrRange']):
-                    attr = self.graph.value(remap, L9['outputAttr'])
-                    start = float(self.graph.value(remap, L9['start']))
-                    end = float(self.graph.value(remap, L9['end']))
-                    self.remapOut[(dev, attr)] = start, end
+                    attr = OutputAttr(self.graph.value(remap, L9['outputAttr']))
+                    start = cast(Literal,
+                                 self.graph.value(remap,
+                                                  L9['start'])).toPython()
+                    end = cast(Literal, self.graph.value(remap,
+                                                         L9['end'])).toPython()
+                    self.remapOut[(dev, attr)] = OutputRange((start, end))
 
     def _forgetStaleClients(self, now):
         # type: (float) -> None
@@ -99,9 +102,10 @@ class Collector(Generic[ClientType, ClientSessionType]):
             del self.lastRequest[c]
 
     # todo: move to settings.py
-    def resolvedSettingsDict(self, settingsList):
-        # type: (List[Tuple[URIRef, URIRef, float]]) -> Dict[Tuple[URIRef, URIRef], float]
-        out = {}  # type: Dict[Tuple[URIRef, URIRef], float]
+    def resolvedSettingsDict(
+            self, settingsList: List[Tuple[DeviceUri, DeviceAttr, float]]
+    ) -> Dict[Tuple[DeviceUri, DeviceAttr], float]:
+        out: Dict[Tuple[DeviceUri, DeviceAttr], float] = {}
         for d, da, v in settingsList:
             if (d, da) in out:
                 out[(d, da)] = resolve(d, da, [out[(d, da)], v])
@@ -119,7 +123,8 @@ class Collector(Generic[ClientType, ClientSessionType]):
                 client, requestLag * 1000)
 
     def _merge(self, lastRequests):
-        deviceAttrs = {}  # device: {deviceAttr: value}
+        deviceAttrs: Dict[DeviceUri, Dict[DeviceAttr, float]] = {
+        }  # device: {deviceAttr: value}
         for _, lastSettings in lastRequests:
             for (device, deviceAttr), value in lastSettings.items():
                 if (device, deviceAttr) in self.remapOut:
@@ -145,12 +150,13 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
         return deviceAttrs
 
-    def setAttrs(self, client, clientSession, settings, sendTime):
+    def setAttrs(self, client: ClientType, clientSession: ClientSessionType,
+                 settings: List[Tuple[DeviceUri, DeviceAttr, float]],
+                 sendTime: UnixTime):
         """
         settings is a list of (device, attr, value). These attrs are
         device attrs. We resolve conflicting values, process them into
-        output attrs, and call Output.update/Output.flush to send the
-        new outputs.
+        output attrs, and call Output.update to send the new outputs.
 
         client is a string naming the type of client. (client,
         clientSession) is a unique client instance.
@@ -158,7 +164,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
         Each client session's last settings will be forgotten after
         clientTimeoutSec.
         """
-        now = time.time()
+        now = UnixTime(time.time())
         self._warnOnLateRequests(client, now, sendTime)
 
         self._forgetStaleClients(now)
@@ -168,7 +174,7 @@ class Collector(Generic[ClientType, ClientSessionType]):
 
         deviceAttrs = self._merge(iter(self.lastRequest.values()))
 
-        outputAttrs = {}  # device: {outputAttr: value}
+        outputAttrs: Dict[DeviceUri, Dict[OutputAttr, OutputValue]] = {}
         for d in self.allDevices:
             try:
                 devType = self.deviceType[d]
@@ -183,30 +189,26 @@ class Collector(Generic[ClientType, ClientSessionType]):
             except Exception as e:
                 log.error('failing toOutputAttrs on %s: %r', d, e)
 
-        pendingOut = {}  # output : values
+        pendingOut: Dict[OutputUri, Tuple[OutputInstance, bytearray]] = {}
         for out in self.outputs:
-            pendingOut[out] = [0] * out.numChannels
+            pendingOut[OutputUri(out.uri)] = (out, bytearray(512))
 
         for device, attrs in outputAttrs.items():
             for outputAttr, value in attrs.items():
-                self.setAttr(device, outputAttr, value, pendingOut)
+                output, _index = self.outputMap[(device, outputAttr)]
+                outputUri = OutputUri(output.uri)
+                index = DmxMessageIndex(_index)
+                _, outArray = pendingOut[outputUri]
+                if outArray[index] != 0:
+                    raise ValueError(f"someone already wrote to index {index}")
+                outArray[index] = value
 
         dt1 = 1000 * (time.time() - now)
-        self.flush(pendingOut)
+        for uri, (out, buf) in pendingOut.items():
+            out.update(bytes(buf))
         dt2 = 1000 * (time.time() - now)
         if dt1 > 30:
             log.warn(
                 "slow setAttrs: %.1fms -> flush -> %.1fms. lr %s da %s oa %s" %
                 (dt1, dt2, len(
                     self.lastRequest), len(deviceAttrs), len(outputAttrs)))
-
-    def setAttr(self, device, outputAttr, value, pendingOut):
-        output, index = self.outputMap[(device, outputAttr)]
-        outList = pendingOut[output]
-        setListElem(outList, index, value, combine=max)
-
-    def flush(self, pendingOut):
-        """write any changed outputs"""
-        for out, vals in pendingOut.items():
-            out.update(vals)
-            out.flush()

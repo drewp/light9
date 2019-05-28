@@ -1,10 +1,11 @@
 import logging
+from typing import Dict, List, Any
 from light9.namespaces import L9
-from rdflib import Literal
+from rdflib import Literal, URIRef
 from webcolors import hex_to_rgb, rgb_to_hex
 from colormath.color_objects import sRGBColor, CMYColor
 import colormath.color_conversions
-
+from light9.newtypes import OutputAttr, OutputValue, DeviceUri, DeviceAttr
 log = logging.getLogger('device')
 
 
@@ -42,7 +43,10 @@ def _8bit(f):
     return clamp255(int(f * 255))
 
 
-def resolve(deviceType, deviceAttr, values):
+def resolve(
+        deviceType: DeviceUri,  # should be DeviceClass?
+        deviceAttr: DeviceAttr,
+        values: List[Any]):
     """
     return one value to use for this attr, given a set of them that
     have come in simultaneously. len(values) >= 1.
@@ -51,11 +55,13 @@ def resolve(deviceType, deviceAttr, values):
     """
     if len(values) == 1:
         return values[0]
-    if deviceAttr == L9['color']:
+    if deviceAttr == DeviceAttr(L9['color']):
         rgbs = [hex_to_rgb(v) for v in values]
         return rgb_to_hex([max(*component) for component in zip(*rgbs)])
     # incomplete. how-to-resolve should be on the DeviceAttr defs in the graph.
-    if deviceAttr in [L9['rx'], L9['ry'], L9['zoom'], L9['focus'], L9['iris']]:
+    if deviceAttr in map(
+            DeviceAttr,
+        [L9['rx'], L9['ry'], L9['zoom'], L9['focus'], L9['iris']]):
         floatVals = []
         for v in values:
             if isinstance(v, Literal):
@@ -70,7 +76,14 @@ def resolve(deviceType, deviceAttr, values):
     return max(values)
 
 
-def toOutputAttrs(deviceType, deviceAttrSettings):
+def toOutputAttrs(deviceType,
+                  deviceAttrSettings) -> Dict[OutputAttr, OutputValue]:
+    return dict(
+        (OutputAttr(u), OutputValue(v)) for u, v in untype_toOutputAttrs(
+            deviceType, deviceAttrSettings).items())
+
+
+def untype_toOutputAttrs(deviceType, deviceAttrSettings) -> Dict[URIRef, int]:
     """
     Given device attr settings like {L9['color']: Literal('#ff0000')},
     return a similar dict where the keys are output attrs (like
@@ -113,6 +126,9 @@ def toOutputAttrs(deviceType, deviceAttrSettings):
     if deviceType == L9['ChauvetColorStrip']:
         r, g, b = rgbAttr(L9['color'])
         return {L9['mode']: 215, L9['red']: r, L9['green']: g, L9['blue']: b}
+    elif deviceType == L9['Bar612601']:
+        r, g, b = rgbAttr(L9['color'])
+        return {L9['red']: r, L9['green']: g, L9['blue']: b}
     elif deviceType == L9['SimpleDimmer']:
         return {L9['level']: _8bit(floatAttr(L9['brightness']))}
     elif deviceType == L9['Mini15']:

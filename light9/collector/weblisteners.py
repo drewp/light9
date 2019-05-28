@@ -1,23 +1,36 @@
 import logging, traceback, time, json
+from typing import List, Tuple, Any, Dict
+
+import cyclone.websocket
+from rdflib import URIRef
+
+from light9.newtypes import DeviceUri, DmxIndex, DmxMessageIndex, OutputAttr, OutputValue
+from light9.collector.output import Output as OutputInstance
+
 log = logging.getLogger('weblisteners')
 
 
 class WebListeners(object):
 
-    def __init__(self):
-        self.clients = []
-        self.pendingMessageForDev = {}  # dev: (attrs, outputmap)
+    def __init__(self) -> None:
+        self.clients: List[Tuple[Any, Dict[URIRef, Dict[URIRef, Any]]]] = []
+        self.pendingMessageForDev: Dict[DeviceUri, Tuple[
+            Dict[OutputAttr, OutputValue],
+            Dict[Tuple[DeviceUri, OutputAttr],
+                 Tuple[OutputInstance, DmxMessageIndex]]]] = {}
         self.lastFlush = 0
 
-    def addClient(self, client):
-        self.clients.append([client, {}])  # seen = {dev: attrs}
+    def addClient(self, client: cyclone.websocket.WebSocketHandler):
+        self.clients.append((client, {}))  # seen = {dev: attrs}
         log.info('added client %s %s', len(self.clients), client)
 
-    def delClient(self, client):
-        self.clients = [[c, t] for c, t in self.clients if c != client]
+    def delClient(self, client: cyclone.websocket.WebSocketHandler):
+        self.clients = [(c, t) for c, t in self.clients if c != client]
         log.info('delClient %s, %s left', client, len(self.clients))
 
-    def outputAttrsSet(self, dev, attrs, outputMap):
+    def outputAttrsSet(self, dev: DeviceUri, attrs: Dict[OutputAttr, Any],
+                       outputMap: Dict[Tuple[DeviceUri, OutputAttr],
+                                       Tuple[OutputInstance, DmxMessageIndex]]):
         """called often- don't be slow"""
 
         self.pendingMessageForDev[dev] = (attrs, outputMap)
@@ -50,14 +63,17 @@ class WebListeners(object):
                 seen[dev] = attrs
                 client.sendMessage(msg)
 
-    def makeMsg(self, dev, attrs, outputMap):
+    def makeMsg(self, dev: DeviceUri, attrs: Dict[OutputAttr, Any],
+                outputMap: Dict[Tuple[DeviceUri, OutputAttr],
+                                Tuple[OutputInstance, DmxMessageIndex]]):
         attrRows = []
         for attr, val in attrs.items():
-            output, index = outputMap[(dev, attr)]
+            output, bufIndex = outputMap[(dev, attr)]
+            dmxIndex = DmxIndex(bufIndex + 1)
             attrRows.append({
                 'attr': attr.rsplit('/')[-1],
                 'val': val,
-                'chan': (output.shortId(), index + 1)
+                'chan': (output.shortId(), dmxIndex)
             })
         attrRows.sort(key=lambda r: r['chan'])
         for row in attrRows:

@@ -26,7 +26,7 @@ from light9.namespaces import L9
 from light9.zmqtransport import parseJsonMessage, startZmq
 from rdfdb.syncedgraph import SyncedGraph
 
-from light9.collector.output import EnttecDmx, Udmx, DummyOutput  # noqa
+from light9.collector.output import Udmx, DummyOutput  # noqa
 
 
 class Updates(cyclone.websocket.WebSocketHandler):
@@ -60,15 +60,15 @@ def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
         outputs = [
-            Udmx(L9['output/dmxA/'], bus=None, address=None, numChannels=510),
-            DummyOutput(L9['output/dmxB/'], 510),
+            Udmx(L9['output/dmxA/'], bus=None, address=None),
+            DummyOutput(L9['output/dmxB/']),
         ]
     except Exception:
         log.error("setting up outputs:")
         traceback.print_exc()
         raise
     listeners = WebListeners()
-    c = Collector(graph, outputs, listeners)
+    c: Collector = Collector(graph, outputs, listeners)
 
     startZmq(networking.collectorZmq.port, c)
 
@@ -111,12 +111,17 @@ def main():
                       "--verbose",
                       action="store_true",
                       help="logging.DEBUG")
+    parser.add_option("--logdmx", action="store_true", help="log all dmx sends")
+
     parser.add_option("--loadtest",
                       action="store_true",
                       help="call myself with some synthetic load then exit")
     (options, args) = parser.parse_args()
     log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
+    logging.getLogger('output').setLevel(logging.DEBUG)
 
+    logging.getLogger('output.allDmx').setLevel(
+        logging.DEBUG if options.logdmx else logging.INFO)
     logging.getLogger('colormath').setLevel(logging.INFO)
 
     graph = SyncedGraph(networking.rdfdb.url, "collector")
