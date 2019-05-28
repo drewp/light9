@@ -8,9 +8,11 @@
     <link rel="import" href="/lib/iron-ajax/iron-ajax.html">
     <link rel="import" href="../rdfdb-synced-graph.html">
     <link rel="import" href="../resource-display.html">
+    <script src="../lib/jquery/dist/jquery.slim.min.js"></script>
     <script src="/node_modules/n3/n3-browser.js"></script> 
     <script src="/lib/async/dist/async.js"></script>
     <script src="/lib/underscore/underscore-min.js"></script>
+    <script src="../websocket.js"></script>
 
     <link rel="stylesheet"  href="/style.css">
     <style>
@@ -18,7 +20,7 @@
     </style>
   </head>
   <body>
-
+    
     <dom-module id="light9-collector-device">
       <template>
         <style>
@@ -30,8 +32,8 @@
          h3 {
              margin-top: 12px;
              margin-bottom: 0;
-          }
-          td { white-space: nowrap; }
+         }
+         td { white-space: nowrap; }
 
          td.nonzero {
              background: #310202;
@@ -61,27 +63,27 @@
       </template>
       <script>
        HTMLImports.whenReady(function () {
-           Polymer({
-               is: "light9-collector-device",
-               properties: {
-                   graph: {type: Object, notify: true},
-                   uri: {type: Object, notify: true},
-                   attrs: {type: Array, notify: true},
-               },
-               observers: [
-                   "initUpdates(updates)",
-               ],
-               initUpdates: function(updates) {
-                   updates.addListener(function(msg) {
-                       if (msg.outputAttrsSet && msg.outputAttrsSet.dev == this.uri.value) {
-                           this.set('attrs', msg.outputAttrsSet.attrs);
-                           this.attrs.forEach(function(row) {
-                               row.valClass = row.val == 255 ? 'full' : (row.val ? 'nonzero' : '');
-                           });
-                       }
-                   }.bind(this));
-               },
-           });
+         Polymer({
+           is: "light9-collector-device",
+           properties: {
+             graph: {type: Object, notify: true},
+             uri: {type: Object, notify: true},
+             attrs: {type: Array, notify: true},
+           },
+           observers: [
+             "initUpdates(updates)",
+           ],
+           initUpdates: function(updates) {
+             updates.addListener(function(msg) {
+               if (msg.outputAttrsSet && msg.outputAttrsSet.dev == this.uri.value) {
+                 this.set('attrs', msg.outputAttrsSet.attrs);
+                 this.attrs.forEach(function(row) {
+                   row.valClass = row.val == 255 ? 'full' : (row.val ? 'nonzero' : '');
+                 });
+               }
+             }.bind(this));
+           },
+         });
        });
       </script>
     </dom-module>
@@ -95,64 +97,63 @@
 
         <h2>Devices</h2>
         <div style="column-width: 11em">
-        <template is="dom-repeat" items="{{devices}}">
-          <light9-collector-device
+          <template is="dom-repeat" items="{{devices}}">
+            <light9-collector-device
               graph="{{graph}}" updates="{{updates}}"
               uri="{{item}}"></light9-collector-device>
-        </template>
+          </template>
         </div>
       </template>
       <script>
        class Updates {
-           constructor() {
-               this.listeners = [];
-               
-           }
-           addListener(cb) {
-               this.listeners.push(cb);
-           }
-           onMessage(msg) {
-               this.listeners.forEach(function(lis) {
-                   lis(msg);
-               });
-           }
+         constructor() {
+           this.listeners = [];
+           
+         }
+         addListener(cb) {
+           this.listeners.push(cb);
+         }
+         onMessage(msg) {
+           this.listeners.forEach(function(lis) {
+             lis(msg);
+           });
+         }
        }
        HTMLImports.whenReady(function () {
-           Polymer({
-               is: "light9-collector-ui",
-               properties: {
-                   graph: {type: Object, notify: true},
-                   updates: {type: Object, notify: true},
-                   devices: {type: Array},
-               },
-               observers: [
-                   'onGraph(graph)',
-               ],
-               ready: function() {
-                   this.updates = new Updates();
-                   var sock = new WebSocket(
-                       window.location.href.replace(/^http/, 'ws') + 'updates');
-                   sock.onmessage = function(ev) {
-                       this.updates.onMessage(JSON.parse(ev.data));
-                   }.bind(this);
-               },
-               onGraph: function(graph) {
-                   this.graph.runHandler(this.findDevices.bind(this), 'findDevices');
-               },
-               findDevices: function() {
-                   var U = function(x) {
-                       return this.graph.Uri(x);
-                   };
-                   this.set('devices', []);
+         Polymer({
+           is: "light9-collector-ui",
+           properties: {
+             graph: {type: Object, notify: true},
+             updates: {type: Object, notify: true},
+             devices: {type: Array},
+           },
+           observers: [
+             'onGraph(graph)',
+           ],
+           ready: function() {
+             this.updates = new Updates();
+             reconnectingWebSocket('updates',
+                                   function(msg) {
+                                     this.updates.onMessage(msg);
+                                   }.bind(this));
+           },
+           onGraph: function ong(graph) {
+             this.graph.runHandler(this.findDevices.bind(this), 'findDevices');
+           },
+           findDevices: function() {
+             var U = function(x) {
+               return this.graph.Uri(x);
+             };
+             this.set('devices', []);
 
-                   let classes = this.graph.subjects(U('rdf:type'), U(':DeviceClass'));
-                   _.uniq(_.sortBy(classes, 'value'), true).forEach(function(dc) {
-                       _.sortBy(this.graph.subjects(U('rdf:type'), dc), 'value').forEach(function(dev) {
-                           this.push('devices', dev);
-                       }.bind(this));
-                   }.bind(this));
-               }
-           });
+             let classes = this.graph.subjects(U('rdf:type'), U(':DeviceClass'));
+             _.uniq(_.sortBy(classes, 'value'), true).forEach(function(dc) {
+               _.sortBy(this.graph.subjects(U('rdf:type'), dc), 'value').forEach(function(dev) {
+                 this.push('devices', dev);
+               }.bind(this));
+             }.bind(this));
+           }
+         });
        });
       </script>
     </dom-module>
