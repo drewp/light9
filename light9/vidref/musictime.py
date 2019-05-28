@@ -2,6 +2,7 @@ import time, json, logging
 from typing import Dict
 
 from twisted.internet import reactor
+from twisted.internet.defer import inlineCallbacks
 import treq
 
 from light9 import networking
@@ -61,12 +62,13 @@ class MusicTime(object):
 
     def pollMusicTime(self):
 
+        @inlineCallbacks
         def cb(response):
 
             if response.code != 200:
-                raise ValueError("%s %s", response.code, response.body)
+                raise ValueError("%s %s", response.code, (yield response.content()))
 
-            position = json.loads(response.body)
+            position = yield response.json()
 
             # this is meant to be the time when the server gave me its
             # report, and I don't know if that's closer to the
