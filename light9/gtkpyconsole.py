@@ -1,5 +1,5 @@
 from lib.ipython_view import IPythonView
-import gi # noqa
+import gi  # noqa
 from gi.repository import Gtk
 from gi.repository import Pango
 

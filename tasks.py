@@ -47,7 +47,7 @@ def mypy(ctx):
     #    run([src])# + pkg_sources())
 @task
 def reformat(ctx):
-    ctx.run("env/bin/yapf --verbose --parallel --in-place --style google light9/**/*.py `file --no-pad  bin/* | grep 'Python script' | perl -lpe 's/:.*//'`")
+    ctx.run("env/bin/yapf --verbose --parallel --in-place --style google light9/*.py light9/*/*.py `file --no-pad  bin/* | grep 'Python script' | perl -lpe 's/:.*//'`")
     
 @task
 def test(ctx):

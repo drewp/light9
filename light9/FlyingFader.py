@@ -1,6 +1,7 @@
 from tkinter import tix
 from time import time
 
+
 class Mass:
 
     def __init__(self):

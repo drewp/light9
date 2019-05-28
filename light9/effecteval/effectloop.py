@@ -69,7 +69,8 @@ class EffectLoop(object):
         old = now - self.requestTime
         if old > self.coastSecs:
             try:
-                r = yield treq.get(networking.musicPlayer.path('time'), timeout=.5)
+                r = yield treq.get(networking.musicPlayer.path('time'),
+                                   timeout=.5)
                 response = yield r.json_content()
             except TimeoutError:
                 log.warning("TimeoutError: using stale time from %.1f ago", old)

@@ -113,11 +113,11 @@ class SubmasterBox(tk.Frame):
 
         self.namelabel.pack(side=tk.TOP)
         self.levellabel = tk.Label(self,
-                              textvariable=self.slider_var,
-                              font="Arial 6",
-                              bg='black',
-                              fg='white',
-                              pady=0)
+                                   textvariable=self.slider_var,
+                                   font="Arial 6",
+                                   bg='black',
+                                   fg='white',
+                                   pady=0)
         self.levellabel.pack(side=tk.TOP)
         self.scale.pack(side=tk.BOTTOM, expand=1, fill=tk.BOTH)
 
@@ -133,7 +133,7 @@ class SubmasterBox(tk.Frame):
 
     def getVal(self) -> float:
         return self._val
-    
+
     def setVal(self, newVal: float) -> None:
         if self.scale is None:
             return
@@ -189,11 +189,11 @@ class SubmasterBox(tk.Frame):
                     self.setVal(graph.value(setting, L9['level']).toPython())
                 finally:
                     self.pauseTrace = False
-                    
+
     def updateName(self):
         if self.scale is None:
             return
-        
+
         def shortUri(u):
             return '.../' + u.split('/')[-1]
 
@@ -532,8 +532,9 @@ class KeyboardComposer(tk.Frame, SubClient):
         row['bg'] = 'black'
 
     def get_levels(self):
-        return dict([(uri, box.getVal())
-                     for uri, box in list(self.subbox.items())])
+        return dict([
+            (uri, box.getVal()) for uri, box in list(self.subbox.items())
+        ])
 
     def get_output_settings(self, _graph=None):
         _graph = _graph or self.graph

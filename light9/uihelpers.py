@@ -143,7 +143,7 @@ def colorlabel(label):
     low = (80, 80, 180)
     high = (255, 55, 0o50)
     out = [int(l + lev * (h - l)) for h, l in zip(high, low)]
-    col = "#%02X%02X%02X" % tuple(out) # type: ignore
+    col = "#%02X%02X%02X" % tuple(out)  # type: ignore
     label.config(bg=col)
 
 
@@ -151,7 +151,7 @@ def colorlabel(label):
 def colorfade(low, high, percent):
     '''not foolproof.  make sure 0 < percent < 1'''
     out = [int(l + percent * (h - l)) for h, l in zip(high, low)]
-    col = "#%02X%02X%02X" % tuple(out) # type: ignore
+    col = "#%02X%02X%02X" % tuple(out)  # type: ignore
     return col
 
 

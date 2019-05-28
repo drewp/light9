@@ -58,9 +58,10 @@ def songOnDisk(song: URIRef) -> bytes:
     if not name:
         raise ValueError("Song %r has no :songFilename" % song)
 
-    return path.abspath(path.join(
-        cast(Literal, root).toPython(),
-        cast(Literal, name).toPython()))
+    return path.abspath(
+        path.join(
+            cast(Literal, root).toPython(),
+            cast(Literal, name).toPython()))
 
 
 def songFilenameFromURI(uri: URIRef) -> bytes:

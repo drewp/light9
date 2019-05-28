@@ -73,7 +73,7 @@ class Submaster(object):
         # not sure how useful this is
         if not isinstance(other, Submaster):
             return -1
-        return cmp(self.ident(), other.ident()) # noqa
+        return cmp(self.ident(), other.ident())  # noqa
 
     def __hash__(self):
         return hash(self.ident())

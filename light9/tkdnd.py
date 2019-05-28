@@ -2,6 +2,7 @@ from glob import glob
 from os.path import join, basename
 from typing import Dict, Any
 
+
 class TkdndEvent(object):
     """
     see http://www.ellogon.org/petasis/tcltk-projects/tkdnd/tkdnd-man-page

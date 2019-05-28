@@ -126,10 +126,10 @@ class MusicTime(object):
 
     def sendTime(self, t):
         """request that the player go to this time"""
-        treq.post(networking.musicPlayer.path('time'),
-                  data=json.dumps({
-                      "t": time
-                  }).encode('utf8'),
-                  headers={b"content-type": [b"application/json"]},
+        treq.post(
+            networking.musicPlayer.path('time'),
+            data=json.dumps({
+                "t": time
+            }).encode('utf8'),
+            headers={b"content-type": [b"application/json"]},
         )
-        
