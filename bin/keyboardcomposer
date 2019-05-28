@@ -103,6 +103,7 @@ class SubmasterBox(tk.Frame):
         self.slider_var = tk.DoubleVar()
         self.pauseTrace = False
         self.scale = SubScale(self, variable=self.slider_var, width=20)
+        self.dead = False
 
         self.namelabel = tk.Label(self,
                                   font="Arial 9",
@@ -135,15 +136,15 @@ class SubmasterBox(tk.Frame):
         return self._val
 
     def setVal(self, newVal: float) -> None:
-        if self.scale is None:
+        if self.dead:
             return
         try:
             self.scale.set(newVal)
             self.levellabel.config(text=str(newVal))
         except Exception:
             log.warn("disabling handlers on broken subbox")
-            self.scale = None
-        
+            self.dead = True
+
     def cleanup(self):
         self.slider_var.trace_vdelete('w', self._slider_var_trace)
 
