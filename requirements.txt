@@ -34,10 +34,10 @@ mypy==0.701
 flake8
 typing_extensions
 
-git+http://github.com/drewp/scales.git@448d59fb491b7631877528e7695a93553bfaaa93#egg=scales
+git+http://github.com/drewp/scales.git@3f2609c#egg=scales
 git+http://github.com/11craft/louie.git@f18bb71010c114eca9c6b88c96453340e3b39454#egg=louie
 git+http://github.com/webpy/webpy@ace0f8954c28311004b33c7a513c6e40a3c02470#egg=web
 https://github.com/drewp/cyclone/archive/python3.zip#egg=cyclone
 
 cycloneerr==0.3.0
-rdfdb==0.15.0
+rdfdb==0.17.0
