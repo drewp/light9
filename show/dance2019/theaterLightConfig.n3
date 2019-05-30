@@ -1,0 +1,120 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix dmxA: <http://light9.bigasterisk.com/output/dmxA/> .
+@prefix dmxB: <http://light9.bigasterisk.com/output/dmxB/> .
+
+dev:colorStrip a :ChauvetColorStrip; :dmxUniverse dmxA:; :dmxBase 50 .
+dev:moving1 a :Mini15; :dmxUniverse dmxA:; :dmxBase 110 .
+dev:moving1 :outputAttrRange dev:moving1rx . dev:moving1rx :outputAttr :rx; :start 0; :end 540 .
+dev:moving1 :outputAttrRange dev:moving1ry . dev:moving1ry :outputAttr :ry; :start 0; :end 240 .
+
+dev:aura1 a :MacAura; :dmxUniverse dmxB:; :dmxBase 406 .
+dev:aura1 :outputAttrRange dev:aura1rx . dev:aura1rx :outputAttr :rx; :start 0.145; :end 0.275 .
+dev:aura1 :outputAttrRange dev:aura1ry . dev:aura1ry :outputAttr :ry; :start 0.239; :end 0.153 .
+
+dev:strip1 a :Bar612601; :dmxUniverse dmxA:; :dmxBase 1 .
+
+dev:cycRed1        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 83 .
+dev:cycRed2        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 80 .
+dev:cycRed3        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 77 .
+dev:cycRed4        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 74 .
+dev:cycGreen1      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 82 .
+dev:cycGreen2      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 79 .
+dev:cycGreen3      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 76 .
+dev:cycGreen4      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 73 .
+dev:cycBlue1       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 81 .
+dev:cycBlue2       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 78 .
+dev:cycBlue3       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 75 .
+dev:cycBlue4       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 69 .
+dev:stripG1        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 94 .
+dev:stripA2        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 97 .
+dev:stripA1        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 99 .
+dev:stripR1        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 100 .
+dev:stripB1        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 101 .
+dev:stripR2        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 102 .
+dev:stripG2        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 103 .
+dev:stripB2        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 104 .
+#dev:spotRight      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 4 .
+#dev:spotLeft       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 8 .
+#dev:downEdge5      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 2 .
+#dev:down4          a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 3 .
+#dev:down3          a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 6 .
+#dev:down2          a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 7 .
+dev:downEdge1      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 10 .
+dev:mid5           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 13 .
+dev:mid3           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 15 .
+dev:mid1           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 17 .
+dev:downEdge5Big   a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 18 .
+dev:mid4Weak       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 20 .
+dev:mid2           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 22 .
+dev:mid4           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 24 .
+dev:sideLeft       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 26 .
+dev:leftPatio      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 29 .
+dev:up1            a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 28 .
+dev:up3Blue        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 30 .
+dev:upHigh3Blue    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 31 .
+dev:mid3Blue       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 32 .
+dev:up1Pink        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 27 .
+dev:washRedDown    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 36 .
+dev:washGreenDown  a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 37 .
+dev:washBlueDown   a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 47 .
+dev:washBlue3      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 57 .
+dev:washRed3       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 54 .
+dev:washGreen3     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 55 .
+dev:washBlueUp     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 56 .
+dev:washUp         a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 57 .
+dev:washRed2       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 58 .
+dev:washPink2      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 59 .
+dev:washGreen2     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 60 .
+dev:washBlue2      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 61 .
+dev:washRed1       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 62 .
+dev:washMagenta1   a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 63 .
+dev:washGreen1     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 64 .
+dev:washBlue1      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 65 .
+dev:blacklight1    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 111 .
+dev:blacklight2    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 112 .
+dev:pool4          a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 35 .
+dev:scroller3      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 38 .
+dev:scroller2      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 41 .
+dev:pool3          a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 42 .
+dev:pool1          a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 45 .
+dev:scroller3Color a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 230 .
+dev:scroller2Color a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 231 .
+dev:scroller1      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 46 .
+dev:goboWindow     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 48 .
+dev:strobeRight    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 53 .
+dev:strobeLeft     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 66 .
+dev:lowStage3      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 105 .
+dev:lowStage1      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 106 .
+dev:lowStage2      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 107 .
+dev:lowStage4      a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 108 .
+dev:workCyc        a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 146 .
+dev:sky1           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 114 .
+dev:sky2           a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 113 .
+dev:houseUp1       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 139 .
+dev:houseUp2       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 140 .
+dev:houseUp3       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 141 .
+dev:houseUp4       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 142 .
+dev:houseUp5       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 143 .
+dev:houseUp6       a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 144 .
+dev:houseBack1     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 131 .
+dev:houseBack2     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 132 .
+dev:houseBack3     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 133 .
+dev:houseBack4     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 134 .
+dev:houseBack5     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 135 .
+dev:houseBack6     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 136 .
+dev:houseBack7     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 137 .
+dev:houseBack8     a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 138 .
+dev:houseFront1    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 119 .
+dev:houseFront2    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 120 .
+dev:houseFront3    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 121 .
+dev:houseFront4    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 122 .
+dev:houseFront5    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 123 .
+dev:houseFront6    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 124 .
+dev:houseFront7    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 125 .
+dev:houseFront8    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 126 .
+dev:houseFront9    a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 127 .
+dev:houseFront10   a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 128 .
+dev:houseFront11   a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 129 .
+dev:houseFront12   a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 130 .

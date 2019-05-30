@@ -1,0 +1,89 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+:color              a :DeviceAttr; rdfs:label "color"; :dataType :color .
+:rx                 a :DeviceAttr; rdfs:label "rx"; :dataType :angle .
+:ry                 a :DeviceAttr; rdfs:label "ry"; :dataType :angle .
+:uv                 a :DeviceAttr; rdfs:label "uv"; :dataType :scalar .
+:brightness         a :DeviceAttr; rdfs:label "brightness"; :dataType :scalar .
+:zoom               a :DeviceAttr; rdfs:label "zoom"; :dataType :scalar ;
+  rdfs:comment "maybe make this a separate 'wide to narrow' type" .
+:focus              a :DeviceAttr; rdfs:label "focus"; :dataType :scalar .
+:iris               a :DeviceAttr; rdfs:label "iris"; :dataType :scalar .
+:prism              a :DeviceAttr; rdfs:label "prism"; :dataType :scalar .
+:strobe             a :DeviceAttr; rdfs:label "strobe"; :dataType :scalar;
+  rdfs:comment "0=none, 1=fastest" .
+:goboSpeed          a :DeviceAttr; rdfs:label "goboSpeed"; :dataType :scalar ;
+  rdfs:comment "0=stopped, 1=rotate the fastest".
+:quantumGoboChoice  a :DeviceAttr; rdfs:label "gobo"; :dataType :choice;
+  :choice :spider, :windmill, :limbo, :brush, :whirlpool, :stars .
+:mini15GoboChoice   a :DeviceAttr; rdfs:label "gobo"; :dataType :choice;
+  :choice :mini15Gobo1, :mini15Gobo2, :mini15Gobo3, :mini15Gobo4, :mini15Gobo5, :mini15Gobo6, :mini15Gobo7, :mini15Gobo8, :mini15Gobo9, :mini15Gobo10 .
+
+:goboShake          a :DeviceAttr; rdfs:label "goboShake"; :dataType :scalar .
+
+:mini15Gobo1 :value 3 .
+:mini15Gobo2 :value 10 .
+:mini15Gobo3 :value 18 .
+:mini15Gobo4 :value 26 .
+:mini15Gobo5 :value 34 . 
+:mini15Gobo6 :value 42 .
+:mini15Gobo7 :value 50 .
+:mini15Gobo8 :value 58 .
+:mini15Gobo9 :value 66 .
+:mini15Gobo10 :value 74 .
+
+:SimpleDimmer a :DeviceClass; rdfs:label "SimpleDimmer";
+  :deviceAttr :brightness;
+  :attr
+    [ :outputAttr :level; :dmxOffset 0 ] .
+
+:Bar612601 a :DeviceClass; rdfs:label "LED Bar (mode d)";
+  :deviceAttr :color;
+  :attr
+    [ :outputAttr :red; :dmxOffset 0 ],
+    [ :outputAttr :green; :dmxOffset 1 ],
+    [ :outputAttr :blue; :dmxOffset 2 ] .
+
+:ChauvetColorStrip a :DeviceClass; rdfs:label "ChauvetColorStrip";
+  :deviceAttr :color;
+  :attr
+    [ :outputAttr :mode;  :dmxOffset 0 ],
+    [ :outputAttr :red;   :dmxOffset 1 ],
+    [ :outputAttr :green; :dmxOffset 2 ],
+    [ :outputAttr :blue;  :dmxOffset 3 ] .
+
+:Mini15 a :DeviceClass; rdfs:label "Mini15";
+  :deviceAttr :color, :rx, :ry, :mini15GoboChoice, :goboShake ;
+  :attr
+    [ :outputAttr :xRotation;     :dmxOffset 0 ],
+    [ :outputAttr :xFine;         :dmxOffset 1 ],
+    [ :outputAttr :yRotation;     :dmxOffset 2 ],
+    [ :outputAttr :yFine;         :dmxOffset 3 ],
+    [ :outputAttr :rotationSpeed; :dmxOffset 4 ],
+    [ :outputAttr :dimmer;        :dmxOffset 5 ],
+    [ :outputAttr :red;           :dmxOffset 6 ],
+    [ :outputAttr :green;         :dmxOffset 7 ],
+    [ :outputAttr :blue;          :dmxOffset 8 ],
+    [ :outputAttr :colorChange;   :dmxOffset 9 ],
+    [ :outputAttr :colorSpeed;    :dmxOffset 10 ],
+    [ :outputAttr :goboShake;     :dmxOffset 11 ],
+    [ :outputAttr :goboChoose;    :dmxOffset 12 ] .
+
+:Source4LedSeries2 a :DeviceClass; rdfs:label "Source4LedSeries2";
+  :docs <https://www.etcconnect.com/WorkArea/DownloadAsset.aspx?id=10737483869>;
+  :deviceAttr :color;
+  :attr
+    [ :dmxOffset 0; :outputAttr :red ],
+    [ :dmxOffset 1; :outputAttr :green ],
+    [ :dmxOffset 2; :outputAttr :blue ],
+    [ :dmxOffset 4; :outputAttr :strobe ],
+    [ :dmxOffset 7; :outputAttr :fixed255 ],
+    [ :dmxOffset 8; :outputAttr :fixed128_0 ],
+    [ :dmxOffset 9; :outputAttr :fixed128_1 ],
+    [ :dmxOffset 10; :outputAttr :fixed128_2 ],
+    [ :dmxOffset 11; :outputAttr :fixed128_3 ],
+    [ :dmxOffset 12; :outputAttr :fixed128_4 ],
+    [ :dmxOffset 13; :outputAttr :fixed128_5 ],
+    [ :dmxOffset 14; :outputAttr :fixed128_6 ] .
+    
