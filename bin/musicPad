@@ -15,7 +15,7 @@ postPad = 9  # 5 + autostop + 4
 playlist = Playlist.fromShow(showconfig.getGraph(), showconfig.showUri())
 for p in playlist.allSongPaths():
     log.info("read %s", p)
-    inputWave = wave.open(p, 'r')
+    inputWave = wave.open(p, 'rb')
 
     outputDir = os.path.join(os.path.dirname(p), "pad")
     try:
@@ -23,14 +23,14 @@ for p in playlist.allSongPaths():
     except OSError:
         pass  # exists
     outputPath = os.path.join(outputDir, os.path.basename(p))
-    outputWave = wave.open(outputPath, 'w')
+    outputWave = wave.open(outputPath, 'wb')
     outputWave.setparams(inputWave.getparams())
 
     bytesPerSecond = (inputWave.getnchannels() * inputWave.getsampwidth() *
                       inputWave.getframerate())
 
-    outputWave.writeframesraw("\x00" * (bytesPerSecond * introPad))
+    outputWave.writeframesraw(b"\x00" * (bytesPerSecond * introPad))
     outputWave.writeframesraw(inputWave.readframes(inputWave.getnframes()))
-    outputWave.writeframesraw("\x00" * (bytesPerSecond * postPad))
+    outputWave.writeframesraw(b"\x00" * (bytesPerSecond * postPad))
     outputWave.close()
     log.info("wrote %s", outputPath)

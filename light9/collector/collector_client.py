@@ -39,7 +39,7 @@ def sendToCollectorZmq(msg):
     return defer.succeed(0)
 
 
-def sendToCollector(client, session, settings, useZmq=False):
+def sendToCollector(client, session, settings: DeviceSettings, useZmq=False):
     """deferred to the time in seconds it took to get a response from collector"""
     sendTime = time.time()
     msg = toCollectorJson(client, session, settings).encode('utf8')
