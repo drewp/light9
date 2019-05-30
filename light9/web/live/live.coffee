@@ -344,6 +344,9 @@ class GraphToControls
     if (value == undefined or (typeof value == "number" and isNaN(value)) or (typeof value == "object" and value != null and not value.id))
       throw new Error("controlChanged sent bad value " + value)
     effectSetting = @activeSettings.effectSettingLookup(device, deviceAttr)
+
+    # sometimes this misses an existing setting, which leads to a mess
+    
     if @shouldBeStored(deviceAttr, value)
       if not effectSetting?
         @_addEffectSetting(device, deviceAttr, value)
