@@ -28,9 +28,8 @@ toJsonPatch = (jsPatch, cb) ->
     cb(JSON.stringify(out))
   )
 
-parseJsonPatch = (jsonPatch, cb) ->
+parseJsonPatch = (input, cb) ->
   # note response cb doesn't have an error arg.
-  input = JSON.parse(jsonPatch)
   patch = {delQuads: [], addQuads: []}
 
   parseAdds = (cb) =>
@@ -58,14 +57,14 @@ class window.RdfDbClient
     @_lastPingMs = -1
     @_patchesReceived = 0
     @_patchesSent = 0
-
+    @_connectionId = '??'
     @_reconnectionTimeout = null
     @_newConnection()
 
   _updateStatus: ->
     ws = (if not @ws? then 'no' else switch @ws.readyState
       when @ws.CONNECTING then 'connecting'
-      when @ws.OPEN then 'open'
+      when @ws.OPEN then "open as #{@_connectionId}"
       when @ws.CLOSING then 'closing'
       when @ws.CLOSED then 'close'
       )
@@ -121,8 +120,13 @@ class window.RdfDbClient
       @_lastPingMs = Date.now() + @_lastPingMs
       @_updateStatus()
       return
-    parseJsonPatch(msg, @applyPatch.bind(@))
-    @_patchesReceived++
+      
+    input = JSON.parse(msg)
+    if input.connectedAs
+      @_connectionId = input.connectedAs
+    else
+      parseJsonPatch(input, @applyPatch.bind(@))
+      @_patchesReceived++
     @_updateStatus()
 
   _continueSending: ->
