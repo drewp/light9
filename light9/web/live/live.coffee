@@ -342,6 +342,9 @@ class GraphToControls
     @activeSettings.forAll(@_removeEffectSetting.bind(@))
 
   controlChanged: (device, deviceAttr, value) ->
+    # todo: controls should be disabled if there's no effect and they won't do anything.
+    return if not @effect
+    
     # value is float or #color or (Uri or null)
     if (value == undefined or (typeof value == "number" and isNaN(value)) or (typeof value == "object" and value != null and not value.id))
       throw new Error("controlChanged sent bad value " + value)
@@ -412,6 +415,7 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
   constructor: ->
     super()
     @graphToControls = null
+    @okToWriteUrl = false
 
   ready: ->
     super.ready()
@@ -425,9 +429,22 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
     setTimeout(@setFromUrl.bind(@), 1)
 
   setFromUrl: ->
+    # not a continuous bidi link between url and effect; it only reads
+    # the url when the page loads.
     effect = new URL(window.location.href).searchParams.get('effect')
     if effect?
+      log('found url', effect)
       @effectChoice = effect
+    @okToWriteUrl = true
+
+  writeToUrl: (effectStr) ->
+    return unless @okToWriteUrl
+    u = new URL(window.location.href)
+    if u.searchParams.get('effect') == effectStr
+      return        
+    u.searchParams.set('effect', effectStr)
+    window.history.replaceState({}, "", u.href)
+    log('wrote new url', u.href)
 
   newEffect: ->
     @effectChoice = @graphToControls.newEffect().value
@@ -440,6 +457,7 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
     else
       log('load', @effectChoice)
       @graphToControls.setEffect(@graph.Uri(@effectChoice)) if @graphToControls?
+    @writeToUrl(@effectChoice)
  
   clearAll: ->
     # clears the effect!
