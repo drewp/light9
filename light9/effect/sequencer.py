@@ -11,7 +11,7 @@ from twisted.python.filepath import FilePath
 import cyclone.sse
 import logging, bisect, time
 import traceback
-from typing import Any, Callable, Dict, List, Tuple, cast
+from typing import Any, Callable, Dict, List, Tuple, cast, Union
 
 from light9.namespaces import L9, RDF
 from light9.newtypes import DeviceUri, DeviceAttr, NoteUri, Curve, Song
@@ -109,11 +109,16 @@ class Note(object):
             'note': str(self.uri),
             'effectClass': self.effectEval.effect,
         }
-        effectSettings = self.baseEffectSettings.copy()
+        effectSettings: Dict[DeviceAttr, Union[float, str]] = dict(
+            (DeviceAttr(da), v.toPython()) for da, v in self.baseEffectSettings.items())
         effectSettings[L9['strength']] = self.evalCurve(t)
+        def prettyFormat(x: Union[float, str]):
+            if isinstance(x, float):
+                return round(x, 4)
+            return x
         report['effectSettings'] = dict(
-            (str(k), str(round(v, 4))) for k, v in sorted(effectSettings.items()))
-        report['nonZero'] = effectSettings[L9['strength']] > 0
+            (str(k), prettyFormat(v)) for k, v in sorted(effectSettings.items()))
+        report['nonZero'] = cast(float, effectSettings[L9['strength']]) > 0
         out, evalReport = self.effectEval.outputFromEffect(
             list(effectSettings.items()),
             songTime=t,
@@ -149,7 +154,7 @@ class Sequencer(object):
 
     def __init__(self,
                  graph: SyncedGraph,
-                 sendToCollector: Callable[[DeviceSettings], None],
+                 sendToCollector: Callable[[DeviceSettings], defer.Deferred[float]],
                  fps=40):
         self.graph = graph
         self.fps = fps
@@ -161,7 +166,7 @@ class Sequencer(object):
         self.recentUpdateTimes: List[float] = []
         self.lastStatLog = 0.0
         self._compileGraphCall = None
-        self.notes: Dict[URIRef, List[Note]] = {}  # song: [notes]
+        self.notes: Dict[Song, List[Note]] = {}  # song: [notes]
         self.simpleOutputs = SimpleOutputs(self.graph)
         self.graph.addHandler(self.compileGraph)
         self.updateLoop()
@@ -172,10 +177,7 @@ class Sequencer(object):
     @compileStats.graph.time()
     def compileGraph(self) -> None:
         """rebuild our data from the graph"""
-        t1 = time.time()
-        g = self.graph
-
-        for song in g.subjects(RDF.type, L9['Song']):
+        for song in self.graph.subjects(RDF.type, L9['Song']):
             def compileSong(song: Song = cast(Song, song)) -> None:
                 self.compileSong(song)
             self.graph.addHandler(compileSong)
@@ -210,8 +212,7 @@ class Sequencer(object):
         def err(e):
             log.warn('updateLoop: %r', e)
             reactor.callLater(2, self.updateLoop)
-
-        d = self.update()
+        
         d.addCallbacks(done, err)
 
     @updateStats.updateFps.rate()

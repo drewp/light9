@@ -41,10 +41,10 @@ def sendToCollectorZmq(msg):
     if _zmqClient is None:
         _zmqClient = TwistedZmqClient(networking.collectorZmq)
     _zmqClient.send(msg)
-    return defer.succeed(0)
+    return defer.succeed(0.0)
 
 
-def sendToCollector(client, session, settings: DeviceSettings, useZmq=False):
+def sendToCollector(client, session, settings: DeviceSettings, useZmq=False) -> defer.Deferred:
     """deferred to the time in seconds it took to get a response from collector"""
     sendTime = time.time()
     msg = toCollectorJson(client, session, settings).encode('utf8')
