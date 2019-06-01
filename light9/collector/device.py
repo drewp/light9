@@ -61,7 +61,7 @@ def resolve(
     # incomplete. how-to-resolve should be on the DeviceAttr defs in the graph.
     if deviceAttr in map(
             DeviceAttr,
-        [L9['rx'], L9['ry'], L9['zoom'], L9['focus'], L9['iris']]):
+            [L9['rx'], L9['ry'], L9['zoom'], L9['focus'], L9['iris']]):
         floatVals = []
         for v in values:
             if isinstance(v, Literal):

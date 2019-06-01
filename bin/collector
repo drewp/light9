@@ -60,7 +60,7 @@ def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
         outputs = [
-            Udmx(L9['output/dmxA/'], bus=None, address=None),
+            Udmx(L9['output/dmxA/'], bus=None, address=None, lastDmxChannel=221),
             DummyOutput(L9['output/dmxB/']),
         ]
     except Exception:

@@ -46,7 +46,7 @@ class Output(object):
     _writeSucceed = scales.IntStat('write/succeed')
     _writeFail = scales.IntStat('write/fail')
     _writeCall = scales.PmfStat('write/call')
-
+    _writeFps = scales.RecentFpsStat('write/fps')
     def _write(self, buf: bytes) -> None:
         """
         write buffer to output hardware (may be throttled if updates are
@@ -64,7 +64,7 @@ class DummyOutput(Output):
 class BackgroundLoopOutput(Output):
     """Call _write forever at 20hz in background threads"""
 
-    rate = 20  # Hz
+    rate = 30  # Hz
 
     def __init__(self, uri):
         super().__init__(uri)
@@ -91,7 +91,8 @@ class BackgroundLoopOutput(Output):
 
 class Udmx(BackgroundLoopOutput):
 
-    def __init__(self, uri, bus, address):
+    def __init__(self, uri, bus, address, lastDmxChannel):
+        self.lastDmxChannel = lastDmxChannel
         from pyudmx import pyudmx
         self.dev = pyudmx.uDMXDevice()
         if not self.dev.open(bus=bus, address=address):
@@ -101,17 +102,28 @@ class Udmx(BackgroundLoopOutput):
 
     _writeOverflow = scales.IntStat('write/overflow')
 
+    #def update(self, buf:bytes):
+    #    self._write(buf)
+
+    #def _loop(self):
+    #    pass
     def _write(self, buf):
+        self._writeFps.mark()
         with self._writeCall.time():
             try:
                 if not buf:
                     return
 
+                # ok to truncate the last channels if they just went
+                # to 0? No it is not. DMX receivers don't add implicit
+                # zeros there.
+                buf = buf[:self.lastDmxChannel]
+
                 if logAllDmx.isEnabledFor(logging.DEBUG):
                     # for testing fps, smooth fades, etc
                     logAllDmx.debug(
                         '%s: %s' %
-                        (self.shortId(), ' '.join(map(str, buf[:20]))))
+                        (self.shortId(), ' '.join(map(str, buf[:16]))))
 
                 sent = self.dev.send_multi_value(1, buf)
                 if sent != len(buf):
