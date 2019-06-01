@@ -313,7 +313,7 @@ class GraphToControls
           value = @graph.floatValue(setting, pred)
         catch
           value = @graph.stringValue(setting, pred)
-      log('change: graph contains', devAttr, value)
+      #log('change: graph contains', devAttr, value)
 
       if @activeSettings.has(setting)
         @activeSettings.setValue(setting, value)
@@ -470,7 +470,7 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
       for dev in @graph.sortedUris(@graph.subjects(U('rdf:type'), dc))
         newDevs.push({uri: dev})
 
-    log("controls update now has #{newDevs.length} devices")
+    #log("controls update now has #{newDevs.length} devices")
     syncArray(@, 'devices', newDevs, (a, b) -> a.uri.value == b.uri.value)
 
     return
