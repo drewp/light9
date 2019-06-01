@@ -9,6 +9,7 @@ Namespace = _n.Namespace
 
 RDF: Namespace
 RDFS: Namespace
+XSD: Namespace
 
 import rdflib.term as _t
 URIRef = _t.URIRef
