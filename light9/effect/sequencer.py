@@ -97,7 +97,7 @@ class Note(object):
         effectSettings = self.baseEffectSettings.copy()
         effectSettings[L9['strength']] = self.evalCurve(t)
         report['effectSettings'] = dict(
-            (str(k), str(v)) for k, v in sorted(effectSettings.items()))
+            (str(k), str(round(v, 4))) for k, v in sorted(effectSettings.items()))
         report['nonZero'] = effectSettings[L9['strength']] > 0
         out, evalReport = self.effectEval.outputFromEffect(
             list(effectSettings.items()),

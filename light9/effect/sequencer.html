@@ -48,6 +48,10 @@
              width: 8px;
              margin: 0 1px;
          }
+         .number {
+             display: inline-block;
+             min-width: 4em;
+         }
         </style>
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
@@ -89,7 +93,8 @@
               <td>
                 <template is="dom-repeat" items="{{item.effectSettingsPairs}}">
                   <span class="effectSetting">
-                    <resource-display graph="{{graph}}" uri="{{item.effectAttr}}"></resource-display>: {{item.value}}
+                    <resource-display graph="{{graph}}" uri="{{item.effectAttr}}"></resource-display>:
+                    <span class="number">{{item.value}}</span>
                   </span>
                 </template>
               </td>
