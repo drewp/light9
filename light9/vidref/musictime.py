@@ -66,7 +66,8 @@ class MusicTime(object):
         def cb(response):
 
             if response.code != 200:
-                raise ValueError("%s %s", response.code, (yield response.content()))
+                raise ValueError("%s %s", response.code,
+                                 (yield response.content()))
 
             position = yield response.json()
 
