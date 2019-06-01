@@ -77,7 +77,7 @@ class Project
       v = $V([xOffset + tm, val])
       v.uri = pt
       worldPts.push(v)
-    worldPts.sort((a,b) -> a.e(1) > b.e(1))
+    worldPts.sort((a,b) -> a.e(1) - b.e(1))
     return [uris, worldPts]
 
   curveWidth: (worldPts) ->
