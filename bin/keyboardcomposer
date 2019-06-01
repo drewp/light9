@@ -142,7 +142,7 @@ class SubmasterBox(tk.Frame):
             self.scale.set(newVal)
             self.levellabel.config(text=str(newVal))
         except Exception:
-            log.warn("disabling handlers on broken subbox")
+            log.warning("disabling handlers on broken subbox")
             self.dead = True
 
     def cleanup(self):
