@@ -4,11 +4,17 @@ from twisted.internet import defer
 from txzmq import ZmqEndpoint, ZmqFactory, ZmqPushConnection
 import json, time, logging
 import treq
+from greplin import scales
 
 log = logging.getLogger('coll_client')
 
 _zmqClient = None
 
+stats = scales.collection(
+    '/collectorClient/',
+    scales.PmfStat('send'),
+
+    )
 
 class TwistedZmqClient(object):
 
@@ -19,7 +25,6 @@ class TwistedZmqClient(object):
 
     def send(self, msg):
         self.conn.push(msg)
-
 
 def toCollectorJson(client, session, settings) -> str:
     assert isinstance(settings, DeviceSettings)
@@ -51,6 +56,7 @@ def sendToCollector(client, session, settings: DeviceSettings, useZmq=False):
 
     def onDone(result):
         dt = time.time() - sendTime
+        stats.send = dt
         if dt > .1:
             log.warn('sendToCollector request took %.1fms', dt * 1000)
         return dt

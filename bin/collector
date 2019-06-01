@@ -42,12 +42,16 @@ class Updates(cyclone.websocket.WebSocketHandler):
         json.loads(message)
 
 
-stats = scales.collection('/webServer', scales.PmfStat('setAttr'))
+stats = scales.collection('/webServer',
+                          scales.PmfStat('setAttr'),
+                          scales.RecentFpsStat('setAttrFps'),
+)
 
 
 class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def put(self):
+        stats.setAttrFps.mark()
         with stats.setAttr.time():
             client, clientSession, settings, sendTime = parseJsonMessage(
                 self.request.body)

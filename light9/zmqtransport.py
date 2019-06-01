@@ -20,7 +20,10 @@ def parseJsonMessage(msg):
 
 
 def startZmq(port, collector):
-    stats = scales.collection('/zmqServer', scales.PmfStat('setAttr'))
+    stats = scales.collection('/zmqServer',
+                              scales.PmfStat('setAttr'),
+                              scales.RecentFpsStat('setAttrFps'),
+    )
 
     zf = ZmqFactory()
     addr = 'tcp://*:%s' % port
@@ -30,6 +33,7 @@ def startZmq(port, collector):
     class Pull(ZmqPullConnection):
         #highWaterMark = 3
         def onPull(self, message):
+            stats.setAttrFps.mark()
             with stats.setAttr.time():
                 # todo: new compressed protocol where you send all URIs up
                 # front and then use small ints to refer to devices and
