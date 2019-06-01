@@ -16,8 +16,8 @@ print("listen %s;" % splitport(urlparse(webServer).netloc)[1])
 
 
 def location(path, server):
-    print("""
-    location /%(path)s/ {
+    print(f"""
+    location /{path}/ {{
 
       # for websocket
       proxy_http_version 1.1;
@@ -25,10 +25,10 @@ def location(path, server):
       proxy_set_header Connection "upgrade";
       proxy_set_header Host $host;
 
-      proxy_pass %(server)s;
+      proxy_pass {server};
       proxy_buffering off;
       rewrite /[^/]+/(.*) /$1 break;
-    }""" % vars())
+    }}""")
 
 
 for role, server in sorted(graph.predicate_objects(netHome)):
@@ -41,10 +41,8 @@ for role, server in sorted(graph.predicate_objects(netHome)):
     location(path, server)
 
 showPath = showconfig.showUri().split('/', 3)[-1]
-print("""
-    location /%(path)s {
-      root %(root)s;
-    }""" % {
-    'path': showPath,
-    'root': showconfig.root()[:-len(showPath)]
-})
+root = showconfig.root()[:-len(showPath)].decode('ascii')
+print(f"""
+    location /{showPath} {{
+      root {root};
+    }}""")
