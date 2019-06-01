@@ -296,6 +296,7 @@ class GraphToControls
   syncFromGraph: ->
     U = (x) => @graph.Uri(x)
     return if not @effect
+    log('syncFromGraph', @effect)
     
     toClear = new Set(@activeSettings.allSettingsStr())
     

@@ -368,6 +368,7 @@ class window.SyncedGraph
 
   contains: (s, p, o) ->
     @_autoDeps.askedFor(s, p, o, null)
+    log('contains calling getQuads when graph has ', 
     return @graph.getQuads(s, p, o).length > 0
 
   nextNumberedResources: (base, howMany) ->
@@ -387,6 +388,7 @@ class window.SyncedGraph
       uri = @Uri("#{base}#{serial}")
       if not @contains(uri, null, null)
         results.push(uri)
+        log('nextNumberedResources', "picked #{uri}")
         @_nextNumber.set(base, serial + 1)
         if results.length >= howMany
           return results
