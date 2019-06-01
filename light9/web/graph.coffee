@@ -146,7 +146,7 @@ class window.SyncedGraph
   # Note that _applyPatch is the only method to write to the graph, so
   # it can fire subscriptions.
 
-  constructor: (@patchSenderUrl, @prefixes, @setStatus) ->
+  constructor: (@patchSenderUrl, @prefixes, @setStatus, @clearCb) ->
     # patchSenderUrl is the /syncedGraph path of an rdfdb server.
     # prefixes can be used in Uri(curie) calls.
     @_autoDeps = new AutoDependencies() # replaces GraphWatchers
@@ -173,6 +173,7 @@ class window.SyncedGraph
     log('graph: clearGraphOnNewConnection')
     @clearGraph()
     log('graph: clearGraphOnNewConnection done')
+    @clearCb() if @clearCb?
       
   _addPrefixes: (prefixes) ->
     for k in (prefixes or {})
@@ -218,6 +219,9 @@ class window.SyncedGraph
 
   applyAndSendPatch: (patch) ->
     console.time('applyAndSendPatch')
+    if not @_client
+      log('not connected-- dropping patch')
+      return
     if !Array.isArray(patch.addQuads) || !Array.isArray(patch.delQuads)
       console.timeEnd('applyAndSendPatch')
       log('corrupt patch')
@@ -368,7 +372,7 @@ class window.SyncedGraph
 
   contains: (s, p, o) ->
     @_autoDeps.askedFor(s, p, o, null)
-    log('contains calling getQuads when graph has ', 
+    log('contains calling getQuads when graph has ', @graph.size)
     return @graph.getQuads(s, p, o).length > 0
 
   nextNumberedResources: (base, howMany) ->

@@ -51,6 +51,12 @@ parseJsonPatch = (input, cb) ->
 
 class window.RdfDbClient
   # Send and receive patches from rdfdb
+  #
+  # What this should do, and does not yet, is keep the graph
+  # 'coasting' over a reconnect, applying only the diffs from the old
+  # contents to the new ones once they're in. Then, remove all the
+  # clearGraph stuff in graph.coffee that doesn't even work right.
+  # 
   constructor: (@patchSenderUrl, @clearGraphOnNewConnection, @applyPatch,
                 @setStatus) ->
     @_patchesToSend = []
@@ -89,7 +95,7 @@ class window.RdfDbClient
     @ws = new WebSocket(fullUrl)
 
     @ws.onopen = =>
-      log('rdfdbclient: connected to', fullUrl)
+      log('rdfdbclient: new connection to', fullUrl)
       @_updateStatus()
       @clearGraphOnNewConnection()
       @_pingLoop()

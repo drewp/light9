@@ -1,5 +1,4 @@
 log = debug('live')
-debug.enable('live')
 
 # Like element.set(path, newArray), but minimizes splices.
 # Dotted paths don't work yet.
@@ -471,6 +470,7 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
       for dev in @graph.sortedUris(@graph.subjects(U('rdf:type'), dc))
         newDevs.push({uri: dev})
 
+    log("controls update now has #{newDevs.length} devices")
     syncArray(@, 'devices', newDevs, (a, b) -> a.uri.value == b.uri.value)
 
     return
