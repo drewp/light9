@@ -7,6 +7,12 @@
      :host {
          z-index: 10;
          position: fixed;
+         width: 400px;
+         height: 200px;
+         border: 10px solid #000;
+         box-shadow: 8px 11px 40px 0px rgba(0, 0, 0, 0.74);
+         /* This display (and border-color) are replaced later. */
+         display: none;
      }
      #largeCrosshair {
          position: absolute;
@@ -26,8 +32,6 @@
      }
      #largeRainbowComp {
          position: absolute;
-         border: 4px solid #545454;
-         box-shadow: 8px 11px 40px 0px rgba(0, 0, 0, 0.74);
          left: 0x;
          top: 0;
      }
@@ -42,7 +46,7 @@
       <div id="largeRainbow"
            on-mousemove="onCanvasMove"
            on-mouseup="hideLarge"
-           on-mouseleave="hideLarge"></div>
+      ></div>
       <div id="largeCrosshair"></div>
     </div>
   </template>
@@ -63,51 +67,40 @@
          display: flex;
          align-items: center;
          flex-wrap: wrap;
+         user-select: none;
      }
-     #smallRainbowComp {
+     
+     #swatch {
          display: inline-block;
-         overflow: hidden;
-         position: relative;
-     }
-     #smallRainbow {
-         background: url(/colorpick_rainbow_small.png);
          width: 150px; 
          height: 30px;
-     }
-     
-     #smallCrosshair {
-         position: absolute;
-         left: -60px;
-         top: -62px;
-         pointer-events: none;
-     }
-     #smallCrosshair {
-         background: url(/colorpick_crosshair_small.svg);
-         /* this can't be too tall, or chrome will cull it in the 
-            second column if its top goes above the top of the columns */
-         width: 400px; 
-         height: 60px;
-     }
-     
-     #smallRainbowComp {
          margin-right: 3px;
+         border: 1px solid #333;
      }
      
      paper-slider {
          width: 170px;
      }
+     
      #vee {
          display: flex;
          align-items: center;
      }
-     #large {
-         display: none;
+     
+     #outOfBounds {
+         user-select: none;
+         z-index: 1;
+         background: #00000060;
+         position: fixed;
+         left: 0;
+         top: 0;
+         width: 100%;
+         height: 100%;
+         display: none; /* Toggledlater. */
      }
     </style>
-    <div id="smallRainbowComp">
-      <div id="smallRainbow" on-mouseenter="onEnterSmall"></div>
-      <div id="smallCrosshair"></div>
-    </div>
+    <div id="swatch" style="background-color: {{color}}"
+         on-mousedown="onDownSmall"></div>
     <span id="vee">
       V:
       <paper-slider min="0"
@@ -116,6 +109,12 @@
                     value="{{sliderWriteValue}}"
                     immediate-value="{{value}}"></paper-slider>
     </span>
+    <!-- Temporary scrim on the rest of the page. It looks like we're dimming
+         the page to look pretty, but really this is so we can track the mouse
+         when it's outside the large canvas. -->
+    <div id="outOfBounds"
+         on-mousemove="onOutOfBoundsMove"
+         on-mouseup="hideLarge"></div>
     <!--  Large might span multiple columns, and chrome won't
          send events for those parts. Workaround: take it out of
          the columns. -->
@@ -223,30 +222,18 @@
        'onValue(value)',
        'writeColor(hueSatColor, value)'
      ]; }
-     displayed() {
-       // call this when the smallcrosshair first has a size
-       this._updateSmallCrosshair();
-     }
      ready() {
        super.ready();
        if (!window.pickerCanvases) {
          window.pickerCanvases = {
            large: new RainbowCanvas(
-             '/colorpick_rainbow_large.png', [400, 200]),
-           small: new RainbowCanvas(
-             '/colorpick_rainbow_small.png', [150, 30]),
+             '/colorpick_rainbow_large.png', [400, 200]),           
          };
        }
        this.large = window.pickerCanvases.large;
-       this.small = window.pickerCanvases.small;
-       this.small.onLoad(function() {
-         // color may have been set before our image came
-         this._updateSmallCrosshair();
-       }.bind(this));
        this.$.large.onCanvasMove = this.onCanvasMove.bind(this);
        this.$.large.hideLarge = this.hideLarge.bind(this);
        document.body.append(this.$.large);
-       this.$.large.style.display = 'none';
      }
      disconnectedCallback() {
        super.disconnectedCallback();
@@ -257,11 +244,12 @@
          this.hueSatColor = '#ffffff';
        }
        let neverBlack = .1 + .9 * value / 255;
-       this.$.smallRainbow.style.filter = `brightness(${neverBlack})`;
+       this.$.swatch.style.filter = `brightness(${neverBlack})`;
      }
      writeColor(hueSatColor, value) {
        if (hueSatColor === null || this.pauseWrites) { return; }
        this.color = one.color(hueSatColor).value(value / 255).hex();
+       this.$.large.style.borderColor = this.color;
      }
      readColor(color) {
        if (this.$.large.style.display == 'block') {
@@ -277,20 +265,11 @@
        // don't update this if only the value changed, or we desaturate
        this.hueSatColor = one.color(color).value(1).hex();
 
-       this._updateSmallCrosshair();
        this.pauseWrites = false;
-     }
-     _updateSmallCrosshair() {
-       try {
-         var pos = this.small.posFor(this.color);
-       } catch(e) {
-         this.moveSmallCrosshair([-999, -999]);
-         return;
-       }
-       this.moveSmallCrosshair(pos);
-     }
+     }    
      showLarge(x, y) {
        this.$.large.style.display = 'block';
+       this.$.outOfBounds.style.display = 'block';
        try {
          let pos;
          try {
@@ -299,8 +278,8 @@
            pos = [-999, -999];
          }
          this.moveLargeCrosshair(pos);
-         this.$.large.style.left = (x - Math.max(60, Math.min(380, pos[0]))) + 'px';
-         this.$.large.style.top = (y - Math.max(60, Math.min(180, pos[1]))) + 'px';
+         this.$.large.style.left = (x - this.clamp(pos[0], 0, 400)) + 'px';
+         this.$.large.style.top = (y - this.clamp(pos[1], 0, 200)) + 'px';
        } catch(e) {
          this.moveLargeCrosshair([-999, -999]);
          this.$.large.style.left = (400 / 2) + 'px';
@@ -310,35 +289,32 @@
      }
      hideLarge() {
        this.$.large.style.display = 'none';
+       this.$.outOfBounds.style.display = 'none';
+
        if (this.color !== undefined) {
          this.readColor(this.color);
        }
        this.closeTime = Date.now();
      }
-     onEnterSmall(ev) {
-       if (this.closeTime && this.closeTime > Date.now() - 500) {
-         return;
-       }
-
-       // if scrolling put us here, don't open large. require deliberate entering motion.
-       
+     onDownSmall(ev) {
        this.showLarge(ev.pageX, ev.pageY);
      }
-     moveLargeCrosshair(pos, _elem) {
-       _elem = _elem || this.$.large.shadowRoot.querySelector("#largeCrosshair");
-       _elem.style.left = (pos[0] - _elem.offsetWidth / 2) + 'px';
-       _elem.style.top = (pos[1] - _elem.offsetHeight / 2) + 'px';
-     }
-     moveSmallCrosshair(pos) {
-       this.moveLargeCrosshair(pos, this.$.smallCrosshair);
+     moveLargeCrosshair(pos) {
+       const ch = this.$.large.shadowRoot.querySelector("#largeCrosshair");
+       ch.style.left = (pos[0] - ch.offsetWidth / 2) + 'px';
+       ch.style.top = (pos[1] - ch.offsetHeight / 2) + 'px';
      }
      onCanvasMove(ev) {
        if (ev.buttons != 1) {
+         this.hideLarge();
          return;
        }
        var canvas = this.$.large.shadowRoot.querySelector('#largeRainbow');
        var pos = [ev.offsetX - canvas.offsetLeft,
                   ev.offsetY - canvas.offsetTop];
+       this.setLargePoint(pos);
+     }
+     setLargePoint(pos) {
        this.moveLargeCrosshair(pos);
        this.hueSatColor = this.large.colorAt(pos);
 
@@ -346,6 +322,15 @@
        if (this.value == 0) {
          this.value = 255;
        }
+     }
+     onOutOfBoundsMove(ev) {
+       const largeX = ev.offsetX - this.$.large.offsetLeft;
+       const largeY = ev.offsetY - this.$.large.offsetTop;
+       this.setLargePoint([this.clamp(largeX, 0, 400-1),
+                           this.clamp(largeY, 0, 200-1)]);
+     }
+     clamp(x, lo, hi) {
+       return Math.max(lo, Math.min(hi, x));
      }
    }
    customElements.define(Light9ColorPicker.is, Light9ColorPicker);

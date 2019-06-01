@@ -30,7 +30,7 @@
        it("loads rainbow", (done) => {
          const rc = new RainbowCanvas('/colorpick_rainbow_large.png', [400, 200]);
          rc.onLoad(() => {
-           assert.equal(rc.colorAt(200, 100), '#ff33ff');
+           assert.equal(rc.colorAt([200, 100]), '#ff38eb');
            done();
          });
        });
