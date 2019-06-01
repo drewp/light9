@@ -125,10 +125,20 @@ def untype_toOutputAttrs(deviceType, deviceAttrSettings) -> Dict[URIRef, int]:
 
     if deviceType == L9['ChauvetColorStrip']:
         r, g, b = rgbAttr(L9['color'])
-        return {L9['mode']: 215, L9['red']: r, L9['green']: g, L9['blue']: b}
+        return {L9['mode']: 215,
+                L9['red']: r, L9['green']: g, L9['blue']: b}
     elif deviceType == L9['Bar612601']:
         r, g, b = rgbAttr(L9['color'])
         return {L9['red']: r, L9['green']: g, L9['blue']: b}
+    elif deviceType == L9['LedPar90']:
+        r, g, b = rgbAttr(L9['color'])
+        return {L9['master']: 255,
+                L9['red']: r, L9['green']: g, L9['blue']: b, L9['white']: 0}
+    elif deviceType == L9['LedPar54']:
+        r, g, b = rgbAttr(L9['color'])
+        return {L9['master']: 255,
+                L9['red']: r, L9['green']: g, L9['blue']: b, L9['white']: 0,
+                L9['strobe']: 0}
     elif deviceType == L9['SimpleDimmer']:
         return {L9['level']: _8bit(floatAttr(L9['brightness']))}
     elif deviceType == L9['Mini15']:

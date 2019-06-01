@@ -5,6 +5,7 @@
 :brightness         a :DeviceAttr; rdfs:label "brightness"; :dataType :scalar .
 :strobe             a :DeviceAttr; rdfs:label "strobe"; :dataType :scalar;
   rdfs:comment "0=none, 1=fastest" .
+:doNotUse             a :DeviceAttr; rdfs:label "-"; :dataType :scalar .
 
 
 :SimpleDimmer a :DeviceClass; rdfs:label "SimpleDimmer";
@@ -36,7 +37,10 @@
     [ :outputAttr :red;      :dmxOffset 1 ],
     [ :outputAttr :green;    :dmxOffset 2 ],
     [ :outputAttr :blue;     :dmxOffset 3 ],
-    [ :outputAttr :white;    :dmxOffset 4 ] .
+    [ :outputAttr :white;    :dmxOffset 4 ],
+    [ :outputAttr :strobe;   :dmxOffset 5 ],
+    [ :outputAttr :doNotUse; :dmxOffset 6 ],
+    [ :outputAttr :doNotUse; :dmxOffset 7 ] .
 
 :LedPar54  a :DeviceClass; rdfs:label "LED Par 54 RGBW";
   :deviceAttr :color;
