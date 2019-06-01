@@ -1,4 +1,4 @@
-log = console.log
+log = debug('adjusters')
 Drawing = window.Drawing
 
 maxDist = 60

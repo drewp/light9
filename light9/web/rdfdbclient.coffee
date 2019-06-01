@@ -1,4 +1,4 @@
-log = console.log
+log = debug('rdfdbclient')
 
 # for mocha
 if require?
@@ -77,7 +77,7 @@ class window.RdfDbClient
       #{ping}ms")
  
   sendPatch: (patch) ->
-    console.log('rdfdbclient: queue patch to server ', patchSizeSummary(patch))
+    log('rdfdbclient: queue patch to server ', patchSizeSummary(patch))
     @_patchesToSend.push(patch)
     @_updateStatus()
     @_continueSending()

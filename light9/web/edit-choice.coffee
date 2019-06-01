@@ -1,3 +1,4 @@
+log = debug('editchoice')
 RDFS = 'http://www.w3.org/2000/01/rdf-schema#'
 
 
@@ -37,7 +38,7 @@ window.setupDrop = (senseElem, highlightElem, coordinateOriginElem, onDrop) ->
     try
       onDrop(uri, pos)
     catch e
-      console.log(e)
+      log(e)
     unhighlight()
 
 

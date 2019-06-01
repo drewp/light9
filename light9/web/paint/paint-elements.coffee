@@ -1,4 +1,5 @@
-log = console.log
+log = debug('paint')
+debug.enable('paint')
 
 class Painting
   constructor: (@svg) ->

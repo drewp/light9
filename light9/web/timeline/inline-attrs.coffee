@@ -1,4 +1,5 @@
-log = console.log
+log = debug('attrs')
+debug.enable('*')
 
 coffeeElementSetup(class InlineAttrs extends Polymer.Element
   @is: "light9-timeline-note-inline-attrs"

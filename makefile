@@ -32,7 +32,8 @@ bower: node_modules/bower/bin/bower bin/node
 
 npm:
 	npm install
-	cd node_modules/n3; nodejs ../browserify/bin/cmd.js --standalone N3 --require n3 -o n3-browser.js
+	(cd node_modules/n3; nodejs ../browserify/bin/cmd.js --standalone N3 --require n3 -o n3-browser.js)
+	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build.js --standalone debug
 
 bin/ascoltami2: gst_packages link_to_sys_packages
 

@@ -30,7 +30,8 @@
     "iron-flex-layout": "PolymerElements/iron-flex-layout#^2.0.3",
     "iron-component-page": "PolymerElements/iron-component-page#^3.0.1",
     "paper-header-panel": "PolymerElements/paper-header-panel#^2.1.0",
-    "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^2.3.4"
+    "iron-overlay-behavior": "PolymerElements/iron-overlay-behavior#^2.3.4",
+    "debug": "https://github.com/visionmedia/debug/archive/master.zip"
   },
   "resolutions": {
     "webcomponentsjs": "^v1.1.0",

@@ -1,3 +1,4 @@
+log = debug('brick')
 
 class window.BrickLayout
   constructor: (@viewState, @numRows) ->

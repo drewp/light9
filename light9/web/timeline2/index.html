@@ -24,7 +24,7 @@
   </head>
   <body>
     <script>
-     
+     const log = debug('timeline');
      var stage = new PIXI.Container();
      
      var renderer = PIXI.autoDetectRenderer(3000,2000, {
@@ -52,7 +52,7 @@
          graphics.endFill();
          graphics.interactive = true;
          graphics.on('click',  (ev) => {
-             console.log('hit', ev);
+             log('hit', ev);
          });
          
          stage.addChild(graphics);

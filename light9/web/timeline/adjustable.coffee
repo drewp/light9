@@ -1,4 +1,5 @@
-log = console.log
+log = debug('adjustable')
+
 
 class Adjustable
   # Some value you can edit in the UI, probably by dragging

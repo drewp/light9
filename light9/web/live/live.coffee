@@ -1,4 +1,5 @@
-log = console.log
+log = debug('live')
+debug.enable('live')
 
 # Like element.set(path, newArray), but minimizes splices.
 # Dotted paths don't work yet.

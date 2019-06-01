@@ -1,4 +1,5 @@
-log = console.log
+log = debug('music')
+debug.enable('music')
 
 # port of light9/curvecalc/musicaccess.py
 coffeeElementSetup(class Music extends Polymer.Element

@@ -1,4 +1,6 @@
-log = console.log
+log = debug('timeline')
+debug.enable('*')
+
 Drawing = window.Drawing
 ROW_COUNT = 7
 

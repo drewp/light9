@@ -1,4 +1,4 @@
-log = console.log
+log = debug('graph')
 
 # Patch is {addQuads: <quads>, delQuads: <quads>}
 # <quads> are made with Quad(s,p,o,g)
@@ -54,7 +54,7 @@ class AutoDependencies
     # patterns). Top node is not a handler.
     @handlers = new Handler(null)
     @handlerStack = [@handlers] # currently running
-    
+
   runHandler: (func, label) ->
     # what if we have this func already? duplicate is safe?
 
@@ -67,9 +67,9 @@ class AutoDependencies
     # ohno, something depends on some handlers getting run twice :(
     if matchingLabel < 2
       tailChildren.push(h)
-    console.time("handler #{label}")
+    #console.time("handler #{label}")
     @_rerunHandler(h, null)
-    console.timeEnd("handler #{label}")
+    #console.timeEnd("handler #{label}")
     #@_logHandlerTree()
     
   _rerunHandler: (handler, patch) ->
