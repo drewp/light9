@@ -17,7 +17,7 @@ rdfdb.service.main(
         'rdfs': URIRef('http://www.w3.org/2000/01/rdf-schema#'),
         'xsd': URIRef('http://www.w3.org/2001/XMLSchema#'),
         'effect': URIRef('http://light9.bigasterisk.com/effect/'),
-        'dev': URIRef('http://light9.bigasterisk.com/device/'),
+        'dev': URIRef('http://light9.bigasterisk.com/theater/skyline/device/'),
     },
     port=networking.rdfdb.port,
 )
