@@ -43,6 +43,8 @@ def mypy(ctx):
     run(['bin/collector'])
     run(['bin/rdfdb'])
     run(['bin/keyboardcomposer'])
+    run(['bin/effectsequencer'])
+    run(['bin/ascoltami2'])
     #for src in bin_sources:
     #    print(f"mypy {src}")
     #    run([src])# + pkg_sources())

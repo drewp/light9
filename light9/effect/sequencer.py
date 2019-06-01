@@ -11,9 +11,10 @@ from twisted.python.filepath import FilePath
 import cyclone.sse
 import logging, bisect, time
 import traceback
-from typing import Any, Callable, Dict, List, Tuple
+from typing import Any, Callable, Dict, List, Tuple, cast
 
 from light9.namespaces import L9, RDF
+from light9.newtypes import DeviceUri, DeviceAttr, NoteUri, Curve, Song
 from light9.vidref.musictime import MusicTime
 from light9.effect import effecteval
 from light9.effect.settings import DeviceSettings
@@ -35,7 +36,7 @@ stats = scales.collection(
 
 class Note(object):
 
-    def __init__(self, graph, uri, effectevalModule, simpleOutputs):
+    def __init__(self, graph: SyncedGraph, uri: NoteUri, effectevalModule, simpleOutputs):
         g = self.graph = graph
         self.uri = uri
         self.effectEval = effectevalModule.EffectEval(
@@ -56,8 +57,8 @@ class Note(object):
                 self.getCurvePoints(curve, L9['strength'], originTime))
         self.points.sort()
 
-    def getCurvePoints(self, curve, attr,
-                       originTime) -> List[Tuple[float, float]]:
+    def getCurvePoints(self, curve: Curve, attr,
+                       originTime: float) -> List[Tuple[float, float]]:
         points = []
         po = list(self.graph.predicate_objects(curve))
         if dict(po).get(L9['attr'], None) != attr:
@@ -68,10 +69,10 @@ class Note(object):
                 (originTime + float(po2[L9['time']]), float(po2[L9['value']])))
         return points
 
-    def activeAt(self, t):
+    def activeAt(self, t: float) -> bool:
         return self.points[0][0] <= t <= self.points[-1][0]
 
-    def evalCurve(self, t):
+    def evalCurve(self, t: float) -> float:
         i = bisect.bisect_left(self.points, (t, None)) - 1
 
         if i == -1:
@@ -86,7 +87,7 @@ class Note(object):
         y = p1[1] + (p2[1] - p1[1]) * frac
         return y
 
-    def outputSettings(self, t):
+    def outputSettings(self, t: float) -> Tuple[List[Tuple[DeviceUri, DeviceAttr, float]], Dict]:
         """
         list of (device, attr, value), and a report for web
         """
@@ -153,17 +154,19 @@ class Sequencer(object):
             onChange=lambda: self.graph.addHandler(self.compileGraph))
 
     @stats.compileGraph.time()
-    def compileGraph(self):
+    def compileGraph(self) -> None:
         """rebuild our data from the graph"""
         t1 = time.time()
         g = self.graph
 
         for song in g.subjects(RDF.type, L9['Song']):
-            self.graph.addHandler(lambda song=song: self.compileSong(song))
+            def compileSong(song: Song = cast(Song, song)) -> None:
+                self.compileSong(song)
+            self.graph.addHandler(compileSong)
         log.info('compileGraph took %.2f ms', 1000 * (time.time() - t1))
 
     @stats.compileSong.time()
-    def compileSong(self, song):
+    def compileSong(self, song: Song) -> None:
         t1 = time.time()
 
         self.notes[song] = []
@@ -193,7 +196,7 @@ class Sequencer(object):
                 })
             self.lastStatLog = now
 
-        def done(sec):
+        def done(sec: float):
             # print "sec", sec
             # delay = max(0, time.time() - (now + 1 / self.fps))
             # print 'cl', delay
@@ -208,22 +211,19 @@ class Sequencer(object):
         d.addCallbacks(done, err)
 
     @stats.update.time()
-    def update(self):
-        # print "update"
+    def update(self) -> None:
         try:
             musicState = self.music.getLatest()
-            song = URIRef(
-                musicState['song']) if musicState.get('song') else None
-            if 't' not in musicState:
+            if 'song' not in musicState or 't' not in musicState:
                 return defer.succeed(0)
-            t = musicState['t']
-            dispatcher.send('state', update={'song': str(song), 't': t})
+            song = Song(musicState['song'])
+            dispatcher.send('state', update={'song': str(song), 't': musicState['t']})
 
             settings = []
             songNotes = sorted(self.notes.get(song, []), key=lambda n: n.uri)
             noteReports = []
             for note in songNotes:
-                s, report = note.outputSettings(t)
+                s, report = note.outputSettings(musicState['t'])
                 noteReports.append(report)
                 settings.append(s)
             dispatcher.send('state', update={'songNotes': noteReports})
@@ -236,26 +236,26 @@ class Sequencer(object):
 
 class Updates(cyclone.sse.SSEHandler):
 
-    def __init__(self, application, request, **kwargs):
+    def __init__(self, application, request, **kwargs) -> None:
         cyclone.sse.SSEHandler.__init__(self, application, request, **kwargs)
         self.state: Dict = {}
         dispatcher.connect(self.updateState, 'state')
         self.numConnected = 0
 
-    def updateState(self, update):
+    def updateState(self, update: Dict):
         self.state.update(update)
 
-    def bind(self):
+    def bind(self) -> None:
         self.numConnected += 1
 
         if self.numConnected == 1:
             self.loop()
 
-    def loop(self):
+    def loop(self) -> None:
         if self.numConnected == 0:
             return
         self.sendEvent(self.state)
         reactor.callLater(.1, self.loop)
 
-    def unbind(self):
+    def unbind(self) -> None:
         self.numConnected -= 1
