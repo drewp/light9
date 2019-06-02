@@ -1,14 +1,16 @@
-import json, socket, subprocess, cyclone.web
-from twisted.python.util import sibpath
-from light9.namespaces import L9
-from light9.showconfig import getSongsFromShow, songOnDisk
+import json, socket, subprocess, os
+
+from cyclone import template
 from rdflib import URIRef
-from web.contrib.template import render_genshi
-render = render_genshi([sibpath(__file__, ".")], auto_reload=True)
+import cyclone.web
 
 from cycloneerr import PrettyErrorHandler
+from light9.namespaces import L9
+from light9.showconfig import getSongsFromShow, songOnDisk
 
 _songUris = {}  # locationUri : song
+
+loader = template.Loader(os.path.dirname(__file__))
 
 
 def songLocation(graph, songUri):
@@ -25,9 +27,12 @@ class root(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):
         self.set_header("Content-Type", "application/xhtml+xml")
-        # todo: use a template; embed the show name and the intro/post
-        # times into the page
-        self.write(render.index(host=socket.gethostname()))
+        self.write(
+            loader.load('index.html').generate(host=socket.gethostname(),
+                                               times=json.dumps({
+                                                   'intro': 4,
+                                                   'post': 4
+                                               })))
 
 
 def playerSongUri(graph, player):

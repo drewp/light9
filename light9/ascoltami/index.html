@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" 
       xmlns:py="http://genshi.edgewall.org/">
   <head>
-    <title>ascoltami on ${host}</title>
+    <title>ascoltami on {{host}}</title>
     <script type="text/javascript" src="/lib/jquery/dist/jquery.min.js"></script>
     <script type="text/javascript" src="/lib/jquery-ui/jquery-ui.min.js"></script>
     <link rel="Stylesheet" type="text/css" href="/lib/jquery-ui/themes/smoothness/jquery-ui.min.css"/>
@@ -15,7 +15,7 @@
     </style>
   </head>
   <body>
-    <h1>ascoltami on ${host}</h1>
+    <h1>ascoltami on {{host}}</h1>
     <div class="songs"/>
 
     <div class="dimStalled">
@@ -68,10 +68,7 @@ $(function () {
     }
     $("#updateReq").text(updateFreq);
 
-    var times = { // need to get these from server
-	intro: 4,
-	post: 4
-    };
+    var times = {% raw times %};
 
     var currentDuration = 0;
     var currentHighlightedSong = "";
