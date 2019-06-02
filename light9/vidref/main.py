@@ -9,7 +9,7 @@ import gobject, logging, traceback
 import gtk
 from twisted.python.util import sibpath
 from light9.vidref.replay import ReplayViews, framerate
-from light9.vidref.musictime import MusicTime
+from light9.ascoltami.musictime_client import MusicTime
 from light9.vidref.videorecorder import Pipeline
 from light9.vidref import remotepivideo
 log = logging.getLogger()

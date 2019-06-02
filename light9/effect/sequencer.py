@@ -13,12 +13,12 @@ import logging, bisect, time
 import traceback
 from typing import Any, Callable, Dict, List, Tuple, cast, Union
 
-from light9.namespaces import L9, RDF
-from light9.newtypes import DeviceUri, DeviceAttr, NoteUri, Curve, Song
-from light9.vidref.musictime import MusicTime
+from light9.ascoltami.musictime_client import MusicTime
 from light9.effect import effecteval
 from light9.effect.settings import DeviceSettings
 from light9.effect.simple_outputs import SimpleOutputs
+from light9.namespaces import L9, RDF
+from light9.newtypes import DeviceUri, DeviceAttr, NoteUri, Curve, Song
 from rdfdb.syncedgraph import SyncedGraph
 
 from greplin import scales
