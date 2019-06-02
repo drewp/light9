@@ -8,9 +8,14 @@
     <link rel="import" href="/lib/polymer/polymer.html">
   </head>
   <body>
+      <script type="module"  src="stats-line.js"></script>
+
+
+     
     <dom-module id="service-button-row">
       <template>
         <style>
+         :host { padding-bottom: 10px;  }
          a {
              color: #7d7dec;
          }
@@ -29,13 +34,25 @@
          }
          .window {
          }
+         .serviceGrid > td {
+             border: 5px solid red;
+             display: inline-block;
+         }
+         :host > div { display: inline-block; vertical-align: top; }
+         :host > div:nth-child(2) { width: 9em; }
+         :host > div:nth-child(3) { width: 5em; }
+         :host > div:nth-child(4) { width: 3em; }
+         :host > div:nth-child(5) { width: 50px; }
+         
         </style>
-        <div>
-          <span class="left"><a class="big" href="{{name}}/">{{name}}</a></span>
-          <span class="window"><button on-click="click">window</button></span>
-          <span><a href="{{name}}/stats/">stats</a></span>
-          <span id="stats"></span>
-        </div>
+
+
+          <div class="left"><a class="big" href="{{name}}/">{{name}}</a></div>
+          <div class="window"><button on-click="click">window</button></div>
+          <div><a href="{{name}}/stats/">stats</a></div>
+          <div id="stats"><stats-line name="{{name}}"></div>
+
+        
       </template>
       <script>
        HTMLImports.whenReady(function () {
@@ -44,10 +61,13 @@
                properties: {
                    name: String,
                },
+             ready: function() {
+             },
                click: function() {
                    window.open(this.name + '/', '_blank',
                                'scrollbars=1,resizable=1,titlebar=0,location=0');
-               }
+               },
+             
            });
        });
       </script>
@@ -55,8 +75,7 @@
     
     <h1>light9 home page</h1>
 
-    <div style="float: left">
-      <service-button-row name="."></service-button-row>
+    <div style="display: grid">
       <service-button-row name="rdfdb"></service-button-row>
       <hr>
       <service-button-row name="ascoltami"></service-button-row>
