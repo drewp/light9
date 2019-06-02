@@ -37,7 +37,7 @@ def mypy(ctx):
                 pty=True, warn=True)
 
     sources = ' '.join(bin_sources + pkg_sources())
-    ctx.run(f'env/bin/flake8 --ignore=E115,E123,E124,E126,E225,E231,E261,E262,E265,E301,E302,E303,E305,E306,E401,E402,E501,E701,E731,W291,W293,W391,W504 {sources}', warn=True)
+    ctx.run(f'env/bin/flake8 --ignore=E115,E123,E124,E126,E225,E231,E261,E262,E265,E301,E302,E303,E305,E306,E401,E402,E501,E701,E731,W291,W293,W391,W504,E131,E125 {sources}', warn=True)
 
     sources = ' '.join(pkg_sources())
     run(['bin/collector'])
