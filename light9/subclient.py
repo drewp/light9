@@ -41,10 +41,13 @@ class SubClient:
         except Exception:
             traceback.print_exc()
             return
-        return sendToCollector('subclient', self.session, outputSettings,
-                               # when KC uses zmq, we get message
-                               # pileups and delays on collector (even
-                               # at 20fps). When sequencer uses zmp,
-                               # it runs great at 40fps. Not sure the
-                               # difference- maybe Tk main loop?
-                               useZmq=False)
+        return sendToCollector(
+            'subclient',
+            self.session,
+            outputSettings,
+            # when KC uses zmq, we get message
+            # pileups and delays on collector (even
+            # at 20fps). When sequencer uses zmp,
+            # it runs great at 40fps. Not sure the
+            # difference- maybe Tk main loop?
+            useZmq=False)

@@ -13,8 +13,8 @@ _zmqClient = None
 stats = scales.collection(
     '/collectorClient/',
     scales.PmfStat('send'),
+)
 
-    )
 
 class TwistedZmqClient(object):
 
@@ -25,6 +25,7 @@ class TwistedZmqClient(object):
 
     def send(self, msg):
         self.conn.push(msg)
+
 
 def toCollectorJson(client, session, settings) -> str:
     assert isinstance(settings, DeviceSettings)
@@ -44,7 +45,8 @@ def sendToCollectorZmq(msg):
     return defer.succeed(0.0)
 
 
-def sendToCollector(client, session, settings: DeviceSettings, useZmq=False) -> defer.Deferred:
+def sendToCollector(client, session, settings: DeviceSettings,
+                    useZmq=False) -> defer.Deferred:
     """deferred to the time in seconds it took to get a response from collector"""
     sendTime = time.time()
     msg = toCollectorJson(client, session, settings).encode('utf8')

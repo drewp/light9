@@ -38,8 +38,11 @@ class App(object):
 
     def launch(self, *args):
         self.seq = Sequencer(
-            self.graph, lambda settings: sendToCollector(
-                'effectSequencer', self.session, settings,
+            self.graph,
+            lambda settings: sendToCollector(
+                'effectSequencer',
+                self.session,
+                settings,
                 # This seems to be safe here (and lets us get from
                 # 20fpx to 40fpx), even though it leads to big stalls
                 # if I use it on KC.

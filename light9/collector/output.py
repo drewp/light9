@@ -47,6 +47,7 @@ class Output(object):
     _writeFail = scales.IntStat('write/fail')
     _writeCall = scales.PmfStat('write/call')
     _writeFps = scales.RecentFpsStat('write/fps')
+
     def _write(self, buf: bytes) -> None:
         """
         write buffer to output hardware (may be throttled if updates are

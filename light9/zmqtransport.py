@@ -20,9 +20,10 @@ def parseJsonMessage(msg):
 
 
 def startZmq(port, collector):
-    stats = scales.collection('/zmqServer',
-                              scales.PmfStat('setAttr'),
-                              scales.RecentFpsStat('setAttrFps'),
+    stats = scales.collection(
+        '/zmqServer',
+        scales.PmfStat('setAttr'),
+        scales.RecentFpsStat('setAttrFps'),
     )
 
     zf = ZmqFactory()

@@ -25,32 +25,30 @@ from greplin import scales
 import imp
 
 log = logging.getLogger('sequencer')
-stats = scales.collection(
-    '/sequencer/',
-)
+stats = scales.collection('/sequencer/',)
 updateStats = scales.collection(
     '/update/',
     scales.PmfStat('s0_getMusic'),
-    scales.PmfStat('s1_eval'),    
+    scales.PmfStat('s1_eval'),
     scales.PmfStat('s2_sendToWeb'),
     scales.PmfStat('s3_send'),
     scales.PmfStat('sendPhase'),
-
     scales.PmfStat('updateLoopLatency'),
     scales.DoubleStat('updateLoopLatencyGoal'),
     scales.RecentFpsStat('updateFps'),
     scales.DoubleStat('goalFps'),
-
-    )
+)
 compileStats = scales.collection(
     '/compile/',
     scales.PmfStat('graph'),
     scales.PmfStat('song'),
-)    
+)
+
 
 class Note(object):
 
-    def __init__(self, graph: SyncedGraph, uri: NoteUri, effectevalModule, simpleOutputs):
+    def __init__(self, graph: SyncedGraph, uri: NoteUri, effectevalModule,
+                 simpleOutputs):
         g = self.graph = graph
         self.uri = uri
         self.effectEval = effectevalModule.EffectEval(
@@ -101,7 +99,9 @@ class Note(object):
         y = p1[1] + (p2[1] - p1[1]) * frac
         return y
 
-    def outputSettings(self, t: float) -> Tuple[List[Tuple[DeviceUri, DeviceAttr, float]], Dict]:
+    def outputSettings(
+            self,
+            t: float) -> Tuple[List[Tuple[DeviceUri, DeviceAttr, float]], Dict]:
         """
         list of (device, attr, value), and a report for web
         """
@@ -110,14 +110,18 @@ class Note(object):
             'effectClass': self.effectEval.effect,
         }
         effectSettings: Dict[DeviceAttr, Union[float, str]] = dict(
-            (DeviceAttr(da), v.toPython()) for da, v in self.baseEffectSettings.items())
+            (DeviceAttr(da), v.toPython())
+            for da, v in self.baseEffectSettings.items())
         effectSettings[L9['strength']] = self.evalCurve(t)
+
         def prettyFormat(x: Union[float, str]):
             if isinstance(x, float):
                 return round(x, 4)
             return x
+
         report['effectSettings'] = dict(
-            (str(k), prettyFormat(v)) for k, v in sorted(effectSettings.items()))
+            (str(k), prettyFormat(v))
+            for k, v in sorted(effectSettings.items()))
         report['nonZero'] = cast(float, effectSettings[L9['strength']]) > 0
         out, evalReport = self.effectEval.outputFromEffect(
             list(effectSettings.items()),
@@ -152,10 +156,11 @@ class CodeWatcher(object):
 
 class Sequencer(object):
 
-    def __init__(self,
-                 graph: SyncedGraph,
-                 sendToCollector: Callable[[DeviceSettings], defer.Deferred[float]],
-                 fps=40):
+    def __init__(
+            self,
+            graph: SyncedGraph,
+            sendToCollector: Callable[[DeviceSettings], defer.Deferred[float]],
+            fps=40):
         self.graph = graph
         self.fps = fps
         updateStats.goalFps = self.fps
@@ -178,8 +183,10 @@ class Sequencer(object):
     def compileGraph(self) -> None:
         """rebuild our data from the graph"""
         for song in self.graph.subjects(RDF.type, L9['Song']):
+
             def compileSong(song: Song = cast(Song, song)) -> None:
                 self.compileSong(song)
+
             self.graph.addHandler(compileSong)
 
     @compileStats.song.time()
@@ -194,13 +201,16 @@ class Sequencer(object):
 
         d = self.update()
         sendStarted = time.time()
+
         def done(sec: float):
             took = time.time() - frameStart
             delay = max(0, 1 / self.fps - took)
             updateStats.updateLoopLatency = took
 
             # time to send to collector, reported by collector_client
-            if isinstance(sec, float): # sometimes None, not sure why, and neither is mypy
+            if isinstance(
+                    sec,
+                    float):  # sometimes None, not sure why, and neither is mypy
                 updateStats.s3_send = sec
 
             # time to send to collector, measured in this function,
@@ -212,7 +222,7 @@ class Sequencer(object):
         def err(e):
             log.warn('updateLoop: %r', e)
             reactor.callLater(2, self.updateLoop)
-        
+
         d.addCallbacks(done, err)
 
     @updateStats.updateFps.rate()
@@ -220,14 +230,20 @@ class Sequencer(object):
         try:
             with updateStats.s0_getMusic.time():
                 musicState = self.music.getLatest()
-                if not musicState.get('song') or not isinstance(musicState.get('t'), float):
+                if not musicState.get('song') or not isinstance(
+                        musicState.get('t'), float):
                     return defer.succeed(0.0)
                 song = Song(URIRef(musicState['song']))
-                dispatcher.send('state', update={'song': str(song), 't': musicState['t']})
+                dispatcher.send('state',
+                                update={
+                                    'song': str(song),
+                                    't': musicState['t']
+                                })
 
             with updateStats.s1_eval.time():
                 settings = []
-                songNotes = sorted(self.notes.get(song, []), key=lambda n: n.uri)
+                songNotes = sorted(self.notes.get(song, []),
+                                   key=lambda n: n.uri)
                 noteReports = []
                 for note in songNotes:
                     s, report = note.outputSettings(musicState['t'])
@@ -237,7 +253,7 @@ class Sequencer(object):
 
             with updateStats.s2_sendToWeb.time():
                 dispatcher.send('state', update={'songNotes': noteReports})
-                
+
             return self.sendToCollector(devSettings)
         except Exception:
             traceback.print_exc()

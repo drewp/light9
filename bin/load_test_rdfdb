@@ -9,29 +9,32 @@ import time, logging
 from light9 import networking, showconfig
 from light9.namespaces import L9
 
+
 class BusyClient:
+
     def __init__(self, subj, rate):
         self.subj = subj
         self.rate = rate
-    
+
         self.graph = SyncedGraph(networking.rdfdb.url, "collector")
         self.graph.initiallySynced.addCallback(self.go)
+
     def go(self, _):
         task.LoopingCall(self.loop).start(1 / self.rate)
-
 
     def loop(self):
         self.graph.patchObject(showconfig.showUri() + '/loadTestContext',
                                subject=self.subj,
-                          predicate=L9['time'],
-                          newObject=Literal(str(time.time())))
+                               predicate=L9['time'],
+                               newObject=Literal(str(time.time())))
+
 
 def main():
     log.setLevel(logging.INFO)
 
     clients = [BusyClient(L9['loadTest_%d' % i], 20) for i in range(10)]
     reactor.run()
-    
+
+
 if __name__ == "__main__":
     main()
-    
