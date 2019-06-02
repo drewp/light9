@@ -13,7 +13,7 @@ from light9 import networking, showconfig
 from light9.effecteval.effect import EffectNode
 from light9.effect.edit import getMusicStatus, songNotePatch
 from light9.effecteval.effectloop import makeEffectLoop
-from light9.greplin_cyclone import StatsForCyclone
+from greplin.scales.cyclonehandler import StatsHandler
 from light9.namespaces import L9
 from rdfdb.patch import Patch
 from rdfdb.syncedgraph import SyncedGraph
@@ -251,7 +251,9 @@ class App(object):
             (r'/effect/eval', EffectEval),
             (r'/songEffects', SongEffects),
             (r'/songEffects/eval', SongEffectsEval),
-            (r'/stats', StatsForCyclone),
+            (r'/stats/(.*)', StatsHandler, {
+                'serverName': 'effecteval'
+            }),
         ],
                                                   debug=True,
                                                   graph=self.graph,

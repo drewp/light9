@@ -5,7 +5,7 @@ plays back effect notes from the timeline
 
 from run_local import log
 from twisted.internet import reactor
-from light9.greplin_cyclone import StatsForCyclone
+from greplin.scales.cyclonehandler import StatsHandler
 from rdfdb.syncedgraph import SyncedGraph
 from light9 import networking, showconfig
 from greplin import scales
@@ -51,7 +51,9 @@ class App(object):
                 "default_filename": "sequencer.html"
             }),
             (r'/updates', Updates),
-            (r'/stats', StatsForCyclone),
+            (r'/stats/(.*)', StatsHandler, {
+                'serverName': 'effectsequencer'
+            }),
         ],
                                                   debug=True,
                                                   seq=self.seq,

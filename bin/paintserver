@@ -3,7 +3,7 @@
 from run_local import log
 import json
 from twisted.internet import reactor
-from light9.greplin_cyclone import StatsForCyclone
+from greplin.scales.cyclonehandler import StatsHandler
 from rdfdb.syncedgraph import SyncedGraph
 from light9 import networking, showconfig
 from greplin import scales
@@ -91,7 +91,9 @@ class App(object):
         self.solver.loadSamples()
 
         self.cycloneApp = cyclone.web.Application(handlers=[
-            (r'/stats', StatsForCyclone),
+            (r'/stats/(.*)', StatsHandler, {
+                'serverName': 'paintserver'
+            }),
             (r'/solve', Solve),
             (r'/bestMatches', BestMatches),
         ],

@@ -19,7 +19,7 @@ from light9.namespaces import L9, RDF
 from light9 import networking, showconfig
 from rdfdb.syncedgraph import SyncedGraph
 from light9.paint.capture import writeCaptureDescription
-from light9.greplin_cyclone import StatsForCyclone
+from greplin.scales.cyclonehandler import StatsHandler
 from light9.effect.settings import DeviceSettings
 from light9.collector.collector_client import sendToCollector
 from rdfdb.patch import Patch
@@ -173,7 +173,9 @@ def launch(graph):
                               "path": "light9/web",
                               "default_filename": "captureDevice.html"
                           }),
-                          (r'/stats', StatsForCyclone),
+                          (r'/stats/(.*)', StatsHandler, {
+                              'serverName': 'captureDevice'
+                          }),
                       ]),
                       interface='::',
                       cap=cap)
