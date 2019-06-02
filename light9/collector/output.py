@@ -45,7 +45,7 @@ class Output(object):
 
     _writeSucceed = scales.IntStat('write/succeed')
     _writeFail = scales.IntStat('write/fail')
-    _writeCall = scales.PmfStat('write/call')
+    _writeCall = scales.PmfStat('write/call', recalcPeriod=1)
     _writeFps = scales.RecentFpsStat('write/fps')
 
     def _write(self, buf: bytes) -> None:
@@ -169,8 +169,8 @@ class UdmxOld(BackgroundLoopOutput):
                                 
 # out of date
 class EnttecDmx(BackgroundLoopOutput):
-    stats = scales.collection('/output/enttecDmx', scales.PmfStat('write'),
-                              scales.PmfStat('update'))
+    stats = scales.collection('/output/enttecDmx', scales.PmfStat('write', recalcPeriod=1),
+                              scales.PmfStat('update', recalcPeriod=1))
 
     def __init__(self, uri, devicePath='/dev/dmx0', numChannels=80):
         sys.path.append("dmx_usb_module")

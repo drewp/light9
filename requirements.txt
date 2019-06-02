@@ -36,7 +36,7 @@ ipython==5.3.0
 mypy==0.701
 typing_extensions
 
-git+http://github.com/drewp/scales.git@3f2609c#egg=scales
+git+http://github.com/drewp/scales.git@4b011434f7469a442c3fc1d7e81685c0bfa56eeb#egg=scales
 git+http://github.com/11craft/louie.git@f18bb71010c114eca9c6b88c96453340e3b39454#egg=louie
 git+http://github.com/webpy/webpy@ace0f8954c28311004b33c7a513c6e40a3c02470#egg=web
 https://github.com/drewp/cyclone/archive/python3.zip#egg=cyclone

@@ -25,23 +25,23 @@ from greplin import scales
 import imp
 
 log = logging.getLogger('sequencer')
-stats = scales.collection('/sequencer/',)
+
 updateStats = scales.collection(
     '/update/',
-    scales.PmfStat('s0_getMusic'),
-    scales.PmfStat('s1_eval'),
-    scales.PmfStat('s2_sendToWeb'),
-    scales.PmfStat('s3_send'),
-    scales.PmfStat('sendPhase'),
-    scales.PmfStat('updateLoopLatency'),
+    scales.PmfStat('s0_getMusic', recalcPeriod=1),
+    scales.PmfStat('s1_eval', recalcPeriod=1),
+    scales.PmfStat('s2_sendToWeb', recalcPeriod=1),
+    scales.PmfStat('s3_send', recalcPeriod=1),
+    scales.PmfStat('sendPhase', recalcPeriod=1),
+    scales.PmfStat('updateLoopLatency', recalcPeriod=1),
     scales.DoubleStat('updateLoopLatencyGoal'),
     scales.RecentFpsStat('updateFps'),
     scales.DoubleStat('goalFps'),
 )
 compileStats = scales.collection(
     '/compile/',
-    scales.PmfStat('graph'),
-    scales.PmfStat('song'),
+    scales.PmfStat('graph', recalcPeriod=1),
+    scales.PmfStat('song', recalcPeriod=1),
 )
 
 
@@ -156,11 +156,10 @@ class CodeWatcher(object):
 
 class Sequencer(object):
 
-    def __init__(
-            self,
-            graph: SyncedGraph,
-            sendToCollector: Callable[[DeviceSettings], defer.Deferred],
-            fps=40):
+    def __init__(self,
+                 graph: SyncedGraph,
+                 sendToCollector: Callable[[DeviceSettings], defer.Deferred],
+                 fps=40):
         self.graph = graph
         self.fps = fps
         updateStats.goalFps = self.fps

@@ -12,7 +12,7 @@ _zmqClient = None
 
 stats = scales.collection(
     '/collectorClient/',
-    scales.PmfStat('send'),
+    scales.PmfStat('send', recalcPeriod=1),
 )
 
 

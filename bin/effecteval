@@ -113,8 +113,7 @@ class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
                         'label': self.graph.label(uri)
                     })
             out[-1]['effects'].sort(key=lambda e: e['uri'])
-                    
-                    
+
         self.sendMessage({'songs': out})
 
 
@@ -226,10 +225,10 @@ class App(object):
 
         self.stats = scales.collection(
             '/',
-            scales.PmfStat('sendLevels'),
-            scales.PmfStat('getMusic'),
-            scales.PmfStat('evals'),
-            scales.PmfStat('sendOutput'),
+            scales.PmfStat('sendLevels', recalcPeriod=1),
+            scales.PmfStat('getMusic', recalcPeriod=1),
+            scales.PmfStat('evals', recalcPeriod=1),
+            scales.PmfStat('sendOutput', recalcPeriod=1),
             scales.IntStat('errors'),
         )
 

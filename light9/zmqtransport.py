@@ -22,7 +22,7 @@ def parseJsonMessage(msg):
 def startZmq(port, collector):
     stats = scales.collection(
         '/zmqServer',
-        scales.PmfStat('setAttr'),
+        scales.PmfStat('setAttr', recalcPeriod=1),
         scales.RecentFpsStat('setAttrFps'),
     )
 

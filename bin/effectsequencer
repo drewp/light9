@@ -29,10 +29,10 @@ class App(object):
 
         self.stats = scales.collection(
             '/',
-            scales.PmfStat('sendLevels'),
-            scales.PmfStat('getMusic'),
-            scales.PmfStat('evals'),
-            scales.PmfStat('sendOutput'),
+            scales.PmfStat('sendLevels', recalcPeriod=1),
+            scales.PmfStat('getMusic', recalcPeriod=1),
+            scales.PmfStat('evals', recalcPeriod=1),
+            scales.PmfStat('sendOutput', recalcPeriod=1),
             scales.IntStat('errors'),
         )
 

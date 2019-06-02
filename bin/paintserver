@@ -71,7 +71,7 @@ class App(object):
 
         self.stats = scales.collection(
             '/',
-            scales.PmfStat('solve'),
+            scales.PmfStat('solve', recalcPeriod=1),
         )
 
     def launch(self, *args):

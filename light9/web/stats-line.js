@@ -37,6 +37,7 @@ class StatsLine extends LitElement {
         return css`
         :host {
             border: 2px solid #46a79f;
+            display: inline-block;
         }
         table { 
             border-collapse: collapse;
@@ -107,17 +108,16 @@ class StatsLine extends LitElement {
             
             const bar = (y) => {
                 let color;
-                if (y < hi * .85) {
+                if (y < d.average) {
                     color="#6a6aff";
                 } else {
                     color="#d09e4c";
                 }
                 return html`<div class="bar" style="height: ${y * scl}px; background: ${color};"></div>`;
             };
-            return tdWrap(table({
-                average: rounding(d.average, 3),
-                recents: html`<div class="recents">${d.recents.map(bar)}</div>`
-            }, path));
+            return html`<td>
+               <div class="recents">${d.recents.map(bar)}</div>
+               <div>avg=${rounding(d.average ,3)}</div>`;
 
         };
         const pmf = (d, path) => {

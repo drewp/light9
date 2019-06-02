@@ -25,7 +25,8 @@ from light9.collector.collector_client import sendToCollector
 from rdfdb.patch import Patch
 from light9.zmqtransport import parseJsonMessage
 
-stats = scales.collection('/webServer', scales.PmfStat('setAttr'))
+stats = scales.collection('/webServer', scales.PmfStat('setAttr',
+                                                       recalcPeriod=1))
 
 
 class Camera(object):

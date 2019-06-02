@@ -167,6 +167,8 @@ def makeWebApp(app):
         (r"/seekPlayOrPause", seekPlayOrPause),
         (r"/output", output),
         (r"/go", goButton),
-        (r'/stats/(.*)', StatsHandler, {'serverName': 'ascoltami'}),
+        (r'/stats/(.*)', StatsHandler, {
+            'serverName': 'ascoltami'
+        }),
     ],
                                    app=app)

@@ -44,7 +44,7 @@ class Updates(cyclone.websocket.WebSocketHandler):
 
 stats = scales.collection(
     '/webServer',
-    scales.PmfStat('setAttr'),
+    scales.PmfStat('setAttr', recalcPeriod=1),
     scales.RecentFpsStat('setAttrFps'),
 )
 

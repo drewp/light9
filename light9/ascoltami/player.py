@@ -10,9 +10,11 @@ from greplin import scales
 
 log = logging.getLogger()
 
-stats = scales.collection('/player',
-                          scales.RecentFpsStat('currentTimeFps'),
+stats = scales.collection(
+    '/player',
+    scales.RecentFpsStat('currentTimeFps'),
 )
+
 
 class Player(object):
 
