@@ -3,6 +3,7 @@ import json, socket, subprocess, os
 from cyclone import template
 from rdflib import URIRef
 import cyclone.web
+from greplin.scales.cyclonehandler import StatsHandler
 
 from cycloneerr import PrettyErrorHandler
 from light9.namespaces import L9
@@ -166,5 +167,6 @@ def makeWebApp(app):
         (r"/seekPlayOrPause", seekPlayOrPause),
         (r"/output", output),
         (r"/go", goButton),
+        (r'/stats/(.*)', StatsHandler, {'serverName': 'ascoltami'}),
     ],
                                    app=app)

@@ -6,9 +6,13 @@ alternate to the mpd music player, for ascoltami
 import time, logging, traceback
 from gi.repository import Gst
 from twisted.internet import task
+from greplin import scales
 
 log = logging.getLogger()
 
+stats = scales.collection('/player',
+                          scales.RecentFpsStat('currentTimeFps'),
+)
 
 class Player(object):
 
@@ -136,6 +140,7 @@ class Player(object):
             log.error("couldn't preload %s, %r", songPath, e)
             raise
 
+    @stats.currentTimeFps.rate()
     def currentTime(self):
         success, cur = self.playbin.query_position(Gst.Format.TIME)
         if not success:
