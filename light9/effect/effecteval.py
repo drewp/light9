@@ -10,9 +10,9 @@ from light9.effect.scale import scale
 from typing import Dict, Tuple, Any
 import random
 random.seed(0)
-print("reload effecteval")
 
 log = logging.getLogger('effecteval')
+log.info("reload effecteval")
 
 
 def literalColor(rnorm, gnorm, bnorm):

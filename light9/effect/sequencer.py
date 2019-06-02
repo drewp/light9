@@ -159,7 +159,7 @@ class Sequencer(object):
     def __init__(
             self,
             graph: SyncedGraph,
-            sendToCollector: Callable[[DeviceSettings], defer.Deferred[float]],
+            sendToCollector: Callable[[DeviceSettings], defer.Deferred],
             fps=40):
         self.graph = graph
         self.fps = fps
