@@ -7,8 +7,6 @@ import cyclone.web, cyclone.websocket, cyclone.httpclient
 import sys, optparse, logging, json, itertools
 from rdflib import URIRef, Literal
 
-sys.path.append('/usr/lib/pymodules/python2.7/')  # for numpy, on rpi
-sys.path.append('/usr/lib/python2.7/dist-packages')  # For numpy
 from light9 import networking, showconfig
 from light9.effecteval.effect import EffectNode
 from light9.effect.edit import getMusicStatus, songNotePatch
@@ -103,11 +101,20 @@ class SongEffectsUpdates(cyclone.websocket.WebSocketHandler):
         songs = list(self.graph.items(playlist))
         out = []
         for s in songs:
-            out.append({'uri': s, 'label': self.graph.label(s)})
-            out[-1]['effects'] = [{
-                'uri': uri,
-                'label': self.graph.label(uri)
-            } for uri in sorted(self.graph.objects(s, L9['effect']))]
+            out.append({'uri': s, 'label': self.graph.label(s), 'effects': []})
+            seen = set()
+            for n in self.graph.objects(s, L9['note']):
+                for uri in self.graph.objects(n, L9['effectClass']):
+                    if uri in seen:
+                        continue
+                    seen.add(uri)
+                    out[-1]['effects'].append({
+                        'uri': uri,
+                        'label': self.graph.label(uri)
+                    })
+            out[-1]['effects'].sort(key=lambda e: e['uri'])
+                    
+                    
         self.sendMessage({'songs': out})
 
 

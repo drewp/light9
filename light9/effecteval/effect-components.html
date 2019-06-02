@@ -16,9 +16,10 @@
                          label="{{effect.label}}"></l9-effect>
             </li>
           </template>
-          <li>
-            <effect-drop-target song-uri="{{song.uri}}"></effect-drop-target>
-          </li>
+       <!--    <li>
+          <effect-drop-target song-uri="{{song.uri}}"></effect-drop-target>
+      </li>
+      -->
         </ul>
       </li>
     </template>
@@ -52,7 +53,7 @@
 <dom-module id="l9-effect">
   <template>
     <a class="effect" href="{{href}}">{{label}}</a>
-    <button on-click="deleteEffect">Delete</button>
+    
   </template>
 </dom-module>
 <script>
