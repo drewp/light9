@@ -1,4 +1,4 @@
-import os, gtk, shutil, logging, time
+import os, shutil, logging, time
 from bisect import bisect_left
 from decimal import Decimal
 log = logging.getLogger()
