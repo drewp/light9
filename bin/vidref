@@ -10,7 +10,8 @@ light9/vidref/videorecorder.py capture frames and save them
 light9/vidref/replay.py backend for vidref.js playback element- figures out which frames go with the current song and time
 light9/vidref/index.html web ui for watching current stage and song playback
 light9/vidref/setup.html web ui for setup of camera params and frame crop
-light9/web/vidref.js LitElement for video playback
+light9/web/light9-vidref-live.js LitElement for live video frames
+light9/web/light9-vidref-playback.js LitElement for video playback
 
 """
 from run_local import log
@@ -55,7 +56,9 @@ class Snapshot(cyclone.web.RequestHandler):
 
 
 pipeline = videorecorder.GstSource(
-    '/dev/v4l/by-id/usb-Generic_FULL_HD_1080P_Webcam_200901010001-video-index0')
+    '/dev/v4l/by-id/usb-Bison_HD_Webcam_200901010001-video-index0'
+#    '/dev/v4l/by-id/usb-Generic_FULL_HD_1080P_Webcam_200901010001-video-index0'
+)
 
 
 class Live(cyclone.websocket.WebSocketHandler):
@@ -66,18 +69,17 @@ class Live(cyclone.websocket.WebSocketHandler):
     def connectionLost(self, reason):
         0  #self.subj.dispose()
 
-    def onFrame(self, t_img):
-        t, img = t_img
-        if img is None: return
+    def onFrame(self, cf: videorecorder.CaptureFrame):
+        if cf is None: return
         output = BytesIO()
-        img.save(output, 'jpeg', quality=80)
+        cf.img.save(output, 'jpeg', quality=80)
 
         self.sendMessage(
             json.dumps({
                 'jpeg':
                 base64.b64encode(output.getvalue()).decode('ascii'),
                 'description':
-                f't={t}',
+                f't={cf.t}',
             }))
 
 
@@ -95,7 +97,9 @@ class Time(cyclone.web.RequestHandler):
         self.set_status(202)
 
 
-graph = SyncedGraph(networking.rdfdb.url, "vidref")
+#graph = SyncedGraph(networking.rdfdb.url, "vidref")
+outVideos = videorecorder.FramesToVideoFiles(pipeline.liveImages)
+#outVideos.save('/tmp/mov1')
 
 port = networking.vidref.port
 reactor.listenTCP(

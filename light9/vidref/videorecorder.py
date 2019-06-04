@@ -1,17 +1,20 @@
-import sys
+import time, logging, os, traceback, sys
+
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstBase', '1.0')
 from gi.repository import Gst
 from rx.subjects import BehaviorSubject
-
-import time, logging, os, traceback
+from dataclasses import dataclass
 from PIL import Image
-from twisted.internet import defer
+from twisted.internet import defer, threads
 from queue import Queue
 from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
-from typing import Set
-
+from typing import Set, Optional
+import moviepy.editor
+import numpy
+from light9.ascoltami.musictime_client import MusicTime
+from light9.newtypes import Song
 from IPython.core import ultratb
 sys.excepthook = ultratb.FormattedTB(mode='Verbose',
                                      color_scheme='Linux',
@@ -19,6 +22,98 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
 
 log = logging.getLogger()
 
+@dataclass(frozen=True)
+class CaptureFrame:
+    img: Image
+    song: Song
+    t: float
+    isPlaying: bool
+
+class FramesToVideoFiles:
+    """
+
+    nextWriteAction: 'ignore'
+    currentOutputClip: None
+
+    (frames come in for new video)
+    nextWriteAction: 'saveFrame'
+    currentOutputClip: new VideoClip
+    (many frames)
+
+    (music stops or song changes)
+    nextWriteAction: 'close'
+    currentOutputClip: None
+    nextWriteAction: 'ignore'
+    
+    """
+    def __init__(self, frames: BehaviorSubject):
+        self.frames = frames
+        self.nextImg = None
+
+        self.currentOutputClip = None
+        self.currentOutputSong = None
+        self.nextWriteAction = 'ignore'
+        self.frames.subscribe(on_next=self.onFrame)
+
+    def onFrame(self, cf: Optional[CaptureFrame]):
+        if cf is None:
+            return
+        self.nextImg = cf
+
+        if self.currentOutputClip is None and cf.isPlaying:
+            # start up
+            self.nextWriteAction = 'saveFrames'
+            self.currentOutputSong = cf.song
+            self.save('/tmp/out%s' % time.time())
+        elif self.currentOutputClip and cf.isPlaying:
+            self.nextWriteAction = 'saveFrames'
+            # continue recording this
+        elif self.currentOutputClip is None and not cf.isPlaying:
+            self.nextWriteAction  = 'notWritingClip'
+            pass # continue waiting
+        elif self.currentOutputClip and not cf.isPlaying or self.currentOutputSong != cf.song:
+            # stop
+            self.nextWriteAction = 'close'
+        else:
+            raise NotImplementedError        
+
+    def save(self, outBase):
+        """
+        receive frames (infinite) and wall-to-song times (stream ends with
+        the song), and write a video file and a frame map
+        """
+        return threads.deferToThread(self._bg_save, outBase)
+
+    def _bg_save(self, outBase):
+        self.frameMap = open(outBase + '.timing', 'wt')
+
+        # (immediately calls make_frame)
+        self.currentOutputClip = moviepy.editor.VideoClip(
+            self._bg_make_frame, duration=999.)
+        self.currentOutputClip.fps = 5
+        log.info(f'write_videofile {outBase} start')
+        try:
+            self.currentOutputClip.write_videofile(
+                outBase + '.mp4',
+                audio=False, preset='ultrafast', verbose=True, bitrate='150000')
+        except (StopIteration, RuntimeError):
+            pass
+        log.info('write_videofile done')
+        self.currentOutputClip = None
+         
+    def _bg_make_frame(self, video_time_secs):
+        if self.nextWriteAction == 'close':
+            raise StopIteration # the one in write_videofile
+
+        # should be a queue to miss fewer frames
+        while self.nextImg is None:
+            time.sleep(.03)
+        cf, self.nextImg = self.nextImg, None
+
+        self.frameMap.write(
+            f'video {video_time_secs:g} = song {cf.t:g}\n')
+        self.frameMap.flush()
+        return numpy.asarray(cf.img)
 
 class GstSource:
 
@@ -27,15 +122,21 @@ class GstSource:
         make new gst pipeline
         """
         Gst.init(None)
-        self.liveImages = BehaviorSubject((0, None))
+        self.musicTime = MusicTime(pollCurvecalc=False)
+        self.liveImages: BehaviorSubject[Optional[CaptureFrame]] = BehaviorSubject(None)
 
-        size = [800, 600]
+        size = [640, 480]
 
         log.info("new pipeline using device=%s" % dev)
         
         # using videocrop breaks the pipeline, may be this issue
         # https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/issues/732
-        pipeStr = f"v4l2src device=\"{dev}\" ! videoconvert ! appsink emit-signals=true max-buffers=1 drop=true name=end0 caps=video/x-raw,format=RGB,width={size[0]},height={size[1]}"
+        pipeStr = (
+            #f"v4l2src device=\"{dev}\""
+            f'autovideosrc'
+            f" ! videoconvert"
+            f" ! appsink emit-signals=true max-buffers=1 drop=true name=end0 caps=video/x-raw,format=RGB,width={size[0]},height={size[1]}"
+            )
         log.info("pipeline: %s" % pipeStr)
 
         self.pipe = Gst.parse_launch(pipeStr)
@@ -46,7 +147,7 @@ class GstSource:
         self.appsink.connect('new-sample', self.new_sample)
 
         self.pipe.set_state(Gst.State.PLAYING)
-        log.info('recording video')
+        log.info('gst pipeline is recording video')
 
     def new_sample(self, appsink):
         try:
@@ -59,10 +160,15 @@ class GstSource:
                     'RGB', (caps.get_structure(0).get_value('width'),
                             caps.get_structure(0).get_value('height')),
                     mapinfo.data)
-                img = img.crop((0, 100, 800,  500))
+                img = img.crop((0, 100, 640, 380))
             finally:
                 buf.unmap(mapinfo)
-            self.liveImages.on_next((time.time(), img))
+            # could get gst's frame time and pass it to getLatest
+            latest = self.musicTime.getLatest()
+            if 'song' in latest:
+                self.liveImages.on_next(
+                    CaptureFrame(img, Song(latest['song']),
+                                 latest['t'], latest['playing']))
         except Exception:
             traceback.print_exc()
         return Gst.FlowReturn.OK
