@@ -90,12 +90,15 @@ class FramesToVideoFiles:
         return threads.deferToThread(self._bg_save, outBase)
 
     def _bg_save(self, outBase):
+        os.makedirs(os.path.dirname(outBase), exist_ok=True)
         self.frameMap = open(outBase + '.timing', 'wt')
 
         # (immediately calls make_frame)
-        self.currentOutputClip = moviepy.editor.VideoClip(
-            self._bg_make_frame, duration=999.)
-        self.currentOutputClip.fps = 5
+        self.currentOutputClip = moviepy.editor.VideoClip(self._bg_make_frame,
+                                                          duration=999.)
+        # The fps recorded in the file doesn't matter much; we'll play
+        # it back in sync with the music regardless.
+        self.currentOutputClip.fps = 10
         log.info(f'write_videofile {outBase} start')
         try:
             self.currentOutputClip.write_videofile(outBase + '.mp4',
@@ -111,9 +114,15 @@ class FramesToVideoFiles:
 
     def _bg_make_frame(self, video_time_secs):
         if self.nextWriteAction == 'close':
-            raise StopIteration # the one in write_videofile
+            raise StopIteration  # the one in write_videofile
+        elif self.nextWriteAction == 'notWritingClip':
+            raise NotImplementedError
+        elif self.nextWriteAction == 'saveFrames':
+            pass
+        else:
+            raise NotImplementedError(self.nextWriteAction)
 
-        # should be a queue to miss fewer frames
+        # should be a little queue to miss fewer frames
         while self.nextImg is None:
             time.sleep(.03)
         cf, self.nextImg = self.nextImg, None
