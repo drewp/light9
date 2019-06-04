@@ -20,7 +20,8 @@ class MusicTime(object):
                  period=.2,
                  onChange=lambda position: None,
                  pollCurvecalc='ignored'):
-        """period is the seconds between http time requests.
+        """period is the seconds between
+        http time requests.
 
         We call onChange with the time in seconds and the total time
 

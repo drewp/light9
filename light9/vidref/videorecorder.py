@@ -1,20 +1,22 @@
+from dataclasses import dataclass
+from queue import Queue
+from typing import Optional
 import time, logging, os, traceback, sys
 
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstBase', '1.0')
+
+from PIL import Image
 from gi.repository import Gst
 from rx.subjects import BehaviorSubject
-from dataclasses import dataclass
-from PIL import Image
 from twisted.internet import defer, threads
-from queue import Queue
-from light9.vidref.replay import framerate, songDir, takeDir, snapshotDir
-from typing import Set, Optional
 import moviepy.editor
 import numpy
+
 from light9.ascoltami.musictime_client import MusicTime
 from light9.newtypes import Song
+
 from IPython.core import ultratb
 sys.excepthook = ultratb.FormattedTB(mode='Verbose',
                                      color_scheme='Linux',
@@ -22,12 +24,14 @@ sys.excepthook = ultratb.FormattedTB(mode='Verbose',
 
 log = logging.getLogger()
 
+
 @dataclass(frozen=True)
 class CaptureFrame:
     img: Image
     song: Song
     t: float
     isPlaying: bool
+
 
 class FramesToVideoFiles:
     """
@@ -46,12 +50,13 @@ class FramesToVideoFiles:
     nextWriteAction: 'ignore'
     
     """
+
     def __init__(self, frames: BehaviorSubject):
         self.frames = frames
-        self.nextImg = None
+        self.nextImg: Optional[CaptureFrame] = None
 
         self.currentOutputClip = None
-        self.currentOutputSong = None
+        self.currentOutputSong: Optional[Song] = None
         self.nextWriteAction = 'ignore'
         self.frames.subscribe(on_next=self.onFrame)
 
@@ -69,13 +74,13 @@ class FramesToVideoFiles:
             self.nextWriteAction = 'saveFrames'
             # continue recording this
         elif self.currentOutputClip is None and not cf.isPlaying:
-            self.nextWriteAction  = 'notWritingClip'
-            pass # continue waiting
+            self.nextWriteAction = 'notWritingClip'
+            pass  # continue waiting
         elif self.currentOutputClip and not cf.isPlaying or self.currentOutputSong != cf.song:
             # stop
             self.nextWriteAction = 'close'
         else:
-            raise NotImplementedError        
+            raise NotImplementedError(str(vars()))
 
     def save(self, outBase):
         """
@@ -93,14 +98,17 @@ class FramesToVideoFiles:
         self.currentOutputClip.fps = 5
         log.info(f'write_videofile {outBase} start')
         try:
-            self.currentOutputClip.write_videofile(
-                outBase + '.mp4',
-                audio=False, preset='ultrafast', verbose=True, bitrate='150000')
+            self.currentOutputClip.write_videofile(outBase + '.mp4',
+                                                   audio=False,
+                                                   preset='ultrafast',
+                                                   logger=None,
+                                                   bitrate='150000')
         except (StopIteration, RuntimeError):
-            pass
+            self.frameMap.close()
+
         log.info('write_videofile done')
         self.currentOutputClip = None
-         
+
     def _bg_make_frame(self, video_time_secs):
         if self.nextWriteAction == 'close':
             raise StopIteration # the one in write_videofile
@@ -110,10 +118,9 @@ class FramesToVideoFiles:
             time.sleep(.03)
         cf, self.nextImg = self.nextImg, None
 
-        self.frameMap.write(
-            f'video {video_time_secs:g} = song {cf.t:g}\n')
-        self.frameMap.flush()
+        self.frameMap.write(f'video {video_time_secs:g} = song {cf.t:g}\n')
         return numpy.asarray(cf.img)
+
 
 class GstSource:
 
@@ -123,12 +130,13 @@ class GstSource:
         """
         Gst.init(None)
         self.musicTime = MusicTime(pollCurvecalc=False)
-        self.liveImages: BehaviorSubject[Optional[CaptureFrame]] = BehaviorSubject(None)
+        self.liveImages: BehaviorSubject[
+            Optional[CaptureFrame]] = BehaviorSubject(None)
 
         size = [640, 480]
 
         log.info("new pipeline using device=%s" % dev)
-        
+
         # using videocrop breaks the pipeline, may be this issue
         # https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/issues/732
         pipeStr = (
@@ -136,7 +144,7 @@ class GstSource:
             f'autovideosrc'
             f" ! videoconvert"
             f" ! appsink emit-signals=true max-buffers=1 drop=true name=end0 caps=video/x-raw,format=RGB,width={size[0]},height={size[1]}"
-            )
+        )
         log.info("pipeline: %s" % pipeStr)
 
         self.pipe = Gst.parse_launch(pipeStr)
@@ -167,8 +175,8 @@ class GstSource:
             latest = self.musicTime.getLatest()
             if 'song' in latest:
                 self.liveImages.on_next(
-                    CaptureFrame(img, Song(latest['song']),
-                                 latest['t'], latest['playing']))
+                    CaptureFrame(img, Song(latest['song']), latest['t'],
+                                 latest['playing']))
         except Exception:
             traceback.print_exc()
         return Gst.FlowReturn.OK

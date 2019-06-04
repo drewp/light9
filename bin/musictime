@@ -3,13 +3,12 @@ import run_local  # noqa
 import light9.networking
 
 import tkinter as tk
-import time
-import json
-from twisted.internet import reactor, tksupport, task, defer
+from twisted.internet import reactor, tksupport, task
 
 from light9.ascoltami.musictime_client import MusicTime
 
 mt = MusicTime()
+
 
 class MusicTimeTk(tk.Frame, MusicTime):
 
@@ -35,10 +34,11 @@ class MusicTimeTk(tk.Frame, MusicTime):
         self.timelabel.bind('<1>', print_time)
         self.timelabel.focus()
         task.LoopingCall(self.update_time).start(.1)
-        
+
     def update_time(self):
         t = self.getLatest().get('t', 0)
         self.timevar.set(t)
+
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -51,4 +51,3 @@ if __name__ == "__main__":
     MusicTimeTk(root, options.url).pack(expand=1, fill='both')
     tksupport.install(root, ms=20)
     reactor.run()
-

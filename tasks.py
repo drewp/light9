@@ -45,6 +45,7 @@ def mypy(ctx):
     run(['bin/keyboardcomposer'])
     run(['bin/effectsequencer'])
     run(['bin/ascoltami2'])
+    run(['bin/vidref'])
     #for src in bin_sources:
     #    print(f"mypy {src}")
     #    run([src])# + pkg_sources())
