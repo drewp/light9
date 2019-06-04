@@ -19,7 +19,7 @@ class MusicTime(object):
     def __init__(self,
                  period=.2,
                  onChange=lambda position: None,
-                 pollCurvecalc=True):
+                 pollCurvecalc='ignored'):
         """period is the seconds between http time requests.
 
         We call onChange with the time in seconds and the total time
@@ -37,10 +37,8 @@ class MusicTime(object):
         # driven by our pollCurvecalcTime and also by Gui.incomingTime
         self.lastHoverTime = None  # None means "no recent value"
         self.pollMusicTime()
-        if pollCurvecalc:
-            self.pollCurvecalcTime()
 
-    def getLatest(self, frameTime=None):
+    def getLatest(self, frameTime=None) -> Dict:
         """
         dict with 't' and 'song', etc.
 
@@ -87,43 +85,6 @@ class MusicTime(object):
             reactor.callLater(2, self.pollMusicTime)
 
         d = treq.get(networking.musicPlayer.path("time").toPython())
-        d.addCallback(cb)
-        d.addErrback(eb)  # note this includes errors in cb()
-
-    def pollCurvecalcTime(self):
-        """
-        poll the curvecalc position when music isn't playing, so replay
-        can track it.
-
-        This would be better done via rdfdb sync, where changes to the
-        curvecalc position are written to the curvecalc session and we
-        can pick them up in here
-        """
-        if self.position.get('playing'):
-            # don't need this position during playback
-            self.lastHoverTime = None
-            reactor.callLater(.2, self.pollCurvecalcTime)
-            return
-
-        def cb(response):
-            if response.code == 404:
-                # not hovering
-                self.lastHoverTime = None
-                reactor.callLater(.2, self.pollCurvecalcTime)
-                return
-            if response.code != 200:
-                raise ValueError("%s %s" % (response.code, response.body))
-            self.lastHoverTime = json.loads(response.body)['hoverTime']
-
-            reactor.callLater(self.hoverPeriod, self.pollCurvecalcTime)
-
-        def eb(err):
-            if self.lastHoverTime:
-                log.warn("talking to curveCalc: %s", err.getErrorMessage())
-            self.lastHoverTime = None
-            reactor.callLater(2, self.pollCurvecalcTime)
-
-        d = treq.get(networking.curveCalc.path("hoverTime"))
         d.addCallback(cb)
         d.addErrback(eb)  # note this includes errors in cb()
 

@@ -1,28 +1,15 @@
-#!/usr/bin/env python
+#!bin/python
 import run_local  # noqa
 import light9.networking
 
 import tkinter as tk
 import time
-import restkit, jsonlib
+import json
+from twisted.internet import reactor, tksupport, task, defer
 
+from light9.ascoltami.musictime_client import MusicTime
 
-class MusicTime:
-
-    def __init__(self, url):
-        self.player = restkit.Resource(url)
-
-    def get_music_time(self):
-        playtime = None
-        while not playtime:
-            try:
-                playtime = jsonlib.read(self.player.get("time").body_string(),
-                                        use_float=True)['t']
-            except restkit.RequestError as e:
-                print("Server error %s, waiting" % e)
-                time.sleep(2)
-        return playtime
-
+mt = MusicTime()
 
 class MusicTimeTk(tk.Frame, MusicTime):
 
@@ -41,18 +28,17 @@ class MusicTimeTk(tk.Frame, MusicTime):
         self.timelabel.pack(expand=1, fill='both')
 
         def print_time(evt, *args):
-            self.timevar.set(self.get_music_time())
+            self.timevar.set(mt.getLatest().get('t', 0))
             print(self.timevar.get(), evt.keysym)
 
         self.timelabel.bind('<KeyPress>', print_time)
         self.timelabel.bind('<1>', print_time)
         self.timelabel.focus()
-        self.update_time()
-
+        task.LoopingCall(self.update_time).start(.1)
+        
     def update_time(self):
-        self.timevar.set(self.get_music_time())
-        self.after(100, self.update_time)
-
+        t = self.getLatest().get('t', 0)
+        self.timevar.set(t)
 
 if __name__ == "__main__":
     from optparse import OptionParser
@@ -63,7 +49,6 @@ if __name__ == "__main__":
     root = tk.Tk()
     root.title("Time")
     MusicTimeTk(root, options.url).pack(expand=1, fill='both')
-    try:
-        tk.mainloop()
-    except KeyboardInterrupt:
-        root.destroy()
+    tksupport.install(root, ms=20)
+    reactor.run()
+
