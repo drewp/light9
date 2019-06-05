@@ -30,14 +30,30 @@ bin/node:
 bower: node_modules/bower/bin/bower bin/node
 	cd light9/web/lib; nodejs ../../../node_modules/bower/bin/bower install
 
-npm:
+npm_install:
 	npm install
+
+node_modules/n3/n3-browser.js:
 	(cd node_modules/n3; nodejs ../browserify/bin/cmd.js --standalone N3 --require n3 -o n3-browser.js)
+
+light9/web/lib/debug/debug-build.js:
 	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build.js --standalone debug
+
+light9/web/lib/debug/debug-build-es6.js:
+	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build-es6.js --standalone debug
+	echo "export default window.debug;" >> light9/web/lib/debug/debug-build-es6.js
+
+lit_fix:
 	perl -pi -e "s,'lit-html,'/node_modules/lit-html,; s,lit-html',lit-html/lit-html.js'," node_modules/lit-element/lit-element.js
+
+round_fix:
 	perl -pi -e 's/module.exports = rounding/export { rounding }/' node_modules/significant-rounding/index.js
+
+debug_es6: 
 	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build-es6.js
 	node_modules/cjs-to-es6/index.js light9/web/lib/debug/debug-build-es6.js
+
+npm: npm_install node_modules/n3/n3-browser.js light9/web/lib/debug/debug-build.js light9/web/lib/debug/debug-build-es6.js lit_fix round_fix debug_es6
 
 
 bin/ascoltami2: gst_packages link_to_sys_packages

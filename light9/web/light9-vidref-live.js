@@ -1,7 +1,8 @@
 import { LitElement, TemplateResult, html, css } from '/node_modules/lit-element/lit-element.js';
-import { debug } from '/lib/debug/debug-build-es6.js';
+import debug from '/lib/debug/debug-build-es6.js';
 debug.enable('*');
-log = debug('live')
+const log = debug('live');
+log('hi it is live')
 
 class Light9VidrefLive extends LitElement {
     
