@@ -36,6 +36,9 @@ npm:
 	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build.js --standalone debug
 	perl -pi -e "s,'lit-html,'/node_modules/lit-html,; s,lit-html',lit-html/lit-html.js'," node_modules/lit-element/lit-element.js
 	perl -pi -e 's/module.exports = rounding/export { rounding }/' node_modules/significant-rounding/index.js
+	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build-es6.js
+	node_modules/cjs-to-es6/index.js light9/web/lib/debug/debug-build-es6.js
+
 
 bin/ascoltami2: gst_packages link_to_sys_packages
 

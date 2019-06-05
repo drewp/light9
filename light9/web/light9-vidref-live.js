@@ -1,5 +1,7 @@
 import { LitElement, TemplateResult, html, css } from '/node_modules/lit-element/lit-element.js';
-
+import { debug } from '/lib/debug/debug-build-es6.js';
+debug.enable('*');
+log = debug('live')
 
 class Light9VidrefLive extends LitElement {
     
@@ -26,6 +28,11 @@ class Light9VidrefLive extends LitElement {
         
     }
 
+    disconnectedCallback() {
+        log('bye');
+        
+    }
+    
     render() {
         return html`
 <div>

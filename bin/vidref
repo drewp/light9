@@ -108,13 +108,13 @@ reactor.listenTCP(
         handlers=[
             (r'/()', cyclone.web.StaticFileHandler, {
                 'path': 'light9/vidref',
-                'default_filename': 'vidref.html'
+                'default_filename': 'index.html'
             }),
             (r'/setup/()', cyclone.web.StaticFileHandler, {
                 'path': 'light9/vidref',
                 'default_filename': 'setup.html'
             }),
-            (r'/setup/live', Live),
+            (r'/live', Live),
             (r'/snapshot', Snapshot),
             (r'/snapshot/(.*)', SnapshotPic, {
                 "path": snapshotDir()
