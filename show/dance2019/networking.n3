@@ -2,25 +2,29 @@
 @prefix show: <http://light9.bigasterisk.com/show/> .
 @prefix sh: <http://light9.bigasterisk.com/show/dance2019/> .
 
+# Use ip addrs in here to avoid an issue where nginx returns 502
+# errors for ~10sec after a service (re)starts. I haven't found a fix
+# for that in the nginx config.
+
 show:dance2019 :networking sh:netHome .
 sh:netHome
-  :webServer        <http://localhost:8200/>;
-  :patchReceiverUpdateHost "localhost";
-  :captureDevice    <http://localhost:8215/>;
-  :curveCalc        <http://localhost:8201/>;
-  :collector        <http://localhost:8202/>;
-  :collectorZmq     <http://localhost:8203/>;
-  :effectEval       <http://localhost:8204/>;
-  :effectSequencer  <http://localhost:8213/>;
-  :keyboardComposer <http://localhost:8205/>;
-  :musicPlayer      <http://localhost:8206/>;
-  :oscDmxServer     <udp://localhost:8207/>;
-  :paintServer      <http://localhost:8214/>;
-  :picamserve       <http://localhost:8208/>;
-  :rdfdb            <http://localhost:8209/>;
-  :subComposer      <http://localhost:8210/>;
-  :subServer        <http://localhost:8211/>;
-  :vidref           <http://localhost:8212/> .
+  :webServer        <http://127.0.0.1:8200/>;
+  :patchReceiverUpdateHost "127.0.0.1";
+  :captureDevice    <http://127.0.0.1:8215/>;
+  :curveCalc        <http://127.0.0.1:8201/>;
+  :collector        <http://127.0.0.1:8202/>;
+  :collectorZmq     <http://127.0.0.1:8203/>;
+  :effectEval       <http://127.0.0.1:8204/>;
+  :effectSequencer  <http://127.0.0.1:8213/>;
+  :keyboardComposer <http://127.0.0.1:8205/>;
+  :musicPlayer      <http://127.0.0.1:8206/>;
+  :oscDmxServer     <udp://127.0.0.1:8207/>;
+  :paintServer      <http://127.0.0.1:8214/>;
+  :picamserve       <http://127.0.0.1:8208/>;
+  :rdfdb            <http://127.0.0.1:8209/>;
+  :subComposer      <http://127.0.0.1:8210/>;
+  :subServer        <http://127.0.0.1:8211/>;
+  :vidref           <http://127.0.0.1:8212/> .
 
 :captureDevice    :urlPath "captureDevice" .
 :curveCalc        :urlPath "curveCalc" .
