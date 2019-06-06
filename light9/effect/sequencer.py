@@ -30,7 +30,7 @@ log = logging.getLogger('sequencer')
 
 gatherProcessStats()
 updateStats = scales.collection(
-    '/update/',
+    '/update',
     scales.PmfStat('s0_getMusic', recalcPeriod=1),
     scales.PmfStat('s1_eval', recalcPeriod=1),
     #scales.PmfStat('s3_send_client', recalcPeriod=1),
@@ -41,7 +41,7 @@ updateStats = scales.collection(
     scales.DoubleStat('goalFps'),
 )
 compileStats = scales.collection(
-    '/compile/',
+    '/compile',
     scales.PmfStat('graph', recalcPeriod=1),
     scales.PmfStat('song', recalcPeriod=1),
 )
@@ -252,7 +252,11 @@ class Sequencer(object):
                                key=lambda n: n.uri)
             noteReports = []
             for note in songNotes:
-                s, report = note.outputSettings(musicState['t'])
+                try:
+                    s, report = note.outputSettings(musicState['t'])
+                except Exception:
+                    traceback.print_exc()
+                    raise
                 noteReports.append(report)
                 settings.append(s)
             devSettings = DeviceSettings.fromList(self.graph, settings)

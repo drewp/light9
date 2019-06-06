@@ -11,7 +11,7 @@ log = logging.getLogger('coll_client')
 _zmqClient = None
 
 stats = scales.collection(
-    '/collectorClient/',
+    '/collectorClient',
     scales.PmfStat('send', recalcPeriod=1),
 )
 
