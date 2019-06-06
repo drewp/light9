@@ -123,6 +123,9 @@
       </light9-timeline-audio>
     </div>
     <div id="rows"></div>
+    <template is="dom-repeat" items="{{imageSamples}}">
+      <img src="/show/dance2019/anim/rainbow1.png">
+    </template>
     <template is="dom-repeat" items="{{inlineAttrConfigs}}">
       <light9-timeline-note-inline-attrs graph="{{graph}}"
                                          project="{{project}}"

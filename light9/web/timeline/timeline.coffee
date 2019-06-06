@@ -291,6 +291,7 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
     song: { type: String, notify: true }
     viewState: { type: Object, notify: true }
     inlineAttrConfigs: { type: Array, value: [] } # only for inlineattrs that should be displayed
+    imageSamples: { type: Array, value: [] }
   @getter_observers: [
     '_onGraph(graph, setAdjuster, song, viewState, project)',
     'onZoom(viewState)',
@@ -315,6 +316,8 @@ coffeeElementSetup(class TimeZoomed extends Polymer.mixinBehaviors([Polymer.Iron
 
   ready: ->
     super.ready()
+
+    @imageSamples = ['one']
 
     @addEventListener('iron-resize', @_onResize.bind(@))
     Polymer.RenderStatus.afterNextRender(this, @_onResize.bind(@))
