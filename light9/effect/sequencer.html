@@ -28,7 +28,10 @@
          }
          td {
              white-space: nowrap;
-             padding: 0 20px;
+             padding: 0 10px;
+             vertical-align: top;
+             vertical-align: top;
+             text-align: start;
          }
          tr.active { background: #151515; }
          .inactive > * { opacity: .5; }
@@ -56,16 +59,6 @@
         <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
 
         <h1>Sequencer <a href="stats/">[stats]</a></h1>
-
-        <p>fps={{report.recentFps}}</p>
-        
-        <p>Recent frame times (best to worst): 
-        <div class="chart">
-         <template is="dom-repeat" items="{{report.recentDeltasStyle}}">
-           <div style$="{{item}}"></div>
-         </template>
-        </div>
-        </p>
         
         <h2>Song</h2>
 
@@ -92,10 +85,12 @@
               </td>  
               <td>
                 <template is="dom-repeat" items="{{item.effectSettingsPairs}}">
+                  <div>
                   <span class="effectSetting">
                     <resource-display graph="{{graph}}" uri="{{item.effectAttr}}"></resource-display>:
                     <span class="number">{{item.value}}</span>
                   </span>
+                  </div>
                 </template>
               </td>
               <td>

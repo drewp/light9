@@ -6,6 +6,7 @@ from louie import dispatcher
 from rdflib import URIRef
 from twisted.internet import reactor
 from twisted.internet import defer
+from twisted.internet.defer import Deferred, inlineCallbacks
 from twisted.internet.inotify import INotify
 from twisted.python.filepath import FilePath
 import cyclone.sse
@@ -32,9 +33,8 @@ updateStats = scales.collection(
     '/update/',
     scales.PmfStat('s0_getMusic', recalcPeriod=1),
     scales.PmfStat('s1_eval', recalcPeriod=1),
-    scales.PmfStat('s2_sendToWeb', recalcPeriod=1),
+    #scales.PmfStat('s3_send_client', recalcPeriod=1),
     scales.PmfStat('s3_send', recalcPeriod=1),
-    scales.PmfStat('sendPhase', recalcPeriod=1),
     scales.PmfStat('updateLoopLatency', recalcPeriod=1),
     scales.DoubleStat('updateLoopLatencyGoal'),
     scales.RecentFpsStat('updateFps'),
@@ -160,7 +160,7 @@ class Sequencer(object):
 
     def __init__(self,
                  graph: SyncedGraph,
-                 sendToCollector: Callable[[DeviceSettings], defer.Deferred],
+                 sendToCollector: Callable[[DeviceSettings], Deferred],
                  fps=40):
         self.graph = graph
         self.fps = fps
@@ -175,11 +175,16 @@ class Sequencer(object):
         self.notes: Dict[Song, List[Note]] = {}  # song: [notes]
         self.simpleOutputs = SimpleOutputs(self.graph)
         self.graph.addHandler(self.compileGraph)
+        self.lastLoopSucceeded = False
+
+        self.codeWatcher = CodeWatcher(onChange=self.onCodeChange)
         self.updateLoop()
 
-        self.codeWatcher = CodeWatcher(
-            onChange=lambda: self.graph.addHandler(self.compileGraph))
-
+    def onCodeChange(self):
+        log.debug('seq.onCodeChange')
+        self.graph.addHandler(self.compileGraph)
+        #self.updateLoop()
+        
     @compileStats.graph.time()
     def compileGraph(self) -> None:
         """rebuild our data from the graph"""
@@ -192,74 +197,75 @@ class Sequencer(object):
 
     @compileStats.song.time()
     def compileSong(self, song: Song) -> None:
+        anyErrors = False
         self.notes[song] = []
         for note in self.graph.objects(song, L9['note']):
-            self.notes[song].append(
-                Note(self.graph, NoteUri(note), effecteval, self.simpleOutputs))
+            try:
+                n = Note(self.graph, NoteUri(note), effecteval, self.simpleOutputs)
+            except Exception:
+                log.warn(f"failed to build Note {note} - skipping")
+                anyErrors = True
+                continue
+            self.notes[song].append(n)
+        if not anyErrors:
+            log.info('built all notes')
 
+    @inlineCallbacks
     def updateLoop(self) -> None:
         frameStart = time.time()
-
-        d = self.update()
-        sendStarted = time.time()
-
-        def done(sec: float):
+        try:
+            sec = yield self.update()
+        except Exception as e:
+            self.lastLoopSucceeded = False
+            traceback.print_exc()
+            log.warn('updateLoop: %r', e)
+            reactor.callLater(1, self.updateLoop)
+        else:
             took = time.time() - frameStart
-            delay = max(0, 1 / self.fps - took)
             updateStats.updateLoopLatency = took
 
-            # time to send to collector, reported by collector_client
-            if isinstance(
-                    sec,
-                    float):  # sometimes None, not sure why, and neither is mypy
-                updateStats.s3_send = sec
-
-            # time to send to collector, measured in this function,
-            # from after sendToCollector returned its deferred until
-            # when the deferred was called.
-            updateStats.sendPhase = time.time() - sendStarted
+            if not self.lastLoopSucceeded:
+                log.info('Sequencer.update is working')
+                self.lastLoopSucceeded = True
+        
+            delay = max(0, 1 / self.fps - took)
             reactor.callLater(delay, self.updateLoop)
 
-        def err(e):
-            log.warn('updateLoop: %r', e)
-            reactor.callLater(2, self.updateLoop)
-
-        d.addCallbacks(done, err)
-
     @updateStats.updateFps.rate()
-    def update(self) -> defer.Deferred:
-        try:
-            with updateStats.s0_getMusic.time():
-                musicState = self.music.getLatest()
-                if not musicState.get('song') or not isinstance(
-                        musicState.get('t'), float):
-                    return defer.succeed(0.0)
-                song = Song(URIRef(musicState['song']))
-                dispatcher.send('state',
-                                update={
-                                    'song': str(song),
-                                    't': musicState['t']
-                                })
+    @inlineCallbacks
+    def update(self) -> Deferred:
+        with updateStats.s0_getMusic.time():
+            musicState = self.music.getLatest()
+            if not musicState.get('song') or not isinstance(
+                    musicState.get('t'), float):
+                return defer.succeed(0.0)
+            song = Song(URIRef(musicState['song']))
+            dispatcher.send('state',
+                            update={
+                                'song': str(song),
+                                't': musicState['t']
+                            })
 
-            with updateStats.s1_eval.time():
-                settings = []
-                songNotes = sorted(self.notes.get(song, []),
-                                   key=lambda n: n.uri)
-                noteReports = []
-                for note in songNotes:
-                    s, report = note.outputSettings(musicState['t'])
-                    noteReports.append(report)
-                    settings.append(s)
-                devSettings = DeviceSettings.fromList(self.graph, settings)
+        with updateStats.s1_eval.time():
+            settings = []
+            songNotes = sorted(self.notes.get(song, []),
+                               key=lambda n: n.uri)
+            noteReports = []
+            for note in songNotes:
+                s, report = note.outputSettings(musicState['t'])
+                noteReports.append(report)
+                settings.append(s)
+            devSettings = DeviceSettings.fromList(self.graph, settings)
 
-            with updateStats.s2_sendToWeb.time():
-                dispatcher.send('state', update={'songNotes': noteReports})
+        dispatcher.send('state', update={'songNotes': noteReports})
 
-            return self.sendToCollector(devSettings)
-        except Exception:
-            traceback.print_exc()
-            raise
+        with updateStats.s3_send.time(): # our measurement
+            sendSecs = yield self.sendToCollector(devSettings)
 
+        # sendToCollector's own measurement.
+        # (sometimes it's None, not sure why, and neither is mypy)
+        #if isinstance(sendSecs, float):
+        #    updateStats.s3_send_client = sendSecs
 
 class Updates(cyclone.sse.SSEHandler):
 
