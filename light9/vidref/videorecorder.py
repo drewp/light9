@@ -1,13 +1,13 @@
 from dataclasses import dataclass
-from queue import Queue
 from typing import Optional
-import time, logging, os, traceback, sys
+import time, logging, os, traceback
+from io import BytesIO
 
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstBase', '1.0')
 
-from PIL import Image
+import PIL.Image
 from gi.repository import Gst
 from rx.subject import BehaviorSubject
 from twisted.internet import threads
@@ -16,21 +16,31 @@ import numpy
 
 from light9.ascoltami.musictime_client import MusicTime
 from light9.newtypes import Song
-
-from IPython.core import ultratb
-sys.excepthook = ultratb.FormattedTB(mode='Verbose',
-                                     color_scheme='Linux',
-                                     call_pdb=1)
+from light9 import showconfig
 
 log = logging.getLogger()
 
 
-@dataclass(frozen=True)
+@dataclass
 class CaptureFrame:
-    img: Image
+    img: PIL.Image
     song: Song
     t: float
     isPlaying: bool
+    imgJpeg: Optional[bytes] = None
+
+    def asJpeg(self):
+        if not self.imgJpeg:
+            output = BytesIO()
+            self.img.save(output, 'jpeg', quality=80)
+            self.imgJpeg = output.getvalue()
+        return self.imgJpeg
+
+
+def songDir(song: Song) -> bytes:
+    return os.path.join(
+        showconfig.root(), b'video',
+        song.replace('http://', '').replace('/', '_').encode('ascii'))
 
 
 class FramesToVideoFiles:
@@ -51,8 +61,9 @@ class FramesToVideoFiles:
     
     """
 
-    def __init__(self, frames: BehaviorSubject):
+    def __init__(self, frames: BehaviorSubject, root: bytes):
         self.frames = frames
+        self.root = root
         self.nextImg: Optional[CaptureFrame] = None
 
         self.currentOutputClip = None
@@ -69,7 +80,8 @@ class FramesToVideoFiles:
             # start up
             self.nextWriteAction = 'saveFrames'
             self.currentOutputSong = cf.song
-            self.save('/tmp/out%s' % time.time())
+            self.save(
+                os.path.join(songDir(cf.song), b'take_%d' % int(time.time())))
         elif self.currentOutputClip and cf.isPlaying:
             self.nextWriteAction = 'saveFrames'
             # continue recording this
@@ -91,7 +103,11 @@ class FramesToVideoFiles:
 
     def _bg_save(self, outBase):
         os.makedirs(os.path.dirname(outBase), exist_ok=True)
-        self.frameMap = open(outBase + '.timing', 'wt')
+        self.frameMap = open(outBase + b'.timing', 'wt')
+
+        # todo: see moviestore.py for a better-looking version where
+        # we get to call write_frame on a FFMPEG_VideoWriter instead
+        # of it calling us back.
 
         # (immediately calls make_frame)
         self.currentOutputClip = moviepy.editor.VideoClip(self._bg_make_frame,
@@ -101,7 +117,9 @@ class FramesToVideoFiles:
         self.currentOutputClip.fps = 10
         log.info(f'write_videofile {outBase} start')
         try:
-            self.currentOutputClip.write_videofile(outBase + '.mp4',
+            self.currentOutputClip.write_videofile(outBase.decode('ascii') +
+                                                   '.mp4',
+                                                   codec='libx264',
                                                    audio=False,
                                                    preset='ultrafast',
                                                    logger=None,
@@ -124,7 +142,7 @@ class FramesToVideoFiles:
 
         # should be a little queue to miss fewer frames
         while self.nextImg is None:
-            time.sleep(.03)
+            time.sleep(.015)
         cf, self.nextImg = self.nextImg, None
 
         self.frameMap.write(f'video {video_time_secs:g} = song {cf.t:g}\n')
@@ -139,8 +157,8 @@ class GstSource:
         """
         Gst.init(None)
         self.musicTime = MusicTime(pollCurvecalc=False)
-        self.liveImages: BehaviorSubject[
-            Optional[CaptureFrame]] = BehaviorSubject(None)
+        self.liveImages: BehaviorSubject = BehaviorSubject(
+            None)  # stream of Optional[CaptureFrame]
 
         size = [640, 480]
 
@@ -173,7 +191,7 @@ class GstSource:
             buf = sample.get_buffer()
             (result, mapinfo) = buf.map(Gst.MapFlags.READ)
             try:
-                img = Image.frombytes(
+                img = PIL.Image.frombytes(
                     'RGB', (caps.get_structure(0).get_value('width'),
                             caps.get_structure(0).get_value('height')),
                     mapinfo.data)
@@ -184,8 +202,10 @@ class GstSource:
             latest = self.musicTime.getLatest()
             if 'song' in latest:
                 self.liveImages.on_next(
-                    CaptureFrame(img, Song(latest['song']), latest['t'],
-                                 latest['playing']))
+                    CaptureFrame(img=img,
+                                 song=Song(latest['song']),
+                                 t=latest['t'],
+                                 isPlaying=latest['playing']))
         except Exception:
             traceback.print_exc()
         return Gst.FlowReturn.OK
@@ -216,15 +236,11 @@ class GstSource:
             log.error("ignoring error: %r" % messageText)
 
 
+'''
 class oldPipeline(object):
 
     def __init__(self):
         self.snapshotRequests = Queue()
-
-        try:
-            os.makedirs(snapshotDir())
-        except OSError:
-            pass
 
     def snapshot(self):
         """
@@ -235,7 +251,7 @@ class oldPipeline(object):
         d = defer.Deferred()
 
         def req(frame):
-            filename = "%s/%s.jpg" % (snapshotDir(), time.time())
+            filename = "%s/%s.jpg" % ('todo', time.time())
             log.debug("received snapshot; saving in %s", filename)
             frame.save(filename)
             d.callback(filename)
@@ -245,7 +261,6 @@ class oldPipeline(object):
         return d
 
 
-'''
         self.imagesToSave = Queue()
         self.startBackgroundImageSaver(self.imagesToSave)
 

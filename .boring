@@ -158,6 +158,7 @@
 ^show/dance..../capture
 ^show/dance2017/networking.n3
 ^show/dance2019/model/
+^show/dance2019/video/
 ^timelapse/
 __pycache__
 rgbled/build-nano328/

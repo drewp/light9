@@ -4,20 +4,24 @@
     <title>vidref</title>
     <meta charset="utf-8" />
     <style>
-
      
     </style>
+    <script src="/lib/debug/debug-build.js"></script>
+    <script>
+     debug.enable('*');
+    </script>
     <script src="/lib/jquery/dist/jquery.slim.min.js"></script>
-
     <script src="/websocket.js"></script>
-    <script type="module"  src="/light9-vidref-live.js"></script>
-
-
+    <script type="module" src="/light9-vidref-live.js"></script>
+    <script type="module" src="/light9-vidref-replay-stack.js"></script>
   </head>
   <body>
     Live:
-    <light9-vidref-live></light9-vidref-live>
+    <div>
+      <light9-vidref-live></light9-vidref-live>
+    </div>
+    <light9-vidref-replay-stack></light9-vidref-replay-stack>
 
-
+stats of all disk usage
   </body>
 </html>

@@ -41,7 +41,7 @@ light9/web/lib/debug/debug-build.js:
 
 light9/web/lib/debug/debug-build-es6.js:
 	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build-es6.js --standalone debug
-	echo "export default window.debug;" >> light9/web/lib/debug/debug-build-es6.js
+	echo "\nexport default window.debug;" >> light9/web/lib/debug/debug-build-es6.js
 
 lit_fix:
 	perl -pi -e "s,'lit-html,'/node_modules/lit-html,; s,lit-html',lit-html/lit-html.js'," node_modules/lit-element/lit-element.js
@@ -49,11 +49,11 @@ lit_fix:
 round_fix:
 	perl -pi -e 's/module.exports = rounding/export { rounding }/' node_modules/significant-rounding/index.js
 
-debug_es6: 
-	node_modules/browserify/bin/cmd.js light9/web/lib/debug/src/browser.js -o light9/web/lib/debug/debug-build-es6.js
-	node_modules/cjs-to-es6/index.js light9/web/lib/debug/debug-build-es6.js
+light9/web/lib/underscore/underscore-min-es6.js:
+	cp light9/web/lib/underscore/underscore-min.js light9/web/lib/underscore/underscore-min-es6.js
+	perl -pi -e 's/call\(this\);/call(window); export default window._;/' light9/web/lib/underscore/underscore-min-es6.js
 
-npm: npm_install node_modules/n3/n3-browser.js light9/web/lib/debug/debug-build.js light9/web/lib/debug/debug-build-es6.js lit_fix round_fix debug_es6
+npm: npm_install node_modules/n3/n3-browser.js light9/web/lib/debug/debug-build.js light9/web/lib/debug/debug-build-es6.js lit_fix round_fix light9/web/lib/underscore/underscore-min-es6.js
 
 
 bin/ascoltami2: gst_packages link_to_sys_packages

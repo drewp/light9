@@ -1,16 +1,16 @@
-import json, socket, subprocess, os
+import json, socket, subprocess, os, logging, time
 
 from cyclone import template
 from rdflib import URIRef
-import cyclone.web
+import cyclone.web, cyclone.websocket
 from greplin.scales.cyclonehandler import StatsHandler
 
 from cycloneerr import PrettyErrorHandler
 from light9.namespaces import L9
 from light9.showconfig import getSongsFromShow, songOnDisk
-
+from twisted.internet import reactor
 _songUris = {}  # locationUri : song
-
+log = logging.getLogger()
 loader = template.Loader(os.path.dirname(__file__))
 
 
@@ -46,30 +46,32 @@ def playerSongUri(graph, player):
         return None
 
 
+def currentState(graph, player):
+    if player.isAutostopped():
+        nextAction = 'finish'
+    elif player.isPlaying():
+        nextAction = 'disabled'
+    else:
+        nextAction = 'play'
+
+    return {
+        "song": playerSongUri(graph, player),
+        "started": player.playStartTime,
+        "duration": player.duration(),
+        "playing": player.isPlaying(),
+        "t": player.currentTime(),
+        "state": player.states(),
+        "next": nextAction,
+    }
+
+
 class timeResource(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):
         player = self.settings.app.player
         graph = self.settings.app.graph
         self.set_header("Content-Type", "application/json")
-
-        if player.isAutostopped():
-            nextAction = 'finish'
-        elif player.isPlaying():
-            nextAction = 'disabled'
-        else:
-            nextAction = 'play'
-
-        self.write(
-            json.dumps({
-                "song": playerSongUri(graph, player),
-                "started": player.playStartTime,
-                "duration": player.duration(),
-                "playing": player.isPlaying(),
-                "t": player.currentTime(),
-                "state": player.states(),
-                "next": nextAction,
-            }))
+        self.write(json.dumps(currentState(graph, player)))
 
     def post(self):
         """
@@ -87,6 +89,28 @@ class timeResource(PrettyErrorHandler, cyclone.web.RequestHandler):
             player.seek(params['t'])
         self.set_header("Content-Type", "text/plain")
         self.write("ok")
+
+
+class timeStreamResource(cyclone.websocket.WebSocketHandler):
+
+    def connectionMade(self, *args, **kwargs) -> None:
+        self.lastSent = None
+        self.lastSentTime = 0.
+        self.loop()
+
+    def loop(self):
+        now = time.time()
+        msg = currentState(self.settings.app.graph, self.settings.app.player)
+        if msg != self.lastSent or now > self.lastSentTime + 2:
+            self.sendMessage(json.dumps(msg))
+            self.lastSent = msg
+            self.lastSentTime = now
+
+        if self.transport.connected:
+            reactor.callLater(.2, self.loop)
+
+    def connectionLost(self, reason):
+        log.info("bye ws client %r: %s", self, reason)
 
 
 class songs(PrettyErrorHandler, cyclone.web.RequestHandler):
@@ -120,11 +144,16 @@ class songResource(PrettyErrorHandler, cyclone.web.RequestHandler):
 
 
 class seekPlayOrPause(PrettyErrorHandler, cyclone.web.RequestHandler):
+    """curveCalc's ctrl-p or a vidref scrub"""
 
     def post(self):
         player = self.settings.app.player
 
         data = json.loads(self.request.body)
+        if 'scrub' in data:
+            player.pause()
+            player.seek(data['scrub'])
+            return
         if player.isPlaying():
             player.pause()
         else:
@@ -162,6 +191,7 @@ def makeWebApp(app):
     return cyclone.web.Application(handlers=[
         (r"/", root),
         (r"/time", timeResource),
+        (r"/time/stream", timeStreamResource),
         (r"/song", songResource),
         (r"/songs", songs),
         (r"/seekPlayOrPause", seekPlayOrPause),

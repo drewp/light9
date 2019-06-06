@@ -18,13 +18,15 @@ from run_local import log
 
 from twisted.internet import reactor, defer
 
-import logging, optparse, json, base64
+import logging, optparse, json, base64, os, glob
 import cyclone.web, cyclone.httpclient, cyclone.websocket
-from light9 import networking
-from light9.vidref.replay import snapshotDir
+from light9 import networking, showconfig
 from light9.vidref import videorecorder
+from rdflib import URIRef
+from light9.newtypes import Song
+from light9.namespaces import L9
 from rdfdb.syncedgraph import SyncedGraph
-from io import BytesIO
+from cycloneerr import PrettyErrorHandler
 
 parser = optparse.OptionParser()
 parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
@@ -40,11 +42,12 @@ class Snapshot(cyclone.web.RequestHandler):
         # save next pic
         # return /snapshot/path
         try:
+            snapshotDir = 'todo'
             outputFilename = yield self.settings.gui.snapshot()
 
-            assert outputFilename.startswith(snapshotDir())
+            assert outputFilename.startswith(snapshotDir)
             out = networking.vidref.path(
-                "snapshot/%s" % outputFilename[len(snapshotDir()):].lstrip('/'))
+                "snapshot/%s" % outputFilename[len(snapshotDir):].lstrip('/'))
 
             self.write(json.dumps({'snapshot': out}))
             self.set_header("Location", out)
@@ -71,15 +74,11 @@ class Live(cyclone.websocket.WebSocketHandler):
 
     def onFrame(self, cf: videorecorder.CaptureFrame):
         if cf is None: return
-        output = BytesIO()
-        cf.img.save(output, 'jpeg', quality=80)
 
         self.sendMessage(
             json.dumps({
-                'jpeg':
-                base64.b64encode(output.getvalue()).decode('ascii'),
-                'description':
-                f't={cf.t}',
+                'jpeg': base64.b64encode(cf.asJpeg()).decode('ascii'),
+                'description': f't={cf.t}',
             }))
 
 
@@ -97,9 +96,48 @@ class Time(cyclone.web.RequestHandler):
         self.set_status(202)
 
 
-#graph = SyncedGraph(networking.rdfdb.url, "vidref")
-outVideos = videorecorder.FramesToVideoFiles(pipeline.liveImages)
-#outVideos.save('/tmp/mov1')
+def takeUri(songPath: bytes):
+    p = songPath.decode('ascii').split('/')
+    take = p[-1].replace('.mp4', '')
+    song = p[-2].split('_')
+    return URIRef('/'.join(
+        ['http://light9.bigasterisk.com/show', song[-2], song[-1], take]))
+
+
+class ReplayMap(PrettyErrorHandler, cyclone.web.RequestHandler):
+
+    def get(self):
+        song = Song(self.get_argument('song'))
+        clips = []
+        for vid in glob.glob(os.path.join(videorecorder.songDir(song),
+                                          b'*.mp4')):
+            pts = []
+            for line in open(vid.replace(b'.mp4', b'.timing'), 'rb'):
+                _v, vt, _eq, _song, st = line.split()
+                pts.append([float(st), float(vt)])
+
+            url = vid[len(os.path.dirname(os.path.dirname(showconfig.root()))
+                         ):].decode('ascii')
+
+            clips.append({
+                'uri': takeUri(vid),
+                'videoUrl': url,
+                'songToVideo': pts
+            })
+
+        clips.sort(key=lambda c: len(c['songToVideo']))
+        clips = clips[-3:]
+        clips.sort(key=lambda c: c['uri'], reverse=True)
+
+        ret = json.dumps(clips)
+        log.info('replayMap had %s videos; json is %s bytes', len(clips),
+                 len(ret))
+        self.write(ret)
+
+
+graph = SyncedGraph(networking.rdfdb.url, "vidref")
+outVideos = videorecorder.FramesToVideoFiles(
+    pipeline.liveImages, os.path.join(showconfig.root(), b'video'))
 
 port = networking.vidref.port
 reactor.listenTCP(
@@ -115,9 +153,10 @@ reactor.listenTCP(
                 'default_filename': 'setup.html'
             }),
             (r'/live', Live),
+            (r'/replayMap', ReplayMap),
             (r'/snapshot', Snapshot),
             (r'/snapshot/(.*)', SnapshotPic, {
-                "path": snapshotDir()
+                "path": 'todo',
             }),
             (r'/time', Time),
         ],
