@@ -37,7 +37,7 @@ class StatsProcess extends LitElement {
             // wrong type of fade- never goes to 0
             ctx.fillStyle = '#00000003';
             ctx.fillRect(0, 0, w, h);
-            if (this.data.time < now - 2) {
+            if (!this.data || this.data.time < now - 2) {
                 return;
             }
             const dt = now - prev;

@@ -23,7 +23,14 @@ class StatsLine extends LitElement {
                             resp.json().then((msg) => {
                                 this.stats = msg;
                                 setTimeout(reload, 1000);
+                            }).catch((err) => {
+                                setTimeout(reload, 1000);
                             });
+                        } else {
+                            if (resp.status == 502) {
+                                setTimeout(reload, 5000);
+                            }
+                            // 404: likely not mapped to a responding server
                         }
                     });
                 }

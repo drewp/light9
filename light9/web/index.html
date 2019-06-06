@@ -8,10 +8,8 @@
     <link rel="import" href="/lib/polymer/polymer.html">
   </head>
   <body>
-      <script type="module"  src="stats-line.js"></script>
-      <script type="module"  src="stats-process.js"></script>
-
-
+    <script type="module" src="stats-line.js"></script>
+    <script type="module" src="stats-process.js"></script>
      
     <dom-module id="service-button-row">
       <template>
@@ -41,32 +39,27 @@
          :host > div:nth-child(3) { width: 5em; }
          :host > div:nth-child(4) { width: 3em; }
          :host > div:nth-child(5) { width: 50px; }
-         
         </style>
 
-
-          <div class="left"><a class="big" href="{{name}}/">{{name}}</a></div>
-          <div class="window"><button on-click="click">window</button></div>
-          <div><a href="{{name}}/stats/">stats</a></div>
-          <div id="stats"><stats-line name="{{name}}"></div>
-
-        
+        <div class="left"><a class="big" href="{{name}}/">{{name}}</a></div>
+        <div class="window"><button on-click="click">window</button></div>
+        <div><a href="{{name}}/stats/">stats</a></div>
+        <div id="stats"><stats-line name="{{name}}"></div>
       </template>
       <script>
        HTMLImports.whenReady(function () {
-           Polymer({
-               is: "service-button-row",
-               properties: {
-                   name: String,
-               },
-             ready: function() {
-             },
-               click: function() {
-                   window.open(this.name + '/', '_blank',
-                               'scrollbars=1,resizable=1,titlebar=0,location=0');
-               },
-             
-           });
+         Polymer({
+           is: "service-button-row",
+           properties: {
+             name: String,
+           },
+           ready: function() {
+           },
+           click: function() {
+             window.open(this.name + '/', '_blank',
+                         'scrollbars=1,resizable=1,titlebar=0,location=0');
+           },
+         });
        });
       </script>
     </dom-module>
@@ -78,7 +71,7 @@
       <hr>
       <service-button-row name="ascoltami"></service-button-row>
       <hr>
-      <service-button-row name="picamserve"></service-button-row>
+      <!--  <service-button-row name="picamserve"></service-button-row> -->  
       <service-button-row name="vidref"></service-button-row>
       <hr>
       <service-button-row name="collector"></service-button-row>
@@ -88,9 +81,10 @@
       <service-button-row name="timeline"></service-button-row>
       <service-button-row name="paint"></service-button-row>
       <service-button-row name="effectEval"></service-button-row>
-      <hr>
+<!--       <hr>
       <service-button-row name="subServer"></service-button-row>
       <service-button-row name="subComposer"></service-button-row>
+      -->
     </div>
     
   </body>
