@@ -11,6 +11,7 @@ import PIL.Image
 from gi.repository import Gst
 from rx.subject import BehaviorSubject
 from twisted.internet import threads
+from rdflib import URIRef
 import moviepy.editor
 import numpy
 
@@ -42,6 +43,22 @@ def songDir(song: Song) -> bytes:
         showconfig.root(), b'video',
         song.replace('http://', '').replace('/', '_').encode('ascii'))
 
+def takeUri(songPath: bytes) -> URIRef:
+    p = songPath.decode('ascii').split('/')
+    take = p[-1].replace('.mp4', '')
+    song = p[-2].split('_')
+    return URIRef('/'.join(
+        ['http://light9.bigasterisk.com/show', song[-2], song[-1], take]))
+
+def deleteClip(uri: URIRef):
+    # uri http://light9.bigasterisk.com/show/dance2019/song6/take_155
+    # path show/dance2019/video/light9.bigasterisk.com_show_dance2019_song6/take_155.*
+    w = uri.split('/')[-4:]
+    path = '/'.join([w[0], w[1], 'video',
+                     f'light9.bigasterisk.com_{w[0]}_{w[1]}_{w[2]}', w[3]])
+    log.info(f'deleting {uri} {path}')
+    for fn in [path + '.mp4', path + '.timing']:
+        os.remove(fn)
 
 class FramesToVideoFiles:
     """
@@ -66,7 +83,7 @@ class FramesToVideoFiles:
         self.root = root
         self.nextImg: Optional[CaptureFrame] = None
 
-        self.currentOutputClip = None
+        self.currentOutputClip: Optional[moviepy.editor.VideoClip] = None
         self.currentOutputSong: Optional[Song] = None
         self.nextWriteAction = 'ignore'
         self.frames.subscribe(on_next=self.onFrame)
@@ -101,13 +118,15 @@ class FramesToVideoFiles:
         """
         return threads.deferToThread(self._bg_save, outBase)
 
-    def _bg_save(self, outBase):
+    def _bg_save(self, outBase: bytes):
         os.makedirs(os.path.dirname(outBase), exist_ok=True)
         self.frameMap = open(outBase + b'.timing', 'wt')
 
         # todo: see moviestore.py for a better-looking version where
         # we get to call write_frame on a FFMPEG_VideoWriter instead
         # of it calling us back.
+
+        self.currentClipFrameCount = 0
 
         # (immediately calls make_frame)
         self.currentOutputClip = moviepy.editor.VideoClip(self._bg_make_frame,
@@ -117,18 +136,24 @@ class FramesToVideoFiles:
         self.currentOutputClip.fps = 10
         log.info(f'write_videofile {outBase} start')
         try:
-            self.currentOutputClip.write_videofile(outBase.decode('ascii') +
-                                                   '.mp4',
+            self.outMp4 = outBase.decode('ascii') + '.mp4'
+            self.currentOutputClip.write_videofile(self.outMp4,
                                                    codec='libx264',
                                                    audio=False,
                                                    preset='ultrafast',
                                                    logger=None,
+                                                   ffmpeg_params=['-g', '10'],
                                                    bitrate='150000')
         except (StopIteration, RuntimeError):
             self.frameMap.close()
 
         log.info('write_videofile done')
         self.currentOutputClip = None
+
+        if self.currentClipFrameCount < 400:
+            log.info('too small- deleting')
+            deleteClip(takeUri(self.outMp4.encode('ascii')))
+        
 
     def _bg_make_frame(self, video_time_secs):
         if self.nextWriteAction == 'close':
@@ -146,6 +171,7 @@ class FramesToVideoFiles:
         cf, self.nextImg = self.nextImg, None
 
         self.frameMap.write(f'video {video_time_secs:g} = song {cf.t:g}\n')
+        self.currentClipFrameCount += 1
         return numpy.asarray(cf.img)
 
 

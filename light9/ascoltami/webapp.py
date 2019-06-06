@@ -154,6 +154,14 @@ class seekPlayOrPause(PrettyErrorHandler, cyclone.web.RequestHandler):
             player.pause()
             player.seek(data['scrub'])
             return
+        if 'action' in data:
+            if data['action'] == 'play':
+                player.resume()
+            elif data['action'] == 'pause':
+                player.pause()
+            else:
+                raise NotImplementedError
+            return
         if player.isPlaying():
             player.pause()
         else:

@@ -13,15 +13,6 @@ class Light9VidrefLive extends LitElement {
             enabled: { type: Boolean }
         };
     }
-
-    static get styles() {
-        return css`
-        :host {
-            border: 2px solid #46a79f;
-            display: inline-block;
-        }
-        `;
-    }
     
     constructor() {
         super();
@@ -51,13 +42,22 @@ class Light9VidrefLive extends LitElement {
         //close socket
         
     }
+
+    static get styles() {
+        return css`
+        :host {
+            display: inline-block;
+        }
+#live {
+border: 4px solid orange;
+}
+        `;
+    }
     
     render() {
         return html`
-<div>
   <label><input type="checkbox" id="enabled" ?checked="${this.enabled}" @change="${this.onEnabled}">Show live</label>
-  <div id="liveWidget"><img id="live" ></div>
-</div>
+  <div id="liveWidget" style="display: none"><img id="live" ></div>
 `;
 
     }

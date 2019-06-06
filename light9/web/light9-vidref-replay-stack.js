@@ -23,17 +23,19 @@ class Light9VidrefReplayStack extends LitElement {
     setVideoTimesFromSongTime() {
         this.shadowRoot.querySelectorAll('light9-vidref-replay').forEach(
             (r) => {
-                r.setVideoTimeFromSongTime(this.songTime);
+                r.setVideoTimeFromSongTime(this.songTime, this.musicState.playing);
             });
     }
-
+    nudgeTime(dt) {
+        this.songTime += dt;
+        log('song now', this.songTime);
+    }
     fineTime() {       
         if (this.musicState.playing) {
             const sinceLastUpdate = (Date.now() - this.musicState.reportTime) / 1000;
             this.songTime = sinceLastUpdate + this.musicState.tStart;
-            this.songTimeRangeInput.value = this.songTime;
         } else  {
-            //this.songTime = this.musicState.t;
+            this.songTime = this.musicState.t;
         }
         requestAnimationFrame(this.fineTime.bind(this));
     }
@@ -63,7 +65,6 @@ class Light9VidrefReplayStack extends LitElement {
         if (this.musicState.song != this.song) {
             this.song = this.musicState.song;
             this.getReplayMapForSong(this.song);
-
         }
     }
         
@@ -87,8 +88,6 @@ class Light9VidrefReplayStack extends LitElement {
             node.uri = msg[i].uri;
             node.videoUrl = msg[i].videoUrl;
             node.songToVideo = msg[i].songToVideo;
-
-
         });
         this.setVideoTimesFromSongTime();
     }
@@ -114,35 +113,45 @@ class Light9VidrefReplayStack extends LitElement {
             method: 'POST',
             body: JSON.stringify({scrub: st}),
         });
-
     }
 
     static get styles() {
         return css`
         :host {
-         
+           display: inline-block;
         }
         #songTime {
             width: 100%;
         }
-#clips {
-display: flex;
-flex-direction: column;
-}
+        #clips {
+            display: flex;
+            flex-direction: column;
+        }
+        a {
+            color: rgb(97, 97, 255);
+        }
+        #songTime {
+            font-size: 27px;
+        }
         `;
     }
     
     render() {
         return html`
-<div>
-  <div><input id="songTime" type="range" @input="${this.userMovedSongTime}" min="0" max="0" step=".001"></div>
-  <div>${this.musicState.song}</div>
-  <div>showing song time ${rounding(this.songTime, 3)} (${rounding(this.musicState.t, 3)})</div>
-<div>clips:</div>
-<div id="clips">
-   ${this.players}
-</div>
-</div>
+  <div>
+    <input id="songTime" type="range" 
+           .value="${this.songTime}" 
+           @input="${this.userMovedSongTime}" 
+           min="0" max="0" step=".001"></div>
+  <div><a href="${this.musicState.song}">${this.musicState.song}</a></div>
+  <div id="songTime">showing song time ${rounding(this.songTime, 3)}</div>
+  <div>clips:</div>
+  <div id="clips">
+    ${this.players}
+  </div>
+  <div>
+    <button @click="${this.onClipsChanged}">Refresh clips for song</button>
+  </div>
 `;
 
     }

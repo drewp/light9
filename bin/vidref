@@ -24,9 +24,9 @@ from light9 import networking, showconfig
 from light9.vidref import videorecorder
 from rdflib import URIRef
 from light9.newtypes import Song
-from light9.namespaces import L9
 from rdfdb.syncedgraph import SyncedGraph
 from cycloneerr import PrettyErrorHandler
+from typing import cast
 
 parser = optparse.OptionParser()
 parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
@@ -96,13 +96,12 @@ class Time(cyclone.web.RequestHandler):
         self.set_status(202)
 
 
-def takeUri(songPath: bytes):
-    p = songPath.decode('ascii').split('/')
-    take = p[-1].replace('.mp4', '')
-    song = p[-2].split('_')
-    return URIRef('/'.join(
-        ['http://light9.bigasterisk.com/show', song[-2], song[-1], take]))
 
+class Clips(PrettyErrorHandler, cyclone.web.RequestHandler):
+
+    def delete(self):
+        clip = URIRef(self.get_argument('uri'))
+        videorecorder.deleteClip(clip)
 
 class ReplayMap(PrettyErrorHandler, cyclone.web.RequestHandler):
 
@@ -120,12 +119,12 @@ class ReplayMap(PrettyErrorHandler, cyclone.web.RequestHandler):
                          ):].decode('ascii')
 
             clips.append({
-                'uri': takeUri(vid),
+                'uri': videorecorder.takeUri(vid),
                 'videoUrl': url,
                 'songToVideo': pts
             })
 
-        clips.sort(key=lambda c: len(c['songToVideo']))
+        clips.sort(key=lambda c: len(cast(list, c['songToVideo'])))
         clips = clips[-3:]
         clips.sort(key=lambda c: c['uri'], reverse=True)
 
@@ -153,6 +152,7 @@ reactor.listenTCP(
                 'default_filename': 'setup.html'
             }),
             (r'/live', Live),
+            (r'/clips', Clips),
             (r'/replayMap', ReplayMap),
             (r'/snapshot', Snapshot),
             (r'/snapshot/(.*)', SnapshotPic, {

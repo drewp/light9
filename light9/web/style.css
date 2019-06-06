@@ -73,6 +73,24 @@ button a {
 .key {
     color: #888;
 }
+
+div.keys {
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.keyCap {
+    color: #ccc;
+    background: #525252;
+    display: inline-block;
+    border: 1px outset #b3b3b3;
+    padding: 2px 3px;
+    margin: 3px 0;
+    font-size: 16px;
+    box-shadow: 0.9px 0.9px 0px 2px #565656;
+    border-radius: 2px;
+}
+
 .currentSong button {
     background: #a90707;
 }
