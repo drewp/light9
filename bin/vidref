@@ -27,6 +27,8 @@ from light9.newtypes import Song
 from rdfdb.syncedgraph import SyncedGraph
 from cycloneerr import PrettyErrorHandler
 from typing import cast
+from greplin import scales
+from greplin.scales.cyclonehandler import StatsHandler
 
 parser = optparse.OptionParser()
 parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
@@ -34,7 +36,13 @@ parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
 
 log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
-
+stats = scales.collection(
+    '/webServer',
+    scales.RecentFpsStat('liveWebsocketFrameFps'),
+    scales.IntStat('liveClients'),
+    
+)
+ 
 class Snapshot(cyclone.web.RequestHandler):
 
     @defer.inlineCallbacks
@@ -68,12 +76,16 @@ class Live(cyclone.websocket.WebSocketHandler):
 
     def connectionMade(self, *args, **kwargs):
         pipeline.liveImages.subscribe(on_next=self.onFrame)
+        stats.liveClients += 1
 
     def connectionLost(self, reason):
-        0  #self.subj.dispose()
+        #self.subj.dispose()
+        stats.liveClients -= 1
 
     def onFrame(self, cf: videorecorder.CaptureFrame):
         if cf is None: return
+
+        stats.liveWebsocketFrameFps.mark()
 
         self.sendMessage(
             json.dumps({
@@ -108,8 +120,9 @@ class ReplayMap(PrettyErrorHandler, cyclone.web.RequestHandler):
     def get(self):
         song = Song(self.get_argument('song'))
         clips = []
-        for vid in glob.glob(os.path.join(videorecorder.songDir(song),
-                                          b'*.mp4')):
+        videoPaths = glob.glob(os.path.join(videorecorder.songDir(song),
+                                            b'*.mp4'))
+        for vid in videoPaths:
             pts = []
             for line in open(vid.replace(b'.mp4', b'.timing'), 'rb'):
                 _v, vt, _eq, _song, st = line.split()
@@ -159,6 +172,10 @@ reactor.listenTCP(
                 "path": 'todo',
             }),
             (r'/time', Time),
+            (r'/stats/(.*)', StatsHandler, {
+                'serverName': 'vidref'
+            }),
+
         ],
         debug=True,
     ))

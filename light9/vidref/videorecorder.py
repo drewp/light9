@@ -14,6 +14,7 @@ from twisted.internet import threads
 from rdflib import URIRef
 import moviepy.editor
 import numpy
+from greplin import scales
 
 from light9.ascoltami.musictime_client import MusicTime
 from light9.newtypes import Song
@@ -21,6 +22,16 @@ from light9 import showconfig
 
 log = logging.getLogger()
 
+stats = scales.collection(
+    '/recorder',
+    scales.PmfStat('jpegEncode', recalcPeriod=1),
+    scales.IntStat('deletes'),
+    scales.PmfStat('waitForNextImg', recalcPeriod=1),
+    scales.PmfStat('crop', recalcPeriod=1),
+    scales.RecentFpsStat('encodeFrameFps'),
+    scales.RecentFpsStat('queueGstFrameFps'),
+    
+)
 
 @dataclass
 class CaptureFrame:
@@ -30,6 +41,7 @@ class CaptureFrame:
     isPlaying: bool
     imgJpeg: Optional[bytes] = None
 
+    @stats.jpegEncode.time()
     def asJpeg(self):
         if not self.imgJpeg:
             output = BytesIO()
@@ -57,6 +69,7 @@ def deleteClip(uri: URIRef):
     path = '/'.join([w[0], w[1], 'video',
                      f'light9.bigasterisk.com_{w[0]}_{w[1]}_{w[2]}', w[3]])
     log.info(f'deleting {uri} {path}')
+    stats.deletes += 1
     for fn in [path + '.mp4', path + '.timing']:
         os.remove(fn)
 
@@ -156,6 +169,7 @@ class FramesToVideoFiles:
         
 
     def _bg_make_frame(self, video_time_secs):
+        stats.encodeFrameFps.mark()
         if self.nextWriteAction == 'close':
             raise StopIteration  # the one in write_videofile
         elif self.nextWriteAction == 'notWritingClip':
@@ -166,8 +180,10 @@ class FramesToVideoFiles:
             raise NotImplementedError(self.nextWriteAction)
 
         # should be a little queue to miss fewer frames
+        t1 = time.time()
         while self.nextImg is None:
             time.sleep(.015)
+        stats.waitForNextImg = time.time() - t1
         cf, self.nextImg = self.nextImg, None
 
         self.frameMap.write(f'video {video_time_secs:g} = song {cf.t:g}\n')
@@ -221,12 +237,13 @@ class GstSource:
                     'RGB', (caps.get_structure(0).get_value('width'),
                             caps.get_structure(0).get_value('height')),
                     mapinfo.data)
-                img = img.crop((0, 100, 640, 380))
+                img = self.crop(img)
             finally:
                 buf.unmap(mapinfo)
             # could get gst's frame time and pass it to getLatest
             latest = self.musicTime.getLatest()
             if 'song' in latest:
+                stats.queueGstFrameFps.mark()
                 self.liveImages.on_next(
                     CaptureFrame(img=img,
                                  song=Song(latest['song']),
@@ -236,6 +253,10 @@ class GstSource:
             traceback.print_exc()
         return Gst.FlowReturn.OK
 
+    @stats.crop.time()
+    def crop(self, img):
+        return img.crop((0, 100, 640, 380))
+    
     def setupPipelineError(self, pipe, cb):
         bus = pipe.get_bus()
 
