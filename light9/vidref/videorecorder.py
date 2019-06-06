@@ -9,8 +9,8 @@ gi.require_version('GstBase', '1.0')
 
 from PIL import Image
 from gi.repository import Gst
-from rx.subjects import BehaviorSubject
-from twisted.internet import defer, threads
+from rx.subject import BehaviorSubject
+from twisted.internet import threads
 import moviepy.editor
 import numpy
 
