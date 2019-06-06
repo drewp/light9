@@ -14,57 +14,20 @@ show:dance2019 :playList (
   sh:song16 sh:song17
 ) .
 
-sh:song1   a :Song; rdfs:label "01"; :songFilename "01.wav" .
-sh:song2   a :Song; rdfs:label "02"; :songFilename "02_dancing_happy.wav" .
-sh:song3   a :Song; rdfs:label "03"; :songFilename "03-mix.wav" .
-sh:song4   a :Song; rdfs:label "04"; :songFilename "04-trickle.wav" .
-sh:song5   a :Song; rdfs:label "05"; :songFilename "05-mix.wav" .
-sh:song6   a :Song; rdfs:label "06"; :songFilename "06-mix.wav" .
-sh:song7   a :Song; rdfs:label "07"; :songFilename "07.wav" .
-sh:song8   a :Song; rdfs:label "08"; :songFilename "08-mix.wav" .
-sh:song9   a :Song; rdfs:label "09"; :songFilename "09.wav" .
-sh:song10  a :Song; rdfs:label "10"; :songFilename "10mix.wav" .
-sh:song11  a :Song; rdfs:label "11"; :songFilename "11-mix.wav" .
-sh:song12  a :Song; rdfs:label "12"; :songFilename "12_tie_a_yellow_ribbon.wav" .
-sh:song13  a :Song; rdfs:label "13"; :songFilename "13.wav" .
-sh:song14  a :Song; rdfs:label "14"; :songFilename "14.wav" .
-sh:song15  a :Song; rdfs:label "15"; :songFilename "15-mix.wav" .
-sh:song16  a :Song; rdfs:label "16"; :songFilename "16-mix.wav" .
-sh:song17  a :Song; rdfs:label "17"; :songFilename "17-mix.wav" .
-                                                                             
-                                                    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+sh:song1   a :Song; rdfs:label "01 this land";          :songFilename "01.ogg" .
+sh:song2   a :Song; rdfs:label "02 tap specialty [4p]"; :songFilename "02_dancing_happy.ogg" .
+sh:song3   a :Song; rdfs:label "03 rockin robin";       :songFilename "03-mix.ogg" .
+sh:song4   a :Song; rdfs:label "04 trickle";            :songFilename "04-trickle.ogg" .
+sh:song5   a :Song; rdfs:label "05 birds";              :songFilename "05-mix.ogg" .
+sh:song6   a :Song; rdfs:label "06 contemporary";       :songFilename "06-mix.ogg" .
+sh:song7   a :Song; rdfs:label "07 desert";             :songFilename "07.ogg" .
+sh:song8   a :Song; rdfs:label "08 rain ";              :songFilename "08-mix.ogg" .
+sh:song9   a :Song; rdfs:label "09 waltz flowers";      :songFilename "09.ogg" .
+sh:song10  a :Song; rdfs:label "10 lucky star";         :songFilename "10mix.ogg" .
+sh:song11  a :Song; rdfs:label "11 snow";               :songFilename "11-mix.ogg" .
+sh:song12  a :Song; rdfs:label "12 tap specialty [2p]"; :songFilename "12_tie_a_yellow_ribbon.ogg" .
+sh:song13  a :Song; rdfs:label "13 mermaid";            :songFilename "13.ogg" .
+sh:song14  a :Song; rdfs:label "14 shining star";       :songFilename "14.ogg" .
+sh:song15  a :Song; rdfs:label "15 moon";               :songFilename "15-mix.ogg" .
+sh:song16  a :Song; rdfs:label "16 hip hop";            :songFilename "16-mix.ogg" .
+sh:song17  a :Song; rdfs:label "17 rainbow";            :songFilename "17-mix.ogg" .

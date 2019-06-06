@@ -1,0 +1,21 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix show: <http://light9.bigasterisk.com/show/> .
+@prefix sh: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+
+show:dance2019 :videoSetup :cam1 .
+:cam1
+  :dev "/dev/v4l/by-id/usb-Generic_FULL_HD_1080P_Webcam_200901010001-video-index0";
+  :brightness 0;
+  :contrast 0;
+  :saturation 58;
+  :hue 0;
+  :wbAuto false;
+  :gamma 220;
+  :powerFreq "60 Hz";
+  :wbTemperature 4600;
+  :sharpness 4;
+  :backlight 0;
+  :exposureAuto "manual";
+  :exposure 237 .
