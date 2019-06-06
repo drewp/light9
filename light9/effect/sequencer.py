@@ -20,12 +20,14 @@ from light9.effect.simple_outputs import SimpleOutputs
 from light9.namespaces import L9, RDF
 from light9.newtypes import DeviceUri, DeviceAttr, NoteUri, Curve, Song
 from rdfdb.syncedgraph import SyncedGraph
+from standardservice.scalessetup import gatherProcessStats
 
 from greplin import scales
 import imp
 
 log = logging.getLogger('sequencer')
 
+gatherProcessStats()
 updateStats = scales.collection(
     '/update/',
     scales.PmfStat('s0_getMusic', recalcPeriod=1),

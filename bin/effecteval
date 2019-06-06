@@ -16,10 +16,12 @@ from light9.namespaces import L9
 from rdfdb.patch import Patch
 from rdfdb.syncedgraph import SyncedGraph
 from greplin import scales
+from standardservice.scalessetup import gatherProcessStats
 
 from cycloneerr import PrettyErrorHandler
 from light9.coffee import StaticCoffee
 
+gatherProcessStats()
 
 class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
 

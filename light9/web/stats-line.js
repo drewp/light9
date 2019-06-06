@@ -20,13 +20,12 @@ class StatsLine extends LitElement {
                 const reload = () => {
                     fetch(this.name + '/stats/?format=json').then((resp) => {
                         if (resp.ok) {
-                    resp.json().then((msg) => {
-                        
-                        this.stats = msg;
-                    setTimeout(reload, 1000);
-                    });
+                            resp.json().then((msg) => {
+                                this.stats = msg;
+                                setTimeout(reload, 1000);
+                            });
                         }
-                });
+                    });
                 }
                 reload();
             }
@@ -78,10 +77,21 @@ class StatsLine extends LitElement {
     }
     
     render() {
+        const now = Date.now() / 1000;
         const table = (d, path) => {
 
-            const cols = Object.keys(d);
+            let cols = Object.keys(d);
             cols.sort();
+
+            if (path.length == 0) {
+                ['webServer', 'process'].forEach((earlyKey) => {
+                    let i = cols.indexOf(earlyKey);
+                    if (i != -1) {
+                        cols = [earlyKey].concat(cols.slice(0, i), cols.slice(i + 1));
+                    }
+                });
+            }
+            
             const th = (col) =>  {
                 return html`<th>${col}</th>`;
             };
@@ -130,7 +140,14 @@ class StatsLine extends LitElement {
                  `
             }, path));
         };
-        const drawLevel = (d, path) => {           
+        const drawLevel = (d, path) => {
+            if (path.length == 1 && path[0] === 'process') {
+                 const elem = this.shadowRoot.querySelector('#proc');
+                if (elem) {
+                    elem.data = d;
+                }
+                return html`<stats-process id="proc"></stats-process>`;
+            }
             if (typeof d === 'object') {
                 if (d instanceof TemplateResult) {
                     return html`<td class="val">${d}</td>`;

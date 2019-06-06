@@ -30,6 +30,7 @@ from light9 import networking, showconfig
 from light9.newtypes import Song
 from light9.vidref import videorecorder
 from rdfdb.syncedgraph import SyncedGraph
+from standardservice.scalessetup import gatherProcessStats
 
 parser = optparse.OptionParser()
 parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
@@ -37,6 +38,7 @@ parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
 
 log.setLevel(logging.DEBUG if options.verbose else logging.INFO)
 
+gatherProcessStats()
 stats = scales.collection(
     '/webServer',
     scales.RecentFpsStat('liveWebsocketFrameFps'),
