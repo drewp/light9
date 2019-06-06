@@ -12,6 +12,7 @@ from twisted.python.filepath import FilePath
 import cyclone.sse
 import logging, bisect, time
 import traceback
+from decimal import Decimal
 from typing import Any, Callable, Dict, List, Tuple, cast, Union
 
 from light9.ascoltami.musictime_client import MusicTime
@@ -47,6 +48,13 @@ compileStats = scales.collection(
 )
 
 
+def pyType(n):
+    ret = n.toPython()
+    if isinstance(ret, Decimal):
+        return float(ret)
+    return ret
+
+
 class Note(object):
 
     def __init__(self, graph: SyncedGraph, uri: NoteUri, effectevalModule,
@@ -59,7 +67,7 @@ class Note(object):
         for s in g.objects(uri, L9['setting']):
             settingValues = dict(g.predicate_objects(s))
             ea = settingValues[L9['effectAttr']]
-            self.baseEffectSettings[ea] = settingValues[L9['value']]
+            self.baseEffectSettings[ea] = pyType(settingValues[L9['value']])
 
         def floatVal(s, p):
             return float(g.value(s, p).toPython())
@@ -112,7 +120,7 @@ class Note(object):
             'effectClass': self.effectEval.effect,
         }
         effectSettings: Dict[DeviceAttr, Union[float, str]] = dict(
-            (DeviceAttr(da), v.toPython())
+            (DeviceAttr(da), v)
             for da, v in self.baseEffectSettings.items())
         effectSettings[L9['strength']] = self.evalCurve(t)
 
@@ -234,6 +242,7 @@ class Sequencer(object):
     @updateStats.updateFps.rate()
     @inlineCallbacks
     def update(self) -> Deferred:
+        
         with updateStats.s0_getMusic.time():
             musicState = self.music.getLatest()
             if not musicState.get('song') or not isinstance(

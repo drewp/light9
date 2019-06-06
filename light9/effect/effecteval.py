@@ -8,6 +8,7 @@ import logging
 from light9.effect.settings import DeviceSettings
 from light9.effect.scale import scale
 from typing import Dict, Tuple, Any
+from PIL import Image
 import random
 random.seed(0)
 
@@ -384,4 +385,28 @@ def effect_lightning(effectSettings, strength, songTime, noteTime):
         n = noise(songTime * 8 + i * 6.543)
         if n > .4:
             out[(dev, L9['color'])] = col
+    return out
+
+def sample(img, x, y, repeat=False):
+    if 0 <= x < img.width:
+        return img.getpixel((x, y))
+    elif not repeat:
+        return (0, 0, 0)
+    else:
+        return img.getpixel((x % img.width, y))
+
+def effect_image(effectSettings, strength, songTime, noteTime):
+    out = {}
+    imgPath = f'cur/anim/{effectSettings[L9["image"]]}'
+    t_offset = effectSettings.get(L9['tOffset'], 0)
+    pxPerSec = effectSettings.get(L9['pxPerSec'], 30)
+    img = Image.open(imgPath)
+    x = (noteTime * pxPerSec)
+
+    scl = effectSettings.get(L9['strength'], 1)
+    for dev, y in [(L9['theater/skyline/device/strip1'], 0),
+                   (L9['theater/skyline/device/strip2'], 1),
+                   (L9['theater/skyline/device/strip3'], 2)]:
+        color = sample(img, x, y, effectSettings.get(L9['repeat'], False))
+        out[(dev, L9['color'])] = scale(rgb_to_hex(color), scl)
     return out
