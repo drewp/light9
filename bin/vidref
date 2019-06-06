@@ -16,19 +16,20 @@ light9/web/light9-vidref-playback.js LitElement for video playback
 """
 from run_local import log
 
-from twisted.internet import reactor, defer
-
-import logging, optparse, json, base64, os, glob
-import cyclone.web, cyclone.httpclient, cyclone.websocket
-from light9 import networking, showconfig
-from light9.vidref import videorecorder
-from rdflib import URIRef
-from light9.newtypes import Song
-from rdfdb.syncedgraph import SyncedGraph
-from cycloneerr import PrettyErrorHandler
 from typing import cast
+import logging, optparse, json, base64, os, glob
+
 from greplin import scales
 from greplin.scales.cyclonehandler import StatsHandler
+from rdflib import URIRef
+from twisted.internet import reactor, defer
+import cyclone.web, cyclone.httpclient, cyclone.websocket
+
+from cycloneerr import PrettyErrorHandler
+from light9 import networking, showconfig
+from light9.newtypes import Song
+from light9.vidref import videorecorder
+from rdfdb.syncedgraph import SyncedGraph
 
 parser = optparse.OptionParser()
 parser.add_option("-v", "--verbose", action="store_true", help="logging.DEBUG")
@@ -40,9 +41,9 @@ stats = scales.collection(
     '/webServer',
     scales.RecentFpsStat('liveWebsocketFrameFps'),
     scales.IntStat('liveClients'),
-    
 )
- 
+
+
 class Snapshot(cyclone.web.RequestHandler):
 
     @defer.inlineCallbacks
@@ -108,20 +109,20 @@ class Time(cyclone.web.RequestHandler):
         self.set_status(202)
 
 
-
 class Clips(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def delete(self):
         clip = URIRef(self.get_argument('uri'))
         videorecorder.deleteClip(clip)
 
+
 class ReplayMap(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):
         song = Song(self.get_argument('song'))
         clips = []
-        videoPaths = glob.glob(os.path.join(videorecorder.songDir(song),
-                                            b'*.mp4'))
+        videoPaths = glob.glob(
+            os.path.join(videorecorder.songDir(song), b'*.mp4'))
         for vid in videoPaths:
             pts = []
             for line in open(vid.replace(b'.mp4', b'.timing'), 'rb'):
@@ -175,7 +176,6 @@ reactor.listenTCP(
             (r'/stats/(.*)', StatsHandler, {
                 'serverName': 'vidref'
             }),
-
         ],
         debug=True,
     ))

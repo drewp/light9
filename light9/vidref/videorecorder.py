@@ -1,24 +1,24 @@
 from dataclasses import dataclass
+from io import BytesIO
 from typing import Optional
 import time, logging, os, traceback
-from io import BytesIO
 
 import gi
 gi.require_version('Gst', '1.0')
 gi.require_version('GstBase', '1.0')
 
-import PIL.Image
 from gi.repository import Gst
+from greplin import scales
+from rdflib import URIRef
 from rx.subject import BehaviorSubject
 from twisted.internet import threads
-from rdflib import URIRef
+import PIL.Image
 import moviepy.editor
 import numpy
-from greplin import scales
 
+from light9 import showconfig
 from light9.ascoltami.musictime_client import MusicTime
 from light9.newtypes import Song
-from light9 import showconfig
 
 log = logging.getLogger()
 
@@ -30,8 +30,8 @@ stats = scales.collection(
     scales.PmfStat('crop', recalcPeriod=1),
     scales.RecentFpsStat('encodeFrameFps'),
     scales.RecentFpsStat('queueGstFrameFps'),
-    
 )
+
 
 @dataclass
 class CaptureFrame:
@@ -55,6 +55,7 @@ def songDir(song: Song) -> bytes:
         showconfig.root(), b'video',
         song.replace('http://', '').replace('/', '_').encode('ascii'))
 
+
 def takeUri(songPath: bytes) -> URIRef:
     p = songPath.decode('ascii').split('/')
     take = p[-1].replace('.mp4', '')
@@ -62,16 +63,20 @@ def takeUri(songPath: bytes) -> URIRef:
     return URIRef('/'.join(
         ['http://light9.bigasterisk.com/show', song[-2], song[-1], take]))
 
+
 def deleteClip(uri: URIRef):
     # uri http://light9.bigasterisk.com/show/dance2019/song6/take_155
     # path show/dance2019/video/light9.bigasterisk.com_show_dance2019_song6/take_155.*
     w = uri.split('/')[-4:]
-    path = '/'.join([w[0], w[1], 'video',
-                     f'light9.bigasterisk.com_{w[0]}_{w[1]}_{w[2]}', w[3]])
+    path = '/'.join([
+        w[0], w[1], 'video', f'light9.bigasterisk.com_{w[0]}_{w[1]}_{w[2]}',
+        w[3]
+    ])
     log.info(f'deleting {uri} {path}')
     stats.deletes += 1
     for fn in [path + '.mp4', path + '.timing']:
         os.remove(fn)
+
 
 class FramesToVideoFiles:
     """
@@ -166,7 +171,6 @@ class FramesToVideoFiles:
         if self.currentClipFrameCount < 400:
             log.info('too small- deleting')
             deleteClip(takeUri(self.outMp4.encode('ascii')))
-        
 
     def _bg_make_frame(self, video_time_secs):
         stats.encodeFrameFps.mark()
@@ -256,7 +260,7 @@ class GstSource:
     @stats.crop.time()
     def crop(self, img):
         return img.crop((0, 100, 640, 380))
-    
+
     def setupPipelineError(self, pipe, cb):
         bus = pipe.get_bus()
 
