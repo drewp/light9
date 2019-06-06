@@ -52,6 +52,12 @@ try:
 except ImportError:
     pass
 
+if 0:
+    from IPython.core import ultratb
+    sys.excepthook = ultratb.FormattedTB(mode='Verbose',
+                                         color_scheme='Linux',
+                                         call_pdb=1)
+
 progName = sys.argv[0].split('/')[-1]
 log = logging.getLogger()  # this has to get the root logger
 log.name = progName  # but we can rename it for clarity
