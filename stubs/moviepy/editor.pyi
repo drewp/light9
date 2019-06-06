@@ -5,11 +5,14 @@
 from .audio.AudioClip import AudioClip, CompositeAudioClip, concatenate_audioclips
 from .audio.io.AudioFileClip import AudioFileClip
 from .tools import cvsecs
-from .video.VideoClip import ColorClip, ImageClip, TextClip, VideoClip
+from .video.VideoClip import ColorClip, ImageClip, TextClip
 from .video.compositing.CompositeVideoClip import CompositeVideoClip, clips_array
 from .video.compositing.concatenate import concatenate, concatenate_videoclips
 from .video.io.ImageSequenceClip import ImageSequenceClip
 from .video.io.VideoFileClip import VideoFileClip
 from .video.io.downloader import download_webfile
-from .video.io.html_tools import ipython_display
-from .video.io.sliders import sliders
+
+class VideoClip:
+    def __init__(self, make_frame, duration) -> None: ...
+    fps: float
+    def write_videofile(self, path: str, **kw): ...

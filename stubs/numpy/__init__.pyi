@@ -4,3 +4,5 @@
 from typing import Any
 array: Any
 linalg: Any
+
+def asarray(a: Any) -> array: ...
