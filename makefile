@@ -1,7 +1,7 @@
 ### setup ###
 
 packages:
-	sudo aptitude install coffeescript normalize-audio audacity python3-pygame libffi-dev tix libzmq3-dev python3-dev libssl-dev python3-opencv python3-cairo npm git python3-virtualenv nginx-full python3-tk
+	sudo aptitude install coffeescript normalize-audio audacity python3-pygame libffi-dev tix libzmq3-dev python3-dev libssl-dev python3-opencv python3-cairo npm git virtualenv python3-virtualenv nginx-full python3-tk zlib1g-dev libjpeg8-dev curl
 
 gst_packages:
 	sudo aptitude install python3-gi gir1.2-gst-plugins-base-1.0 libgirepository-1.0-1 gir1.2-gstreamer-1.0 gstreamer1.0-tools gstreamer1.0-plugins-good gstreamer1.0-pulseaudio python3-gst-1.0 gir1.2-goocanvas-2.0
