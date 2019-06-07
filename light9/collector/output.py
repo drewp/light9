@@ -136,6 +136,9 @@ class Udmx(BackgroundLoopOutput):
                     self._writeOverflow += 1
                     return
 
+                if e.errno == 19:  # no such dev; usb hw restarted
+                    reactor.crash()
+
                 msg = 'usb: sending %s bytes to %r; error %r' % (len(buf),
                                                                  self.uri, e)
                 log.warn(msg)

@@ -37,8 +37,10 @@ def outputMap(
             except Exception:
                 log.warn('dev %r :dmxUniverse %r', dev, universe)
                 raise
-            dmxBase = DmxIndex(
-                cast(Literal, graph.value(dev, L9['dmxBase'])).toPython())
+            base = graph.value(dev, L9['dmxBase'])
+            if base is None:
+                raise ValueError('no :dmxBase for %s' % dev)
+            dmxBase = DmxIndex(cast(Literal, base).toPython())
             for row in graph.objects(dc, L9['attr']):
                 outputAttr = cast(OutputAttr,
                                   graph.value(row, L9['outputAttr']))
