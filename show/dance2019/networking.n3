@@ -8,35 +8,28 @@
 
 show:dance2019 :networking sh:netHome .
 sh:netHome
-  :webServer        <http://127.0.0.1:8200/>;
-  :patchReceiverUpdateHost "127.0.0.1";
-  :captureDevice    <http://127.0.0.1:8215/>;
-  :curveCalc        <http://127.0.0.1:8201/>;
-  :collector        <http://127.0.0.1:8202/>;
-  :collectorZmq     <http://127.0.0.1:8203/>;
-  :effectEval       <http://127.0.0.1:8204/>;
-  :effectSequencer  <http://127.0.0.1:8213/>;
-  :keyboardComposer <http://127.0.0.1:8205/>;
-  :musicPlayer      <http://127.0.0.1:8206/>;
-  :oscDmxServer     <udp://127.0.0.1:8207/>;
-  :paintServer      <http://127.0.0.1:8214/>;
-  :picamserve       <http://127.0.0.1:8208/>;
-  :rdfdb            <http://127.0.0.1:8209/>;
-  :subComposer      <http://127.0.0.1:8210/>;
-  :subServer        <http://127.0.0.1:8211/>;
-  :vidref           <http://127.0.0.1:8212/> .
+  :captureDevice    <http://10.5.0.1:8215/>;
+  :effectEval       <http://10.5.0.1:8204/>;
+  :effectSequencer  <http://10.5.0.1:8213/>;
+  :keyboardComposer <http://10.5.0.1:8205/>;
+  :musicPlayer      <http://10.5.0.1:8206/>;
+  :paintServer      <http://10.5.0.1:8214/>;
+  :rdfdb            <http://10.5.0.1:8209/>;
+  :subServer        <http://10.5.0.1:8211/>;
+  :vidref           <http://10.5.0.1:8212/>;
+  :webServer        <http://10.5.0.1:8200/>;
+  
+  :collector        <http://10.5.0.2:8202/>;
+  :collectorZmq     <http://10.5.0.2:8203/> .
 
 :captureDevice    :urlPath "captureDevice" .
-:curveCalc        :urlPath "curveCalc" .
+:collector        :urlPath "collector" .
 :dmxServer        :urlPath "dmxServer" .
 :effectEval       :urlPath "effectEval" .
+:effectSequencer  :urlPath "effectSequencer" .
 :keyboardComposer :urlPath "keyboardComposer" .
 :musicPlayer      :urlPath "ascoltami" .
-:picamserve       :urlPath "picamserve" .
 :paintServer      :urlPath "paintServer" .
 :rdfdb            :urlPath "rdfdb" .
-:subComposer      :urlPath "subComposer" .
 :subServer        :urlPath "subServer" .
 :vidref           :urlPath "vidref" .
-:collector        :urlPath "collector" .
-:effectSequencer  :urlPath "effectSequencer" .
