@@ -45,7 +45,8 @@ class SubClient:
                 outputSettings = self.get_output_settings(_graph=g)
         except Exception:
             traceback.print_exc()
-            return
+            raise
+
         return sendToCollector(
             'subclient',
             self.session,
