@@ -66,9 +66,12 @@ class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
 def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
+        rate = 20 # On udmx, 22 breaks. 28 breaks. 30 breaks.
         outputs = [
-            Udmx(L9['output/dmxA/'], bus=None, address=None,
-                 lastDmxChannel=221),
+            
+            Udmx(L9['output/dmxA/'], bus=3, address=None, lastDmxChannel=221, rate=rate),
+            Udmx(L9['output/dmxB/'], bus=1, address=None, lastDmxChannel=221, rate=rate),
+            #DummyOutput(L9['output/dmxA/']),
             DummyOutput(L9['output/dmxB/']),
         ]
     except Exception:

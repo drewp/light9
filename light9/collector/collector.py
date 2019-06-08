@@ -202,6 +202,7 @@ class Collector:
                 index = DmxMessageIndex(_index)
                 _, outArray = pendingOut[outputUri]
                 if outArray[index] != 0:
+                    log.warn(f'conflict: {output} output array was already nonzero at 0-based index {index}')
                     raise ValueError(f"someone already wrote to index {index}")
                 outArray[index] = value
 

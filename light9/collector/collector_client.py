@@ -27,7 +27,7 @@ class TwistedZmqClient(object):
         self.conn.push(msg)
 
 
-def toCollectorJson(client, session, settings) -> str:
+def toCollectorJson(client, session, settings: DeviceSettings) -> str:
     assert isinstance(settings, DeviceSettings)
     return json.dumps({
         'settings': settings.asList(),
