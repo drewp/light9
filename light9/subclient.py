@@ -1,13 +1,18 @@
 from light9.collector.collector_client import sendToCollector
 from twisted.internet import reactor
+from twisted.internet.defer import Deferred
 import traceback
 import time
 import logging
+from rdflib import URIRef
+from rdfdb.syncedgraph import SyncedGraph
 log = logging.getLogger()
 
 
 class SubClient:
-
+    graph: SyncedGraph
+    session: URIRef
+    
     def __init__(self):
         """assumed that your init saves self.graph"""
         pass  # we may later need init code for network setup
@@ -19,7 +24,7 @@ class SubClient:
     def send_levels(self):
         self._send_sub()
 
-    def send_levels_loop(self, delay=1000):
+    def send_levels_loop(self, delay=1000) -> None:
         now = time.time()
 
         def done(sec):
@@ -34,7 +39,7 @@ class SubClient:
         d = self._send_sub()
         d.addCallbacks(done, err)
 
-    def _send_sub(self):
+    def _send_sub(self) -> Deferred:
         try:
             with self.graph.currentState() as g:
                 outputSettings = self.get_output_settings(_graph=g)
