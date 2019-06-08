@@ -12,7 +12,7 @@ log = logging.getLogger()
 class SubClient:
     graph: SyncedGraph
     session: URIRef
-    
+
     def __init__(self):
         """assumed that your init saves self.graph"""
         pass  # we may later need init code for network setup

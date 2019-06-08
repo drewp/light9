@@ -23,6 +23,7 @@ from light9.coffee import StaticCoffee
 
 gatherProcessStats()
 
+
 class EffectEdit(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def get(self):

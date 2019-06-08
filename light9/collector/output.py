@@ -28,10 +28,8 @@ class Output(object):
         scales.init(self, self.statPath)
 
         self._writeStats = scales.collection(
-            self.statPath + '/write',
-            scales.IntStat('succeed'),
-            scales.IntStat('fail'),
-            scales.PmfStat('call', recalcPeriod=1),
+            self.statPath + '/write', scales.IntStat('succeed'),
+            scales.IntStat('fail'), scales.PmfStat('call', recalcPeriod=1),
             scales.RecentFpsStat('fps'))
 
         self._currentBuffer = b''
@@ -42,7 +40,7 @@ class Output(object):
 
     def reconnect(self):
         pass
-            
+
     def shortId(self) -> str:
         """short string to distinguish outputs"""
         return self.uri.rstrip('/').rsplit('/')[-1]
@@ -57,7 +55,7 @@ class Output(object):
         if msg != self._lastLoggedMsg:
             log.debug(msg)
             self._lastLoggedMsg = msg
-            
+
     def _write(self, buf: bytes) -> None:
         """
         write buffer to output hardware (may be throttled if updates are
@@ -68,6 +66,7 @@ class Output(object):
     def crash(self):
         log.error('unrecoverable- exiting')
         reactor.crash()
+
 
 class DummyOutput(Output):
 
@@ -104,19 +103,20 @@ class BackgroundLoopOutput(Output):
         d = threads.deferToThread(self._write, sendingBuffer)
         d.addCallbacks(done, err)
 
+
 class FtdiDmx(BackgroundLoopOutput):
+
     def __init__(self, uri, lastDmxChannel, rate=22):
         super().__init__(uri)
         self.lastDmxChannel = lastDmxChannel
         from .dmx_controller_output import OpenDmxUsb
         self.dmx = OpenDmxUsb()
-        
+
     def _write(self, buf):
         self._writeStats.fps.mark()
         with self._writeStats.call.time():
             if not buf:
-                logAllDmx.debug('%s: empty buf- no output',
-                                self.shortId())
+                logAllDmx.debug('%s: empty buf- no output', self.shortId())
                 return
 
             # ok to truncate the last channels if they just went
@@ -126,9 +126,8 @@ class FtdiDmx(BackgroundLoopOutput):
 
             if logAllDmx.isEnabledFor(logging.DEBUG):
                 # for testing fps, smooth fades, etc
-                logAllDmx.debug(
-                    '%s: %s...' %
-                    (self.shortId(), ' '.join(map(str, buf[:32]))))
+                logAllDmx.debug('%s: %s...' %
+                                (self.shortId(), ' '.join(map(str, buf[:32]))))
 
             self.dmx.send_dmx(buf)
 
@@ -190,13 +189,14 @@ class Udmx(BackgroundLoopOutput):
         super().__init__(uri, rate=rate)
 
         self._errStats = scales.collection(self.statPath + '/write',
-                                          scales.IntStat('overflow'),
-                                          scales.IntStat('ioError'),
-                                          scales.IntStat('pipeError')
-        )
+                                           scales.IntStat('overflow'),
+                                           scales.IntStat('ioError'),
+                                           scales.IntStat('pipeError'))
         self.reconnect()
+
     def shortId(self) -> str:
         return super().shortId() + f'_bus={self.bus}'
+
     def reconnect(self):
         self._connected = 0
         from pyudmx import pyudmx
@@ -220,8 +220,7 @@ class Udmx(BackgroundLoopOutput):
         with self._writeStats.call.time():
             try:
                 if not buf:
-                    logAllDmx.debug('%s: empty buf- no output',
-                                    self.shortId())
+                    logAllDmx.debug('%s: empty buf- no output', self.shortId())
                     return
 
                 # ok to truncate the last channels if they just went
@@ -247,14 +246,14 @@ class Udmx(BackgroundLoopOutput):
                     self._errStats.overflow += 1
                     return
 
-                if e.errno == 5: # i/o err
+                if e.errno == 5:  # i/o err
                     self._errStats.ioError += 1
                     return
 
-                if e.errno == 32: # pipe err
+                if e.errno == 32:  # pipe err
                     self._errStats.pipeError += 1
                     return
-                
+
                 msg = 'usb: sending %s bytes to %r; error %r' % (len(buf),
                                                                  self.uri, e)
                 log.warn(msg)

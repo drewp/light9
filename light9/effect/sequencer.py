@@ -120,8 +120,7 @@ class Note(object):
             'effectClass': self.effectEval.effect,
         }
         effectSettings: Dict[DeviceAttr, Union[float, str]] = dict(
-            (DeviceAttr(da), v)
-            for da, v in self.baseEffectSettings.items())
+            (DeviceAttr(da), v) for da, v in self.baseEffectSettings.items())
         effectSettings[L9['strength']] = self.evalCurve(t)
 
         def prettyFormat(x: Union[float, str]):
@@ -192,7 +191,7 @@ class Sequencer(object):
         log.debug('seq.onCodeChange')
         self.graph.addHandler(self.compileGraph)
         #self.updateLoop()
-        
+
     @compileStats.graph.time()
     def compileGraph(self) -> None:
         """rebuild our data from the graph"""
@@ -209,7 +208,8 @@ class Sequencer(object):
         self.notes[song] = []
         for note in self.graph.objects(song, L9['note']):
             try:
-                n = Note(self.graph, NoteUri(note), effecteval, self.simpleOutputs)
+                n = Note(self.graph, NoteUri(note), effecteval,
+                         self.simpleOutputs)
             except Exception:
                 log.warn(f"failed to build Note {note} - skipping")
                 anyErrors = True
@@ -235,14 +235,14 @@ class Sequencer(object):
             if not self.lastLoopSucceeded:
                 log.info('Sequencer.update is working')
                 self.lastLoopSucceeded = True
-        
+
             delay = max(0, 1 / self.fps - took)
             reactor.callLater(delay, self.updateLoop)
 
     @updateStats.updateFps.rate()
     @inlineCallbacks
     def update(self) -> Deferred:
-        
+
         with updateStats.s0_getMusic.time():
             musicState = self.music.getLatest()
             if not musicState.get('song') or not isinstance(
@@ -257,8 +257,7 @@ class Sequencer(object):
 
         with updateStats.s1_eval.time():
             settings = []
-            songNotes = sorted(self.notes.get(song, []),
-                               key=lambda n: n.uri)
+            songNotes = sorted(self.notes.get(song, []), key=lambda n: n.uri)
             noteReports = []
             for note in songNotes:
                 try:
@@ -272,13 +271,14 @@ class Sequencer(object):
 
         dispatcher.send('state', update={'songNotes': noteReports})
 
-        with updateStats.s3_send.time(): # our measurement
+        with updateStats.s3_send.time():  # our measurement
             sendSecs = yield self.sendToCollector(devSettings)
 
         # sendToCollector's own measurement.
         # (sometimes it's None, not sure why, and neither is mypy)
         #if isinstance(sendSecs, float):
         #    updateStats.s3_send_client = sendSecs
+
 
 class Updates(cyclone.sse.SSEHandler):
 

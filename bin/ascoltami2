@@ -17,6 +17,7 @@ from gi.repository import GObject, Gst
 
 gatherProcessStats()
 
+
 class App(object):
 
     def __init__(self, graph, show):

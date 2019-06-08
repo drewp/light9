@@ -387,6 +387,7 @@ def effect_lightning(effectSettings, strength, songTime, noteTime):
             out[(dev, L9['color'])] = col
     return out
 
+
 def sample(img, x, y, repeat=False):
     if 0 <= x < img.width:
         return img.getpixel((x, y))
@@ -394,6 +395,7 @@ def sample(img, x, y, repeat=False):
         return (0, 0, 0)
     else:
         return img.getpixel((x % img.width, y))
+
 
 def effect_image(effectSettings, strength, songTime, noteTime):
     out = {}
