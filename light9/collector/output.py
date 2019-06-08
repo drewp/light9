@@ -1,4 +1,6 @@
 from rdflib import URIRef
+import socket
+import struct
 import time
 import usb.core
 import logging
@@ -129,6 +131,51 @@ class FtdiDmx(BackgroundLoopOutput):
                     (self.shortId(), ' '.join(map(str, buf[:32]))))
 
             self.dmx.send_dmx(buf)
+
+
+class ArtnetDmx(BackgroundLoopOutput):
+    # adapted from https://github.com/spacemanspiff2007/PyArtNet/blob/master/pyartnet/artnet_node.py (gpl3)
+    def __init__(self, uri, host, port, rate):
+        """sends UDP messages to the given host/port"""
+        super().__init__(uri, rate)
+        packet = bytearray()
+        packet.extend(map(ord, "Art-Net"))
+        packet.append(0x00)  # Null terminate Art-Net
+        packet.extend([0x00, 0x50])  # Opcode ArtDMX 0x5000 (Little endian)
+        packet.extend([0x00, 0x0e])  # Protocol version 14
+        self.base_packet = packet
+        self.sequence_counter = 255
+        self._socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+    def _write(self, buf):
+        self._writeStats.fps.mark()
+        with self._writeStats.call.time():
+
+            if not buf:
+                logAllDmx.debug('%s: empty buf- no output', self.shortId())
+                return
+
+            if logAllDmx.isEnabledFor(logging.DEBUG):
+                # for testing fps, smooth fades, etc
+                logAllDmx.debug('%s: %s...' %
+                                (self.shortId(), ' '.join(map(str, buf[:32]))))
+
+            if self.sequence_counter:
+                self.sequence_counter += 1
+                if self.sequence_counter > 255:
+                    self.sequence_counter = 1
+            packet = self.base_packet[:]
+            packet.append(self.sequence_counter)  # Sequence,
+            packet.append(0x00)  # Physical
+            universe_nr = 0
+            packet.append(universe_nr & 0xFF)  # Universe LowByte
+            packet.append(universe_nr >> 8 & 0xFF)  # Universe HighByte
+
+            packet.extend(struct.pack(
+                '>h', len(buf)))  # Pack the number of channels Big endian
+            packet.extend(buf)
+
+            self._socket.sendto(packet, ('127.0.0.1', 6454))
 
 
 class Udmx(BackgroundLoopOutput):

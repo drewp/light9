@@ -27,7 +27,7 @@ from light9.zmqtransport import parseJsonMessage, startZmq
 from rdfdb.syncedgraph import SyncedGraph
 from standardservice.scalessetup import gatherProcessStats
 
-from light9.collector.output import Udmx, DummyOutput  # noqa
+from light9.collector.output import Udmx, ArtnetDmx, DummyOutput  # noqa
 
 
 class Updates(cyclone.websocket.WebSocketHandler):
@@ -66,13 +66,13 @@ class Attrs(PrettyErrorHandler, cyclone.web.RequestHandler):
 def launch(graph, doLoadTest=False):
     try:
         # todo: drive outputs with config files
-        rate = 20 # On udmx, 22 breaks. 28 breaks. 30 breaks.
+        rate = 20  # On udmx, 22 breaks. 28 breaks. 30 breaks.
         outputs = [
-            
-            Udmx(L9['output/dmxA/'], bus=3, address=None, lastDmxChannel=221, rate=rate),
-            Udmx(L9['output/dmxB/'], bus=1, address=None, lastDmxChannel=221, rate=rate),
+
+            #Udmx(L9['output/dmxB/'], bus=1, address=None, lastDmxChannel=221, rate=rate),
             #DummyOutput(L9['output/dmxA/']),
-            DummyOutput(L9['output/dmxB/']),
+            DummyOutput(L9['output/dmxA/']),
+            ArtnetDmx(L9['output/dmxB/'], rate=rate),
         ]
     except Exception:
         log.error("setting up outputs:")
