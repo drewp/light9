@@ -126,7 +126,7 @@ def untype_toOutputAttrs(deviceType, deviceAttrSettings) -> Dict[URIRef, int]:
     if deviceType == L9['ChauvetColorStrip']:
         r, g, b = rgbAttr(L9['color'])
         return {L9['mode']: 215, L9['red']: r, L9['green']: g, L9['blue']: b}
-    elif deviceType == L9['Bar612601']:
+    elif deviceType == L9['Bar612601d']:
         r, g, b = rgbAttr(L9['color'])
         return {L9['red']: r, L9['green']: g, L9['blue']: b}
     elif deviceType == L9['LedPar90']:
