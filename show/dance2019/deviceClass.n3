@@ -23,7 +23,7 @@
     [ :outputAttr :green;    :dmxOffset 2 ],
     [ :outputAttr :blue;     :dmxOffset 3 ] .
 
-:Bar612601 a :DeviceClass; rdfs:label "LED Bar (mode d)";
+:Bar612601d a :DeviceClass; rdfs:label "LED Bar (mode d)";
   :deviceAttr :color;
   :attr
     [ :outputAttr :red;      :dmxOffset 0 ],

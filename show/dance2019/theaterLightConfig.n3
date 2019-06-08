@@ -4,19 +4,18 @@
 @prefix dmxA: <http://light9.bigasterisk.com/output/dmxA/> .
 @prefix dmxB: <http://light9.bigasterisk.com/output/dmxB/> .
 
-dev:strip1  a :ChauvetColorStrip; :dmxUniverse dmxA:; :dmxBase 148 .
-dev:strip2  a :Bar612601;         :dmxUniverse dmxA:; :dmxBase 152 .
-dev:strip3  a :Bar612601;         :dmxUniverse dmxA:; :dmxBase 155 .
-
-dev:par90   a :LedPar90;          :dmxUniverse dmxA:; :dmxBase 158 .
-dev:par1    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 166 .
-dev:par2    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 174 .
-dev:par3    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 181 .
-dev:par4    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 188 .
-dev:par5    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 195 .
-dev:par6    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 202 .
-dev:par7    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 209 .
-dev:par8    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 216 .
+dev:strip1  a :Bar612601d;         :dmxUniverse dmxA:; :dmxBase 175 .
+dev:strip2  a :ChauvetColorStrip; :dmxUniverse dmxA:; :dmxBase 12 .
+dev:strip3  a :Bar612601d;         :dmxUniverse dmxA:; :dmxBase 178 .
+dev:par90   a :LedPar90;          :dmxUniverse dmxA:; :dmxBase 16 .
+dev:par1    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 84 .
+dev:par2    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 91 .
+dev:par3    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 98 .
+dev:par4    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 105 .
+dev:par5    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 147 .
+dev:par6    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 154 .
+dev:par7    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 161 .
+dev:par8    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 168 .
 
 
 dev:down1              a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 11 .
