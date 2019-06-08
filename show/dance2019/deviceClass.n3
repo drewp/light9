@@ -5,9 +5,16 @@
 :brightness         a :DeviceAttr; rdfs:label "brightness"; :dataType :scalar .
 :strobe             a :DeviceAttr; rdfs:label "strobe"; :dataType :scalar;
   rdfs:comment "0=none, 1=fastest" .
+:strobeSpeed        a :DeviceAttr; rdfs:label "strobeSpeed"; :dataType :scalar .
 :doNotUse             a :DeviceAttr; rdfs:label "-"; :dataType :scalar .
 
-
+:MegaFlash a :DeviceClass; rdfs:label "Mega Flash" ;
+:doc <https://cdb.s3-us-west-1.amazonaws.com/ItemRelatedFiles/7470/Mega%20Flash%20DMX-JAN2005.pdf>;
+  :deviceAttr :brightness, :strobeSpeed;
+  :attr
+    [ :outputAttr :strobeSpeed;    :dmxOffset 0 ],
+    [ :outputAttr :brightness;     :dmxOffset 1 ] .
+    
 :SimpleDimmer a :DeviceClass; rdfs:label "SimpleDimmer";
   :deviceAttr :brightness;
   :attr

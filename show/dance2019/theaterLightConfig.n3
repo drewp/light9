@@ -17,6 +17,7 @@ dev:par6    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 154 .
 dev:par7    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 161 .
 dev:par8    a :LedPar54;          :dmxUniverse dmxA:; :dmxBase 168 .
 
+dev:strobe a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 115 .
 
 dev:down1              a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 11 .
 dev:down2              a :SimpleDimmer; :dmxUniverse dmxA:; :dmxBase 9 .

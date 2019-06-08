@@ -150,6 +150,11 @@ def untype_toOutputAttrs(deviceType, deviceAttrSettings) -> Dict[URIRef, int]:
         }
     elif deviceType == L9['SimpleDimmer']:
         return {L9['level']: _8bit(floatAttr(L9['brightness']))}
+    elif deviceType == L9['MegaFlash']:
+        return {
+            L9['brightness']: _8bit(floatAttr(L9['brightness'])),
+            L9['strobeSpeed']: _8bit(floatAttr(L9['strobeSpeed'])),
+        }
     elif deviceType == L9['Mini15']:
         out = {
             L9['rotationSpeed']: 0,  # seems to have no effect
