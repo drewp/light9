@@ -70,9 +70,8 @@ class Snapshot(cyclone.web.RequestHandler):
 
 
 pipeline = videorecorder.GstSource(
-    '/dev/v4l/by-id/usb-Bison_HD_Webcam_200901010001-video-index0'
-    #    '/dev/v4l/by-id/usb-Generic_FULL_HD_1080P_Webcam_200901010001-video-index0'
-)
+    #'/dev/v4l/by-id/usb-Bison_HD_Webcam_200901010001-video-index0'
+    '/dev/v4l/by-id/usb-Generic_FULL_HD_1080P_Webcam_200901010001-video-index0')
 
 
 class Live(cyclone.websocket.WebSocketHandler):

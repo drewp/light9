@@ -206,15 +206,16 @@ class GstSource:
         self.liveImages: BehaviorSubject = BehaviorSubject(
             None)  # stream of Optional[CaptureFrame]
 
-        size = [640, 480]
+        # need to use 640,480 on some webcams or they fail mysteriously
+        size = [800, 600]
 
         log.info("new pipeline using device=%s" % dev)
 
         # using videocrop breaks the pipeline, may be this issue
         # https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/issues/732
         pipeStr = (
-            #f"v4l2src device=\"{dev}\""
-            f'autovideosrc'
+            f"v4l2src device=\"{dev}\""
+            #            f'autovideosrc'
             f" ! videoconvert"
             f" ! appsink emit-signals=true max-buffers=1 drop=true name=end0 caps=video/x-raw,format=RGB,width={size[0]},height={size[1]}"
         )
@@ -259,7 +260,7 @@ class GstSource:
 
     @stats.crop.time()
     def crop(self, img):
-        return img.crop((0, 100, 640, 380))
+        return img.crop((40, 100, 790, 310))
 
     def setupPipelineError(self, pipe, cb):
         bus = pipe.get_bus()
