@@ -468,6 +468,8 @@ coffeeElementSetup(class Light9LiveControls extends Polymer.Element
     newDevs = []
     for dc in @graph.sortedUris(@graph.subjects(U('rdf:type'), U(':DeviceClass')))
       for dev in @graph.sortedUris(@graph.subjects(U('rdf:type'), dc))
+        if @graph.contains(dev, U(':hideInLiveUi'), null)
+          continue
         newDevs.push({uri: dev})
 
     #log("controls update now has #{newDevs.length} devices")
