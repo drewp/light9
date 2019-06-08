@@ -102,6 +102,34 @@ class BackgroundLoopOutput(Output):
         d = threads.deferToThread(self._write, sendingBuffer)
         d.addCallbacks(done, err)
 
+class FtdiDmx(BackgroundLoopOutput):
+    def __init__(self, uri, lastDmxChannel, rate=22):
+        super().__init__(uri)
+        self.lastDmxChannel = lastDmxChannel
+        from .dmx_controller_output import OpenDmxUsb
+        self.dmx = OpenDmxUsb()
+        
+    def _write(self, buf):
+        self._writeStats.fps.mark()
+        with self._writeStats.call.time():
+            if not buf:
+                logAllDmx.debug('%s: empty buf- no output',
+                                self.shortId())
+                return
+
+            # ok to truncate the last channels if they just went
+            # to 0? No it is not. DMX receivers don't add implicit
+            # zeros there.
+            buf = bytes([0]) + buf[:self.lastDmxChannel]
+
+            if logAllDmx.isEnabledFor(logging.DEBUG):
+                # for testing fps, smooth fades, etc
+                logAllDmx.debug(
+                    '%s: %s...' %
+                    (self.shortId(), ' '.join(map(str, buf[:32]))))
+
+            self.dmx.send_dmx(buf)
+
 
 class Udmx(BackgroundLoopOutput):
     _reconnections = scales.IntStat('reconnections')

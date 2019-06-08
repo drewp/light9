@@ -46,3 +46,4 @@ https://github.com/drewp/cyclone/archive/python3.zip#egg=cyclone
 cycloneerr==0.3.0
 rdfdb==0.20.0
 standardservice==0.6.0
+pyftdi==0.29.4
