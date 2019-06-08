@@ -142,13 +142,14 @@ class Udmx(BackgroundLoopOutput):
         self.dev = None
         super().__init__(uri, rate=rate)
 
-        self.errStats = scales.collection(self.statPath + '/write',
+        self._errStats = scales.collection(self.statPath + '/write',
                                           scales.IntStat('overflow'),
                                           scales.IntStat('ioError'),
                                           scales.IntStat('pipeError')
         )
         self.reconnect()
-
+    def shortId(self) -> str:
+        return super().shortId() + f'_bus={self.bus}'
     def reconnect(self):
         self._connected = 0
         from pyudmx import pyudmx
