@@ -34,16 +34,23 @@
              border: 5px solid red;
              display: inline-block;
          }
+         .big {
+             font-size: 120%;
+             display: inline-block;
+             padding: 10px 0;
+         }
+
+         
          :host > div { display: inline-block; vertical-align: top; }
          :host > div:nth-child(2) { width: 9em; }
-         :host > div:nth-child(3) { width: 5em; }
-         :host > div:nth-child(4) { width: 3em; }
-         :host > div:nth-child(5) { width: 50px; }
         </style>
 
+        <div>
         <div class="left"><a class="big" href="{{name}}/">{{name}}</a></div>
         <div class="window"><button on-click="click">window</button></div>
         <div><a href="{{name}}/stats/">stats</a></div>
+        </div>
+
         <div id="stats"><stats-line name="{{name}}"></div>
       </template>
       <script>
