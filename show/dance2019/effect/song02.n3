@@ -9,6 +9,9 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:song02 a :Effect; rdfs:label "dummy"; :publishAttr :strength; :setting effect:song02_set1, effect:song02_set2 .
-effect:song02_set1 :device dev:moat_left_up_red; :deviceAttr :brightness; :scaledValue 1 .
-effect:song02_set2 :device dev:moat_right_red; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02 a :Effect; rdfs:label "dummy"; :publishAttr :strength; :setting effect:song02_set13, effect:song02_set17, effect:song02_set18, effect:song02_set19, effect:song02_set20 .
+effect:song02_set13 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02_set17 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02_set18 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02_set19 :device dev:down6; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02_set20 :device dev:down7; :deviceAttr :brightness; :scaledValue 1 .
