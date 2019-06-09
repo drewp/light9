@@ -1,4 +1,4 @@
-from rdflib import Literal, URIRef
+from rdflib import Literal, URIRef, Namespace
 from light9.namespaces import L9, DEV
 from webcolors import rgb_to_hex, hex_to_rgb
 from colorsys import hsv_to_rgb
@@ -10,6 +10,10 @@ from light9.effect.scale import scale
 from typing import Dict, Tuple, Any
 from PIL import Image
 import random
+
+
+SKY = Namespace('http://light9.bigasterisk.com/theater/skyline/device/')
+
 random.seed(0)
 
 log = logging.getLogger('effecteval')
@@ -50,6 +54,15 @@ def noise(t):
 def clamp(lo, hi, x):
     return max(lo, min(hi, x))
 
+
+def clamp255(x):
+    return min(255, max(0, x))
+
+
+def _8bit(f):
+    if not isinstance(f, (int, float)):
+        raise TypeError(repr(f))
+    return clamp255(int(f * 255))
 
 class EffectEval(object):
     """
@@ -406,9 +419,9 @@ def effect_image(effectSettings, strength, songTime, noteTime):
     x = (noteTime * pxPerSec)
 
     scl = effectSettings.get(L9['strength'], 1)
-    for dev, y in [(L9['theater/skyline/device/strip1'], 0),
-                   (L9['theater/skyline/device/strip2'], 1),
-                   (L9['theater/skyline/device/strip3'], 2)]:
+    for dev, y in [(SKY['strip1'], 0),
+                   (SKY['strip2'], 1),
+                   (SKY['strip3'], 2)]:
         color = sample(img, x, y, effectSettings.get(L9['repeat'], False))
         out[(dev, L9['color'])] = scale(rgb_to_hex(color), scl)
     return out
@@ -418,19 +431,74 @@ def effect_cyc(effectSettings, strength, songTime, noteTime):
     r, g, b = map(lambda x: x / 255, hex_to_rgb(colorScale))
 
     out ={
-        (L9['theater/skyline/device/cycRed1'], L9['brightness']): r,
-        (L9['theater/skyline/device/cycRed2'], L9['brightness']): r,
-        (L9['theater/skyline/device/cycRed3'], L9['brightness']): r,
-        (L9['theater/skyline/device/cycRed4'], L9['brightness']): r,
-        (L9['theater/skyline/device/cycGreen1'], L9['brightness']): g,
-        (L9['theater/skyline/device/cycGreen2'], L9['brightness']): g,
-        (L9['theater/skyline/device/cycGreen3'], L9['brightness']): g,
-        (L9['theater/skyline/device/cycGreen4'], L9['brightness']): g,
-        (L9['theater/skyline/device/cycBlue1'], L9['brightness']): b,
-        (L9['theater/skyline/device/cycBlue2'], L9['brightness']): b,
-        (L9['theater/skyline/device/cycBlue3'], L9['brightness']): b,
-        (L9['theater/skyline/device/cycBlue4'], L9['brightness']): b,
+        (SKY['cycRed1'], L9['brightness']): r,
+        (SKY['cycRed2'], L9['brightness']): r,
+        (SKY['cycRed3'], L9['brightness']): r,
+        (SKY['cycRed4'], L9['brightness']): r,
+        (SKY['cycGreen1'], L9['brightness']): g,
+        (SKY['cycGreen2'], L9['brightness']): g,
+        (SKY['cycGreen3'], L9['brightness']): g,
+        (SKY['cycGreen4'], L9['brightness']): g,
+        (SKY['cycBlue1'], L9['brightness']): b,
+        (SKY['cycBlue2'], L9['brightness']): b,
+        (SKY['cycBlue3'], L9['brightness']): b,
+        (SKY['cycBlue4'], L9['brightness']): b,
          
         }
+
+    return out
+
+cycChase1_members = [
+       SKY['cycRed1'], 
+       SKY['cycRed2'], 
+       SKY['cycRed3'], 
+       SKY['cycRed4'], 
+       SKY['cycGreen1'], 
+       SKY['cycGreen2'], 
+       SKY['cycGreen3'], 
+       SKY['cycGreen4'], 
+       SKY['cycBlue1'], 
+       SKY['cycBlue2'], 
+       SKY['cycBlue3'], 
+       SKY['cycBlue4'],
+    ]
+cycChase1_members = cycChase1_members * 20
+random.shuffle(cycChase1_members)
+
+def effect_cycChase1(effectSettings, strength, songTime, noteTime):
+    colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
+    r, g, b = map(lambda x: x / 255, hex_to_rgb(colorScale))
+    tintAmount = {'Red': r, 'Green': g, 'Blue': b}
+
+    members = cycChase1_members
+
+    out = {}
+    period = float(effectSettings.get(L9['period'], 6 / len(members)))
+
+    for i, dev in enumerate(members):
+        cursor = (songTime / period) % float(len(members))
+        dist = abs(i - cursor)
+        radius = 7
+        if dist < radius:
+            colorFromUri = str(dev).split('/')[-1].split('cyc')[1][:-1]
+            scale = strength * tintAmount[colorFromUri]
+            out.update({
+                (dev, L9['brightness']): (1 - dist / radius) * scale,
+            })
+    return out
+
+
+def effect_parNoise(effectSettings, strength, songTime, noteTime):
+    
+    colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
+    r, g, b = map(lambda x: x / 255, hex_to_rgb(colorScale))
+    out = {}
+    speed = 10
+    gamma = .6
+    for dev in [SKY['strip1'], SKY['strip2'], SKY['strip3']]:
+        out[(dev, L9['color'])] = scale(rgb_to_hex(
+            (_8bit(r * math.pow(max(.01, noise(speed * songTime)), gamma)),
+             _8bit(g * math.pow(max(.01, noise(speed * songTime + 10)), gamma)),
+             _8bit(b * math.pow(max(.01, noise(speed * songTime + 20)), gamma)))), strength)
 
     return out
