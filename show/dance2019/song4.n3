@@ -14,9 +14,9 @@ show:song4 :note <http://light9.bigasterisk.com/show/dance2019/song4/n0>, <http:
 
 <http://light9.bigasterisk.com/show/dance2019/song4/n0c0> a :Curve; :attr :strength;
      :point <http://light9.bigasterisk.com/show/dance2019/song4/n0c0p0>, <http://light9.bigasterisk.com/show/dance2019/song4/n0c0p1>, <http://light9.bigasterisk.com/show/dance2019/song4/n0c0p2>, <http://light9.bigasterisk.com/show/dance2019/song4/n0c0p3> .
-<http://light9.bigasterisk.com/show/dance2019/song4/n0c0p0> :time 0; :value 0 .
-<http://light9.bigasterisk.com/show/dance2019/song4/n0c0p1> :time 14.031; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song4/n0c0p2> :time 32.998; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song4/n0c0p0> :time -100.453; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song4/n0c0p1> :time -99.994; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song4/n0c0p2> :time 38.25; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song4/n0c0p3> :time 42.092; :value 0 .
 
 <http://light9.bigasterisk.com/show/dance2019/song4/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song4/n1c0>;
@@ -24,7 +24,7 @@ show:song4 :note <http://light9.bigasterisk.com/show/dance2019/song4/n0>, <http:
 
 <http://light9.bigasterisk.com/show/dance2019/song4/n1c0> a :Curve; :attr :strength;
      :point <http://light9.bigasterisk.com/show/dance2019/song4/n1c0p0>, <http://light9.bigasterisk.com/show/dance2019/song4/n1c0p1>, <http://light9.bigasterisk.com/show/dance2019/song4/n1c0p2>, <http://light9.bigasterisk.com/show/dance2019/song4/n1c0p3> .
-<http://light9.bigasterisk.com/show/dance2019/song4/n1c0p0> :time 0; :value 0 .
-<http://light9.bigasterisk.com/show/dance2019/song4/n1c0p1> :time 12.385; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song4/n1c0p2> :time 33.457; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song4/n1c0p0> :time 20.865; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song4/n1c0p1> :time 27.236; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song4/n1c0p2> :time 33.419; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song4/n1c0p3> :time 37.156; :value 0 .

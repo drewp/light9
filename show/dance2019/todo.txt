@@ -1,9 +1,15 @@
+song01: real-ish timing but with dummy look
+
 song02: small tap special? maybe mostly center?
-        made basic look, but maybe should be tighter
-             oops, deleted it
+        real-ish timing but with dummy look
 
+song03: real-ish timing but with dummy look
 
-song04: fake timing
+song04: real-ish timing, real look
+
+song05: real-ish timing but with dummy look
+
+song06: real-ish timing but with dummy look
 
 song07: fake timing for song07 and bow
         cyc could fade purple -> red -> orange
