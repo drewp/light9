@@ -100,14 +100,27 @@ class SnapshotPic(cyclone.web.StaticFileHandler):
     pass
 
 
-class Time(cyclone.web.RequestHandler):
+class Time(PrettyErrorHandler, cyclone.web.RequestHandler):
 
     def put(self):
         body = json.loads(self.request.body)
         t = body['t']
-        source = body['source']
-        self.settings.gui.incomingTime(t, source)
+        for listener in TimeStream.time_stream_listeners:
+            listener.sendMessage(json.dumps({
+                'st': t,
+                'song': body['song'],
+            }))
         self.set_status(202)
+
+
+class TimeStream(cyclone.websocket.WebSocketHandler):
+    time_stream_listeners = []
+
+    def connectionMade(self, *args, **kwargs):
+        TimeStream.time_stream_listeners.append(self)
+
+    def connectionLost(self, reason):
+        TimeStream.time_stream_listeners.remove(self)
 
 
 class Clips(PrettyErrorHandler, cyclone.web.RequestHandler):
@@ -174,6 +187,7 @@ reactor.listenTCP(
                 "path": 'todo',
             }),
             (r'/time', Time),
+            (r'/time/stream', TimeStream),
             (r'/stats/(.*)', StatsHandler, {
                 'serverName': 'vidref'
             }),

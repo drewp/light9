@@ -215,7 +215,7 @@ coffeeElementSetup(class TimelineEditor extends Polymer.mixinBehaviors([Polymer.
   sendMouseToVidref: ->
     now = Date.now()
     if (!@$.vidrefLastSent? || @$.vidrefLastSent < now - 200) && !@songPlaying
-      @$.vidrefTime.body = {t: @viewState.latestMouseTime(), source: 'timeline'}
+      @$.vidrefTime.body = {t: @viewState.latestMouseTime(), source: 'timeline', song: @song}
       @$.vidrefTime.generateRequest()
       @$.vidrefLastSent = now
 

@@ -35,7 +35,7 @@ class Light9VidrefReplayStack extends LitElement {
             const sinceLastUpdate = (Date.now() - this.musicState.reportTime) / 1000;
             this.songTime = sinceLastUpdate + this.musicState.tStart;
         } else  {
-            this.songTime = this.musicState.t;
+            // this.songTime = this.musicState.t;
         }
         requestAnimationFrame(this.fineTime.bind(this));
     }
@@ -51,6 +51,7 @@ class Light9VidrefReplayStack extends LitElement {
 
         const ws = reconnectingWebSocket('../ascoltami/time/stream',
                                          this.receivedSongAndTime.bind(this));
+        reconnectingWebSocket('time/stream', this.receivedRemoteScrubbedTime.bind(this));
         // bug: upon connecting, clear this.song
         this.fineTime();
     }
@@ -64,6 +65,17 @@ class Light9VidrefReplayStack extends LitElement {
 
         if (this.musicState.song != this.song) {
             this.song = this.musicState.song;
+            this.getReplayMapForSong(this.song);
+        }
+    }
+
+    receivedRemoteScrubbedTime(msg) {
+        this.songTime = msg.st;
+
+        // This doesn't work completely since it will keep getting
+        // updates from ascoltami slow updates.
+        if (msg.song != this.song) {
+            this.song = msg.song;
             this.getReplayMapForSong(this.song);
         }
     }
