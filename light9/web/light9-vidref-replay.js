@@ -15,7 +15,8 @@ class Light9VidrefReplay extends LitElement {
             videoTime: { type: Number },
             outVideoCurrentTime: { type: Number },
             timeErr: { type: Number },
-            playRate: { type: Number }
+            playRate: { type: Number },
+            size: { type: String, attribute: true }
         };
     }
     estimateRate() {
@@ -98,13 +99,16 @@ class Light9VidrefReplay extends LitElement {
         a {
             color: rgb(97, 97, 255);
         }
+        video.size-small {
+          width: 460px;
+        }
         `;
     }
     
     render() {
-        return html`
-  <video id="replay" src="${this.videoUrl}"></video>
-  <div>
+        let details = '';
+        if (this.size != 'small') {
+            details = html`  <div>
     take is <a href="${this.uri}">${this.uri}</a> 
     (${Object.keys(this.songToVideo).length} frames)
     <button @click="${this.onDelete}">Delete</button>
@@ -117,6 +121,10 @@ class Light9VidrefReplay extends LitElement {
     err = <span class="num">${rounding(this.timeErr, 3)} </span>
     rate = <span class="num">${rounding(this.playRate, 3)}</span>
   </div>
+`;
+        }
+        return html`
+  <video id="replay" class="size-${this.size}" src="${this.videoUrl}"></video>
   `;
 
     }

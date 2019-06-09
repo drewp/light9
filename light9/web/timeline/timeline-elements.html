@@ -11,6 +11,10 @@
 <link rel="import" href="../light9-music.html">
 <link rel="import" href="../edit-choice.html">
 <link rel="import" href="inline-attrs.html">
+    <script src="/websocket.js"></script>
+<script type="module" src="/light9-vidref-replay.js"></script>
+
+<script type="module" src="/light9-vidref-replay-stack.js"></script>
 
 
 <!-- Whole editor- include this on your page.
@@ -50,6 +54,13 @@
          font-size: 125%;
          height: 15px;
      }
+     light9-vidref-replay-stack {
+             position: absolute;
+             bottom: 10px;
+             background: gray;
+             box-shadow: 6px 10px 12px #0000006b;
+             display: inline-block;
+     }
     </style>
     <div>
       <rdfdb-synced-graph graph="{{graph}}"></rdfdb-synced-graph>
@@ -80,6 +91,7 @@
       <light9-adjusters-canvas id="adjustersCanvas" set-adjuster="{{setAdjuster}}">
       </light9-adjusters-canvas>
       <light9-cursor-canvas id="cursorCanvas" view-state="{{viewState}}"></light9-cursor-canvas>
+      <light9-vidref-replay-stack size="small"></light9-vidref-replay-stack>
     </div>
   </template>
   

@@ -11,7 +11,8 @@ class Light9VidrefReplayStack extends LitElement {
         return {
             songTime: { type: Number, attribute: false }, // from musicState.t but higher res
             musicState: { type: Object, attribute: false },
-            players: { type: Array, attribute: false }
+            players: { type: Array, attribute: false },
+            size: { type: String, attribute: true }
         };
     }
 
@@ -30,13 +31,14 @@ class Light9VidrefReplayStack extends LitElement {
         this.songTime += dt;
         log('song now', this.songTime);
     }
-    fineTime() {       
+    fineTime() {
         if (this.musicState.playing) {
             const sinceLastUpdate = (Date.now() - this.musicState.reportTime) / 1000;
             this.songTime = sinceLastUpdate + this.musicState.tStart;
-        } else  {
-            // this.songTime = this.musicState.t;
+        } else if (this.lastFineTimePlayingState)  {
+            this.songTime = this.musicState.t;
         }
+        this.lastFineTimePlayingState = this.musicState.playing;
         requestAnimationFrame(this.fineTime.bind(this));
     }
 
@@ -51,7 +53,7 @@ class Light9VidrefReplayStack extends LitElement {
 
         const ws = reconnectingWebSocket('../ascoltami/time/stream',
                                          this.receivedSongAndTime.bind(this));
-        reconnectingWebSocket('time/stream', this.receivedRemoteScrubbedTime.bind(this));
+        reconnectingWebSocket('../vidref/time/stream', this.receivedRemoteScrubbedTime.bind(this));
         // bug: upon connecting, clear this.song
         this.fineTime();
     }
@@ -84,6 +86,7 @@ class Light9VidrefReplayStack extends LitElement {
         const u = new URL(window.location.href);
         u.pathname = '/vidref/replayMap'
         u.searchParams.set('song', song);
+        u.searchParams.set('maxClips', this.size == "small" ? '1' : '3');
         fetch(u.toString()).then((resp) => {
             if (resp.ok) {
                 resp.json().then((msg) => {
@@ -105,7 +108,7 @@ class Light9VidrefReplayStack extends LitElement {
     }
     
     makeClipRow(clip) {
-        return html`<light9-vidref-replay @clips-changed="${this.onClipsChanged}"></light9-vidref-replay>`;
+        return html`<light9-vidref-replay @clips-changed="${this.onClipsChanged}" size="${this.size}"></light9-vidref-replay>`;
     }
     
     onClipsChanged(ev) {
@@ -149,21 +152,26 @@ class Light9VidrefReplayStack extends LitElement {
     }
     
     render() {
-        return html`
-  <div>
-    <input id="songTime" type="range" 
+        const songTimeRange = this.size != "small" ? html`<input id="songTime" type="range" 
            .value="${this.songTime}" 
            @input="${this.userMovedSongTime}" 
            min="0" max="0" step=".001"></div>
   <div><a href="${this.musicState.song}">${this.musicState.song}</a></div>
-  <div id="songTime">showing song time ${rounding(this.songTime, 3)}</div>
+  <div id="songTime">showing song time ${rounding(this.songTime, 3)}</div>` : '';
+
+        const globalCommands = this.size != 'small' ? html`
+  <div>
+    <button @click="${this.onClipsChanged}">Refresh clips for song</button>
+  </div>
+` : '';
+        return html`
+  <div>
+    ${songTimeRange}
   <div>clips:</div>
   <div id="clips">
     ${this.players}
   </div>
-  <div>
-    <button @click="${this.onClipsChanged}">Refresh clips for song</button>
-  </div>
+  ${globalCommands}
 `;
 
     }
