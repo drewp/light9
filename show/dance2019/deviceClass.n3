@@ -15,6 +15,7 @@
     [ :outputAttr :strobeSpeed;    :dmxOffset 0 ],
     [ :outputAttr :brightness;     :dmxOffset 1 ] .
     
+    
 :SimpleDimmer a :DeviceClass; rdfs:label "SimpleDimmer";
   :deviceAttr :brightness;
   :attr

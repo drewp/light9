@@ -1,0 +1,18 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:effect9 a :Effect; rdfs:label "redmid"; :publishAttr :strength; :setting effect:effect9_set1, effect:effect9_set2, effect:effect9_set3, effect:effect9_set4, effect:effect9_set6, effect:effect9_set7 .
+effect:effect9_set1 :device dev:down_CL_red; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect9_set2 :device dev:down_CR_red; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect9_set3 :device dev:mid_CL_red; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect9_set4 :device dev:mid_CR_red; :deviceAttr :brightness; :scaledValue 0.19 .
+effect:effect9_set6 :device dev:moat_left_down_red; :deviceAttr :brightness;
+     :scaledValue 0.402 .
+effect:effect9_set7 :device dev:moat_left_up_red; :deviceAttr :brightness; :scaledValue 0.819 .

@@ -9,6 +9,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect0 a :Effect; rdfs:label "effect00"; :publishAttr :strength; :setting effect:effect0_set0, effect:effect0_set1 .
-effect:effect0_set0 :device dev:blacklight2; :deviceAttr :brightness; :scaledValue 1 .
-effect:effect0_set1 :device dev:strip1; :deviceAttr :color; :scaledValue "#7499ff" .
+effect:effect0 a :Effect; rdfs:label "downcenter"; :publishAttr :strength; :setting effect:effect0_set32, effect:effect0_set34, effect:effect0_set35, effect:effect0_set7 .
+effect:effect0_set32 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect0_set34 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect0_set35 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect0_set7 :device dev:strip2; :deviceAttr :color; :scaledValue "#0b0b0b" .

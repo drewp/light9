@@ -1,6 +1,5 @@
 @prefix : <http://light9.bigasterisk.com/> .
 @prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
-@prefix dev1: <http://light9.bigasterisk.com/device/> .
 @prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -9,5 +8,10 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect2 a :Effect; rdfs:label "two"; :publishAttr :strength; :setting effect:effect2_set0 .
-effect:effect2_set0 :device dev:strip2; :deviceAttr :color; :scaledValue "#8a42ff" .
+effect:effect2 a :Effect; rdfs:label "fronts"; :publishAttr :strength; :setting effect:effect2_set0, effect:effect2_set1, effect:effect2_set2, effect:effect2_set3, effect:effect2_set4, effect:effect2_set5 .
+effect:effect2_set0 :device dev:down1; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect2_set1 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect2_set2 :device dev:down6; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect2_set3 :device dev:down7; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect2_set4 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect2_set5 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .

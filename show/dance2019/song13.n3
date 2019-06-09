@@ -1,0 +1,52 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+show:song13 :note <http://light9.bigasterisk.com/show/dance2019/song13/n3> .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n0c0>;
+     :effectClass effect:effect4; :originTime 34.1 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n1c0>;
+     :effectClass effect:effect12; :originTime 49.02 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n2> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n2c0>;
+     :effectClass effect:effect2; :originTime 37.157 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n0c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song13/n0c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n0c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n0c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n0c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song13/n0c0p0> :time 0; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n0c0p1> :time 10.008; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n0c0p2> :time 20.016; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n0c0p3> :time 30.024; :value 0 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n1c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song13/n1c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n1c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n1c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n1c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song13/n1c0p0> :time 0; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n1c0p1> :time 10.008; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n1c0p2> :time 20.016; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n1c0p3> :time 30.024; :value 0 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n2c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song13/n2c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n2c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n2c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n2c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song13/n2c0p0> :time 0; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n2c0p1> :time 10.008; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n2c0p2> :time 20.016; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n2c0p3> :time 30.024; :value 0 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n3> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n3c0>;
+     :effectClass effect:effect28; :originTime 129.126 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0> :time -124.784;
+     :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1> :time -114.254;
+     :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2> :time 75.174; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> :time 76.205; :value 0 .

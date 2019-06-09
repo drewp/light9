@@ -8,5 +8,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect3 a :Effect; rdfs:label "orchestra"; :publishAttr :strength; :setting effect:effect3_set0 .
-effect:effect3_set0 :device dev:orchestra; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect24 a :Effect; rdfs:label "parright"; :publishAttr :strength; :setting effect:effect24_set12, effect:effect24_set6 .
+effect:effect24_set12 :device dev:par7; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:effect24_set6 :device dev:par1; :deviceAttr :color; :scaledValue "#ffffff" .

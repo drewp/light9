@@ -8,5 +8,6 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect3 a :Effect; rdfs:label "orchestra"; :publishAttr :strength; :setting effect:effect3_set0 .
-effect:effect3_set0 :device dev:orchestra; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect16 a :Effect; rdfs:label "treeleft"; :publishAttr :strength; :setting effect:effect16_set0, effect:effect16_set1 .
+effect:effect16_set0 :device dev:tree_down_L_low; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect16_set1 :device dev:tree_up_L_low; :deviceAttr :brightness; :scaledValue 1 .

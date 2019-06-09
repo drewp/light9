@@ -1,0 +1,27 @@
+song02: small tap special? maybe mostly center?
+        made basic look, but maybe should be tighter
+             oops, deleted it
+
+
+song04: fake timing
+
+song07: fake timing for song07 and bow
+        cyc could fade purple -> red -> orange
+
+song10: should have two different looks based on music
+        could go between song10calm and song04+something animated during bass things
+
+song12: started a small look, but might have moats we don't want
+
+song15: front should come on around ~177? out ~225
+        could have a different look after that goes out
+        bow timing is rough
+
+song16: add cyc around ~90
+        ~336 strobe on
+        366 song change
+        ~410 center pool
+        440 bigger, eventually pulsing
+            red cyc, fronts, down c
+
+song17: start less colorful and build?

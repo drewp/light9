@@ -1,0 +1,38 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song10calm/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song10calm a :Effect; rdfs:label "song10calm"; :publishAttr :strength;
+     :setting eff:set1273238, eff:set147187, eff:set2085207, eff:set2159234, eff:set2467009, eff:set2724028, eff:set3414627, eff:set3580754, eff:set3623302, eff:set4430142, eff:set4840022, eff:set4883986, eff:set5083235, eff:set5120406, eff:set5181036, eff:set5828979, eff:set6725044, eff:set6811072, eff:set7047319, eff:set7500021, eff:set7562243, eff:set8503004, eff:set9426922, eff:set9442035, eff:set9958820 .
+eff:set1273238 :device dev:mid_CR_red; :deviceAttr :brightness; :scaledValue 1 .
+eff:set147187 :device dev:par3; :deviceAttr :color; :scaledValue "#999999" .
+eff:set2085207 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.714 .
+eff:set2159234 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 1 .
+eff:set2467009 :device dev:strip1; :deviceAttr :color; :scaledValue "#333333" .
+eff:set2724028 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.714 .
+eff:set3414627 :device dev:par1; :deviceAttr :color; :scaledValue "#8c8c8c" .
+eff:set3580754 :device dev:tree_down_L_low; :deviceAttr :brightness; :scaledValue 0.55 .
+eff:set3623302 :device dev:par4; :deviceAttr :color; :scaledValue "#999999" .
+eff:set4430142 :device dev:down_CR_red; :deviceAttr :brightness; :scaledValue 1 .
+eff:set4840022 :device dev:moat_right_red; :deviceAttr :brightness; :scaledValue 0.057 .
+eff:set4883986 :device dev:moat_left_down_red; :deviceAttr :brightness; :scaledValue 0.532 .
+eff:set5083235 :device dev:tree_up_R_low; :deviceAttr :brightness; :scaledValue 0.65 .
+eff:set5120406 :device dev:tree_down_R_low; :deviceAttr :brightness; :scaledValue 0.65 .
+eff:set5181036 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 1 .
+eff:set5828979 :device dev:par7; :deviceAttr :color; :scaledValue "#8c8c8c" .
+eff:set6725044 :device dev:strip2; :deviceAttr :color; :scaledValue "#333333" .
+eff:set6811072 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.714 .
+eff:set7047319 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.714 .
+eff:set7500021 :device dev:strip3; :deviceAttr :color; :scaledValue "#333333" .
+eff:set7562243 :device dev:tree_up_L_low; :deviceAttr :brightness; :scaledValue 0.55 .
+eff:set8503004 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 1 .
+eff:set9426922 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 1 .
+eff:set9442035 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.714 .
+eff:set9958820 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.714 .

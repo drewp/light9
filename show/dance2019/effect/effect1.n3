@@ -1,5 +1,5 @@
 @prefix : <http://light9.bigasterisk.com/> .
-@prefix dev: <http://light9.bigasterisk.com/device/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
 @prefix effect: <http://light9.bigasterisk.com/effect/> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -8,7 +8,29 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect1 a :Effect; rdfs:label "effect1"; :publishAttr :strength;
-     :setting effect:effect1_set0 .
-effect:effect1_set0 :device <http://light9.bigasterisk.com/theater/skyline/device/strip1>;
-     :deviceAttr :color; :scaledValue "#96beff" .
+effect:effect1 a :Effect; rdfs:label "house"; :publishAttr :strength; :setting effect:effect1_set0, effect:effect1_set1, effect:effect1_set10, effect:effect1_set11, effect:effect1_set12, effect:effect1_set13, effect:effect1_set14, effect:effect1_set15, effect:effect1_set16, effect:effect1_set17, effect:effect1_set18, effect:effect1_set19, effect:effect1_set2, effect:effect1_set20, effect:effect1_set21, effect:effect1_set22, effect:effect1_set23, effect:effect1_set24, effect:effect1_set3, effect:effect1_set4, effect:effect1_set5, effect:effect1_set6, effect:effect1_set7, effect:effect1_set8, effect:effect1_set9 .
+effect:effect1_set0 :device dev:houseBack1; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set1 :device dev:houseBack3; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set10 :device dev:houseFront4; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set11 :device dev:houseFront6; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set12 :device dev:houseFront8; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set13 :device dev:houseFront3; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set14 :device dev:houseFront5; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set15 :device dev:houseFront7; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set16 :device dev:houseFront9; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set17 :device dev:houseFront11; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set18 :device dev:houseFront10; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set19 :device dev:houseFront12; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set2 :device dev:houseBack5; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set20 :device dev:houseUp3; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set21 :device dev:houseUp5; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set22 :device dev:houseUp4; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set23 :device dev:houseUp1; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set24 :device dev:houseUp6; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set3 :device dev:houseBack7; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set4 :device dev:houseFront1; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set5 :device dev:houseBack8; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set6 :device dev:houseBack6; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set7 :device dev:houseBack4; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set8 :device dev:houseBack2; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect1_set9 :device dev:houseFront2; :deviceAttr :brightness; :scaledValue 1 .

@@ -1,0 +1,32 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song17/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song17 a :Effect; rdfs:label "song17lessdim"; :publishAttr :strength;
+     :setting eff:set1396546, eff:set1428590, eff:set1876027, eff:set2361527, eff:set2676808, eff:set2923560, eff:set3118176, eff:set3615387, eff:set4013040, eff:set4430142, eff:set452316, eff:set5303398, eff:set6417807, eff:set7139805, eff:set725590, eff:set7623986, eff:set8352572, eff:set9561433, eff:set9561656 .
+eff:set1396546 :device dev:mid_C_blue; :deviceAttr :brightness; :scaledValue 1 .
+eff:set1428590 :device dev:strip2; :deviceAttr :color; :scaledValue "#040404" .
+eff:set1876027 :device dev:moat_left_up_red; :deviceAttr :brightness; :scaledValue 0.819 .
+eff:set2361527 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.45 .
+eff:set2676808 :device dev:cross_up_L; :deviceAttr :brightness; :scaledValue 0.4 .
+eff:set2923560 :device dev:cross_down_L; :deviceAttr :brightness; :scaledValue 0.9 .
+eff:set3118176 :device dev:cross_down_R; :deviceAttr :brightness; :scaledValue 0.9 .
+eff:set3615387 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 1 .
+eff:set4013040 :device dev:down_R_blue; :deviceAttr :brightness; :scaledValue 1 .
+eff:set4430142 :device dev:down_CR_red; :deviceAttr :brightness; :scaledValue 1 .
+eff:set452316 :device dev:moat_left_down_red; :deviceAttr :brightness; :scaledValue 0.402 .
+eff:set5303398 :device dev:mid_CL_red; :deviceAttr :brightness; :scaledValue 1 .
+eff:set6417807 :device dev:cross_up_R; :deviceAttr :brightness; :scaledValue 0.4 .
+eff:set7139805 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.45 .
+eff:set725590 :device dev:down_CL_red; :deviceAttr :brightness; :scaledValue 1 .
+eff:set7623986 :device dev:mid_L_blue; :deviceAttr :brightness; :scaledValue 1 .
+eff:set8352572 :device dev:down_C_blue; :deviceAttr :brightness; :scaledValue 1 .
+eff:set9561433 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.45 .
+eff:set9561656 :device dev:mid_CR_red; :deviceAttr :brightness; :scaledValue 0.19 .
