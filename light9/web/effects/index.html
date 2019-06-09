@@ -30,10 +30,23 @@
              background: #1e271e;
              margin-bottom: 3px;
          }
+         a {
+             color: #7992d0;
+             background: #00000859;
+             min-width: 4em;
+             min-height: 2em;
+             display: inline-block;
+             text-align: center;
+             vertical-align: middle;
+         }
+         resource-display {
+             min-width: 12em;
+         }
         </style>
 
         Effect
         <resource-display graph="{{graph}}" uri="{{uri}}" rename></resource-display>
+        <a href="../live?effect={{uri.value}}">Edit</a>
         <iron-ajax id="songEffects"
                    url="/effectEval/songEffects"
                    method="POST"
