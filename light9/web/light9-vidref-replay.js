@@ -100,7 +100,7 @@ class Light9VidrefReplay extends LitElement {
             color: rgb(97, 97, 255);
         }
         video.size-small {
-          width: 460px;
+          width: 60%;
         }
         `;
     }
