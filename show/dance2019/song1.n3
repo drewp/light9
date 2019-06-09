@@ -36,7 +36,7 @@ show:song1 :note <http://light9.bigasterisk.com/show/dance2019/song1/n2>, <http:
 <http://light9.bigasterisk.com/show/dance2019/song1/n1c0p3> :time 30.059; :value 0 .
 
 <http://light9.bigasterisk.com/show/dance2019/song1/n2> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song1/n2c0>;
-     :effectClass effect:song02; :originTime 73.263; :setting <http://light9.bigasterisk.com/show/dance2019/song1/n2set0> .
+     :effectClass effect:song01; :originTime 73.263; :setting <http://light9.bigasterisk.com/show/dance2019/song1/n2set0> .
 
 <http://light9.bigasterisk.com/show/dance2019/song1/n2c0> a :Curve; :attr :strength;
      :point <http://light9.bigasterisk.com/show/dance2019/song1/n2c0p0>, <http://light9.bigasterisk.com/show/dance2019/song1/n2c0p1>, <http://light9.bigasterisk.com/show/dance2019/song1/n2c0p2>, <http://light9.bigasterisk.com/show/dance2019/song1/n2c0p3> .

@@ -1,0 +1,18 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song11d2/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song11d2 a :Effect; rdfs:label "song11d2"; :publishAttr :strength; :setting eff:set1731397, eff:set3273766, eff:set3552374, eff:set4425252, eff:set5921567, eff:set8392520 .
+eff:set1731397 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set3273766 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set3552374 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set4425252 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set5921567 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set8392520 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.3 .

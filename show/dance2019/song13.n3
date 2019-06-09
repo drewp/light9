@@ -7,7 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song13 :note <http://light9.bigasterisk.com/show/dance2019/song13/n3> .
+show:song13 :note <http://light9.bigasterisk.com/show/dance2019/song13/n3>, <http://light9.bigasterisk.com/show/dance2019/song13/n4> .
 
 <http://light9.bigasterisk.com/show/dance2019/song13/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n0c0>;
      :effectClass effect:effect4; :originTime 34.1 .
@@ -46,7 +46,17 @@ show:song13 :note <http://light9.bigasterisk.com/show/dance2019/song13/n3> .
      :point <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> .
 <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0> :time -124.784;
      :value 0 .
-<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1> :time -114.254;
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1> :time -117.001;
      :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2> :time 75.174; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> :time 76.205; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2> :time 74.801; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> :time 75.192; :value 0 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n4> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n4c0>;
+     :effectClass effect:bow; :originTime 194.466 .
+
+<http://light9.bigasterisk.com/show/dance2019/song13/n4c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song13/n4c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n4c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n4c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n4c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song13/n4c0p0> :time 0; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n4c0p1> :time 3.156; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n4c0p2> :time 9.418; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n4c0p3> :time 9.856; :value 0 .

@@ -7,7 +7,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song3 :note <http://light9.bigasterisk.com/show/dance2019/song3/n0>, <http://light9.bigasterisk.com/show/dance2019/song3/n1> .
+show:song3 :note <http://light9.bigasterisk.com/show/dance2019/song3/n0>, <http://light9.bigasterisk.com/show/dance2019/song3/n1>, <http://light9.bigasterisk.com/show/dance2019/song3/n2> .
 
 <http://light9.bigasterisk.com/show/dance2019/song3/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song3/n0c0>;
      :effectClass effect:song02; :originTime 13.948 .
@@ -16,8 +16,8 @@ show:song3 :note <http://light9.bigasterisk.com/show/dance2019/song3/n0>, <http:
      :point <http://light9.bigasterisk.com/show/dance2019/song3/n0c0p0>, <http://light9.bigasterisk.com/show/dance2019/song3/n0c0p1>, <http://light9.bigasterisk.com/show/dance2019/song3/n0c0p2>, <http://light9.bigasterisk.com/show/dance2019/song3/n0c0p3> .
 <http://light9.bigasterisk.com/show/dance2019/song3/n0c0p0> :time -10.321; :value 0 .
 <http://light9.bigasterisk.com/show/dance2019/song3/n0c0p1> :time -9.197; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song3/n0c0p2> :time 212.31; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song3/n0c0p3> :time 214.016; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n0c0p2> :time 140.557; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n0c0p3> :time 142.263; :value 0 .
 
 <http://light9.bigasterisk.com/show/dance2019/song3/n1> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song3/n1c0>;
      :effectClass effect:bow; :originTime 223.595 .
@@ -28,3 +28,13 @@ show:song3 :note <http://light9.bigasterisk.com/show/dance2019/song3/n0>, <http:
 <http://light9.bigasterisk.com/show/dance2019/song3/n1c0p1> :time 0.483; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song3/n1c0p2> :time 2.669; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song3/n1c0p3> :time 4.401; :value 0 .
+
+<http://light9.bigasterisk.com/show/dance2019/song3/n2> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song3/n2c0>;
+     :effectClass effect:song03d2; :originTime 155.057 .
+
+<http://light9.bigasterisk.com/show/dance2019/song3/n2c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song3/n2c0p0>, <http://light9.bigasterisk.com/show/dance2019/song3/n2c0p1>, <http://light9.bigasterisk.com/show/dance2019/song3/n2c0p2>, <http://light9.bigasterisk.com/show/dance2019/song3/n2c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song3/n2c0p0> :time -1.406; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n2c0p1> :time -0.402; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n2c0p2> :time 70.709; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n2c0p3> :time 72.719; :value 0 .

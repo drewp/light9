@@ -1,23 +1,47 @@
-song01: real-ish timing but with dummy look
+song01: real-ish timing
+        need to add cyc
 
 song02: small tap special? maybe mostly center?
         real-ish timing but with dummy look
+        red on cyc
+        start with 12 and make it red
 
 song03: real-ish timing but with dummy look
+        also red, maybe red cyc
+        ~154 change to new song, more upbeat
 
 song04: real-ish timing, real look
 
 song05: real-ish timing but with dummy look
+        add cyc rainbow effect
+        t=130 jump up to rainbows
+        but not full-red.
 
-song06: real-ish timing but with dummy look
+***song06: real-ish timing but with dummy look
 
-song07: fake timing for song07 and bow
+song07: real-ish timing for song07 and bow
+        basic look
+        maybe should have blacklight or equivalent?
         cyc could fade purple -> red -> orange
+        SM: low lights. purple and pinks. start in sill.
+        flute at 155- different look for this music
+        line down the center- focus on that
 
-song10: should have two different looks based on music
-        could go between song10calm and song04+something animated during bass things
+song08: real-ish timing but 2 dummy looks
 
-song12: started a small look, but might have moats we don't want
+song09: real-ish timing but dummy look
+
+song10: real-ish timing, real looks
+        song10busy could add something animated during bass things
+
+song11: real-ish timing, 2 dummy looks
+        first one is snowy, blue
+        second one could have a slow chase
+
+song12: real-ish timing, real look
+        started a small look, but might have moats we don't want
+
+song13: real look (?), real-ish timing
 
 song15: front should come on around ~177? out ~225
         could have a different look after that goes out
