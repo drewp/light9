@@ -50,8 +50,8 @@ class SubScale(tk.Scale, Fadable):
         self.scale_var = kw.get('variable') or tk.DoubleVar()
         kw.update({
             'variable': self.scale_var,
-            'from': 1,
-            'to': 0,
+            'from': 1.,
+            'to': 0.,
             'showvalue': 0,
             'sliderlength': 15,
             'res': 0.001,

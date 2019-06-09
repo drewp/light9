@@ -76,6 +76,10 @@ class Fadable:
         # variable's display instead of using Label(textvariable=var)
         # and format it there.
         self.fade_var.set(round(value, 7))
+        if self.fade_var.get() != value:
+            self.fade_var.set(value)
+        if self.fade_var.get() != value:
+            raise ValueError("doublevar won't set")
 
     def fade(self, value, length=0.5, step_time=10):
         """Fade to value in length seconds with steps every step_time
@@ -131,7 +135,7 @@ class Fadable:
             newlevel = self.fade_end_level - amount
         else:
             newlevel = self.fade_var.get() - amount
-        newlevel = max(0, newlevel)
+        newlevel = max(0., newlevel)
         self.set_volume(newlevel, length)
 
     def set_volume(self, newlevel, length=0.3):
@@ -146,12 +150,12 @@ class Fadable:
         """Toggles whether the volume is being muted."""
         if self.last_level is None:
             self.last_level = self.fade_var.get()
-            if self.last_level == 0:  # we don't want last_level to be zero,
+            if self.last_level == 0.:  # we don't want last_level to be zero,
                 # since it will make us toggle between 0
                 # and 0
-                newlevel = 1
+                newlevel = 1.
             else:
-                newlevel = 0
+                newlevel = 0.
         else:
             newlevel = self.last_level
             self.last_level = None
