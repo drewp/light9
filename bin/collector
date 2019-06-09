@@ -68,7 +68,10 @@ def launch(graph, doLoadTest=False):
         # todo: drive outputs with config files
         rate = 30
         outputs = [
-            ArtnetDmx(L9['output/dmxA/'], host='127.0.0.1', port=6445, rate=rate),
+            ArtnetDmx(L9['output/dmxA/'],
+                      host='127.0.0.1',
+                      port=6445,
+                      rate=rate),
             #DummyOutput(L9['output/dmxA/']),
         ]
     except Exception:

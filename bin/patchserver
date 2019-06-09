@@ -27,29 +27,33 @@ from rdfdb.patch import Patch
 stats = scales.collection('/webServer', scales.PmfStat('setAttr',
                                                        recalcPeriod=1))
 
+
 def launch(graph):
     if 0:
-        reactor.listenTCP(networking.captureDevice.port,
-                          cyclone.web.Application(handlers=[
-                              (r'/()', cyclone.web.StaticFileHandler, {
-                                  "path": "light9/web",
-                                  "default_filename": "patchServer.html"
-                              }),
-                              (r'/stats/(.*)', StatsHandler, {
-                                  'serverName': 'patchServer'
-                              }),
-                          ]),
-                          interface='::',
-                          )
+        reactor.listenTCP(
+            networking.captureDevice.port,
+            cyclone.web.Application(handlers=[
+                (r'/()', cyclone.web.StaticFileHandler, {
+                    "path": "light9/web",
+                    "default_filename": "patchServer.html"
+                }),
+                (r'/stats/(.*)', StatsHandler, {
+                    'serverName': 'patchServer'
+                }),
+            ]),
+            interface='::',
+        )
         log.info('serving http on %s', networking.captureDevice.port)
 
     def prn():
         width = {}
         for dc in graph.subjects(RDF.type, L9['DeviceClass']):
             for attr in graph.objects(dc, L9['attr']):
-                width[dc] = max(width.get(dc, 0), graph.value(attr, L9['dmxOffset']).toPython() + 1)
-        
-        user = {} # chan: [dev]
+                width[dc] = max(
+                    width.get(dc, 0),
+                    graph.value(attr, L9['dmxOffset']).toPython() + 1)
+
+        user = {}  # chan: [dev]
         for dev in set(graph.subjects(L9['dmxBase'], None)):
             dc = graph.value(dev, RDF.type)
             base = graph.value(dev, L9['dmxBase']).toPython()
@@ -60,8 +64,10 @@ def launch(graph):
         for chan in range(1, max(user) + 1):
             dev = user.get(chan, None)
             print(f'chan {chan} used by {dev}')
+
     graph.addHandler(prn)
-    
+
+
 def main():
     parser = optparse.OptionParser()
     parser.add_option("-v",
