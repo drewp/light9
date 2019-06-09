@@ -412,3 +412,25 @@ def effect_image(effectSettings, strength, songTime, noteTime):
         color = sample(img, x, y, effectSettings.get(L9['repeat'], False))
         out[(dev, L9['color'])] = scale(rgb_to_hex(color), scl)
     return out
+
+def effect_cyc(effectSettings, strength, songTime, noteTime):
+    colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
+    r, g, b = map(lambda x: x / 255, hex_to_rgb(colorScale))
+
+    out ={
+        (L9['theater/skyline/device/cycRed1'], L9['brightness']): r,
+        (L9['theater/skyline/device/cycRed2'], L9['brightness']): r,
+        (L9['theater/skyline/device/cycRed3'], L9['brightness']): r,
+        (L9['theater/skyline/device/cycRed4'], L9['brightness']): r,
+        (L9['theater/skyline/device/cycGreen1'], L9['brightness']): g,
+        (L9['theater/skyline/device/cycGreen2'], L9['brightness']): g,
+        (L9['theater/skyline/device/cycGreen3'], L9['brightness']): g,
+        (L9['theater/skyline/device/cycGreen4'], L9['brightness']): g,
+        (L9['theater/skyline/device/cycBlue1'], L9['brightness']): b,
+        (L9['theater/skyline/device/cycBlue2'], L9['brightness']): b,
+        (L9['theater/skyline/device/cycBlue3'], L9['brightness']): b,
+        (L9['theater/skyline/device/cycBlue4'], L9['brightness']): b,
+         
+        }
+
+    return out
