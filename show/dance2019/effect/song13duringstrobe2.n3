@@ -1,0 +1,31 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song13duringstrobe2/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song13duringstrobe2 a :Effect; rdfs:label "song13duringstrobe2"; :publishAttr :strength;
+     :setting eff:set1664540, eff:set1799172, eff:set2293721, eff:set3238909, eff:set412047, eff:set4242286, eff:set4418158, eff:set532192, eff:set5923961, eff:set6039560, eff:set6266860, eff:set6356346, eff:set6570736, eff:set6974247, eff:set7123171, eff:set820958, eff:set9529615, eff:set9842340 .
+eff:set1664540 :device dev:mid_L_blue; :deviceAttr :brightness; :scaledValue 0.349 .
+eff:set1799172 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 0.746 .
+eff:set2293721 :device dev:strip1; :deviceAttr :color; :scaledValue "#1d009d" .
+eff:set3238909 :device dev:down_C_blue; :deviceAttr :brightness; :scaledValue 0.349 .
+eff:set412047 :device dev:par6; :deviceAttr :color; :scaledValue "#04009d" .
+eff:set4242286 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 0.746 .
+eff:set4418158 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 0.349 .
+eff:set532192 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 0.746 .
+eff:set5923961 :device dev:mid_C_blue; :deviceAttr :brightness; :scaledValue 0.349 .
+eff:set6039560 :device dev:par3; :deviceAttr :color; :scaledValue "#00009d" .
+eff:set6266860 :device dev:par2; :deviceAttr :color; :scaledValue "#12009d" .
+eff:set6356346 :device dev:par4; :deviceAttr :color; :scaledValue "#0f009d" .
+eff:set6570736 :device dev:down_R_blue; :deviceAttr :brightness; :scaledValue 0.349 .
+eff:set6974247 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 0.746 .
+eff:set7123171 :device dev:strip3; :deviceAttr :color; :scaledValue "#0a009d" .
+eff:set820958 :device dev:strip2; :deviceAttr :color; :scaledValue "#00049d" .
+eff:set9529615 :device dev:par1; :deviceAttr :color; :scaledValue "#00049d" .
+eff:set9842340 :device dev:par7; :deviceAttr :color; :scaledValue "#00009d" .

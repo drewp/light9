@@ -27,21 +27,31 @@ song07: real-ish timing for song07 and bow
         flute at 155- different look for this music
         line down the center- focus on that
 
-song08: real-ish timing but 2 dummy looks
-
+song08: 
+        SM: yellow and blue. lots of kids.
+        let the lights go lower between the songs
+        made a partial look for part 1; nothing for part 2 yet.
+        
 song09: real-ish timing but dummy look
+        keep it dark, light sides.
+        
 
 song10: real-ish timing, real looks
         song10busy could add something animated during bass things
+        134 make it faster like the other txn
 
 song11: real-ish timing, 2 dummy looks
+        open upstage to just strip2
         first one is snowy, blue
         second one could have a slow chase
-
+      
 song12: real-ish timing, real look
         started a small look, but might have moats we don't want
+        why is this showing other colors on side pars?
 
 song13: real look (?), real-ish timing
+        cyc fade from blue to purple
+        
 
 song15: front should come on around ~177? out ~225
         could have a different look after that goes out
