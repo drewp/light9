@@ -38,27 +38,25 @@ class BCF2000(object):
         self.dev = None
         self.lastValue: Dict[str, int] = {} # control name : value
         self.reopen()
-        self.packet = ""
+        self.packet = b""
         loop = LoopingCall(self.poll)
         loop.start(.01)
 
     def poll(self):
         try:
-            bytes = self.dev.read(3)
+            newData = self.dev.read(3)
         except (IOError, AttributeError):
             return
-        if len(bytes) == 0:
-            print("midi stall, reopen slider device")
-            self.reopen()
+        if newData is None:
             return
-        self.packet += bytes
+        self.packet += newData
         if len(self.packet) == 3:
             p = self.packet
-            self.packet = ""
+            self.packet = b""
             self.packetReceived(p)
 
     def packetReceived(self, packet):
-        b0, which, value = [ord(b) for b in packet]
+        b0, which, value = packet
         if b0 != 0xb0:
             return
         if which in self.control:
@@ -78,7 +76,7 @@ class BCF2000(object):
                 pass
 
         self.lastValue.clear()
-        self.dev = open(self.devPath, "r+")
+        self.dev = open(self.devPath, "rb+", buffering=0)
         twisted.internet.fdesc.setNonBlocking(self.dev)
                     
     def valueIn(self, name, value):
@@ -107,7 +105,7 @@ class BCF2000(object):
         if name.startswith('button-'):
             value = value * 127
         #print "bcf: write %s %s" % (name, value)
-        self.dev.write(chr(0xb0) + chr(which[0]) + chr(int(value)))
+        self.dev.write(bytes([0xb0, which[0], int(value)]))
 
     def close(self):
         self.dev.close()
