@@ -401,7 +401,9 @@ def effect_lightning(effectSettings, strength, songTime, noteTime):
     return out
 
 
-def sample(img, x, y, repeat=False):
+def sample8(img, x, y, repeat=False):
+    if not (0 <= y < img.height):
+        return (0,0,0)
     if 0 <= x < img.width:
         return img.getpixel((x, y))
     elif not repeat:
@@ -412,18 +414,45 @@ def sample(img, x, y, repeat=False):
 
 def effect_image(effectSettings, strength, songTime, noteTime):
     out = {}
-    imgPath = f'cur/anim/{effectSettings[L9["image"]]}'
+    imageSetting = effectSettings.get(L9["image"], 'specks.png')
+    imgPath = f'cur/anim/{imageSetting}'
     t_offset = effectSettings.get(L9['tOffset'], 0)
     pxPerSec = effectSettings.get(L9['pxPerSec'], 30)
     img = Image.open(imgPath)
     x = (noteTime * pxPerSec)
+    
+    colorScale = hex_to_rgb(effectSettings.get(L9['colorScale'],
+                                               '#ffffff'))
 
-    scl = effectSettings.get(L9['strength'], 1)
     for dev, y in [(SKY['strip1'], 0),
                    (SKY['strip2'], 1),
-                   (SKY['strip3'], 2)]:
-        color = sample(img, x, y, effectSettings.get(L9['repeat'], False))
-        out[(dev, L9['color'])] = scale(rgb_to_hex(color), scl)
+                   (SKY['strip3'], 2),
+                   (SKY['par3'], 3), # dl
+                   (SKY['par4'], 4), # ul
+                   (SKY['par7'], 5), # ur
+                   (SKY['par1'], 6), # dr
+                   ('cyc1', 7),
+                   ('cyc2', 8),
+                   ('cyc3', 9),
+                   ('cyc4', 10),
+                   ('down1', 11),
+                   ('down2', 12),
+                   ('down3', 13),
+                   ('down4', 14),
+                   ('down5', 15),
+                   ('down6', 16),
+                   ('down7', 17),
+    ]:
+        color8 = sample8(img, x, y, effectSettings.get(L9['repeat'], True))
+        color = map(lambda v: v / 255 * strength, color8)
+        color = [v * cs / 255 for v, cs in zip(color, colorScale)]
+        if dev in ['cyc1', 'cyc2', 'cyc3', 'cyc4']:
+            column = dev[-1]
+            out[(SKY[f'cycRed{column}'],   L9['brightness'])] = color[0]
+            out[(SKY[f'cycGreen{column}'], L9['brightness'])] = color[1]
+            out[(SKY[f'cycBlue{column}'],  L9['brightness'])] = color[2]
+        else:
+            out[(dev, L9['color'])] = rgb_to_hex(map(_8bit, color))
     return out
 
 def effect_cyc(effectSettings, strength, songTime, noteTime):
