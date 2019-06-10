@@ -11,7 +11,6 @@ from typing import Dict, Tuple, Any
 from PIL import Image
 import random
 
-
 SKY = Namespace('http://light9.bigasterisk.com/theater/skyline/device/')
 
 random.seed(0)
@@ -63,6 +62,7 @@ def _8bit(f):
     if not isinstance(f, (int, float)):
         raise TypeError(repr(f))
     return clamp255(int(f * 255))
+
 
 class EffectEval(object):
     """
@@ -403,7 +403,7 @@ def effect_lightning(effectSettings, strength, songTime, noteTime):
 
 def sample8(img, x, y, repeat=False):
     if not (0 <= y < img.height):
-        return (0,0,0)
+        return (0, 0, 0)
     if 0 <= x < img.width:
         return img.getpixel((x, y))
     elif not repeat:
@@ -420,46 +420,47 @@ def effect_image(effectSettings, strength, songTime, noteTime):
     pxPerSec = effectSettings.get(L9['pxPerSec'], 30)
     img = Image.open(imgPath)
     x = (noteTime * pxPerSec)
-    
-    colorScale = hex_to_rgb(effectSettings.get(L9['colorScale'],
-                                               '#ffffff'))
 
-    for dev, y in [(SKY['strip1'], 0),
-                   (SKY['strip2'], 1),
-                   (SKY['strip3'], 2),
-                   (SKY['par3'], 3), # dl
-                   (SKY['par4'], 4), # ul
-                   (SKY['par7'], 5), # ur
-                   (SKY['par1'], 6), # dr
-                   ('cyc1', 7),
-                   ('cyc2', 8),
-                   ('cyc3', 9),
-                   ('cyc4', 10),
-                   ('down1', 11),
-                   ('down2', 12),
-                   ('down3', 13),
-                   ('down4', 14),
-                   ('down5', 15),
-                   ('down6', 16),
-                   ('down7', 17),
+    colorScale = hex_to_rgb(effectSettings.get(L9['colorScale'], '#ffffff'))
+
+    for dev, y in [
+        (SKY['strip1'], 0),
+        (SKY['strip2'], 1),
+        (SKY['strip3'], 2),
+        (SKY['par3'], 3),  # dl
+        (SKY['par4'], 4),  # ul
+        (SKY['par7'], 5),  # ur
+        (SKY['par1'], 6),  # dr
+        ('cyc1', 7),
+        ('cyc2', 8),
+        ('cyc3', 9),
+        ('cyc4', 10),
+        ('down1', 11),
+        ('down2', 12),
+        ('down3', 13),
+        ('down4', 14),
+        ('down5', 15),
+        ('down6', 16),
+        ('down7', 17),
     ]:
         color8 = sample8(img, x, y, effectSettings.get(L9['repeat'], True))
         color = map(lambda v: v / 255 * strength, color8)
         color = [v * cs / 255 for v, cs in zip(color, colorScale)]
         if dev in ['cyc1', 'cyc2', 'cyc3', 'cyc4']:
             column = dev[-1]
-            out[(SKY[f'cycRed{column}'],   L9['brightness'])] = color[0]
+            out[(SKY[f'cycRed{column}'], L9['brightness'])] = color[0]
             out[(SKY[f'cycGreen{column}'], L9['brightness'])] = color[1]
-            out[(SKY[f'cycBlue{column}'],  L9['brightness'])] = color[2]
+            out[(SKY[f'cycBlue{column}'], L9['brightness'])] = color[2]
         else:
             out[(dev, L9['color'])] = rgb_to_hex(map(_8bit, color))
     return out
+
 
 def effect_cyc(effectSettings, strength, songTime, noteTime):
     colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
     r, g, b = map(lambda x: strength * x / 255, hex_to_rgb(colorScale))
 
-    out ={
+    out = {
         (SKY['cycRed1'], L9['brightness']): r,
         (SKY['cycRed2'], L9['brightness']): r,
         (SKY['cycRed3'], L9['brightness']): r,
@@ -472,27 +473,28 @@ def effect_cyc(effectSettings, strength, songTime, noteTime):
         (SKY['cycBlue2'], L9['brightness']): b,
         (SKY['cycBlue3'], L9['brightness']): b,
         (SKY['cycBlue4'], L9['brightness']): b,
-         
-        }
+    }
 
     return out
 
+
 cycChase1_members = [
-       SKY['cycRed1'], 
-       SKY['cycRed2'], 
-       SKY['cycRed3'], 
-       SKY['cycRed4'], 
-       SKY['cycGreen1'], 
-       SKY['cycGreen2'], 
-       SKY['cycGreen3'], 
-       SKY['cycGreen4'], 
-       SKY['cycBlue1'], 
-       SKY['cycBlue2'], 
-       SKY['cycBlue3'], 
-       SKY['cycBlue4'],
-    ]
+    SKY['cycRed1'],
+    SKY['cycRed2'],
+    SKY['cycRed3'],
+    SKY['cycRed4'],
+    SKY['cycGreen1'],
+    SKY['cycGreen2'],
+    SKY['cycGreen3'],
+    SKY['cycGreen4'],
+    SKY['cycBlue1'],
+    SKY['cycBlue2'],
+    SKY['cycBlue3'],
+    SKY['cycBlue4'],
+]
 cycChase1_members = cycChase1_members * 20
 random.shuffle(cycChase1_members)
+
 
 def effect_cycChase1(effectSettings, strength, songTime, noteTime):
     colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
@@ -518,16 +520,20 @@ def effect_cycChase1(effectSettings, strength, songTime, noteTime):
 
 
 def effect_parNoise(effectSettings, strength, songTime, noteTime):
-    
     colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
     r, g, b = map(lambda x: x / 255, hex_to_rgb(colorScale))
     out = {}
     speed = 10
     gamma = .6
     for dev in [SKY['strip1'], SKY['strip2'], SKY['strip3']]:
-        out[(dev, L9['color'])] = scale(rgb_to_hex(
-            (_8bit(r * math.pow(max(.01, noise(speed * songTime)), gamma)),
-             _8bit(g * math.pow(max(.01, noise(speed * songTime + 10)), gamma)),
-             _8bit(b * math.pow(max(.01, noise(speed * songTime + 20)), gamma)))), strength)
+        out[(dev, L9['color'])] = scale(
+            rgb_to_hex(
+                (_8bit(r * math.pow(max(.01, noise(speed * songTime)), gamma)),
+                 _8bit(g *
+                       math.pow(max(.01, noise(speed * songTime + 10)), gamma)),
+                 _8bit(
+                     b *
+                     math.pow(max(.01, noise(speed * songTime + 20)), gamma)))),
+            strength)
 
     return out
