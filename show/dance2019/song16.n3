@@ -9,7 +9,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song16 :note song:n10, song:n11, song:n12, song:n15, song:n16, song:n17, song:n18, song:n19, song:n20, song:n21, song:n7, song:n9 .
+show:song16 :note song:n10, song:n11, song:n12, song:n15, song:n16, song:n17, song:n18, song:n19, song:n20, song:n21, song:n22, song:n23, song:n7, song:n9 .
 
 song:n0 a :Note; :curve song:n0c0; :effectClass effect:effect2; :originTime 63.273 .
 
@@ -64,8 +64,8 @@ song:n12 a :Note; :curve song:n12c0; :effectClass effect:song16jlo; :originTime 
 song:n12c0 a :Curve; :attr :strength; :point song:n12c0p0, song:n12c0p1, song:n12c0p2, song:n12c0p3 .
 song:n12c0p0 :time -6.316; :value 0 .
 song:n12c0p1 :time -4.513; :value 1 .
-song:n12c0p2 :time 35.262; :value 1 .
-song:n12c0p3 :time 52.893; :value 0 .
+song:n12c0p2 :time 162.7; :value 1 .
+song:n12c0p3 :time 180.331; :value 0 .
 
 song:n13c0 a :Curve; :attr :strength; :point song:n13c0p0, song:n13c0p1, song:n13c0p2, song:n13c0p3 .
 song:n13c0p0 :time 0; :value 0 .
@@ -83,36 +83,36 @@ song:n15 a :Note; :curve song:n15c0; :effectClass effect:image; :originTime 294.
      :setting song:n15set0 .
 
 song:n15c0 a :Curve; :attr :strength; :point song:n15c0p0, song:n15c0p1, song:n15c0p2, song:n15c0p3 .
-song:n15c0p0 :time 0; :value 0 .
-song:n15c0p1 :time 40.928; :value 1 .
-song:n15c0p2 :time 71.617; :value 1 .
-song:n15c0p3 :time 74.207; :value 0 .
+song:n15c0p0 :time -9.409; :value 0 .
+song:n15c0p1 :time 12.352; :value 1 .
+song:n15c0p2 :time 66.585; :value 1 .
+song:n15c0p3 :time 77.185; :value 0 .
 song:n15set0 :effectAttr :colorScale; :value "#fff312" .
 
 song:n16 a :Note; :curve song:n16c0; :effectClass effect:image; :originTime 400.422;
      :setting song:n16set0 .
 
 song:n16c0 a :Curve; :attr :strength; :point song:n16c0p0, song:n16c0p1, song:n16c0p2, song:n16c0p3 .
-song:n16c0p0 :time -34.48; :value 0 .
-song:n16c0p1 :time -31.093; :value 1 .
-song:n16c0p2 :time 40.939; :value 1 .
-song:n16c0p3 :time 50.56; :value 0 .
+song:n16c0p0 :time -38.999; :value 0 .
+song:n16c0p1 :time -29.142; :value 1 .
+song:n16c0p2 :time 37.544; :value 1 .
+song:n16c0p3 :time 43.126; :value 0 .
 song:n16set0 :effectAttr :colorScale; :value "#4400ff" .
 
 song:n17 a :Note; :curve song:n17c0; :effectClass effect:image; :originTime 445.088 .
 
 song:n17c0 a :Curve; :attr :strength; :point song:n17c0p0, song:n17c0p1, song:n17c0p2, song:n17c0p3 .
-song:n17c0p0 :time -4.266; :value 0 .
-song:n17c0p1 :time 1.56; :value 1 .
-song:n17c0p2 :time 112.819; :value 1 .
-song:n17c0p3 :time 114.006; :value 0 .
+song:n17c0p0 :time -7.017; :value 0 .
+song:n17c0p1 :time 3.843; :value 1 .
+song:n17c0p2 :time 107.243; :value 1 .
+song:n17c0p3 :time 107.36; :value 0 .
 
 song:n18 a :Note; :curve song:n18c0; :effectClass effect:bow; :originTime 556.633 .
 
 song:n18c0 a :Curve; :attr :strength; :point song:n18c0p0, song:n18c0p1, song:n18c0p2, song:n18c0p3 .
-song:n18c0p0 :time -3.613; :value 0 .
+song:n18c0p0 :time -4.622; :value 0 .
 song:n18c0p1 :time 1.242; :value 1 .
-song:n18c0p2 :time 0.847; :value 1 .
+song:n18c0p2 :time -4.549; :value 1 .
 song:n18c0p3 :time 1.954; :value 0 .
 
 song:n19 a :Note; :curve song:n19c0; :effectClass effect:song16p2; :originTime 63.256 .
@@ -140,17 +140,33 @@ song:n20c0p3 :time 71.867; :value 0 .
 song:n20s1 :effectAttr :image; :value "specks.png" .
 song:n20set0 :effectAttr :colorScale; :value "#ffd7d4" .
 
-song:n21 a :Note; :curve song:n21c0; :effectClass effect:image; :originTime 152.568 ; :setting song:n21s1, song:n21s2, song:n21s3.
-
-song:n21s1 :effectAttr :image; :value "burstgradient.png" .
-song:n21s2 :effectAttr :pxPerSec; :value 60 .
-song:n21s3 :effectAttr :tOffset; :value 0 .
+song:n21 a :Note; :curve song:n21c0; :effectClass effect:image; :originTime 152.568;
+     :setting song:n21s1, song:n21s2, song:n21s3 .
 
 song:n21c0 a :Curve; :attr :strength; :point song:n21c0p0, song:n21c0p1, song:n21c0p2, song:n21c0p3 .
 song:n21c0p0 :time 0; :value 0 .
 song:n21c0p1 :time 1.518; :value 1 .
-song:n21c0p2 :time 13.244; :value 1 .
-song:n21c0p3 :time 14.762; :value 0 .
+song:n21c0p2 :time 28.033; :value 1 .
+song:n21c0p3 :time 29.551; :value 0 .
+song:n21s1 :effectAttr :image; :value "burstgradient.png" .
+song:n21s2 :effectAttr :pxPerSec; :value 60 .
+song:n21s3 :effectAttr :tOffset; :value 0 .
+
+song:n22 a :Note; :curve song:n22c0; :effectClass effect:effect22; :originTime 490.171 .
+
+song:n22c0 a :Curve; :attr :strength; :point song:n22c0p0, song:n22c0p1, song:n22c0p2, song:n22c0p3 .
+song:n22c0p0 :time -0.75; :value 0 .
+song:n22c0p1 :time -0.127; :value 1 .
+song:n22c0p2 :time 20.981; :value 1 .
+song:n22c0p3 :time 23.582; :value 0 .
+
+song:n23 a :Note; :curve song:n23c0; :effectClass effect:song16p2; :originTime 526.881 .
+
+song:n23c0 a :Curve; :attr :strength; :point song:n23c0p0, song:n23c0p1, song:n23c0p2, song:n23c0p3 .
+song:n23c0p0 :time -15.058; :value 0 .
+song:n23c0p1 :time -11.864; :value 1 .
+song:n23c0p2 :time 30.953; :value 1 .
+song:n23c0p3 :time 31.678; :value 0 .
 
 song:n2c0 a :Curve; :attr :strength; :point song:n2c0p0, song:n2c0p1, song:n2c0p2, song:n2c0p3 .
 song:n2c0p0 :time 1.364; :value 0 .

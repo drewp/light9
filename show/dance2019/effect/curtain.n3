@@ -9,10 +9,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:curtain a :Effect; rdfs:label "curtain"; :publishAttr :strength; :setting eff:set31286, eff:set3529883, eff:set5102511, eff:set57762, eff:set682070, eff:set783078 .
-eff:set31286 :device dev:down7; :deviceAttr :brightness; :scaledValue 1 .
+effect:curtain a :Effect; rdfs:label "curtain"; :publishAttr :strength; :setting eff:set3529883, eff:set5102511, eff:set783078, effect:curtain_set3 .
 eff:set3529883 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
-eff:set5102511 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
-eff:set57762 :device dev:down1; :deviceAttr :brightness; :scaledValue 1 .
-eff:set682070 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
-eff:set783078 :device dev:down6; :deviceAttr :brightness; :scaledValue 1 .
+eff:set5102511 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.374 .
+eff:set783078 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.674 .
+effect:curtain_set3 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.128 .
