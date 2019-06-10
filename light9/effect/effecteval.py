@@ -457,7 +457,7 @@ def effect_image(effectSettings, strength, songTime, noteTime):
 
 def effect_cyc(effectSettings, strength, songTime, noteTime):
     colorScale = effectSettings.get(L9['colorScale'], '#ffffff')
-    r, g, b = map(lambda x: x / 255, hex_to_rgb(colorScale))
+    r, g, b = map(lambda x: strength * x / 255, hex_to_rgb(colorScale))
 
     out ={
         (SKY['cycRed1'], L9['brightness']): r,
