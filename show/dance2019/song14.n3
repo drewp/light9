@@ -37,7 +37,7 @@ show:song14 :note <http://light9.bigasterisk.com/show/dance2019/song14/n0>, <htt
 <http://light9.bigasterisk.com/show/dance2019/song14/n2c0p0> :time -4.336; :value 0 .
 <http://light9.bigasterisk.com/show/dance2019/song14/n2c0p1> :time -1.438; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song14/n2c0p2> :time 2.987; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song14/n2c0p3> :time 3.685; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song14/n2c0p3> :time 5.916; :value 0 .
 
 <http://light9.bigasterisk.com/show/dance2019/song14/n3> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song14/n3c0>;
      :effectClass effect:image; :originTime 14.335; :setting <http://light9.bigasterisk.com/show/dance2019/song14/n3s0> .
