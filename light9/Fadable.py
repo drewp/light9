@@ -78,8 +78,10 @@ class Fadable:
         self.fade_var.set(round(value, 7))
         if self.fade_var.get() != value:
             self.fade_var.set(value)
-        if self.fade_var.get() != value:
-            raise ValueError("doublevar won't set")
+        if abs(self.fade_var.get() - value) > .1:
+            raise ValueError(
+                "doublevar won't set- trying %r but it stays at %r" %
+                (value, self.fade_var.get()))
 
     def fade(self, value, length=0.5, step_time=10):
         """Fade to value in length seconds with steps every step_time
