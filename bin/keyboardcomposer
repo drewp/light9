@@ -301,7 +301,7 @@ class KeyboardComposer(tk.Frame, SubClient):
                                self.graph.label(effect), effect))
         withgroups.sort()
 
-        log.info("withgroups %s", withgroups)
+        log.debug("withgroups %s", withgroups)
 
         self.effectEval: Dict[URIRef, light9.effect.effecteval.EffectEval] = {}
         imp.reload(light9.effect.effecteval)
@@ -335,12 +335,13 @@ class KeyboardComposer(tk.Frame, SubClient):
         self.rows[self.current_row].focus()
 
     def connect_to_hw(self, hw_sliders):
+        log.info('connect_to_hw')
         if hw_sliders:
             try:
                 self.sliders = Sliders(self)
                 log.info("connected to sliders")
-            except IOError:
-                log.info("no hardware sliders")
+            except IOError as e:
+                log.info("no hardware sliders %r", e)
                 self.sliders = DummySliders()
                 self.use_hw_sliders = False
             dispatcher.connect(self.send_to_hw, 'send_to_hw')
@@ -469,7 +470,7 @@ class KeyboardComposer(tk.Frame, SubClient):
                 self.pendingHwSet.cancel()
             except twisted.internet.error.AlreadyCalled:
                 pass
-        self.pendingHwSet = reactor.callLater(.01, subbox.safeSliderSet, value)
+        self.pendingHwSet = reactor.callLater(.01, subbox.setVal, value)
 
     def send_to_hw(self, sub, hwCol, boxRow):
         if isinstance(self.sliders, DummySliders):
@@ -624,6 +625,7 @@ class Sliders(BCF2000):
         ]
         for dev in devices:
             try:
+                log.info('try sliders on %s', dev)
                 BCF2000.__init__(self, dev=dev)
             except IOError:
                 if dev is devices[-1]:
@@ -688,7 +690,7 @@ if __name__ == "__main__":
     parser.add_option('-v', action='store_true', help="log info level")
     opts, args = parser.parse_args()
 
-    log.setLevel(logging.DEBUG if opts.v else logging.WARN)
+    log.setLevel(logging.DEBUG if opts.v else logging.INFO)
     logging.getLogger('colormath').setLevel(logging.INFO)
 
     graph = SyncedGraph(networking.rdfdb.url, "keyboardcomposer")
