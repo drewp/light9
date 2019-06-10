@@ -11,9 +11,11 @@ done:
         10
         11 except for motion bounce (optional)
         12
-        13 but image poorly tested
+        13
         14
         15
+       UH OH
+        17
 
 song01: real-ish timing
         need to add cyc

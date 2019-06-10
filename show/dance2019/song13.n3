@@ -110,16 +110,18 @@ show:song13 :note <http://light9.bigasterisk.com/show/dance2019/song13/n10>, <ht
 <http://light9.bigasterisk.com/show/dance2019/song13/n7c0p3> :time 12.933; :value 0 .
 
 <http://light9.bigasterisk.com/show/dance2019/song13/n8> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song13/n8c0>;
-     :effectClass effect:image; :originTime 35.082; :setting <http://light9.bigasterisk.com/show/dance2019/song13/n8s0> .
+     :effectClass effect:image; :originTime 35.082; :setting <http://light9.bigasterisk.com/show/dance2019/song13/n8s0>, <http://light9.bigasterisk.com/show/dance2019/song13/n8set0> .
 
-<http://light9.bigasterisk.com/show/dance2019/song13/n8s0> :effectAttr :image;
-     :value "cyctwinkle.png" .
 <http://light9.bigasterisk.com/show/dance2019/song13/n8c0> a :Curve; :attr :strength;
-      :point <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p3> .
+     :point <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p3> .
 <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p0> :time -30.683; :value 0 .
 <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p1> :time -24.022; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p2> :time 96.461; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song13/n8c0p3> :time 96.486; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song13/n8s0> :effectAttr :image;
+     :value "cyctwinkle.png" .
+<http://light9.bigasterisk.com/show/dance2019/song13/n8set0> :effectAttr :colorScale;
+     :value "#00ffff" .
 
 <http://light9.bigasterisk.com/show/dance2019/song13/n9c0> a :Curve; :attr :strength;
      :point <http://light9.bigasterisk.com/show/dance2019/song13/n9c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n9c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n9c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n9c0p3> .

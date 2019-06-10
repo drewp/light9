@@ -7,3 +7,9 @@ e:cyc a :Effect ; rdfs:label "cyc".
 e:cycChase1 a :Effect ; rdfs:label "cycChase1".
 e:parNoise a :Effect ; rdfs:label "parNoise".
 e:image a :Effect ; rdfs:label "image".
+
+e:effect13 :group "main"; :order 1 .
+e:cyc      :group "main"; :order 2 .
+e:effect1  :group "main"; :order 3 .
+e:curtain  :group "main"; :order 4 .
+e:effect2  :group "main"; :order 5 .
