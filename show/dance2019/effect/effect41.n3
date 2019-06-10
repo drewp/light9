@@ -1,0 +1,22 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:effect41 a :Effect; rdfs:label "song06"; :publishAttr :strength; :setting effect:effect41_set1, effect:effect41_set10, effect:effect41_set11, effect:effect41_set2, effect:effect41_set3, effect:effect41_set4, effect:effect41_set5, effect:effect41_set6, effect:effect41_set7, effect:effect41_set8, effect:effect41_set9 .
+effect:effect41_set1 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 0.966 .
+effect:effect41_set10 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.235 .
+effect:effect41_set11 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.306 .
+effect:effect41_set2 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect41_set3 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect41_set4 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect41_set5 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.317 .
+effect:effect41_set6 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.317 .
+effect:effect41_set7 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.185 .
+effect:effect41_set8 :device dev:cycRed4; :deviceAttr :brightness; :scaledValue 0.239 .
+effect:effect41_set9 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.343 .

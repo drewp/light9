@@ -1,0 +1,32 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song02help2/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song02help2 a :Effect; rdfs:label "song02help2"; :publishAttr :strength;
+     :setting eff:set2927093, eff:set6544100, eff:set6660109, eff:set8747228, eff:set891878, eff:set9085531, effect:song02help2_set0, effect:song02help2_set1, effect:song02help2_set10, effect:song02help2_set11, effect:song02help2_set2, effect:song02help2_set3, effect:song02help2_set5, effect:song02help2_set6, effect:song02help2_set7, effect:song02help2_set9 .
+eff:set2927093 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
+eff:set6544100 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
+eff:set6660109 :device dev:down7; :deviceAttr :brightness; :scaledValue 1 .
+eff:set8747228 :device dev:down1; :deviceAttr :brightness; :scaledValue 1 .
+eff:set891878 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
+eff:set9085531 :device dev:down6; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02help2_set0 :device dev:cycRed1; :deviceAttr :brightness; :scaledValue 0.958 .
+effect:song02help2_set1 :device dev:cycRed4; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02help2_set10 :device dev:strip3; :deviceAttr :color; :scaledValue "#a00000" .
+effect:song02help2_set11 :device dev:strip1; :deviceAttr :color; :scaledValue "#9e0f00" .
+effect:song02help2_set2 :device dev:cycRed2; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02help2_set3 :device dev:cycRed3; :deviceAttr :brightness; :scaledValue 1 .
+effect:song02help2_set5 :device dev:moat_right_red; :deviceAttr :brightness;
+     :scaledValue 1 .
+effect:song02help2_set6 :device dev:tree_down_L_low; :deviceAttr :brightness;
+     :scaledValue 0.532 .
+effect:song02help2_set7 :device dev:moat_left_down_red; :deviceAttr :brightness;
+     :scaledValue 0.682 .
+effect:song02help2_set9 :device dev:strip2; :deviceAttr :color; :scaledValue "#893000" .

@@ -44,9 +44,9 @@ show:song13 :note <http://light9.bigasterisk.com/show/dance2019/song13/n3>, <htt
 
 <http://light9.bigasterisk.com/show/dance2019/song13/n3c0> a :Curve; :attr :strength;
      :point <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2>, <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> .
-<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0> :time -124.784;
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p0> :time -126.754;
      :value 0 .
-<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1> :time -117.001;
+<http://light9.bigasterisk.com/show/dance2019/song13/n3c0p1> :time -118.478;
      :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p2> :time 2.405; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song13/n3c0p3> :time 2.796; :value 0 .

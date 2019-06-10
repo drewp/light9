@@ -9,4 +9,21 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:song03d2 a :Effect; rdfs:label "song03d2"; :publishAttr :strength .
+effect:song03d2 a :Effect; rdfs:label "song03d2"; :publishAttr :strength; :setting effect:song03d2_set0, effect:song03d2_set1, effect:song03d2_set10, effect:song03d2_set11, effect:song03d2_set12, effect:song03d2_set13, effect:song03d2_set14, effect:song03d2_set15, effect:song03d2_set16, effect:song03d2_set2, effect:song03d2_set3, effect:song03d2_set4, effect:song03d2_set5, effect:song03d2_set6, effect:song03d2_set7, effect:song03d2_set8, effect:song03d2_set9 .
+effect:song03d2_set0 :device dev:par1; :deviceAttr :color; :scaledValue "#ff0011" .
+effect:song03d2_set1 :device dev:par3; :deviceAttr :color; :scaledValue "#ff0400" .
+effect:song03d2_set10 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.837 .
+effect:song03d2_set11 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.736 .
+effect:song03d2_set12 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.624 .
+effect:song03d2_set13 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.647 .
+effect:song03d2_set14 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.593 .
+effect:song03d2_set15 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.604 .
+effect:song03d2_set16 :device dev:moat_right_red; :deviceAttr :brightness; :scaledValue 0.468 .
+effect:song03d2_set2 :device dev:par4; :deviceAttr :color; :scaledValue "#ff1e00" .
+effect:song03d2_set3 :device dev:par7; :deviceAttr :color; :scaledValue "#ff0800" .
+effect:song03d2_set4 :device dev:mid_CL_red; :deviceAttr :brightness; :scaledValue 0.759 .
+effect:song03d2_set5 :device dev:mid_CR_red; :deviceAttr :brightness; :scaledValue 0.805 .
+effect:song03d2_set6 :device dev:down_CL_red; :deviceAttr :brightness; :scaledValue 0.769 .
+effect:song03d2_set7 :device dev:down_CR_red; :deviceAttr :brightness; :scaledValue 0.828 .
+effect:song03d2_set8 :device dev:cycRed4; :deviceAttr :brightness; :scaledValue 1 .
+effect:song03d2_set9 :device dev:cycRed1; :deviceAttr :brightness; :scaledValue 1 .

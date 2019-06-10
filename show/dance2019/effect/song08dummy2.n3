@@ -10,10 +10,31 @@
 
 
 effect:song08dummy2 a :Effect; rdfs:label "song08dummy2"; :publishAttr :strength;
-     :setting eff:set17095, eff:set264481, eff:set402270, eff:set4135193, eff:set428404, eff:set8589750 .
-eff:set17095 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set402270 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set4135193 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set428404 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set8589750 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.3 .
+     :setting eff:set264481, eff:set402270, effect:song08dummy2_set10, effect:song08dummy2_set11, effect:song08dummy2_set12, effect:song08dummy2_set13, effect:song08dummy2_set14, effect:song08dummy2_set16, effect:song08dummy2_set17, effect:song08dummy2_set19, effect:song08dummy2_set20, effect:song08dummy2_set21, effect:song08dummy2_set22, effect:song08dummy2_set23, effect:song08dummy2_set24, effect:song08dummy2_set25, effect:song08dummy2_set26, effect:song08dummy2_set27, effect:song08dummy2_set29, effect:song08dummy2_set30, effect:song08dummy2_set31, effect:song08dummy2_set4, effect:song08dummy2_set5, effect:song08dummy2_set6, effect:song08dummy2_set7, effect:song08dummy2_set8, effect:song08dummy2_set9 .
+eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.881 .
+eff:set402270 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.87 .
+effect:song08dummy2_set10 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 0.886 .
+effect:song08dummy2_set11 :device dev:down_CL_red; :deviceAttr :brightness; :scaledValue 0.29 .
+effect:song08dummy2_set12 :device dev:down_CR_red; :deviceAttr :brightness; :scaledValue 0.329 .
+effect:song08dummy2_set13 :device dev:down_R_blue; :deviceAttr :brightness; :scaledValue 0.719 .
+effect:song08dummy2_set14 :device dev:mid_C_blue; :deviceAttr :brightness; :scaledValue 0.665 .
+effect:song08dummy2_set16 :device dev:cycRed1; :deviceAttr :brightness; :scaledValue 0.245 .
+effect:song08dummy2_set17 :device dev:cycRed2; :deviceAttr :brightness; :scaledValue 0.196 .
+effect:song08dummy2_set19 :device dev:cycRed4; :deviceAttr :brightness; :scaledValue 0.212 .
+effect:song08dummy2_set20 :device dev:strip1; :deviceAttr :color; :scaledValue "#59561d" .
+effect:song08dummy2_set21 :device dev:strip3; :deviceAttr :color; :scaledValue "#8f893b" .
+effect:song08dummy2_set22 :device dev:strip2; :deviceAttr :color; :scaledValue "#535512" .
+effect:song08dummy2_set23 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.628 .
+effect:song08dummy2_set24 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.597 .
+effect:song08dummy2_set25 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.681 .
+effect:song08dummy2_set26 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.525 .
+effect:song08dummy2_set27 :device dev:par3; :deviceAttr :color; :scaledValue "#ffae00" .
+effect:song08dummy2_set29 :device dev:par1; :deviceAttr :color; :scaledValue "#eeff00" .
+effect:song08dummy2_set30 :device dev:par4; :deviceAttr :color; :scaledValue "#ddff00" .
+effect:song08dummy2_set31 :device dev:par7; :deviceAttr :color; :scaledValue "#ffff00" .
+effect:song08dummy2_set4 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 1 .
+effect:song08dummy2_set5 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 0.543 .
+effect:song08dummy2_set6 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 0.871 .
+effect:song08dummy2_set7 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 1 .
+effect:song08dummy2_set8 :device dev:mid_CL_red; :deviceAttr :brightness; :scaledValue 0.171 .
+effect:song08dummy2_set9 :device dev:down_C_blue; :deviceAttr :brightness; :scaledValue 0.749 .

@@ -1,0 +1,28 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:effect39 a :Effect; rdfs:label "song15moondance"; :publishAttr :strength;
+     :setting effect:effect39_set0, effect:effect39_set1, effect:effect39_set10, effect:effect39_set11, effect:effect39_set12, effect:effect39_set13, effect:effect39_set14, effect:effect39_set15, effect:effect39_set2, effect:effect39_set3, effect:effect39_set4, effect:effect39_set5, effect:effect39_set6, effect:effect39_set7, effect:effect39_set8, effect:effect39_set9 .
+effect:effect39_set0 :device dev:par1; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:effect39_set1 :device dev:par3; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:effect39_set10 :device dev:mid_L_blue; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect39_set11 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.121 .
+effect:effect39_set12 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.222 .
+effect:effect39_set13 :device dev:strip2; :deviceAttr :color; :scaledValue "#44009d" .
+effect:effect39_set14 :device dev:strip3; :deviceAttr :color; :scaledValue "#14003a" .
+effect:effect39_set15 :device dev:strip1; :deviceAttr :color; :scaledValue "#0b096d" .
+effect:effect39_set2 :device dev:par4; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:effect39_set3 :device dev:par7; :deviceAttr :color; :scaledValue "#ffffff" .
+effect:effect39_set4 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect39_set5 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 0.815 .
+effect:effect39_set6 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 0.935 .
+effect:effect39_set7 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 0.878 .
+effect:effect39_set8 :device dev:down_C_blue; :deviceAttr :brightness; :scaledValue 0.896 .
+effect:effect39_set9 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 0.928 .

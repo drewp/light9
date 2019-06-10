@@ -9,10 +9,26 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:song11d a :Effect; rdfs:label "song11d"; :publishAttr :strength; :setting eff:set17095, eff:set264481, eff:set402270, eff:set4135193, eff:set428404, eff:set8589750 .
+effect:song11d a :Effect; rdfs:label "song11part1"; :publishAttr :strength; :setting eff:set17095, eff:set264481, eff:set402270, eff:set4135193, eff:set428404, eff:set8589750, effect:song11d_set0, effect:song11d_set1, effect:song11d_set10, effect:song11d_set11, effect:song11d_set12, effect:song11d_set15, effect:song11d_set18, effect:song11d_set2, effect:song11d_set3, effect:song11d_set4, effect:song11d_set5, effect:song11d_set6, effect:song11d_set7, effect:song11d_set8, effect:song11d_set9 .
 eff:set17095 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.259 .
 eff:set402270 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set4135193 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set428404 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set8589750 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.3 .
+eff:set4135193 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.333 .
+eff:set428404 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.256 .
+eff:set8589750 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.162 .
+effect:song11d_set0 :device dev:cross_down_L; :deviceAttr :brightness; :scaledValue 0.326 .
+effect:song11d_set1 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 1 .
+effect:song11d_set10 :device dev:tree_up_R_low; :deviceAttr :brightness; :scaledValue 0.291 .
+effect:song11d_set11 :device dev:tree_up_R_high; :deviceAttr :brightness; :scaledValue 0.813 .
+effect:song11d_set12 :device dev:tree_up_L_low; :deviceAttr :brightness; :scaledValue 0.435 .
+effect:song11d_set15 :device dev:tree_down_L_high; :deviceAttr :brightness; :scaledValue 0.617 .
+effect:song11d_set18 :device dev:cross_down_R; :deviceAttr :brightness; :scaledValue 0.238 .
+effect:song11d_set2 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 1 .
+effect:song11d_set3 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 1 .
+effect:song11d_set4 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 1 .
+effect:song11d_set5 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 0.632 .
+effect:song11d_set6 :device dev:moat_right_red; :deviceAttr :brightness; :scaledValue 0.385 .
+effect:song11d_set7 :device dev:moat_left_up_red; :deviceAttr :brightness; :scaledValue 0.32 .
+effect:song11d_set8 :device dev:moat_left_down_red; :deviceAttr :brightness;
+     :scaledValue 0.499 .
+effect:song11d_set9 :device dev:tree_up_L_high; :deviceAttr :brightness; :scaledValue 0.783 .

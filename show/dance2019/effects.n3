@@ -6,3 +6,4 @@
 e:cyc a :Effect ; rdfs:label "cyc".
 e:cycChase1 a :Effect ; rdfs:label "cycChase1".
 e:parNoise a :Effect ; rdfs:label "parNoise".
+e:image a :Effect ; rdfs:label "image".

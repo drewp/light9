@@ -8,7 +8,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:effect30 a :Effect; rdfs:label "song12"; :publishAttr :strength; :setting effect:effect30_set0, effect:effect30_set10, effect:effect30_set11, effect:effect30_set12, effect:effect30_set13, effect:effect30_set14, effect:effect30_set15, effect:effect30_set16, effect:effect30_set17, effect:effect30_set18, effect:effect30_set19, effect:effect30_set33, effect:effect30_set34, effect:effect30_set7, effect:effect30_set8, effect:effect30_set9 .
+effect:effect30 a :Effect; rdfs:label "song12"; :publishAttr :strength; :setting effect:effect30_set0, effect:effect30_set10, effect:effect30_set11, effect:effect30_set12, effect:effect30_set13, effect:effect30_set14, effect:effect30_set15, effect:effect30_set16, effect:effect30_set17, effect:effect30_set18, effect:effect30_set23, effect:effect30_set24, effect:effect30_set26, effect:effect30_set27, effect:effect30_set28, effect:effect30_set33, effect:effect30_set34, effect:effect30_set7, effect:effect30_set8, effect:effect30_set9 .
 effect:effect30_set0 :device dev:moat_right_red; :deviceAttr :brightness; :scaledValue 0.179 .
 effect:effect30_set10 :device dev:tree_down_R_high; :deviceAttr :brightness;
      :scaledValue 0.984 .
@@ -21,8 +21,11 @@ effect:effect30_set15 :device dev:tree_down_R_low; :deviceAttr :brightness; :sca
 effect:effect30_set16 :device dev:cycGreen4; :deviceAttr :brightness; :scaledValue 1 .
 effect:effect30_set17 :device dev:tree_up_L_low; :deviceAttr :brightness; :scaledValue 0.163 .
 effect:effect30_set18 :device dev:tree_up_R_low; :deviceAttr :brightness; :scaledValue 0.573 .
-effect:effect30_set19 :device dev:moat_left_down_red; :deviceAttr :brightness;
-     :scaledValue 0.334 .
+effect:effect30_set23 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
+effect:effect30_set24 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.598 .
+effect:effect30_set26 :device dev:cross_down_L; :deviceAttr :brightness; :scaledValue 0.819 .
+effect:effect30_set27 :device dev:cross_down_R; :deviceAttr :brightness; :scaledValue 0.631 .
+effect:effect30_set28 :device dev:strip2; :deviceAttr :color; :scaledValue "#034b00" .
 effect:effect30_set33 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.933 .
 effect:effect30_set34 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.839 .
 effect:effect30_set7 :device dev:cycGreen3; :deviceAttr :brightness; :scaledValue 1 .

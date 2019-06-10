@@ -1,23 +1,39 @@
+done:
+        2
+        4
+        6
+        7
+        10
+        12
+        15
+
 song01: real-ish timing
         need to add cyc
 
 song02: small tap special? maybe mostly center?
-        real-ish timing but with dummy look
+        real timing, real looks
         red on cyc
         start with 12 and make it red
 
 song03: real-ish timing but with dummy look
         also red, maybe red cyc
+    !!! first look completely untested
         ~154 change to new song, more upbeat
 
 song04: real-ish timing, real look
 
 song05: real-ish timing but with dummy look
+    !!! completely untested look song05
         add cyc rainbow effect
         t=130 jump up to rainbows
         but not full-red.
+            when does it go out???
 
-***song06: real-ish timing but with dummy look
+song06: real timing, real looks
+        SM: blues preferred throughout
+        t=222 goto blacklight
+        238 fade start for end of blacklight
+        wade-in-water song 250- keep blues on them to catch scarves
 
 song07: real-ish timing for song07 and bow
         basic look
@@ -36,14 +52,18 @@ song09: real-ish timing but dummy look
         keep it dark, light sides.
         
 
-song10: real-ish timing, real looks
+song10: real timing, real looks
         song10busy could add something animated during bass things
+              (done)
         134 make it faster like the other txn
+              (done)
 
-song11: real-ish timing, 2 dummy looks
+song11: real timing, real looks
         open upstage to just strip2
         first one is snowy, blue
         second one could have a slow chase
+
+        ~130 add something for dance motion bouncing
       
 song12: real-ish timing, real look
         started a small look, but might have moats we don't want
@@ -51,13 +71,18 @@ song12: real-ish timing, real look
 
 song13: real look (?), real-ish timing
         cyc fade from blue to purple
+
+song14: 
+        pulsing cyc colors for the disco
+        guitar at 77
+        there's some group-by-group stuff at the end. SM: "three finishes"        
         
-
 song15: front should come on around ~177? out ~225
-        could have a different look after that goes out
-        bow timing is rough
+        song15front should have a cyc chase. random order + colors
+        dim at 219 so we can punch bright on the new band hit
+        297 fade lights down as their dance fizzles out, then bring up the bow
 
-song16: add cyc around ~90
+***song16: add cyc around ~90
         ~336 strobe on
         366 song change
         ~410 center pool
@@ -65,3 +90,5 @@ song16: add cyc around ~90
             red cyc, fronts, down c
 
 song17: start less colorful and build?
+        timing at end for brightest2 needs work
+        cyc rainbow for bow?

@@ -12,9 +12,9 @@
 effect:song07open a :Effect; rdfs:label "song07open"; :publishAttr :strength;
      :setting eff:set2021079, eff:set4219257, eff:set4269590, eff:set4655933, eff:set5371473, eff:set6109074, eff:set8313325 .
 eff:set2021079 :device dev:par7; :deviceAttr :color; :scaledValue "#ff00fb" .
-eff:set4219257 :device dev:strip1; :deviceAttr :color; :scaledValue "#ff00d4" .
-eff:set4269590 :device dev:strip3; :deviceAttr :color; :scaledValue "#ff00c3" .
-eff:set4655933 :device dev:strip2; :deviceAttr :color; :scaledValue "#ff0040" .
+eff:set4219257 :device dev:strip1; :deviceAttr :color; :scaledValue "#570049" .
+eff:set4269590 :device dev:strip3; :deviceAttr :color; :scaledValue "#38002b" .
+eff:set4655933 :device dev:strip2; :deviceAttr :color; :scaledValue "#440012" .
 eff:set5371473 :device dev:par1; :deviceAttr :color; :scaledValue "#ff00ae" .
 eff:set6109074 :device dev:par4; :deviceAttr :color; :scaledValue "#ff00ff" .
-eff:set8313325 :device dev:par3; :deviceAttr :color; :scaledValue "#ffffff" .
+eff:set8313325 :device dev:par3; :deviceAttr :color; :scaledValue "#ff00d9" .

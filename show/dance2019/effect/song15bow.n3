@@ -9,8 +9,8 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:song15bow a :Effect; rdfs:label "song15bow"; :publishAttr :strength; :setting eff:set1253847, eff:set139686, eff:set1750710, eff:set1951759, eff:set3460073, eff:set3904679, eff:set4210944, eff:set4559798, eff:set6360915, eff:set7562612, eff:set7769468, eff:set8887571, eff:set9258731, eff:set9795219, eff:set9937750, eff:set999418 .
-eff:set1253847 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.35 .
+effect:song15bow a :Effect; rdfs:label "song15bow"; :publishAttr :strength; :setting eff:set1253847, eff:set139686, eff:set1750710, eff:set1951759, eff:set3460073, eff:set3904679, eff:set4210944, eff:set4559798, eff:set6360915, eff:set7562612, eff:set7769468, eff:set8887571, eff:set9258731, eff:set9795219, eff:set9937750, eff:set999418, effect:song15bow_set0, effect:song15bow_set1, effect:song15bow_set2 .
+eff:set1253847 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
 eff:set139686 :device dev:tree_up_L_low; :deviceAttr :brightness; :scaledValue 0.5 .
 eff:set1750710 :device dev:tree_down_L_low; :deviceAttr :brightness; :scaledValue 0.45 .
 eff:set1951759 :device dev:strip2; :deviceAttr :color; :scaledValue "#8c8c8c" .
@@ -20,9 +20,12 @@ eff:set4210944 :device dev:cross_up_R; :deviceAttr :brightness; :scaledValue 1 .
 eff:set4559798 :device dev:cycRed3; :deviceAttr :brightness; :scaledValue 1 .
 eff:set6360915 :device dev:cycRed2; :deviceAttr :brightness; :scaledValue 1 .
 eff:set7562612 :device dev:strip3; :deviceAttr :color; :scaledValue "#8c8c8c" .
-eff:set7769468 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.35 .
+eff:set7769468 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
 eff:set8887571 :device dev:strip1; :deviceAttr :color; :scaledValue "#8c8c8c" .
 eff:set9258731 :device dev:tree_down_R_low; :deviceAttr :brightness; :scaledValue 0.5 .
-eff:set9795219 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.35 .
+eff:set9795219 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
 eff:set9937750 :device dev:cycRed1; :deviceAttr :brightness; :scaledValue 1 .
 eff:set999418 :device dev:cross_up_L; :deviceAttr :brightness; :scaledValue 1 .
+effect:song15bow_set0 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.493 .
+effect:song15bow_set1 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.664 .
+effect:song15bow_set2 :device dev:down6; :deviceAttr :brightness; :scaledValue 1 .

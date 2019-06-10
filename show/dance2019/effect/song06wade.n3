@@ -1,0 +1,26 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song06wade/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song06wade a :Effect; rdfs:label "song06wade"; :publishAttr :strength;
+     :setting effect:song06wade_set1, effect:song06wade_set10, effect:song06wade_set11, effect:song06wade_set12, effect:song06wade_set14, effect:song06wade_set2, effect:song06wade_set3, effect:song06wade_set4, effect:song06wade_set5, effect:song06wade_set6, effect:song06wade_set7, effect:song06wade_set8, effect:song06wade_set9 .
+effect:song06wade_set1 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 1 .
+effect:song06wade_set10 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.522 .
+effect:song06wade_set11 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.485 .
+effect:song06wade_set12 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.438 .
+effect:song06wade_set14 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.273 .
+effect:song06wade_set2 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 1 .
+effect:song06wade_set3 :device dev:cycGreen3; :deviceAttr :brightness; :scaledValue 1 .
+effect:song06wade_set4 :device dev:cycGreen2; :deviceAttr :brightness; :scaledValue 0.989 .
+effect:song06wade_set5 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 1 .
+effect:song06wade_set6 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 1 .
+effect:song06wade_set7 :device dev:cycGreen1; :deviceAttr :brightness; :scaledValue 1 .
+effect:song06wade_set8 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.249 .
+effect:song06wade_set9 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.499 .
