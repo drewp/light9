@@ -46,7 +46,7 @@ show:song3 :note <http://light9.bigasterisk.com/show/dance2019/song3/n0>, <http:
      :point <http://light9.bigasterisk.com/show/dance2019/song3/n3c0p0>, <http://light9.bigasterisk.com/show/dance2019/song3/n3c0p1>, <http://light9.bigasterisk.com/show/dance2019/song3/n3c0p2>, <http://light9.bigasterisk.com/show/dance2019/song3/n3c0p3> .
 <http://light9.bigasterisk.com/show/dance2019/song3/n3c0p0> :time -6.352; :value 0 .
 <http://light9.bigasterisk.com/show/dance2019/song3/n3c0p1> :time -1.986; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song3/n3c0p2> :time 60.115; :value 1 .
-<http://light9.bigasterisk.com/show/dance2019/song3/n3c0p3> :time 63.069; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n3c0p2> :time 58.677; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song3/n3c0p3> :time 62.522; :value 0 .
 <http://light9.bigasterisk.com/show/dance2019/song3/n3set0> :effectAttr :colorScale;
      :value "#969696" .

@@ -1,10 +1,12 @@
 done:
         2
+        3
         4
         6
         7
         10
         12
+        14
         15
 
 song01: real-ish timing
@@ -17,7 +19,6 @@ song02: small tap special? maybe mostly center?
 
 song03: real-ish timing but with dummy look
         also red, maybe red cyc
-    !!! first look completely untested
         ~154 change to new song, more upbeat
 
 song04: real-ish timing, real look

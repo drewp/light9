@@ -1,0 +1,24 @@
+@prefix : <http://light9.bigasterisk.com/> .
+@prefix dev: <http://light9.bigasterisk.com/theater/skyline/device/> .
+@prefix eff: <http://light9.bigasterisk.com/effect/song14/> .
+@prefix effect: <http://light9.bigasterisk.com/effect/> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix show: <http://light9.bigasterisk.com/show/dance2019/> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+effect:song14 a :Effect; rdfs:label "song14"; :publishAttr :strength; :setting eff:set2669279, eff:set2794979, eff:set4101404, eff:set4891191, eff:set5285256, eff:set6939955, effect:song14_set0, effect:song14_set1, effect:song14_set2, effect:song14_set3, effect:song14_set4, effect:song14_set5 .
+eff:set2669279 :device dev:down4; :deviceAttr :brightness; :scaledValue 1 .
+eff:set2794979 :device dev:down3; :deviceAttr :brightness; :scaledValue 1 .
+eff:set4101404 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.752 .
+eff:set4891191 :device dev:down1; :deviceAttr :brightness; :scaledValue 1 .
+eff:set5285256 :device dev:down6; :deviceAttr :brightness; :scaledValue 1 .
+eff:set6939955 :device dev:down2; :deviceAttr :brightness; :scaledValue 1 .
+effect:song14_set0 :device dev:mid_CL_red; :deviceAttr :brightness; :scaledValue 1 .
+effect:song14_set1 :device dev:mid_CR_red; :deviceAttr :brightness; :scaledValue 1 .
+effect:song14_set2 :device dev:mid_L_blue; :deviceAttr :brightness; :scaledValue 0.918 .
+effect:song14_set3 :device dev:mid_C_blue; :deviceAttr :brightness; :scaledValue 0.973 .
+effect:song14_set4 :device dev:down_R_blue; :deviceAttr :brightness; :scaledValue 0.997 .
+effect:song14_set5 :device dev:down_CR_red; :deviceAttr :brightness; :scaledValue 0.929 .
