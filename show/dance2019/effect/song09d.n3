@@ -9,10 +9,30 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:song09d a :Effect; rdfs:label "song09d"; :publishAttr :strength; :setting eff:set17095, eff:set264481, eff:set402270, eff:set4135193, eff:set428404, eff:set8589750 .
-eff:set17095 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set402270 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set4135193 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set428404 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.3 .
-eff:set8589750 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.3 .
+effect:song09d a :Effect; rdfs:label "song09"; :publishAttr :strength; :setting eff:set17095, eff:set264481, eff:set402270, eff:set4135193, eff:set428404, eff:set8589750, effect:song09d_set0, effect:song09d_set1, effect:song09d_set10, effect:song09d_set11, effect:song09d_set12, effect:song09d_set13, effect:song09d_set14, effect:song09d_set15, effect:song09d_set18, effect:song09d_set19, effect:song09d_set2, effect:song09d_set22, effect:song09d_set23, effect:song09d_set3, effect:song09d_set4, effect:song09d_set5, effect:song09d_set6, effect:song09d_set7, effect:song09d_set8, effect:song09d_set9 .
+eff:set17095 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.39 .
+eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.333 .
+eff:set402270 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.437 .
+eff:set4135193 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.299 .
+eff:set428404 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.391 .
+eff:set8589750 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.31 .
+effect:song09d_set0 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 0.756 .
+effect:song09d_set1 :device dev:cycBlue3; :deviceAttr :brightness; :scaledValue 0.772 .
+effect:song09d_set10 :device dev:tree_down_L_high; :deviceAttr :brightness; :scaledValue 0.205 .
+effect:song09d_set11 :device dev:tree_down_L_low; :deviceAttr :brightness; :scaledValue 0.297 .
+effect:song09d_set12 :device dev:par1; :deviceAttr :color; :scaledValue "#2b00ff" .
+effect:song09d_set13 :device dev:par4; :deviceAttr :color; :scaledValue "#ffff27" .
+effect:song09d_set14 :device dev:par7; :deviceAttr :color; :scaledValue "#ffeb35" .
+effect:song09d_set15 :device dev:par3; :deviceAttr :color; :scaledValue "#1900ff" .
+effect:song09d_set18 :device dev:moat_right_red; :deviceAttr :brightness; :scaledValue 0.473 .
+effect:song09d_set19 :device dev:moat_left_up_red; :deviceAttr :brightness; :scaledValue 0.518 .
+effect:song09d_set2 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 0.763 .
+effect:song09d_set22 :device dev:cross_down_L; :deviceAttr :brightness; :scaledValue 0.313 .
+effect:song09d_set23 :device dev:cross_down_R; :deviceAttr :brightness; :scaledValue 0.236 .
+effect:song09d_set3 :device dev:cycBlue2; :deviceAttr :brightness; :scaledValue 0.822 .
+effect:song09d_set4 :device dev:tree_up_R_low; :deviceAttr :brightness; :scaledValue 0.175 .
+effect:song09d_set5 :device dev:tree_up_L_high; :deviceAttr :brightness; :scaledValue 0.283 .
+effect:song09d_set6 :device dev:tree_down_R_low; :deviceAttr :brightness; :scaledValue 0.171 .
+effect:song09d_set7 :device dev:tree_up_R_high; :deviceAttr :brightness; :scaledValue 0.611 .
+effect:song09d_set8 :device dev:tree_up_L_low; :deviceAttr :brightness; :scaledValue 0.14 .
+effect:song09d_set9 :device dev:tree_down_R_high; :deviceAttr :brightness; :scaledValue 0.409 .

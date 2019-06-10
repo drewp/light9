@@ -9,7 +9,7 @@
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 
-effect:song08dummy2 a :Effect; rdfs:label "song08dummy2"; :publishAttr :strength;
+effect:song08dummy2 a :Effect; rdfs:label "song08part2"; :publishAttr :strength;
      :setting eff:set264481, eff:set402270, effect:song08dummy2_set10, effect:song08dummy2_set11, effect:song08dummy2_set12, effect:song08dummy2_set13, effect:song08dummy2_set14, effect:song08dummy2_set16, effect:song08dummy2_set17, effect:song08dummy2_set19, effect:song08dummy2_set20, effect:song08dummy2_set21, effect:song08dummy2_set22, effect:song08dummy2_set23, effect:song08dummy2_set24, effect:song08dummy2_set25, effect:song08dummy2_set26, effect:song08dummy2_set27, effect:song08dummy2_set29, effect:song08dummy2_set30, effect:song08dummy2_set31, effect:song08dummy2_set4, effect:song08dummy2_set5, effect:song08dummy2_set6, effect:song08dummy2_set7, effect:song08dummy2_set8, effect:song08dummy2_set9 .
 eff:set264481 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.881 .
 eff:set402270 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.87 .

@@ -12,18 +12,18 @@
 effect:song11d2 a :Effect; rdfs:label "song11part2"; :publishAttr :strength;
      :setting eff:set1731397, eff:set3273766, eff:set3552374, eff:set4425252, eff:set5921567, eff:set8392520, effect:song11d2_set10, effect:song11d2_set11, effect:song11d2_set2, effect:song11d2_set3, effect:song11d2_set4, effect:song11d2_set5, effect:song11d2_set6, effect:song11d2_set7, effect:song11d2_set8, effect:song11d2_set9 .
 eff:set1731397 :device dev:down4; :deviceAttr :brightness; :scaledValue 0.628 .
-eff:set3273766 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.439 .
+eff:set3273766 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.763 .
 eff:set3552374 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.3 .
 eff:set4425252 :device dev:down2; :deviceAttr :brightness; :scaledValue 0.3 .
 eff:set5921567 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.3 .
 eff:set8392520 :device dev:down3; :deviceAttr :brightness; :scaledValue 0.3 .
-effect:song11d2_set10 :device dev:down_CL_red; :deviceAttr :brightness; :scaledValue 0.693 .
-effect:song11d2_set11 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 0.772 .
+effect:song11d2_set10 :device dev:down_CL_red; :deviceAttr :brightness; :scaledValue 0.79 .
+effect:song11d2_set11 :device dev:down_L_blue; :deviceAttr :brightness; :scaledValue 0.58 .
 effect:song11d2_set2 :device dev:cycBlue1; :deviceAttr :brightness; :scaledValue 0.844 .
 effect:song11d2_set3 :device dev:cycRed2; :deviceAttr :brightness; :scaledValue 1 .
 effect:song11d2_set4 :device dev:cycRed3; :deviceAttr :brightness; :scaledValue 0.636 .
 effect:song11d2_set5 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 1 .
-effect:song11d2_set6 :device dev:cross_down_R; :deviceAttr :brightness; :scaledValue 0.378 .
-effect:song11d2_set7 :device dev:cross_down_L; :deviceAttr :brightness; :scaledValue 0.571 .
+effect:song11d2_set6 :device dev:cross_down_R; :deviceAttr :brightness; :scaledValue 0.209 .
+effect:song11d2_set7 :device dev:cross_down_L; :deviceAttr :brightness; :scaledValue 0.306 .
 effect:song11d2_set8 :device dev:cross_up_L; :deviceAttr :brightness; :scaledValue 0.447 .
 effect:song11d2_set9 :device dev:cross_up_R; :deviceAttr :brightness; :scaledValue 0.742 .

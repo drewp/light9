@@ -11,8 +11,8 @@
 
 effect:song08part1 a :Effect; rdfs:label "song08part1"; :publishAttr :strength;
      :setting eff:set1263146, eff:set1549182, eff:set1855440, eff:set2225014, eff:set2336615, eff:set2365289, eff:set2475209, eff:set2796202, eff:set3158087, eff:set3443153, eff:set4320394, eff:set4797672, eff:set6487600, eff:set6682716, eff:set7188084, eff:set7411466, eff:set7500021, eff:set8640233, eff:set9608704, eff:set9909743, eff:set9911956, eff:set9959813 .
-eff:set1263146 :device dev:down7; :deviceAttr :brightness; :scaledValue 0.254 .
-eff:set1549182 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.254 .
+eff:set1263146 :device dev:down7; :deviceAttr :brightness; :scaledValue 1 .
+eff:set1549182 :device dev:down1; :deviceAttr :brightness; :scaledValue 0.56 .
 eff:set1855440 :device dev:strip2; :deviceAttr :color; :scaledValue "#0b0b0b" .
 eff:set2225014 :device dev:down6; :deviceAttr :brightness; :scaledValue 0.254 .
 eff:set2336615 :device dev:cycBlue4; :deviceAttr :brightness; :scaledValue 1 .

@@ -8,7 +8,7 @@
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
-show:song1 :note <http://light9.bigasterisk.com/show/dance2019/song1/n2>, <http://light9.bigasterisk.com/show/dance2019/song1/n4> .
+show:song1 :note <http://light9.bigasterisk.com/show/dance2019/song1/n2>, <http://light9.bigasterisk.com/show/dance2019/song1/n4>, <http://light9.bigasterisk.com/show/dance2019/song1/n5> .
 
 <http://light9.bigasterisk.com/show/dance2019/song1/n0> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song1/n0c0>;
      :effectClass effect:effect2; :originTime 24.296; :setting <http://light9.bigasterisk.com/show/dance2019/song1/n0set0> .
@@ -63,3 +63,15 @@ show:song1 :note <http://light9.bigasterisk.com/show/dance2019/song1/n2>, <http:
 <http://light9.bigasterisk.com/show/dance2019/song1/n4c0p1> :time -2.805; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song1/n4c0p2> :time 13.245; :value 1 .
 <http://light9.bigasterisk.com/show/dance2019/song1/n4c0p3> :time 15.075; :value 0 .
+
+<http://light9.bigasterisk.com/show/dance2019/song1/n5> a :Note; :curve <http://light9.bigasterisk.com/show/dance2019/song1/n5c0>;
+     :effectClass effect:cyc; :originTime 10.882; :setting <http://light9.bigasterisk.com/show/dance2019/song1/n5set0> .
+
+<http://light9.bigasterisk.com/show/dance2019/song1/n5c0> a :Curve; :attr :strength;
+     :point <http://light9.bigasterisk.com/show/dance2019/song1/n5c0p0>, <http://light9.bigasterisk.com/show/dance2019/song1/n5c0p1>, <http://light9.bigasterisk.com/show/dance2019/song1/n5c0p2>, <http://light9.bigasterisk.com/show/dance2019/song1/n5c0p3> .
+<http://light9.bigasterisk.com/show/dance2019/song1/n5c0p0> :time -5.875; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song1/n5c0p1> :time 5.593; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song1/n5c0p2> :time 155.826; :value 1 .
+<http://light9.bigasterisk.com/show/dance2019/song1/n5c0p3> :time 156.845; :value 0 .
+<http://light9.bigasterisk.com/show/dance2019/song1/n5set0> :effectAttr :colorScale;
+     :value "#ffffff" .
