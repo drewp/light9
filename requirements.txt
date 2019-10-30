@@ -1,4 +1,4 @@
-Pillow==4.0.0
+Pillow==6.2.0
 Twisted==19.2.0
 autobahn==19.5.1
 coloredlogs==6.0
